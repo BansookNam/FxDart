@@ -2,7 +2,7 @@
 slug: fork
 title: fork — FxDart 101
 description: FxDart fork tutorial: branch one buffered iteration of a source into multiple independent readers, with a live playground.
-heading: <code>fork</code>
+heading: <code>fxFork</code>
 section: 6
 crumb: fork
 prev: reverse.html
@@ -21,7 +21,7 @@ nextLabel: tee
     every time you ask for a fresh <code>.iterator</code>. That's wasteful
     (or outright wrong) when producing a value is expensive: a network
     fetch, a slow computation, a stream you can only read once.
-    <code>fork</code> fixes this: every call to <code>fork(iterable)</code>
+    <code>fxFork</code> fixes this: every call to <code>fxFork(iterable)</code>
     with the <em>same</em> <code>iterable</code> object returns an
     independent cursor over one shared, lazily-growing buffer. The
     underlying source is walked exactly once, no matter how many forks read
@@ -34,7 +34,7 @@ nextLabel: tee
     happen to look alike. Each fork can be consumed at its own pace: reading
     ahead on one fork pulls new values from the source and appends them to
     the shared buffer; a fork that's behind just replays values already in
-    the buffer, at no extra cost. <code>forkAsync</code> works the same way
+    the buffer, at no extra cost. <code>fxForkAsync</code> works the same way
     for <code>FxAsyncIterable</code>, and additionally lets concurrent
     downstream demand from multiple forks pull the shared async source in
     parallel.
@@ -61,7 +61,7 @@ nextLabel: tee
   <h2>Try it yourself</h2>
   <p>
     Exercise: right now <code>readings</code> is iterated twice with no
-    <code>fork</code>, so <code>sensor()</code> runs twice and
+    <code>fxFork</code>, so <code>sensor()</code> runs twice and
     <code>reads</code> ends up at 6. Fork <code>readings</code> for each
     consumer so the sensor is only read once (<code>reads</code> should be
     3).
@@ -72,5 +72,5 @@ nextLabel: tee
     <strong>Related:</strong>
     <a href="peek.html"><code>peek</code></a> — observe without branching ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation within one branch ·
-    <a href="memoize.html"><code>memoize</code></a> — cache a single value instead of a whole sequence
+    <a href="memoize.html"><code>fxMemoize</code></a> — cache a single value instead of a whole sequence
   </div>

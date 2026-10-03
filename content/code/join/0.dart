@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // Data-first form: separator comes FIRST, unlike Dart's Iterable.join.
-  print(join(', ', ['a', 'b', 'c'])); // a, b, c
+  print(fxJoin(', ', ['a', 'b', 'c'])); // a, b, c
 
   // Chain form reuses Dart's built-in Iterable.join(separator), whose
   // default separator is '' (empty), not ',':

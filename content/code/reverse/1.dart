@@ -5,7 +5,7 @@ Future<void> main() async {
   // finite async sources — it buffers everything before yielding the first.
   final result = await fx([1, 2, 3, 4])
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 50), a * 10))
+      .map((a) => fxDelay(Duration(milliseconds: 50), a * 10))
       .reverse()
       .toList();
 

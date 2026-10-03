@@ -10,7 +10,7 @@ prevLabel: unicodeToList
 next: toAsync.html
 nextLabel: toAsync
 ---
-  <p class="hero-sub">Currificación totalmente tipada como getters de extensión: el reemplazo nativo de Dart para el <code>curry</code> de FxTS.</p>
+  <p class="hero-sub">Currificación totalmente tipada como getters de extensión: el reemplazo nativo de Dart para el <code>fxCurry</code> de FxTS.</p>
 
   {{signature}}
 
@@ -24,7 +24,7 @@ nextLabel: toAsync
     <code>filter</code>.
   </p>
   <p>
-    FxTS lo ofrece como función, <code>curry(f)</code>, apoyándose en dos cosas
+    FxTS lo ofrece como función, <code>fxCurry(f)</code>, apoyándose en dos cosas
     que Dart no tiene: reflexión de aridad en tiempo de ejecución
     (<code>fn.length</code>) y tipos condicionales recursivos. FxDart, en
     cambio, declara una extensión por aridad (2–5), todas exponiendo el mismo
@@ -41,7 +41,7 @@ nextLabel: toAsync
     coincidente más profunda; aplica una extensión de forma explícita
     (<code>Uncurry2(f).uncurried</code>) para aplanar menos niveles. La
     historia completa del diseño — incluido por qué el getter se llama
-    <code>curried</code> y no <code>curry</code> — está en
+    <code>curried</code> y no <code>fxCurry</code> — está en
     <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>.
   </p>
 
@@ -73,13 +73,13 @@ nextLabel: toAsync
     con nombre y los valores tipados como <code>Function</code> a secas no
     encajan con las extensiones; ahí escribe un closure. Los parámetros
     posicionales opcionales <em>sí</em> encajan, pero en la cadena ese hueco
-    pasa a ser obligatorio. El stub de nivel superior <code>curry</code>, ya
+    pasa a ser obligatorio. El stub de nivel superior <code>fxCurry</code>, ya
     obsoleto, solo sigue ahí para guiar hasta aquí a quien migre desde FxTS.
   </div>
 
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="pipe.html"><code>pipe</code></a> — composición, el principal consumidor de funciones aplicadas parcialmente ·
-    <a href="identity.html"><code>identity</code></a> &amp; <a href="always.html"><code>always</code></a> — otras utilidades sobre la forma de las funciones ·
-    <a href="apply.html"><code>apply</code></a> — despliega una lista en argumentos posicionales
+    <a href="identity.html"><code>fxIdentity</code></a> &amp; <a href="always.html"><code>fxAlways</code></a> — otras utilidades sobre la forma de las funciones ·
+    <a href="apply.html"><code>fxApply</code></a> — despliega una lista en argumentos posicionales
   </div>

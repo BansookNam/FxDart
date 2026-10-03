@@ -39,7 +39,7 @@ nextLabel: using
     bajo <code><a href="concurrent.html">concurrent(n)</a></code> cada
     pull solapado lleva su propio temporizador, así que <em>n</em>
     elementos algo lentos que se solapan siguen pasando individualmente.
-    Combínalo con <code><a href="retry.html">retry</a></code> — timeout
+    Combínalo con <code><a href="retry.html">fxRetry</a></code> — timeout
     convierte «colgarse» en «fallar», y retry convierte «fallar» en
     «inténtalo otra vez».
   </p>
@@ -56,7 +56,7 @@ nextLabel: using
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="retry.html"><code>retry</code></a> — qué hacer después de que salte el timeout ·
+    <a href="retry.html"><code>fxRetry</code></a> — qué hacer después de que salte el timeout ·
     <a href="concurrent.html"><code>concurrent</code></a> — los pulls solapados expiran de forma independiente ·
     <a href="eitherPipelines.html">errores tipados</a> — capturar la <code>TimeoutException</code> como valor
   </div>

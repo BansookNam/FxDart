@@ -27,9 +27,9 @@ String money(num n) => '\$${n.toStringAsFixed(2)}';
 String fmt(Tx t) => '${t.id} ${t.desc} ${money(t.amount)}';
 
 void main() {
-  final added = differenceBy((Tx t) => t.id, before, after);
-  final removed = differenceBy((Tx t) => t.id, after, before);
-  final common = intersectionBy((Tx t) => t.id, before, after);
+  final added = fxDifferenceBy((Tx t) => t.id, before, after);
+  final removed = fxDifferenceBy((Tx t) => t.id, after, before);
+  final common = fxIntersectionBy((Tx t) => t.id, before, after);
 
   final diffLines = fx(added)
       .sortBy((t) => t.id)
@@ -40,7 +40,7 @@ void main() {
       fx(before).sumBy((t) => t.amount);
   final sign = net < 0 ? '-' : '+';
 
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Ledger diff (${before.length} -> ${after.length} entries)',
     ...diffLines,
     '= ${fx(common).size()} unchanged entries',

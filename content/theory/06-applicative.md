@@ -93,7 +93,7 @@ free to look at both and concatenate their failures.
 ## Accumulating, in FxDart
 
 Dart has no `Validated` type; FxDart follows Arrow 2.x and provides an
-accumulating *scope* instead. Inside `either`, ask for one:
+accumulating *scope* instead. Inside `fxEither`, ask for one:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -108,7 +108,7 @@ class User {
 }
 
 Either<Nel<String>, User> parse(String name, String age) =>
-    either((r) => r.zipOrAccumulate2(
+    fxEither((r) => r.zipOrAccumulate2(
           (br) {
             if (name.isEmpty) br.raise('name is empty');
             return name;
@@ -141,7 +141,7 @@ Either<Nel<String>, String> checkout(
   String qty,
   String coupon,
 ) =>
-    either((r) => r.accumulate((acc) {
+    fxEither((r) => r.accumulate((acc) {
           final i = acc.accumulating((br) {
             if (item.isEmpty) br.raise('item required');
             return item;
@@ -187,7 +187,7 @@ independent versus dependent — is this chapter's distinction, made into API.
 
 | You need | Use | Because |
 |---|---|---|
-| Step 2 needs step 1's value | `flatMap` / `either` scope | The dependency is real |
+| Step 2 needs step 1's value | `flatMap` / `fxEither` scope | The dependency is real |
 | Steps are independent, first failure is enough | `map2` | Cheapest, and short-circuits |
 | Steps are independent, report every failure | `zipOrAccumulate` / `accumulate` | Only the applicative shape can |
 | Steps are independent and slow | Applicative + concurrency | Independence is what makes overlap legal |

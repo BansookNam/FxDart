@@ -17,7 +17,7 @@ nextLabel: compact
   <h2>강의</h2>
   <p>
     <code>whereNot</code>은
-    <code>where((a) =&gt; !f(a), iterable)</code>로 구현되어 있습니다 —
+    <code>fxWhere((a) =&gt; !f(a), iterable)</code>로 구현되어 있습니다 —
     오로지 가독성을 위해 존재합니다. <code>list.whereNot(isInvalid)</code>가
     <code>list.where((a) =&gt; !isInvalid(a))</code>보다 훨씬 자연스럽게 읽히고,
     술어에 이미 긍정형의 분명한 이름이 붙어 있다면 더욱 그렇습니다.
@@ -28,7 +28,7 @@ nextLabel: compact
   </p>
   <p>
     <code>where</code>의 동작은 그대로 이어집니다. 지연 평가되고, 비동기
-    형태는 <code>whereAsync</code>의 전용 동시성 경로를 물려받으므로
+    형태는 <code>fxWhereAsync</code>의 전용 동시성 경로를 물려받으므로
     <code>.concurrent(n)</code>은 실제로 술어 <code>n</code>개를 병렬로
     평가하면서도 결과는 원래 순서대로 반환합니다.
   </p>
@@ -47,7 +47,7 @@ nextLabel: compact
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="filter.html"><code>filter</code></a> — reject가 위임하는 함수 ·
-    <a href="compact.html"><code>compact</code></a> — null만 콕 집어 제거 ·
+    <a href="compact.html"><code>fxCompact</code></a> — null만 콕 집어 제거 ·
     <a href="uniq.html"><code>uniq</code></a> — 중복 제거 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>

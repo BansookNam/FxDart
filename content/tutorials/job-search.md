@@ -22,7 +22,7 @@ nextLabel: bounded concurrent fetch
     a slow "da" can overwrite a fast "dart". That is a
     <em>push</em> job:
     <code><a href="fxEvents.html">fxEvents</a></code> +
-    <code><a href="debounce.html">debounce</a></code> +
+    <code><a href="debounce.html">fxDebounce</a></code> +
     <code><a href="switchMap.html">switchMap</a></code>.
   </p>
   <p>
@@ -67,7 +67,7 @@ nextLabel: bounded concurrent fetch
     <strong>Related:</strong>
     <a href="whichSurface.html">which surface</a> — why this is push ·
     <a href="fxEvents.html"><code>fxEvents</code></a> ·
-    <a href="debounce.html"><code>debounce</code></a> ·
+    <a href="debounce.html"><code>fxDebounce</code></a> ·
     <a href="switchMap.html"><code>switchMap</code></a> ·
     <a href="mapEither.html"><code>mapEither</code></a> ·
     <a href="job-fetch.html">bounded concurrent fetch</a> — the I/O job ·

@@ -3,12 +3,16 @@
 ///
 /// - **Sync** operators work on plain [Iterable]s and stay lazy.
 /// - **Async** operators work on [FxAsyncIterable] — a pull-based async
-///   protocol with a concurrency back-channel (`concurrentAsync`), which
-///   Dart Streams cannot express. Bridge with `toAsync`, `fromStream`,
+///   protocol with a concurrency back-channel (`fxConcurrentAsync`), which
+///   Dart Streams cannot express. Bridge with `toAsync`, `fxFromStream`,
 ///   and `toStream()`.
 /// - **Pipelines**: use the typed `fx()` chain; the dynamic `pipe` exists
 ///   for FxTS parity but loses static types (Dart has no variadic
 ///   generics/overloads).
+/// - **Naming**: a short top-level function carries an `fx` prefix
+///   (`fxMap`, `fxRange`, `fxGroupBy`) so it cannot collide with
+///   `dart:math`, `dart:io` or other packages; chain methods use the plain
+///   FxTS names (`fx(xs).map(f)`).
 library;
 
 export 'src/async_iterable.dart'
@@ -18,14 +22,14 @@ export 'src/async_iterable.dart'
         FxAsyncIterable,
         FxAsyncIterator,
         FxAsyncIterableToStream,
-        asyncEmpty,
-        toAsync,
-        fromStream,
+        fxAsyncEmpty,
+        fxToAsync,
+        fxFromStream,
         fromStreamLatest,
         fromStreamChunked,
         fromStreamNext,
-        concurrentAsync,
-        concurrentPoolAsync;
+        fxConcurrentAsync,
+        fxConcurrentPoolAsync;
 export 'src/config.dart' show FxDart, FxConfig;
 export 'src/fx.dart'
     show
@@ -82,16 +86,16 @@ export 'src/typed/fx_either.dart'
         FxEitherOps,
         flattenOrAccumulate,
         flattenOrAccumulateAsync,
-        lefts,
-        leftsAsync,
+        fxLefts,
+        fxLeftsAsync,
         mapOrAccumulate,
         mapOrAccumulateAsync,
-        rights,
-        rightsAsync,
-        separateEither,
-        separateEitherAsync,
-        sequenceEither,
-        sequenceEitherAsync;
+        fxRights,
+        fxRightsAsync,
+        fxSeparateEither,
+        fxSeparateEitherAsync,
+        fxSequenceEither,
+        fxSequenceEitherAsync;
 export 'src/typed/non_empty_list.dart' show IterableToNel, Nel, NonEmptyList;
 export 'src/typed/raise.dart'
     show
@@ -99,15 +103,15 @@ export 'src/typed/raise.dart'
         RaiseLeakedError,
         RaiseOps,
         SingletonRaise,
-        catching,
-        catchingAsync,
-        either,
-        eitherAsync,
-        eitherCatching,
-        eitherCatchingAsync,
-        foldRaise,
-        foldRaiseAsync,
-        nullable,
-        nullableAsync;
+        fxCatching,
+        fxCatchingAsync,
+        fxEither,
+        fxEitherAsync,
+        fxEitherCatching,
+        fxEitherCatchingAsync,
+        fxFoldRaise,
+        fxFoldRaiseAsync,
+        fxNullable,
+        fxNullableAsync;
 export 'src/util/shuffle.dart';
 export 'src/util/timing.dart';

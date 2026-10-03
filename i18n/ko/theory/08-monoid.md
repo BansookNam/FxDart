@@ -17,11 +17,11 @@ description: 결합적인 결합 연산에 항등원 하나 — 쓸모 있는 �
 
 **반군(semigroup)** 은 결합적인 이항 연산을 가진 타입입니다.
 
-`combine(a, combine(b, c)) == combine(combine(a, b), c)`
+`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
 
 **모노이드(monoid)** 는 항등원을 가진 반군입니다.
 
-`combine(empty, a) == a == combine(a, empty)`
+`fxCombine(empty, a) == a == fxCombine(a, empty)`
 
 그게 전부입니다. `+`와 `0`을 가진 `int`, `*`와 `1`을 가진 `int`, `+`와 `''`를
 가진 `String`, `+`와 `[]`를 가진 `List`, `&&`와 `true`를 가진 `bool`. 오늘도
@@ -163,7 +163,7 @@ void main() {
 > `(A, B)`도 모노이드입니다. 성분별로 결합하고 `(emptyA, emptyB)`가 항등원이죠 —
 > 그래서 "합계, 개수, 최댓값을 한 번에"는 곱 모노이드에 대한 fold 하나이고,
 > 평균은 그 fold에 나눗셈 하나입니다. 모노이드로 가는 함수들도 모노이드를
-> 이루고(`(f + g)(x) = f(x) + g(x)`), 자기함수들은 합성 아래 `identity`를 단위원
+> 이루고(`(f + g)(x) = f(x) + g(x)`), 자기함수들은 합성 아래 `fxIdentity`를 단위원
 > 삼아 모노이드를 이룹니다 — "모나드는 자기함자 범주 위의 모노이드다"라는 문장
 > 안에 숨은 말이 이것입니다. `flatten`이 결합이고 `of`가 항등원이며, 1장의 세
 > 모나드 법칙이 이 두 법칙을 변장시킨 것입니다.

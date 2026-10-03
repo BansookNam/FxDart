@@ -1,8 +1,8 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final fetchUser = memoize<int, Future<String>>(
-      (id) => delay(Duration(milliseconds: 150), 'user$id'));
+  final fetchUser = fxMemoize<int, Future<String>>(
+      (id) => fxDelay(Duration(milliseconds: 150), 'user$id'));
 
   final sw = Stopwatch()..start();
   print(await fetchUser(1)); // user1, ~150ms

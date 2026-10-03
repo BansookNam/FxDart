@@ -14,10 +14,10 @@ import 'map.dart';
 /// `retry(3, () => fxAsync(source()).map(parse).toList())`.
 ///
 /// ```dart
-/// final user = await retry(3, () => api.fetchUser(id),
+/// final user = await fxRetry(3, () => api.fetchUser(id),
 ///     delay: (failed) => Duration(milliseconds: 100 * failed));
 /// ```
-Future<T> retry<T>(
+Future<T> fxRetry<T>(
   int attempts,
   FutureOr<T> Function() f, {
   Duration Function(int failed)? delay,
@@ -43,27 +43,30 @@ void _checkAttempts(int attempts) {
 }
 
 /// Lazily maps each value with [f], retrying each call up to [attempts]
-/// times (see [retry]) before letting the error propagate. Parallel-safe:
+/// times (see [fxRetry]) before letting the error propagate. Parallel-safe:
 /// composes with `concurrent`, and each in-flight value retries
 /// independently.
 ///
-/// fxdart extension (not part of FxTS) — the per-element form of [retry].
+/// fxdart extension (not part of FxTS) — the per-element form of [fxRetry].
 ///
 /// ```dart
-/// await fxAsync(toAsync(urls))
+/// await fxAsync(fxToAsync(urls))
 ///     .mapRetry(3, fetch, delay: (failed) => Duration(seconds: failed))
 ///     .concurrent(5)
 ///     .toList();
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<R> mapRetryAsync<A, R>(
+FxAsyncIterable<R> fxMapRetryAsync<A, R>(
   int attempts,
   FutureOr<R> Function(A a) f,
   FxAsyncIterable<A> iterable, {
   Duration Function(int failed)? delay,
 }) {
   _checkAttempts(attempts);
-  return mapAsync((A a) => retry(attempts, () => f(a), delay: delay), iterable);
+  return fxMapAsync(
+    (A a) => fxRetry(attempts, () => f(a), delay: delay),
+    iterable,
+  );
 }
 
 /// Lazily maps each value with [f], handing any error [f] throws to
@@ -71,33 +74,33 @@ FxAsyncIterable<R> mapRetryAsync<A, R>(
 /// failure never ends the iteration.
 ///
 /// The library's own raise signal is **rethrown, not recovered**: this
-/// delegates to [catching], so a `r.raise(...)` crossing [f] — from a
+/// delegates to [fxCatching], so a `r.raise(...)` crossing [f] — from a
 /// `bind`, an `ensure`, or a nested builder — still short-circuits the
 /// enclosing `either {}` / `nullable {}` block. Recovering it here would
 /// turn a typed error into a lost one, and leak a raise out of its scope.
 ///
-/// fxdart extension (not part of FxTS) — the per-element form of [catching],
-/// the pair [retry]/[mapRetryAsync] already establishes. RxDart writes this
+/// fxdart extension (not part of FxTS) — the per-element form of [fxCatching],
+/// the pair [fxRetry]/[fxMapRetryAsync] already establishes. RxDart writes this
 /// as `onErrorReturnWith` in the same position.
 ///
 /// ```dart
 /// fx(ids).mapCatching(parse, (e, _) => Reading.invalid(e)).toList();
 /// ```
-Iterable<R> mapCatching<A, R>(
+Iterable<R> fxMapCatching<A, R>(
   R Function(A a) f,
   R Function(Object error, StackTrace stackTrace) onError,
   Iterable<A> iterable,
-) => map((A a) => catching(() => f(a), onError), iterable);
+) => fxMap((A a) => fxCatching(() => f(a), onError), iterable);
 
-/// Async counterpart of [mapCatching]; [f] and [onError] may each return a
-/// [Future], and the raise signal is rethrown by [catchingAsync] for the
+/// Async counterpart of [fxMapCatching]; [f] and [onError] may each return a
+/// [Future], and the raise signal is rethrown by [fxCatchingAsync] for the
 /// same reason.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<R> mapCatchingAsync<A, R>(
+FxAsyncIterable<R> fxMapCatchingAsync<A, R>(
   FutureOr<R> Function(A a) f,
   FutureOr<R> Function(Object error, StackTrace stackTrace) onError,
   FxAsyncIterable<A> iterable,
-) => mapAsync((A a) => catchingAsync(() => f(a), onError), iterable);
+) => fxMapAsync((A a) => fxCatchingAsync(() => f(a), onError), iterable);
 
 /// Fails a pull with a [TimeoutException] when the upstream takes longer
 /// than [limit] to produce it. The limit applies to each pull (the time to
@@ -108,13 +111,13 @@ FxAsyncIterable<R> mapCatchingAsync<A, R>(
 /// measuring demand-to-item time, the pull-model analog.
 ///
 /// ```dart
-/// await fxAsync(toAsync(urls))
+/// await fxAsync(fxToAsync(urls))
 ///     .map(fetch)
 ///     .timeout(Duration(seconds: 2))
 ///     .toList(); // throws TimeoutException if any fetch stalls
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> timeoutAsync<A>(
+FxAsyncIterable<A> fxTimeoutAsync<A>(
   Duration limit,
   FxAsyncIterable<A> iterable,
 ) {
@@ -158,13 +161,13 @@ class _TimeoutAsyncIterator<A> implements FxFastIterator<A>, StreamPullCancel {
 /// of breaking — or manage the resource with `try`/`finally` yourself.
 ///
 /// ```dart
-/// final lines = using(
+/// final lines = fxUsing(
 ///   () => File('data.txt').openSync(),
 ///   (file) => readLines(file),
 ///   (file) => file.closeSync(),
 /// );
 /// ```
-Iterable<T> using<R, T>(
+Iterable<T> fxUsing<R, T>(
   R Function() acquire,
   Iterable<T> Function(R resource) use,
   void Function(R resource) release,
@@ -222,13 +225,13 @@ class _UsingIterator<R, T> implements Iterator<T> {
   }
 }
 
-/// Async counterpart of [using]: [acquire] and [release] may be
+/// Async counterpart of [fxUsing]: [acquire] and [release] may be
 /// asynchronous, and the elements come from an [FxAsyncIterable].
 /// [release] runs exactly once — after the terminal pull, or before the
 /// error propagates when a pull fails (including a failing [use]).
-/// The same abandonment caveat as [using] applies.
+/// The same abandonment caveat as [fxUsing] applies.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> usingAsync<R, T>(
+FxAsyncIterable<T> fxUsingAsync<R, T>(
   FutureOr<R> Function() acquire,
   FxAsyncIterable<T> Function(R resource) use,
   FutureOr<void> Function(R resource) release,
@@ -238,7 +241,7 @@ FxAsyncIterable<T> usingAsync<R, T>(
   );
 }
 
-/// The [usingAsync] iterator. Public `next` stays a pass-through (as
+/// The [fxUsingAsync] iterator. Public `next` stays a pass-through (as
 /// before); the fast-pull path serves synchronously answered inner pulls
 /// without futures, releasing exactly once on completion or error.
 class _UsingAsyncIterator<R, T> implements FxFastIterator<T>, StreamPullCancel {

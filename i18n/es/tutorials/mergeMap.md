@@ -70,5 +70,5 @@ nextLabel: switchLatest
     <strong>Relacionado:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — la cuarta política: gana el más nuevo, el resto se cancela ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — abanico acotado del lado pull, donde los resultados mantienen el orden ·
-    <a href="debounce.html"><code>debounce</code></a> — a menudo la mejor solución: corta los eventos de más antes de que se conviertan en streams internos
+    <a href="debounce.html"><code>fxDebounce</code></a> — a menudo la mejor solución: corta los eventos de más antes de que se conviertan en streams internos
   </div>

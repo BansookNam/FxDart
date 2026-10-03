@@ -2,7 +2,7 @@
 slug: compress
 title: compress — FxDart 101
 description: FxDart compress 튜토리얼: 이터러블을 나란히 놓인 불리언 리스트로 걸러 내는 방법을 라이브 플레이그라운드와 함께 익힙니다.
-heading: <code>compress</code>
+heading: <code>fxCompress</code>
 section: 4
 crumb: compress
 prev: intersectionBy.html
@@ -16,10 +16,10 @@ nextLabel: take
 
   <h2>강의</h2>
   <p>
-    <code>compress</code>는 위치 기반 마스크입니다. <code>i</code>번 위치의
+    <code>fxCompress</code>는 위치 기반 마스크입니다. <code>i</code>번 위치의
     <code>iterable</code> 원소는 <code>selectors[i]</code>가 <code>true</code>일
     때만 살아남습니다. 이미 알고 있는 두 함수만으로 그대로 만들어져 있습니다 —
-    <code>map((r) =&gt; r.$2, filter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
     마스크와 데이터를 zip한 뒤 true인 쌍만 걸러 내고 값을 꺼내는 식입니다.
     그래서 길이가 어긋날 때의 동작도 <code>zip</code>에서 그대로 물려받습니다.
     <em>더 짧은</em> 쪽, 그러니까 <code>selectors</code>와 <code>iterable</code>
@@ -41,7 +41,7 @@ nextLabel: take
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>compress</code>로 정답만 남겨
+  <p>연습: <code>fxCompress</code>로 정답만 남겨
     보세요.</p>
   {{playground:2}}
 

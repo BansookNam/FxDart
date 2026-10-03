@@ -1,9 +1,9 @@
-bool isNull(Object? a)
+bool fxIsNull(Object? a)
 bool isNotNull(Object? a)
-bool isNil(Object? a)       // == isNull; Dart has no separate `undefined`
-bool isBool(Object? a)
-bool isNum(Object? a)
-bool isString(Object? a)
+bool fxIsNil(Object? a)       // == isNull; Dart has no separate `undefined`
+bool fxIsBool(Object? a)
+bool fxIsNum(Object? a)
+bool fxIsString(Object? a)
 bool isDateTime(Object? a)
-bool isList(Object? a)
-bool isMap(Object? a)
+bool fxIsList(Object? a)
+bool fxIsMap(Object? a)

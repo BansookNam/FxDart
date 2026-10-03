@@ -23,7 +23,7 @@ nextLabel: concat
     no shifting indices, just one extra value ahead of the rest.
   </p>
   <p>
-    <code>prependAsync</code> accepts a <code>Future</code> for <code>a</code>
+    <code>fxPrependAsync</code> accepts a <code>Future</code> for <code>a</code>
     as well; it's awaited first, before the first pull reaches the
     underlying source.
   </p>

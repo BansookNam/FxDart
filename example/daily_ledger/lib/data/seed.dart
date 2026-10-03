@@ -1,6 +1,6 @@
 /// Deterministic demo fixtures, generated with fxdart:
-/// `createSeededRandom` for reproducible randomness, `range` + `flatMap`
-/// to lay entries out over ~6 months, `shuffle(seed:)` for stable variety.
+/// `createSeededRandom` for reproducible randomness, `fxRange` + `flatMap`
+/// to lay entries out over ~6 months, `fxShuffle(seed:)` for stable variety.
 library;
 
 import 'package:fxdart/fxdart.dart';
@@ -154,7 +154,7 @@ List<Entry> seedEntries(DateTime today) {
       titles[(rand() * titles.length).floor()];
 
   // Daily spending & tasks, laid out over the past 180 days with flatMap.
-  final daily = fx(range(0, 180)).flatMap((back) {
+  final daily = fx(fxRange(0, 180)).flatMap((back) {
     final day = DateTime(day0.year, day0.month, day0.day - back);
     final isWeekend = day.weekday >= DateTime.saturday;
     return [
@@ -217,7 +217,7 @@ List<Entry> seedEntries(DateTime today) {
   });
 
   // Monthly fixtures: salary, rent, utilities — one bundle per month.
-  final monthly = fx(range(0, 7)).flatMap((m) {
+  final monthly = fx(fxRange(0, 7)).flatMap((m) {
     final month = DateTime(day0.year, day0.month - m, 1);
     bool isPast(int d) => DateTime(month.year, month.month, d).isBefore(day0);
     return [
@@ -301,5 +301,5 @@ List<Entry> seedEntries(DateTime today) {
 
   // A seeded shuffle keeps insertion order arbitrary-but-stable, proving the
   // pipelines never rely on storage order.
-  return shuffle(daily.concat(monthly).concat(upcoming), seedValue);
+  return fxShuffle(daily.concat(monthly).concat(upcoming), seedValue);
 }

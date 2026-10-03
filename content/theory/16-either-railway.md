@@ -102,7 +102,7 @@ Either<RangeError2, int> inStock(int n) =>
 
 void main() {
   // mapLeft lifts both into the pipeline's own error type.
-  Either<OrderError, int> order(String raw) => either((r) {
+  Either<OrderError, int> order(String raw) => fxEither((r) {
         final n = r.bind(
             parse(raw).mapLeft((e) => BadInput('$e')));
         final ok = r.bind(
@@ -183,7 +183,7 @@ void main() {
   print(fx(rows).map(parseRow).sequence());
 
   // Everything that failed, and everything that did not.
-  final (errors, values) = separateEither(rows.map(parseRow));
+  final (errors, values) = fxSeparateEither(rows.map(parseRow));
   print('imported ${values.length}, rejected: $errors');
 
   // Keep going, but report every reason at the end.
@@ -225,7 +225,7 @@ built by interpolation is a stringly-typed exception with extra steps.
 3. You have `Either<A, T>` from one module and `Either<B, T>` from another, and
    the caller wants `Either<C, T>`. Sketch the three `mapLeft` calls and say
    where in a layered application they belong.
-4. `separateEither` returns `(errors, values)`. Why that order, and what
+4. `fxSeparateEither` returns `(errors, values)`. Why that order, and what
    consequence does the choice have for reading code at a glance?
 
 ## Solutions

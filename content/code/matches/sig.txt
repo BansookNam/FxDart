@@ -1,1 +1,1 @@
-bool Function(Object? target) matches(Object? pattern)
+bool Function(Object? target) fxMatches(Object? pattern)

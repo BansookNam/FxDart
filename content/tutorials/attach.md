@@ -28,7 +28,7 @@ nextLabel: filter
     pair keeps the item next to the (maybe missing) price, so the fallback
     <code>r.$2&nbsp;??&nbsp;r.$1.listPrice</code> and the "which SKU was
     that?" label are both still in reach. The async form is built on
-    <code>mapAsync</code>, so it is parallel-safe — put
+    <code>fxMapAsync</code>, so it is parallel-safe — put
     <code><a href="concurrent.html">concurrent(n)</a></code> after it and
     <em>n</em> lookups run at once.
   </p>

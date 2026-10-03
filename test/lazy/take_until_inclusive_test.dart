@@ -20,12 +20,12 @@ void main() {
           }
           expect(res, equals([1, 2]));
 
-          final res1 = toList(
+          final res1 = fxToList(
             takeUntilInclusive((a) => a % 2 == 0, [1, 2, 3, 4]),
           );
           expect(res1, equals([1, 2]));
 
-          final res2 = toList(takeUntilInclusive((a) => a > 5, [1, 2, 3, 4]));
+          final res2 = fxToList(takeUntilInclusive((a) => a > 5, [1, 2, 3, 4]));
           expect(res2, equals([1, 2, 3, 4]));
         },
       );
@@ -34,10 +34,10 @@ void main() {
         final res = pipe(
           [1, 2, 3, 4],
           [
-            (v) => map((int a) => a + 10, v),
-            (v) => filter((int a) => a % 2 == 0, v),
+            (v) => fxMap((int a) => a + 10, v),
+            (v) => fxFilter((int a) => a % 2 == 0, v),
             (v) => takeUntilInclusive((int a) => a > 12, v),
-            (v) => toList(v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -62,7 +62,7 @@ void main() {
           final res = <int>[];
           final it = takeUntilInclusiveAsync(
             (a) => a % 2 == 0,
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).iterator;
           while (true) {
             final r = await it.next();
@@ -71,13 +71,13 @@ void main() {
           }
           expect(res, equals([1, 2]));
 
-          final res1 = await toListAsync(
-            takeUntilInclusiveAsync((a) => a % 2 == 0, toAsync([1, 2, 3, 4])),
+          final res1 = await fxToListAsync(
+            takeUntilInclusiveAsync((a) => a % 2 == 0, fxToAsync([1, 2, 3, 4])),
           );
           expect(res1, equals([1, 2]));
 
-          final res2 = await toListAsync(
-            takeUntilInclusiveAsync((a) => a > 5, toAsync([1, 2, 3, 4])),
+          final res2 = await fxToListAsync(
+            takeUntilInclusiveAsync((a) => a > 5, fxToAsync([1, 2, 3, 4])),
           );
           expect(res2, equals([1, 2, 3, 4]));
         },
@@ -86,23 +86,26 @@ void main() {
       test(
         'should be able to take the element until the async callback result is truthy',
         () async {
-          final res1 = await toListAsync(
+          final res1 = await fxToListAsync(
             takeUntilInclusiveAsync(
               (a) async => a % 2 == 0,
-              toAsync([1, 2, 3, 4]),
+              fxToAsync([1, 2, 3, 4]),
             ),
           );
           expect(res1, equals([1, 2]));
 
-          final res2 = await toListAsync(
-            takeUntilInclusiveAsync((a) async => a > 5, toAsync([1, 2, 3, 4])),
+          final res2 = await fxToListAsync(
+            takeUntilInclusiveAsync(
+              (a) async => a > 5,
+              fxToAsync([1, 2, 3, 4]),
+            ),
           );
           expect(res2, equals([1, 2, 3, 4]));
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await fxAsync(toAsync([1, 2, 3, 4]))
+        final res = await fxAsync(fxToAsync([1, 2, 3, 4]))
             .map((a) => a + 10)
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 12)
@@ -114,7 +117,7 @@ void main() {
       test(
         'should be able to be used as a chaining method in the `fx`',
         () async {
-          final res = await fxAsync(toAsync([1, 2, 3, 4]))
+          final res = await fxAsync(fxToAsync([1, 2, 3, 4]))
               .map((a) => a + 10)
               .filter((a) => a % 2 == 0)
               .takeUntilInclusive((a) => a > 12)
@@ -128,9 +131,9 @@ void main() {
         'should be able to take the element (lazily pulls the source)',
         () async {
           var peeked = 0;
-          final res = await fxAsync(toAsync([3, 3, 1, 0, 0]))
+          final res = await fxAsync(fxToAsync([3, 3, 1, 0, 0]))
               .peek((a) => peeked++)
-              .map((a) => delay(const Duration(milliseconds: 50), a))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a))
               .takeUntilInclusive((a) => a < 3)
               .toList();
 
@@ -143,7 +146,7 @@ void main() {
         'should be able to take the element until the callback result is truthy concurrently',
         () async {
           final res = await fxAsync(
-            toAsync(range(1, 20)),
+            fxToAsync(fxRange(1, 20)),
           ).takeUntilInclusive((a) => a > 12).concurrent(4).toList();
 
           expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]));
@@ -153,8 +156,8 @@ void main() {
       test(
         "should be consumed 'AsyncIterable' as many times as called with 'next'",
         () async {
-          final res = fxAsync(toAsync(range(1, 500)))
-              .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+          final res = fxAsync(fxToAsync(fxRange(1, 500)))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
               .takeUntilInclusive((a) => a > 14)
               .concurrent(2);
 
@@ -175,8 +178,8 @@ void main() {
       );
 
       test('should be consumed concurrently', () async {
-        final res = await fxAsync(toAsync(range(1, 500)))
-            .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+        final res = await fxAsync(fxToAsync(fxRange(1, 500)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
             .filter((a) => a % 2 == 0)
             .takeUntilInclusive((a) => a > 20)
             .concurrent(2)
@@ -186,8 +189,8 @@ void main() {
 
       test('should be able to handle an error when asynchronous', () async {
         await expectLater(
-          fxAsync(toAsync(naturals()))
-              .map((a) => delay(const Duration(milliseconds: 20), a + 10))
+          fxAsync(fxToAsync(naturals()))
+              .map((a) => fxDelay(const Duration(milliseconds: 20), a + 10))
               .filter((a) => a % 2 == 0)
               .takeUntilInclusive((a) {
                 if (a > 15) throw Exception('err');
@@ -201,19 +204,19 @@ void main() {
 
       test('should be controlled the order when concurrency', () async {
         Iterable<Future<int>> source() sync* {
-          yield delay(const Duration(milliseconds: 100), 1);
-          yield delay(const Duration(milliseconds: 80), 2);
-          yield delay(const Duration(milliseconds: 60), 3);
-          yield delay(const Duration(milliseconds: 40), 4);
-          yield delay(const Duration(milliseconds: 20), 5);
-          yield delay(const Duration(milliseconds: 100), 6);
-          yield delay(const Duration(milliseconds: 80), 7);
-          yield delay(const Duration(milliseconds: 60), 8);
-          yield delay(const Duration(milliseconds: 40), 9);
+          yield fxDelay(const Duration(milliseconds: 100), 1);
+          yield fxDelay(const Duration(milliseconds: 80), 2);
+          yield fxDelay(const Duration(milliseconds: 60), 3);
+          yield fxDelay(const Duration(milliseconds: 40), 4);
+          yield fxDelay(const Duration(milliseconds: 20), 5);
+          yield fxDelay(const Duration(milliseconds: 100), 6);
+          yield fxDelay(const Duration(milliseconds: 80), 7);
+          yield fxDelay(const Duration(milliseconds: 60), 8);
+          yield fxDelay(const Duration(milliseconds: 40), 9);
         }
 
         final res = await fxAsync(
-          toAsync(source()),
+          fxToAsync(source()),
         ).takeUntilInclusive((a) => a > 8).concurrent(5).toList();
         expect(res, equals([1, 2, 3, 4, 5, 6, 7, 8, 9]));
       });

@@ -50,8 +50,8 @@ nextLabel: curried &amp; uncurried
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="split.html"><code>split</code></a> — divide con un iterable de caracteres normal ·
+    <a href="split.html"><code>fxSplit</code></a> — divide con un iterable de caracteres normal ·
     <a href="reverse.html"><code>reverse</code></a> — invierte un Iterable; con cadenas hay que cuidar igual los pares subrogados ·
     <a href="countBy.html"><code>countBy</code></a> — usado arriba para contabilizar caracteres ·
-    <a href="identity.html"><code>identity</code></a> — usado arriba como clave de conteo
+    <a href="identity.html"><code>fxIdentity</code></a> — usado arriba como clave de conteo
   </div>

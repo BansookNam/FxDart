@@ -33,9 +33,9 @@ nextLabel: uniqAdjacent
   </p>
   <p>
     대가는 하류에서 일을 중간에 끊을 수 없다는 것입니다.
-    <code>distinct(xs).take(3)</code>은 서로 다른 값 3개가 나오는 순간
+    <code>fxDistinct(xs).take(3)</code>은 서로 다른 값 3개가 나오는 순간
     <code>xs</code>를 그만 당깁니다. 반면
-    <code>uniqStrict(xs).take(3)</code>은 <code>xs</code> 전체를 먼저 중복
+    <code>fxUniqStrict(xs).take(3)</code>은 <code>xs</code> 전체를 먼저 중복
     제거한 다음 3개를 가져갑니다. 즉시 실행 버전을 조기 종료하는 소비자 앞에
     두지 마세요. 무한 이터러블에는 절대 쓰지 마세요 — 끝나지 않습니다.
   </p>

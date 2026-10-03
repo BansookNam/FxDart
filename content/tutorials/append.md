@@ -25,7 +25,7 @@ nextLabel: prepend
   </p>
   <p>
     On the async side, <code>a</code> itself may be a <code>Future</code> —
-    <code>appendAsync</code> awaits it only once the upstream is done, so a
+    <code>fxAppendAsync</code> awaits it only once the upstream is done, so a
     slow "closing" value doesn't hold anything up early.
   </p>
 

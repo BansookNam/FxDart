@@ -28,7 +28,7 @@ nextLabel: predicates
     동기 체인의 <code>.any(f)</code>는 Dart의 <code>Iterable</code>에서
     그대로 온 것이라 — <code>Fx</code>가 상속합니다 — 따로 정의할 필요가
     없습니다. 비동기 체인과 data-first 형태의
-    <code>any(f, iterable)</code>는 fxdart가 제공하며, FxTS식 표기인
+    <code>fxAny(f, iterable)</code>는 fxdart가 제공하며, FxTS식 표기인
     <code>some</code>도 모든 자리에서 그대로 동작합니다.
   </p>
 
@@ -45,7 +45,7 @@ nextLabel: predicates
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="every.html"><code>every</code></a> — "전부 만족하는가"에 대응하는 짝 ·
-    <a href="includes.html"><code>includes</code></a> — <code>any</code>의 특수화된 형태 ·
+    <a href="includes.html"><code>fxIncludes</code></a> — <code>any</code>의 특수화된 형태 ·
     <a href="find.html"><code>find</code></a> — bool이 아니라 일치하는 원소 자체를 얻기 ·
     <a href="predicates.html"><code>predicates</code></a> — <code>any</code>와 함께 쓰기 좋은 미리 만들어진 술어들
   </div>

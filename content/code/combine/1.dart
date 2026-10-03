@@ -18,7 +18,7 @@ Future<void> main() async {
   final src = timed([(0, 1), (80, 2), (160, 3)], 220);
   final other = timed([(40, 10), (120, 20)], 220);
 
-  final out = await combine([
+  final out = await fxCombine([
     CombineSpec(src),
     CombineSpec(other, causesEmit: false),
   ]).toList();

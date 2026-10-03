@@ -15,7 +15,7 @@ int _recover(Object error, StackTrace stackTrace) => -1;
 void main() {
   group('mapCatching', () {
     test('yields the handler result in place of a thrown error', () {
-      expect(mapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(), [
+      expect(fxMapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(), [
         10,
         -1,
         30,
@@ -23,7 +23,7 @@ void main() {
     });
 
     test('does not end the iteration at the first failure', () {
-      expect(mapCatching(_explodeOnTwo, _recover, [2, 2, 2]).toList(), [
+      expect(fxMapCatching(_explodeOnTwo, _recover, [2, 2, 2]).toList(), [
         -1,
         -1,
         -1,
@@ -33,7 +33,7 @@ void main() {
     test('hands the error and its stack trace to the handler', () {
       Object? seenError;
       StackTrace? seenTrace;
-      mapCatching(_explodeOnTwo, (error, stackTrace) {
+      fxMapCatching(_explodeOnTwo, (error, stackTrace) {
         seenError = error;
         seenTrace = stackTrace;
         return 0;
@@ -44,7 +44,7 @@ void main() {
 
     test('is lazy — nothing runs before iteration', () {
       var calls = 0;
-      final mapped = mapCatching(
+      final mapped = fxMapCatching(
         (int a) {
           calls++;
           return a;
@@ -58,12 +58,12 @@ void main() {
     });
 
     test('an empty source yields nothing', () {
-      expect(mapCatching(_explodeOnTwo, _recover, <int>[]).toList(), <int>[]);
+      expect(fxMapCatching(_explodeOnTwo, _recover, <int>[]).toList(), <int>[]);
     });
 
     test('rethrows a raise signal instead of recovering it', () {
-      final result = either<String, List<int>>(
-        (r) => mapCatching(
+      final result = fxEither<String, List<int>>(
+        (r) => fxMapCatching(
           (int a) => a == 2 ? r.raise('raised') : a,
           _recover,
           [1, 2, 3],
@@ -73,9 +73,9 @@ void main() {
     });
 
     test('a raise from a foreign scope is not recovered either', () {
-      final outer = either<String, int>((ro) {
-        final inner = either<int, List<int>>(
-          (ri) => mapCatching(
+      final outer = fxEither<String, int>((ro) {
+        final inner = fxEither<int, List<int>>(
+          (ri) => fxMapCatching(
             (int a) => a == 2 ? ro.raise('outer') : a,
             _recover,
             [1, 2, 3],
@@ -96,7 +96,7 @@ void main() {
         ]).mapCatching(_explodeOnTwo, _recover);
         expect(
           chained.toList(),
-          mapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(),
+          fxMapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(),
         );
       },
     );
@@ -105,20 +105,20 @@ void main() {
   group('mapCatchingAsync', () {
     test('agrees with the sync spelling', () async {
       expect(
-        await toListAsync(
-          mapCatchingAsync(_explodeOnTwo, _recover, toAsync([1, 2, 3])),
+        await fxToListAsync(
+          fxMapCatchingAsync(_explodeOnTwo, _recover, fxToAsync([1, 2, 3])),
         ),
-        mapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(),
+        fxMapCatching(_explodeOnTwo, _recover, [1, 2, 3]).toList(),
       );
     });
 
     test('recovers a failure from an async callback', () async {
       expect(
-        await toListAsync(
-          mapCatchingAsync(
+        await fxToListAsync(
+          fxMapCatchingAsync(
             (int a) async => a == 2 ? throw StateError('boom') : a * 10,
             (error, stackTrace) async => -1,
-            toAsync([1, 2, 3]),
+            fxToAsync([1, 2, 3]),
           ),
         ),
         [10, -1, 30],
@@ -126,12 +126,12 @@ void main() {
     });
 
     test('rethrows a raise signal instead of recovering it', () async {
-      final result = await eitherAsync<String, List<int>>(
-        (r) => toListAsync(
-          mapCatchingAsync(
+      final result = await fxEitherAsync<String, List<int>>(
+        (r) => fxToListAsync(
+          fxMapCatchingAsync(
             (int a) async => a == 2 ? r.raise('raised') : a,
             _recover,
-            toAsync([1, 2, 3]),
+            fxToAsync([1, 2, 3]),
           ),
         ),
       );
@@ -141,7 +141,7 @@ void main() {
     test('FxAsync.mapCatching agrees with the top-level function', () async {
       expect(
         await fxAsync(
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         ).mapCatching(_explodeOnTwo, _recover).toList(),
         [10, -1, 30],
       );

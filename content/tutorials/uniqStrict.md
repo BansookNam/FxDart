@@ -33,8 +33,8 @@ nextLabel: uniqAdjacent
   </p>
   <p>
     The price is that nothing downstream can cut the work short.
-    <code>distinct(xs).take(3)</code> stops pulling <code>xs</code> as soon as
-    3 distinct values have appeared; <code>uniqStrict(xs).take(3)</code> dedupes
+    <code>fxDistinct(xs).take(3)</code> stops pulling <code>xs</code> as soon as
+    3 distinct values have appeared; <code>fxUniqStrict(xs).take(3)</code> dedupes
     all of <code>xs</code> first and then takes 3. Never put the strict form
     ahead of a short-circuiting consumer, and never point it at an unbounded
     iterable — it will not terminate.

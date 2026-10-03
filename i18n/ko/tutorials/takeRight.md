@@ -26,7 +26,7 @@ nextLabel: takeWhile
     함께 받습니다 — 같은 연산자입니다.
   </p>
   <p>
-    비동기 버전에도 같은 제약이 있습니다. <code>takeLastAsync</code>는
+    비동기 버전에도 같은 제약이 있습니다. <code>fxTakeLastAsync</code>는
     꼬리 부분을 돌려주기 전에 상류 전체를 (모든 원소를 await 하며)
     소진합니다. 소스가 유한하고 버퍼링해도 될 만큼 작다는 것을 알 때에만
     쓰세요.

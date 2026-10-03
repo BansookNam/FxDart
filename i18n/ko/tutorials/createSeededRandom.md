@@ -25,13 +25,13 @@ prevLabel: shuffle
     난수는 쓸모가 많기 때문입니다. 재현 가능한 테스트, 안정적인 데모
     데이터, 실패를 그대로 재생할 수 있는 속성 기반 퍼징 등
     "무작위지만 매번 동일해야 하는" 상황이라면 어디에나 어울립니다.
-    <a href="shuffle.html"><code>shuffle</code></a>에 시드를 넘겼을 때
+    <a href="shuffle.html"><code>fxShuffle</code></a>에 시드를 넘겼을 때
     내부에서 쓰는 것도 바로 이 함수입니다.
   </p>
   <p>
     <code>dart:math</code>의 <code>Random(seed)</code>와 달리, 이 수열은
     FxTS와 맺은 라이브러리 계약의 일부입니다 — 같은 시드라면 FxDart와
-    FxTS의 시드 기반 <code>shuffle</code>은 같은 순서를 만들어 냅니다.
+    FxTS의 시드 기반 <code>fxShuffle</code>은 같은 순서를 만들어 냅니다.
   </p>
 
   <h2>데모 1 · 같은 시드, 같은 수열</h2>
@@ -40,7 +40,7 @@ prevLabel: shuffle
   <h2>데모 2 · 재현 가능한 뽑기와 셔플</h2>
   <p>
     생성기를 필요한 형태의 난수로 바꿔 쓰면 됩니다 — 여기서는 주사위
-    굴리기와 시드 기반 <code>shuffle</code>입니다:
+    굴리기와 시드 기반 <code>fxShuffle</code>입니다:
   </p>
   {{playground:1}}
 
@@ -51,6 +51,6 @@ prevLabel: shuffle
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="shuffle.html"><code>shuffle</code></a> — 이 생성기 위에 올린 시드 기반 셔플 ·
-    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — 결정론적인 무한 소스
+    <a href="shuffle.html"><code>fxShuffle</code></a> — 이 생성기 위에 올린 시드 기반 셔플 ·
+    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>fxRepeat</code></a> — 결정론적인 무한 소스
   </div>

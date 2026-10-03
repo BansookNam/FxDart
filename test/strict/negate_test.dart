@@ -2,12 +2,12 @@ import 'package:fxdart/fxdart.dart';
 import 'package:test/test.dart' hide isEmpty, isNull, isNotNull, isList, isMap;
 
 // Ported from FxTS test/negate.spec.ts. Dart has no `undefined` or `Symbol`;
-// `isUndefined` is an alias of `isNull` (deprecated), `isArray` of `isList`.
+// `fxIsUndefined` is an alias of `fxIsNull` (deprecated), `fxIsArray` of `fxIsList`.
 void main() {
   group('negate', () {
     group('negate isUndefined', () {
       // ignore: deprecated_member_use
-      final isDefined = negate(isUndefined);
+      final isDefined = fxNegate(fxIsUndefined);
 
       for (final a in <Object>[2, true, <String, int>{}, <int>[], 'a']) {
         test('given non-null ($a) then should be true', () {
@@ -22,7 +22,7 @@ void main() {
 
     group('negate isArray', () {
       // ignore: deprecated_member_use
-      final isNotArray = negate(isArray);
+      final isNotArray = fxNegate(fxIsArray);
 
       for (final s in <Object?>[null, true, 1, 'a', () => null]) {
         test('given non array ($s) then should return true', () {
@@ -36,7 +36,7 @@ void main() {
     });
 
     group('negate isEmpty', () {
-      final isNotEmpty = negate(isEmpty);
+      final isNotEmpty = fxNegate(fxIsEmpty);
 
       final testParameters = <(Object?, bool)>[
         (1, false),
@@ -62,7 +62,7 @@ void main() {
     });
 
     group('negate isNil', () {
-      final isNotNil = negate(isNil);
+      final isNotNil = fxNegate(fxIsNil);
 
       test('given null then should return false', () {
         expect(isNotNil(null), equals(false));

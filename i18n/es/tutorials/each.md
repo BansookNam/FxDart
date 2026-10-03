@@ -29,11 +29,11 @@ nextLabel: consume
   <p>
     En una cadena síncrona, <code>.forEach(f)</code> es el propio
     <code>Iterable.forEach</code> de Dart, heredado por <code>Fx</code>; la
-    cadena asíncrona y la forma data-first <code>forEach(f, iterable)</code>
+    cadena asíncrona y la forma data-first <code>fxForEach(f, iterable)</code>
     las aporta fxdart, para que el operador se lea igual en todas partes.
   </p>
   <p>
-    <code>forEachAsync</code> (o <code>.forEach()</code> sobre una cadena
+    <code>fxForEachAsync</code> (o <code>.forEach()</code> sobre una cadena
     <code>FxAsync</code>) espera con await a <code>f</code> para cada
     elemento, estrictamente en el orden en que llegan; aunque algunas
     llamadas individuales pudieran terminar antes que otras,
@@ -48,7 +48,7 @@ nextLabel: consume
   <h2>Demo 2 · Asíncrono, estrictamente en orden</h2>
   <p>
     Aunque cada elemento duerme durante un tiempo <em>distinto</em>,
-    <code>forEachAsync</code> los sigue procesando 1, 2, 3 — nunca fuera de
+    <code>fxForEachAsync</code> los sigue procesando 1, 2, 3 — nunca fuera de
     orden:
   </p>
   {{playground:1}}

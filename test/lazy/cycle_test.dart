@@ -8,14 +8,14 @@ void main() {
     group('sync', () {
       test('should repeat given elements (numbers)', () {
         expect(
-          take(8, cycle([1, 2, 3, 4, 5])).toList(),
+          fxTake(8, fxCycle([1, 2, 3, 4, 5])).toList(),
           equals([1, 2, 3, 4, 5, 1, 2, 3]),
         );
       });
 
       test('should repeat given elements (string chars)', () {
         expect(
-          take(8, cycle('abcde'.split(''))).toList(),
+          fxTake(8, fxCycle('abcde'.split(''))).toList(),
           equals(['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c']),
         );
       });
@@ -28,14 +28,14 @@ void main() {
 
     group('async', () {
       test('should repeat given elements (numbers)', () async {
-        final it = cycleAsync(toAsync([1, 2, 3, 4, 5])).iterator;
+        final it = fxCycleAsync(fxToAsync([1, 2, 3, 4, 5])).iterator;
         for (final expected in [1, 2, 3, 4, 5, 1, 2, 3]) {
           expect((await it.next()).value, equals(expected));
         }
       });
 
       test('should repeat given elements (string chars)', () async {
-        final it = cycleAsync(toAsync('abcde'.split(''))).iterator;
+        final it = fxCycleAsync(fxToAsync('abcde'.split(''))).iterator;
         for (final expected in ['a', 'b', 'c', 'd', 'e', 'a', 'b', 'c']) {
           expect((await it.next()).value, equals(expected));
         }
@@ -54,10 +54,10 @@ void main() {
       test('should be repeated concurrently', () async {
         final sw = Stopwatch()..start();
         final res = await fxAsync(
-          cycleAsync(
-            toAsync(() sync* {
+          fxCycleAsync(
+            fxToAsync(() sync* {
               for (var i = 1; i <= 6; i++) {
-                yield delay(const Duration(milliseconds: 100), i);
+                yield fxDelay(const Duration(milliseconds: 100), i);
               }
             }()),
           ),
@@ -71,7 +71,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = cycleAsync(mock).iterator;
+          final it = fxCycleAsync(mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

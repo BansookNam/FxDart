@@ -23,7 +23,7 @@ nextLabel: mapEffect
     심지어 무한한 — 시퀀스에도 <code>map</code>을 걸 수 있습니다.
   </p>
   <p>
-    data-first 형태(<code>map(f, iterable)</code>)와 체인
+    data-first 형태(<code>fxMap(f, iterable)</code>)와 체인
     메서드(<code>fx(iterable).map(f)</code>) 두 가지로 쓸 수 있습니다. 둘 다
     동일한 지연 결과를 반환합니다.
   </p>
@@ -35,7 +35,7 @@ nextLabel: mapEffect
 
   <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <p>
-    <code>mapAsync</code>(또는 <code>.toAsync().map(...)</code>)는 비동기
+    <code>fxMapAsync</code>(또는 <code>.toAsync().map(...)</code>)는 비동기
     함수를 받습니다. 그대로 두면 원소를 하나씩 순서대로 await 하지만,
     <code>concurrent(n)</code>을 붙이면 상류가 한 번에 <code>n</code>개씩
     평가합니다 — 결과는 여전히 순서대로 도착합니다:

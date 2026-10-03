@@ -2,7 +2,7 @@
 slug: pick
 title: pick — FxDart 101
 description: FxDart pick tutorial: return a copy of a Map with only the given keys, missing keys simply absent.
-heading: <code>pick</code>
+heading: <code>fxPick</code>
 section: 9
 crumb: pick
 prev: omit.html
@@ -16,9 +16,9 @@ nextLabel: omitBy
 
   <h2>Lecture</h2>
   <p>
-    <code>pick</code> is <code>omit</code>'s mirror: instead of listing what
+    <code>fxPick</code> is <code>fxOmit</code>'s mirror: instead of listing what
     to remove, you list what to keep. Requested keys that aren't present in
-    the source map are simply absent from the result — <code>pick</code>
+    the source map are simply absent from the result — <code>fxPick</code>
     does not insert them with a <code>null</code> placeholder, so the
     result's key set can be smaller than <code>keysToPick</code>.
   </p>
@@ -35,13 +35,13 @@ nextLabel: omitBy
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>pick</code> to keep only <code>'id'</code> and <code>'email'</code> from <code>profile</code>.</p>
+  <p>Exercise: use <code>fxPick</code> to keep only <code>'id'</code> and <code>'email'</code> from <code>profile</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="omit.html"><code>omit</code></a> — the inverse: drop only some keys ·
-    <a href="pickBy.html"><code>pickBy</code></a> — keep by predicate instead of key list ·
-    <a href="props.html"><code>props</code></a> — pull several values out as a List ·
-    <a href="prop.html"><code>prop</code></a> — pull a single value out
+    <a href="omit.html"><code>fxOmit</code></a> — the inverse: drop only some keys ·
+    <a href="pickBy.html"><code>fxPickBy</code></a> — keep by predicate instead of key list ·
+    <a href="props.html"><code>fxProps</code></a> — pull several values out as a List ·
+    <a href="prop.html"><code>fxProp</code></a> — pull a single value out
   </div>

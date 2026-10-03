@@ -57,7 +57,7 @@ Forecast monthForecast(
     projectAll(rules, entries, today, horizon),
   ).filter((e) => e.type.isMoney && sameMonth(e.date, month)).toList();
 
-  final points = fx(concat(actual, ghosts))
+  final points = fx(fxConcat(actual, ghosts))
       .sortBy((e) => e.date)
       .scan(
         (acc, e) => BalancePoint(e.date, acc.balance + e.signedAmount),

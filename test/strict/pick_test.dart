@@ -8,15 +8,15 @@ void main() {
     group('sync', () {
       test('should be picked properties as given keys', () {
         final obj = {'a': 1, 'b': 2, 'c': '3'};
-        expect(pick(['a', 'c'], obj), equals({'a': 1, 'c': '3'}));
+        expect(fxPick(['a', 'c'], obj), equals({'a': 1, 'c': '3'}));
       });
 
       test('should be able to be used in the pipeline', () {
         final res = pipe(
           {'a': 1, 'b': '2', 'c': true},
           [
-            (Map<String, Object> m) => pick(['a', 'b'], m),
-            (Map<String, Object> m) => toList(entries(m)),
+            (Map<String, Object> m) => fxPick(['a', 'b'], m),
+            (Map<String, Object> m) => fxToList(fxEntries(m)),
           ],
         );
         expect(res, equals([('a', 1), ('b', '2')]));

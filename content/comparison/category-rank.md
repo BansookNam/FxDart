@@ -43,6 +43,6 @@ async: false
     Honestly: <code>package:collection</code> covers the grouping well, and
     for a one-off report the native version is fine. The chain earns its
     keep as the report grows — every added step (a filter, a second
-    ranking) extends the pipeline instead of another <code>entries</code>
+    ranking) extends the pipeline instead of another <code>fxEntries</code>
     round-trip.
   </p>

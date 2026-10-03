@@ -5,12 +5,12 @@ void main() {
   group('average', () {
     group('sync', () {
       test('should return the average of the given elements', () {
-        expect(average([1, 2, 3, 4, 5]), equals(3));
-        expect(average(<num>[]).isNaN, isTrue);
+        expect(fxAverage([1, 2, 3, 4, 5]), equals(3));
+        expect(fxAverage(<num>[]).isNaN, isTrue);
       });
 
       test('should switch to double accumulation at the first double', () {
-        expect(average([1, 2, 1.5]), equals(1.5));
+        expect(fxAverage([1, 2, 1.5]), equals(1.5));
       });
 
       test('should be able to be used in the pipeline', () {
@@ -21,8 +21,8 @@ void main() {
 
     group('async', () {
       test('should return the average of the given elements', () async {
-        expect(await averageAsync(toAsync([1, 2, 3, 4, 5])), equals(3));
-        final empty = await averageAsync(toAsync(<num>[]));
+        expect(await fxAverageAsync(fxToAsync([1, 2, 3, 4, 5])), equals(3));
+        final empty = await fxAverageAsync(fxToAsync(<num>[]));
         expect(empty.isNaN, isTrue);
       });
 

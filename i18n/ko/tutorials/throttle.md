@@ -2,7 +2,7 @@
 slug: throttle
 title: throttle — FxDart 101
 description: FxDart throttle 튜토리얼: wait 구간마다 함수를 최대 한 번만 실행하는 방법, leading/trailing 에지와 cancel(), 그리고 라이브 플레이그라운드까지.
-heading: <code>throttle</code>
+heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
 next: shuffle.html
@@ -14,9 +14,9 @@ nextLabel: shuffle
 
   <h2>강의</h2>
   <p>
-    <code>throttle</code>은 감싼 함수가 아무리 자주 호출되더라도
+    <code>fxThrottle</code>은 감싼 함수가 아무리 자주 호출되더라도
     <code>func</code>가 <code>wait</code>마다 최대 한 번만 실행되도록
-    보장합니다. <a href="debounce.html"><code>debounce</code></a>와의 결정적인
+    보장합니다. <a href="debounce.html"><code>fxDebounce</code></a>와의 결정적인
     차이가 여기 있습니다. debounce는 호출이 있을 때마다 타이머를
     <em>다시 시작</em>하므로 호출이 끊이지 않으면 실행이 무한정 밀릴 수
     있지만, throttle의 구간은 한 번 시작되면 고정이라 호출이 일정한
@@ -49,9 +49,9 @@ nextLabel: shuffle
 
   <h2>메서드 표기</h2>
   <p>
-    <a href="debounce.html"><code>debounce</code></a>와 같습니다.
+    <a href="debounce.html"><code>fxDebounce</code></a>와 같습니다.
     <code>onScroll.fxThrottle(wait)</code>는
-    <code>throttle(onScroll, wait)</code>이고,
+    <code>fxThrottle(onScroll, wait)</code>이고,
     <code>leading</code>과 <code>trailing</code>도 그대로 전달합니다.
   </p>
   <pre><code>void onScroll(double offset) =&gt; _measure(offset);
@@ -65,7 +65,7 @@ final handler = onScroll.fxThrottle(
     <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
   </p>
   <h2>직접 해 보기</h2>
-  <p>연습: <code>onClick</code>을 <code>throttle</code>로 감싸(wait는 100ms)
+  <p>연습: <code>onClick</code>을 <code>fxThrottle</code>로 감싸(wait는 100ms)
     빠르게 이어진 클릭이 세 번이 아니라 최대 두 번 — 리딩과 트레일링 —
     만 기록되게 만들어 보세요.</p>
   {{playground:2}}
@@ -84,8 +84,8 @@ final handler = onScroll.fxThrottle(
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 타이밍 데모를 만드는 재료 ·
-    <a href="shuffle.html"><code>shuffle</code></a> — 시드를 지정하는 난수 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — 타이밍 데모를 만드는 재료 ·
+    <a href="shuffle.html"><code>fxShuffle</code></a> — 시드를 지정하는 난수 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한
   </div>

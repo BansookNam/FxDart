@@ -157,7 +157,7 @@ void main() {
       final failFast = err('name').map2(err('age'), (a, b) => a + b);
       expect(failFast, equals(Left<String, int>('name')));
 
-      final accumulated = either<Nel<String>, int>(
+      final accumulated = fxEither<Nel<String>, int>(
         (r) => r.zipOrAccumulate2<int, int, int>(
           (r) => r.raise('name'),
           (r) => r.raise('age'),

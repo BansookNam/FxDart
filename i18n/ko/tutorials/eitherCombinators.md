@@ -89,7 +89,7 @@ nextLabel: either &amp; Raise
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="either.html"><code>Either</code></a> — 이들이 확장하는 타입 ·
-    <a href="raise.html"><code>either</code> &amp; <code>Raise</code></a> — 빌더 스코프, <code>ensure</code>와 <code>recover</code> ·
+    <a href="raise.html"><code>fxEither</code> &amp; <code>Raise</code></a> — 빌더 스코프, <code>ensure</code>와 <code>recover</code> ·
     <a href="accumulate.html">누적</a> — 첫 실패가 아니라 모든 실패 ·
     <a href="eitherPipelines.html">Either × 파이프라인</a> — 체인을 통해 Either 나르기
   </div>

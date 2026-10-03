@@ -21,7 +21,7 @@ nextLabel: Either × pipelines
 
   <h2>Lecture</h2>
   <p>
-    Inside <code>either&lt;Nel&lt;E&gt;, _&gt;(...)</code> — any scope whose
+    Inside <code>fxEither&lt;Nel&lt;E&gt;, _&gt;(...)</code> — any scope whose
     error type is a <code>NonEmptyList</code> — the scope gains the
     accumulation vocabulary:
   </p>
@@ -79,6 +79,6 @@ nextLabel: Either × pipelines
     <strong>Related:</strong>
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — the error carrier ·
     <a href="eitherPipelines.html">Either × pipelines</a> — fail-slow validation over <code>fx()</code> chains, with concurrency ·
-    <a href="raise.html"><code>either</code> &amp; Raise</a> — the fail-fast scope this extends ·
+    <a href="raise.html"><code>fxEither</code> &amp; Raise</a> — the fail-fast scope this extends ·
     <a href="typedErrors.html">typed errors — full guide</a>
   </div>

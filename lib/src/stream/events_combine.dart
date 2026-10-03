@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'events.dart';
 
-/// One input to [combine]: a [source] plus whether it triggers an emit
+/// One input to [fxCombine]: a [source] plus whether it triggers an emit
 /// and whether it must have spoken before any emit.
 ///
 /// Search term: `FxEvents.combine`.
@@ -44,7 +44,7 @@ class CombineSpec<T> {
 ///
 /// Search term: `FxEvents.combine` — a top-level function because Dart
 /// cannot add statics to [FxEvents] from this file.
-FxEvents<List<T>> combine<T>(Iterable<CombineSpec<T>> specs) {
+FxEvents<List<T>> fxCombine<T>(Iterable<CombineSpec<T>> specs) {
   final list = List<CombineSpec<T>>.of(specs);
   final out = StreamController<List<T>>();
   final subs = <StreamSubscription<T>>[];
@@ -95,8 +95,8 @@ FxEvents<List<T>> combine<T>(Iterable<CombineSpec<T>> specs) {
 ///
 /// Contrast [FxEvents.concat], which waits to subscribe to the next
 /// source until the current one completes. An empty [sources] closes
-/// immediately. fxdart events layer, after Rx's `concatEager`.
-FxEvents<T> concatEager<T>(Iterable<Stream<T>> sources) {
+/// immediately. fxdart events layer, after Rx's `fxConcatEager`.
+FxEvents<T> fxConcatEager<T>(Iterable<Stream<T>> sources) {
   final list = List<Stream<T>>.of(sources);
   final out = StreamController<T>();
   out.onListen = () {

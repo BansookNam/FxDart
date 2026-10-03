@@ -34,7 +34,7 @@ place it is spelled in Dart. The chapter number is where it is introduced.
 | **join** | `flatten`, μ | `flat()`, `expand(id)` | 20 |
 | **map2** | `zipWith`, `liftA2` | `map2`, `zipOrAccumulate2` | 6 |
 | **traverse** | — | `mapOrAccumulate`, `.map(f).sequence()` | 9 |
-| **sequence** | — | `sequenceEither`, `Future.wait` | 9 |
+| **sequence** | — | `fxSequenceEither`, `Future.wait` | 9 |
 | **fold** | catamorphism, `reduce` with seed | `fold`, `Either.fold` | 8 |
 
 ## Evaluation
@@ -55,12 +55,12 @@ place it is spelled in Dart. The chapter number is where it is introduced.
 | Term | Also called | In Dart / FxDart | Ch. |
 |---|---|---|---|
 | **Either** | `Result`, `Validation`, disjoint union | `Either<L, R>`, `Left`, `Right` | 16 |
-| **Raise scope** | context receiver scope, effect scope | `either((r) { … })`, `r.bind`, `r.ensure` | 15 |
-| **Delimited continuation** | `shift`/`reset`, effect handler | the non-local exit inside `either` | 15 |
+| **Raise scope** | context receiver scope, effect scope | `fxEither((r) { … })`, `r.bind`, `r.ensure` | 15 |
+| **Delimited continuation** | `shift`/`reset`, effect handler | the non-local exit inside `fxEither` | 15 |
 | **Short-circuit** | fail-fast | the first `Left` ends the chain | 16 |
 | **Accumulation** | fail-slow, applicative validation | `accumulate`, `zipOrAccumulate`, `mapOrAccumulate` | 17 |
 | **NonEmptyList** | `Nel` | `NonEmptyList<E>` — extension type over `List` | 8 |
-| **Monad transformer** | `EitherT`, `OptionT` | *not used* — `eitherAsync` instead | 7 |
+| **Monad transformer** | `EitherT`, `OptionT` | *not used* — `fxEitherAsync` instead | 7 |
 
 ## Foundations
 

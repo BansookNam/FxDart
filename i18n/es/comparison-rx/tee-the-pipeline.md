@@ -34,7 +34,7 @@ async: false
     la misma idea — compartir una sola pasada. RxDart hace el stream
     <em>conectable</em>: <code>publish()</code> difiere la fuente, ambas
     reducciones se suscriben, y <code>connect()</code> arranca la única
-    suscripción que las alimenta. El <code>fork</code> de FxDart
+    suscripción que las alimenta. El <code>fxFork</code> de FxDart
     ramifica una sola iteración con buffer: cada fork del mismo objeto
     iterable es un cursor independiente sobre un buffer compartido, así
     que el cuerpo del generador corre una vez sin importar cuántos

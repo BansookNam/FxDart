@@ -25,7 +25,7 @@ void main() {
 
     test('sorts a narrow key range ascending', () {
       expect(
-        sortBy((int a) => a, [5, 1, 4, 1, 3, 2, 0]),
+        fxSortBy((int a) => a, [5, 1, 4, 1, 3, 2, 0]),
         equals([0, 1, 1, 2, 3, 4, 5]),
       );
     });
@@ -38,7 +38,7 @@ void main() {
         const Row(1, 'd'),
         const Row(2, 'e'),
       ];
-      expect(tags(sortBy((Row r) => r.key, rows)), equals([
+      expect(tags(fxSortBy((Row r) => r.key, rows)), equals([
         '1b',
         '1d',
         '2a',
@@ -62,14 +62,14 @@ void main() {
       ]));
       // `sortBy` with a negated key must agree with `sortByDesc`.
       expect(
-        tags(sortBy((Row r) => -r.key, rows)),
+        tags(fxSortBy((Row r) => -r.key, rows)),
         equals(tags(sortByDesc((Row r) => r.key, rows))),
       );
     });
 
     test('handles negative and mixed-sign keys', () {
       expect(
-        sortBy((int a) => a, [3, -2, 0, -5, 1, -2]),
+        fxSortBy((int a) => a, [3, -2, 0, -5, 1, -2]),
         equals([-5, -2, -2, 0, 1, 3]),
       );
       expect(
@@ -80,7 +80,7 @@ void main() {
 
     test('handles a single repeated key', () {
       final rows = [const Row(7, 'a'), const Row(7, 'b'), const Row(7, 'c')];
-      expect(tags(sortBy((Row r) => r.key, rows)), equals(['7a', '7b', '7c']));
+      expect(tags(fxSortBy((Row r) => r.key, rows)), equals(['7a', '7b', '7c']));
       expect(
         tags(sortByDesc((Row r) => r.key, rows)),
         equals(['7a', '7b', '7c']),
@@ -92,7 +92,7 @@ void main() {
     test('sorts a key range wider than the input', () {
       final keys = [900000000, -900000000, 5, 1 << 50, -(1 << 50), 0];
       expect(
-        sortBy((int a) => a, keys),
+        fxSortBy((int a) => a, keys),
         equals([-(1 << 50), -900000000, 0, 5, 900000000, 1 << 50]),
       );
     });
@@ -104,7 +104,7 @@ void main() {
         const Row(1 << 40, 'c'),
         const Row(-(1 << 40), 'd'),
       ];
-      expect(tags(sortBy((Row r) => r.key, rows)), equals([
+      expect(tags(fxSortBy((Row r) => r.key, rows)), equals([
         '-1099511627776b',
         '-1099511627776d',
         '1099511627776a',
@@ -117,7 +117,7 @@ void main() {
       const lo = -0x7fffffffffffffff;
       const hi = 0x7fffffffffffffff;
       expect(
-        sortBy((int a) => a, [hi, 0, lo]),
+        fxSortBy((int a) => a, [hi, 0, lo]),
         equals([lo, 0, hi]),
       );
       expect(
@@ -135,7 +135,7 @@ void main() {
         const Row(2, 'c'),
         const Row(3, 'd'),
       ];
-      expect(tags(sortBy((Row r) => r.key, rows)), equals([
+      expect(tags(fxSortBy((Row r) => r.key, rows)), equals([
         '1a',
         '1b',
         '2c',
@@ -144,7 +144,7 @@ void main() {
     });
 
     test('reverses a strictly reversed input', () {
-      expect(sortBy((int a) => a, [5, 4, 3, 2, 1]), equals([1, 2, 3, 4, 5]));
+      expect(fxSortBy((int a) => a, [5, 4, 3, 2, 1]), equals([1, 2, 3, 4, 5]));
       expect(
         sortByDesc((int a) => a, [1, 2, 3, 4, 5]),
         equals([5, 4, 3, 2, 1]),
@@ -160,7 +160,7 @@ void main() {
         '2b',
         '1c',
       ]));
-      expect(tags(sortBy((Row r) => r.key, rows)), equals([
+      expect(tags(fxSortBy((Row r) => r.key, rows)), equals([
         '1c',
         '2a',
         '2b',
@@ -180,11 +180,11 @@ void main() {
           ..sort((a, b) => a.key.compareTo(b.key)); // List.sort is unstable…
         // …so compare keys only, then check stability separately.
         expect(
-          [for (final r in sortBy((Row r) => r.key, rows)) r.key],
+          [for (final r in fxSortBy((Row r) => r.key, rows)) r.key],
           equals([for (final r in expected) r.key]),
           reason: 'span=$span',
         );
-        final sorted = sortBy((Row r) => r.key, rows);
+        final sorted = fxSortBy((Row r) => r.key, rows);
         final index = {for (var i = 0; i < rows.length; i++) rows[i].tag: i};
         for (var i = 1; i < sorted.length; i++) {
           if (sorted[i - 1].key == sorted[i].key) {

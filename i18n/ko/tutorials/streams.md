@@ -14,7 +14,7 @@ nextLabel: concurrent
 
   <h2>강의</h2>
   <p>
-    <code>fromStream</code>은 단일 구독이든 브로드캐스트든 어떤
+    <code>fxFromStream</code>은 단일 구독이든 브로드캐스트든 어떤
     <code>Stream</code>이라도 <code>FxAsyncIterable</code>로 바꿔 줍니다.
     덕분에 소켓이나 파일, 위젯의 이벤트 스트림 등 Dart가
     <code>Stream</code>으로 건네주는 모든 데이터 위에서 FxDart의 연산자
@@ -55,7 +55,7 @@ nextLabel: concurrent
     </tbody>
   </table>
   <p>
-    <code>fromStream</code>이 기본값이자 데모 1이 쓰는 것이고, 파일이나
+    <code>fxFromStream</code>이 기본값이자 데모 1이 쓰는 것이고, 파일이나
     소켓은 바이트를 잃으면 안 되기 때문입니다. 최신만 쓰는 UI에는
     latest, 묶음으로 일하고 싶으면 chunked, 낡은 이벤트가 공백보다 나쁠
     때는 next를 고르세요.
@@ -79,7 +79,7 @@ nextLabel: concurrent
   <h2>데모 3 · 스트림을 당기는 네 가지 방법</h2>
   <p>
     이미 pull이 기다리는 동안 1, 2, 3의 동기 버스트가 도착합니다.
-    <code>fromStream</code>은 모든 값을 지키고,
+    <code>fxFromStream</code>은 모든 값을 지키고,
     <code>fromStreamLatest</code>는 최신만 지키고,
     <code>fromStreamChunked</code>는 리스트 하나로 내보내고,
     <code>fromStreamNext</code>는 기다리던 pull을 만난 값만 지킵니다.

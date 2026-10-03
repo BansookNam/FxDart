@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  final classify = cases<int, String>([
+  final classify = fxCases<int, String>([
     ((n) => n < 0, (n) => 'negative'),
     ((n) => n == 0, (n) => 'zero'),
   ], orElse: (n) => 'positive');

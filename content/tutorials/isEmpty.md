@@ -49,8 +49,8 @@ nextLabel: every
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop nulls from a Map ·
+    <a href="compact.html"><code>fxCompact</code></a> — drop nulls from an iterable ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — drop nulls from a Map ·
     <a href="predicates.html"><code>predicates</code></a> — more filter-friendly type checks ·
-    <a href="includes.html"><code>includes</code></a> — the neighboring membership check
+    <a href="includes.html"><code>fxIncludes</code></a> — the neighboring membership check
   </div>

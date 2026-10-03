@@ -15,5 +15,5 @@ void main() {
   }
 
   // FxTS alias: last — the same operator.
-  print(last([1, 2, 3])); // 3
+  print(fxLast([1, 2, 3])); // 3
 }

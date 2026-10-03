@@ -138,8 +138,8 @@ void main() {
     });
 
     test('FxAsyncNum.min/max are not shadowed and stay reachable', () async {
-      expect(await fxAsync(toAsync(<num>[3, 1, 2])).min(), 1);
-      expect(await fxAsync(toAsync(<num>[3, 1, 2])).max(), 3);
+      expect(await fxAsync(fxToAsync(<num>[3, 1, 2])).min(), 1);
+      expect(await fxAsync(fxToAsync(<num>[3, 1, 2])).max(), 3);
     });
   });
 }

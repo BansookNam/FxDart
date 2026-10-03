@@ -5,7 +5,7 @@ Future<void> main() async {
 
   Future<FxAsync<String>> makeChain() async => fx([1, 2, 3])
       .toAsync()
-      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'));
+      .map((i) => fxDelay(Duration(milliseconds: delays[i - 1]), 'item$i'));
 
   // concurrent(3): still 3 in flight at once, but the *result* order always
   // matches the source order.

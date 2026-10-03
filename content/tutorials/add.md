@@ -2,7 +2,7 @@
 slug: add
 title: add — FxDart 101
 description: FxDart add tutorial: a generic + as a function value, usable as a reducer, with a live playground.
-heading: <code>add</code>
+heading: <code>fxAdd</code>
 section: 10
 crumb: add
 prev: cases.html
@@ -16,11 +16,11 @@ nextLabel: gt · gte · lt · lte
 
   <h2>Lecture</h2>
   <p>
-    <code>add(a, b)</code> is <code>+</code> packaged as a function value.
+    <code>fxAdd(a, b)</code> is <code>+</code> packaged as a function value.
     Since it dispatches to <code>+</code> dynamically, it works for anything
     that supports the operator — <code>num</code>, <code>String</code>
     concatenation, even <code>List</code> concatenation — mirroring FxTS's
-    <code>add</code>, which accepts both numbers and strings.
+    <code>fxAdd</code>, which accepts both numbers and strings.
   </p>
   <p>
     Its real value shows up wherever an API wants a binary
@@ -29,7 +29,7 @@ nextLabel: gt · gte · lt · lte
     function for <code>reduce</code>/<code>fold</code>. It's a binary
     function though, so to use it as a unary <code>map</code> callback
     (adding a fixed amount to every element) you close over one side
-    yourself: <code>(b) =&gt; add(n, b)</code>.
+    yourself: <code>(b) =&gt; fxAdd(n, b)</code>.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -39,7 +39,7 @@ nextLabel: gt · gte · lt · lte
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>fold</code> + <code>add</code> to concatenate all
+  <p>Exercise: use <code>fold</code> + <code>fxAdd</code> to concatenate all
     the parts into one string.</p>
   {{playground:2}}
 
@@ -47,6 +47,6 @@ nextLabel: gt · gte · lt · lte
     <strong>Related:</strong>
     <a href="reduce.html"><code>reduce</code></a> / <a href="fold.html"><code>fold</code></a> — the usual home for add as a combiner ·
     <a href="sum.html"><code>sum</code></a> — a ready-made sum for Iterable&lt;num&gt; ·
-    <a href="comparisons.html"><code>gt · gte · lt · lte</code></a> — the comparison counterparts to add ·
-    <a href="apply.html"><code>apply</code></a> — call any function with a dynamic argument list
+    <a href="comparisons.html"><code>fxGt · fxGte · fxLt · fxLte</code></a> — the comparison counterparts to add ·
+    <a href="apply.html"><code>fxApply</code></a> — call any function with a dynamic argument list
   </div>

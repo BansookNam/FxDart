@@ -1,5 +1,5 @@
 /// Tag explorer (Round 4 feature): set algebra over tag usage with
-/// `intersection` / `difference`, and `pluck` + `compact` for totals.
+/// `intersection` / `difference`, and `fxPluck` + `fxCompact` for totals.
 library;
 
 import 'package:fxdart/fxdart.dart';
@@ -35,9 +35,9 @@ TagMonthComparison compareTagMonths(List<Entry> entries, DateTime month) {
     DateTime(month.year, month.month - 1),
   );
   return TagMonthComparison(
-    intersection(lastMonth, thisMonth).toList(),
-    difference(lastMonth, thisMonth).toList(),
-    difference(thisMonth, lastMonth).toList(),
+    fxIntersection(lastMonth, thisMonth).toList(),
+    fxDifference(lastMonth, thisMonth).toList(),
+    fxDifference(thisMonth, lastMonth).toList(),
   );
 }
 
@@ -50,7 +50,7 @@ List<Entry> tagEntries(List<Entry> entries, String tag, DateTime month) =>
 
 /// Money spent on [tag] in [month].
 /// Pipeline: entries → field maps (non-spending entries map to a null
-/// amount) → `pluck('amount')` → `compact` drops the nulls → `sum`.
+/// amount) → `fxPluck('amount')` → `fxCompact` drops the nulls → `sum`.
 double tagSpend(List<Entry> entries, String tag, DateTime month) {
   final maps = fx(tagEntries(entries, tag, month))
       .map(
@@ -61,5 +61,5 @@ double tagSpend(List<Entry> entries, String tag, DateTime month) {
         },
       )
       .toList();
-  return sum(compact(pluck<String, double?>('amount', maps))).toDouble();
+  return fxSum(fxCompact(fxPluck<String, double?>('amount', maps))).toDouble();
 }

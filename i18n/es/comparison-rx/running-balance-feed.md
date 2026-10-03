@@ -37,7 +37,7 @@ async: false
     <code>scan</code> de RxDart toma una semilla y emite un valor por
     evento (su acumulador recibe además un índice); el <code>scan</code>
     con semilla de FxDart sigue a FxTS y produce primero la semilla misma,
-    así que el panel usa el <code>scan1</code> sin semilla — para un saldo
+    así que el panel usa el <code>fxScan1</code> sin semilla — para un saldo
     que abre a cero, cada suma parcial <em>es</em> el saldo, y las dos
     cadencias encajan exactamente. Más allá de eso, el único residuo es la
     entrega: la versión stream recolecta a través de un main

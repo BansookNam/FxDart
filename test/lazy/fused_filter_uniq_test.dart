@@ -1,6 +1,6 @@
 // `filter(...).uniq()` and `filter(...).uniqBy(...)` are built as one stage
 // rather than two (see FxUniqFusable / FxUniqByFusable), and `filter` walks a
-// `List` or a `range()` source by counter rather than through its iterator.
+// `List` or a `fxRange()` source by counter rather than through its iterator.
 //
 // Every case is paired with what the unfused / unindexed form does, so what is
 // pinned is behaviour — elements, order, laziness, callback count — not the
@@ -13,31 +13,34 @@ void main() {
   group('filter().uniq() / filter().uniqBy() fusion', () {
     test('builds one stage, not a uniq wrapping a filter', () {
       expect(
-        uniq(filter((int a) => a > 1, [1, 2, 3])).runtimeType.toString(),
+        fxUniq(fxFilter((int a) => a > 1, [1, 2, 3])).runtimeType.toString(),
         startsWith('_FilterUniq'),
       );
       expect(
-        uniqBy(
+        fxUniqBy(
           (int a) => a % 2,
-          filter((int a) => a > 1, [1, 2, 3]),
+          fxFilter((int a) => a > 1, [1, 2, 3]),
         ).runtimeType.toString(),
         startsWith('_FilterUniqBy'),
       );
       // A source that cannot absorb it still gets the plain stage.
-      expect(uniq([1, 2, 3]).runtimeType.toString(), startsWith('_Uniq'));
+      expect(fxUniq([1, 2, 3]).runtimeType.toString(), startsWith('_Uniq'));
       expect(
-        uniqBy((int a) => a, [1, 2, 3]).runtimeType.toString(),
+        fxUniqBy((int a) => a, [1, 2, 3]).runtimeType.toString(),
         startsWith('_UniqBy'),
       );
     });
 
     test('filter picks the indexed walk for List and range sources', () {
       expect(
-        filter((int a) => a > 1, [1, 2, 3]).iterator.runtimeType.toString(),
+        fxFilter((int a) => a > 1, [1, 2, 3]).iterator.runtimeType.toString(),
         startsWith('_FilterListIterator'),
       );
       expect(
-        filter((int a) => a > 1, range(0, 3)).iterator.runtimeType.toString(),
+        fxFilter(
+          (int a) => a > 1,
+          fxRange(0, 3),
+        ).iterator.runtimeType.toString(),
         startsWith('_FilterRangeIterator'),
       );
       Iterable<int> generated() sync* {
@@ -45,7 +48,7 @@ void main() {
       }
 
       expect(
-        filter((int a) => a > 1, generated()).iterator.runtimeType.toString(),
+        fxFilter((int a) => a > 1, generated()).iterator.runtimeType.toString(),
         startsWith('_FilterIterator'),
       );
     });
@@ -67,7 +70,7 @@ void main() {
 
       const nums = [1, 2, 2, 3, 4, 4, 5];
       expect(fx(nums).filter((a) => a.isEven).uniq().toList(), [2, 4]);
-      expect(uniqStrict(nums.where((a) => a.isEven).toList()), [2, 4]);
+      expect(fxUniqStrict(nums.where((a) => a.isEven).toList()), [2, 4]);
     });
 
     test('runs both callbacks once per element consumed, in order', () {
@@ -106,7 +109,7 @@ void main() {
 
     test('a filter over a range stays lazy under take', () {
       final tested = <int>[];
-      final result = fx(range(0, 1000))
+      final result = fx(fxRange(0, 1000))
           .filter((i) {
             tested.add(i);
             return i.isEven;
@@ -158,7 +161,7 @@ void main() {
     });
 
     test('a descending range is walked in the right direction', () {
-      expect(fx(range(5, 0, -1)).filter((i) => i.isOdd).toList(), [5, 3, 1]);
+      expect(fx(fxRange(5, 0, -1)).filter((i) => i.isOdd).toList(), [5, 3, 1]);
     });
 
     test('an empty source yields an empty list', () {
@@ -167,7 +170,7 @@ void main() {
         fx(<int>[]).filter((a) => true).uniq().iterator.moveNext(),
         isFalse,
       );
-      expect(fx(range(0, 0)).filter((a) => true).toList(), <int>[]);
+      expect(fx(fxRange(0, 0)).filter((a) => true).toList(), <int>[]);
     });
 
     test('toList(growable: false) returns a fixed-length list', () {

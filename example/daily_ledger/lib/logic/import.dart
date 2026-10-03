@@ -1,7 +1,7 @@
 /// CSV import — the round-trip partner of `export.dart`.
 ///
 /// Round 7 shipped this as a `(Entry?, ImportIssue?)` tuple per row, split
-/// with `compact` twice. That tuple *was* an `Either` with the type system
+/// with `fxCompact` twice. That tuple *was* an `Either` with the type system
 /// switched off; round 10 (typed-errors series) makes it one for real:
 ///
 /// ```
@@ -128,7 +128,7 @@ List<(int, String)> _numbered(String text) => fx(text.split('\n'))
 /// *cells*; the caller stamps the line number on with `mapLeft` — the
 /// scope-free counterpart to the `withError` adapter used inside [parseRow].
 Either<FieldError, List<(int, String)>> _dataRows(List<(int, String)> lines) =>
-    either((r) {
+    fxEither((r) {
       r.ensure(lines.isNotEmpty, () => const FieldError('file', 'no data'));
       final cells = splitCsvLine(lines.first.$2);
       r.ensure(
@@ -156,8 +156,8 @@ Either<RowError, Entry> parseRow(
   required String idPrefix,
 }) {
   final (line, raw) = numberedRow;
-  return either<RowError, Entry>(
-    (r) => catching(
+  return fxEither<RowError, Entry>(
+    (r) => fxCatching(
       // Explicit type arguments: inference does not flow from the
       // transform's parameter type here, and without them `fr` lands as
       // `Raise<Object?>`.
@@ -177,7 +177,7 @@ Either<RowError, Entry> parseRow(
           ),
         );
         // zip(header, cells) → fromEntries: the row as a column-keyed map.
-        final row = fromEntries(fx(csvColumns).zip(cells));
+        final row = fxFromEntries(fx(csvColumns).zip(cells));
 
         // Written in column order, so the *first* bad column is the one
         // reported — fail-fast is an ordering promise, not just a count.
@@ -227,7 +227,7 @@ Map<String, String> _rowCells(Raise<Nel<FieldError>> r, String raw) {
       'expected ${csvColumns.length} columns, got ${cells.length}',
     ),
   );
-  return fromEntries(fx(csvColumns).zip(cells));
+  return fxFromEntries(fx(csvColumns).zip(cells));
 }
 
 /// One row, **fail-slow**: every bad column is reported, not just the first.
@@ -246,8 +246,8 @@ Either<RowError, Entry> parseRowAll(
   required String idPrefix,
 }) {
   final (line, raw) = numberedRow;
-  return either<RowError, Entry>(
-    (r) => catching(
+  return fxEither<RowError, Entry>(
+    (r) => fxCatching(
       () => r.withError<Nel<FieldError>, Entry>(
         (fields) => RowError(line, fields),
         (fr) {

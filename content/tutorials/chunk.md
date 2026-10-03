@@ -24,7 +24,7 @@ nextLabel: windowed
     chunk is allowed to come up short, if the source doesn't divide evenly.
   </p>
   <p>
-    The async version, <code>chunkAsync</code>, awaits <code>size</code>
+    The async version, <code>fxChunkAsync</code>, awaits <code>size</code>
     elements before producing each chunk — pair it with
     <code>.concurrent(n)</code> upstream to fill a chunk's worth of async
     work concurrently.
@@ -44,6 +44,6 @@ nextLabel: windowed
   <div class="callout">
     <strong>Related:</strong>
     <a href="slice.html"><code>slice</code></a> — a single arbitrary window instead of repeated batches ·
-    <a href="split.html"><code>split</code></a> — group by separator instead of fixed size ·
-    <a href="transpose.html"><code>transpose</code></a> — flip rows and columns of already-chunked data
+    <a href="split.html"><code>fxSplit</code></a> — group by separator instead of fixed size ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — flip rows and columns of already-chunked data
   </div>

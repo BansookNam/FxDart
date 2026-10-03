@@ -9,7 +9,7 @@ Future<void> main() async {
   final result = await fx([1, 2, 3])
       .toAsync()
       .peek((a) async {
-        await delay(Duration(milliseconds: 150), null);
+        await fxDelay(Duration(milliseconds: 150), null);
         logged.add(a);
       })
       .concurrent(3)

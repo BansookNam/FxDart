@@ -37,7 +37,7 @@ void main() {
       expect('한글'.runes.fx.length, 2);
       expect({'a': 1, 'b': 2}.entries.fx.map((e) => e.key).toList(),
           ['a', 'b']);
-      expect(range(0, 10, 3).fx.toList(), [0, 3, 6, 9]);
+      expect(fxRange(0, 10, 3).fx.toList(), [0, 3, 6, 9]);
       expect(Iterable<int>.generate(1000000).fx.take(3).toList(), [0, 1, 2]);
     });
 
@@ -55,7 +55,7 @@ void main() {
 
   group('FxAsyncEntry / FxStreamEntry / FxFutureEntry', () {
     test('.fx on an FxAsyncIterable chains', () async {
-      expect(await toAsync([1, 2, 3]).fx.map((a) => a * 2).toList(),
+      expect(await fxToAsync([1, 2, 3]).fx.map((a) => a * 2).toList(),
           [2, 4, 6]);
     });
 

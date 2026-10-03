@@ -8,12 +8,12 @@ Future<void> main() async {
   final ids = [1, 2, 3, 4];
   final fetched = fx(ids)
       .toAsync()
-      .map((id) => delay(Duration(milliseconds: 150), id.isEven ? null : id))
+      .map((id) => fxDelay(Duration(milliseconds: 150), id.isEven ? null : id))
       .concurrent(4);
 
   // There is no async .nonNulls getter, so use the top-level form here.
   // FxTS alias: compactAsync(fetched) does the same thing.
-  final found = await fxAsync(nonNullsAsync(fetched)).toList();
+  final found = await fxAsync(fxNonNullsAsync(fetched)).toList();
 
   print(found); // [1, 3]
   print('took ${sw.elapsedMilliseconds}ms'); // ~150ms

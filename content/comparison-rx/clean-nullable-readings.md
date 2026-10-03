@@ -26,7 +26,7 @@ async: false
 
   <h2>Why they differ</h2>
   <p>
-    <code>whereNotNull</code> <em>is</em> <code>compact</code> — the same
+    <code>whereNotNull</code> <em>is</em> <code>fxCompact</code> — the same
     operator wearing each library's naming convention. Both do the thing
     that matters beyond filtering: they <strong>narrow the static
     type</strong>, turning a <code>double?</code> element type into

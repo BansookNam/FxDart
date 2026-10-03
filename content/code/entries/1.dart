@@ -5,7 +5,7 @@ void main() {
   // FxDart operators over its (key, value) pairs.
   final inventory = {'apples': 4, 'bananas': 0, 'cherries': 12};
 
-  final inStock = fx(entries(inventory))
+  final inStock = fx(fxEntries(inventory))
       .filter((e) => e.$2 > 0)
       .map((e) => '${e.$1}: ${e.$2}')
       .toList();

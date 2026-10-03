@@ -13,7 +13,7 @@ Future<void> main() async {
   // 80
 
   // Async too, and the numbering stays in source order under concurrent.
-  final numbered = await fxAsync(toAsync(rows))
+  final numbered = await fxAsync(fxToAsync(rows))
       .mapWithIndex((row, i) => '$i$row')
       .toList();
   print(numbered); // [0a, 1b, 2c, 3d]

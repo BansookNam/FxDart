@@ -9,7 +9,7 @@ Future<void> main() async {
   final sw = Stopwatch()..start();
   final result = await fx([1, 2, 3])
       .toAsync()
-      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
+      .map((i) => fxDelay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrent(3)
       .toList();
 

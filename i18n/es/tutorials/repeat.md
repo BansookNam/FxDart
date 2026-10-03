@@ -2,7 +2,7 @@
 slug: repeat
 title: repeat — FxDart 101
 description: Tutorial de repeat en FxDart: emite el mismo valor n veces, de forma perezosa.
-heading: <code>repeat</code>
+heading: <code>fxRepeat</code>
 section: 2
 crumb: repeat
 prev: range.html
@@ -16,19 +16,19 @@ nextLabel: cycle
 
   <h2>Lección</h2>
   <p>
-    <code>repeat(n, value)</code> emite <code>value</code> exactamente
+    <code>fxRepeat(n, value)</code> emite <code>value</code> exactamente
     <code>n</code> veces y se detiene: es finito y perezoso, como el resto de
     generadores de esta sección. Ten en cuenta que repite el <em>mismo</em>
     valor (o la misma referencia de objeto, si no es un primitivo) cada vez; si
     necesitas un valor nuevo en cada iteración, genéralo aparte (por ejemplo,
     con un <code>map</code> sobre el resultado) en lugar de esperar que
-    <code>repeat</code> llame a una función de fábrica.
+    <code>fxRepeat</code> llame a una función de fábrica.
   </p>
   <p>
     Resulta más útil combinado con otra cosa: aplícale <code>zip</code> con una
     secuencia de longitud variable para estampar una etiqueta constante en cada
     elemento, o usa <code>fx(...).join()</code> para construir una cadena
-    separadora de ancho fijo. <code>repeat(0, value)</code> es una forma válida
+    separadora de ancho fijo. <code>fxRepeat(0, value)</code> es una forma válida
     y perfectamente normal de obtener un iterable vacío.
   </p>
   <p>
@@ -43,7 +43,7 @@ nextLabel: cycle
 
   <h2>Demo 2 · Emparejar una constante con una secuencia variable</h2>
   <p>
-    <code>repeat</code> emite el MISMO valor cada vez: combínalo con
+    <code>fxRepeat</code> emite el MISMO valor cada vez: combínalo con
     <code>zip</code> para estampar una constante sobre una secuencia de
     longitud variable:
   </p>
@@ -51,12 +51,12 @@ nextLabel: cycle
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: construye una <code>List&lt;int&gt;</code> de 5 elementos con
-    el valor 7 usando <code>repeat</code>.</p>
+    el valor 7 usando <code>fxRepeat</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="range.html"><code>range</code></a> — una secuencia perezosa de enteros crecientes o decrecientes ·
+    <a href="range.html"><code>fxRange</code></a> — una secuencia perezosa de enteros crecientes o decrecientes ·
     <a href="cycle.html"><code>cycle</code></a> — repite una secuencia entera, para siempre ·
     <a href="zip.html"><code>zip</code></a> — empareja, se usa a menudo junto a repeat ·
     <a href="fx.html"><code>fx</code></a> — la cadena en la que repeat suele envolverse

@@ -39,7 +39,7 @@ nextLabel: using
     <code><a href="concurrent.html">concurrent(n)</a></code> 아래에서는
     겹쳐 진행되는 각 pull이 자기만의 타이머를 갖고 있으므로, 다소 느린
     항목 <em>n</em>개가 겹쳐도 각각 개별적으로 통과합니다.
-    <code><a href="retry.html">retry</a></code>와 짝을 이룹니다 —
+    <code><a href="retry.html">fxRetry</a></code>와 짝을 이룹니다 —
     timeout은 "멈춰 있음"을 "실패함"으로 바꾸고, retry는 "실패함"을
     "다시 시도함"으로 바꿉니다.
   </p>
@@ -56,7 +56,7 @@ nextLabel: using
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="retry.html"><code>retry</code></a> — 타임아웃이 발생한 뒤 할 일 ·
+    <a href="retry.html"><code>fxRetry</code></a> — 타임아웃이 발생한 뒤 할 일 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 겹치는 pull은 독립적으로 타임아웃됨 ·
     <a href="eitherPipelines.html">타입 있는 에러</a> — <code>TimeoutException</code>을 값으로 잡기
   </div>

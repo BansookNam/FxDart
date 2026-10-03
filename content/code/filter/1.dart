@@ -9,7 +9,7 @@ Future<void> main() async {
   final result = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
       .where((a) async {
-        await delay(Duration(milliseconds: 150), null);
+        await fxDelay(Duration(milliseconds: 150), null);
         return a.isEven;
       })
       .concurrent(3)

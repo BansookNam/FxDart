@@ -2,7 +2,7 @@
 slug: nullable
 title: nullable — FxDart 101
 description: FxDart nullable tutorial: the nullable and nullableAsync builders — straight-line unwrapping of nullable values, the nullable-first alternative to an Option type.
-heading: <code>nullable</code>
+heading: <code>fxNullable</code>
 section: 13
 crumb: nullable
 prev: raise.html
@@ -22,8 +22,8 @@ nextLabel: NonEmptyList
   <p>
     When the only failure information you need is <em>absence</em>, an
     <code>Either</code> is overkill — Dart already has a dedicated absence
-    channel: <code>T?</code>. <code>nullable</code> is the
-    <a href="raise.html"><code>either</code> builder</a>'s info-free twin
+    channel: <code>T?</code>. <code>fxNullable</code> is the
+    <a href="raise.html"><code>fxEither</code> builder</a>'s info-free twin
     (the port of Arrow's <code>nullable&nbsp;{&nbsp;}</code>): the scope's
     <code>r.bind(value)</code> unwraps a nullable, and if it's
     <code>null</code> the whole block returns <code>null</code>.
@@ -54,8 +54,8 @@ nextLabel: NonEmptyList
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="raise.html"><code>either</code> builder</a> — when the failure needs a reason ·
+    <a href="raise.html"><code>fxEither</code> builder</a> — when the failure needs a reason ·
     <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code> bridges back to nullable ·
-    <a href="compact.html"><code>nonNulls</code></a> — drop nulls from a pipeline ·
+    <a href="compact.html"><code>fxNonNulls</code></a> — drop nulls from a pipeline ·
     <a href="typedErrors.html">typed errors — full guide</a>
   </div>

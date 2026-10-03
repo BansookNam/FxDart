@@ -10,7 +10,7 @@ prevLabel: unicodeToList
 next: toAsync.html
 nextLabel: toAsync
 ---
-  <p class="hero-sub">Fully typed currying as extension getters — the Dart-native replacement for FxTS <code>curry</code>.</p>
+  <p class="hero-sub">Fully typed currying as extension getters — the Dart-native replacement for FxTS <code>fxCurry</code>.</p>
 
   {{signature}}
 
@@ -23,7 +23,7 @@ nextLabel: toAsync
     <code>map</code> and <code>filter</code> want.
   </p>
   <p>
-    FxTS ships this as a function, <code>curry(f)</code>, built on two things
+    FxTS ships this as a function, <code>fxCurry(f)</code>, built on two things
     Dart doesn't have: runtime arity reflection (<code>fn.length</code>) and
     recursive conditional types. FxDart instead declares one extension per
     arity (2–5), all exposing the same <code>curried</code> getter, and lets
@@ -38,7 +38,7 @@ nextLabel: toAsync
     deeper than two levels, the deepest matching arity wins; apply an
     extension explicitly (<code>Uncurry2(f).uncurried</code>) to flatten
     fewer levels. The full design story — including why the getter is named
-    <code>curried</code> and not <code>curry</code> — is in
+    <code>curried</code> and not <code>fxCurry</code> — is in
     <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>.
   </p>
 
@@ -70,13 +70,13 @@ nextLabel: toAsync
     and values typed as bare <code>Function</code> don't match the extensions;
     write a closure there. Optional positional parameters <em>do</em> match,
     but the optional slot becomes required in the chain. The deprecated
-    top-level <code>curry</code> stub remains only to steer FxTS migrations
+    top-level <code>fxCurry</code> stub remains only to steer FxTS migrations
     here.
   </div>
 
   <div class="callout">
     <strong>Related:</strong>
     <a href="pipe.html"><code>pipe</code></a> — composition, the main consumer of partially applied functions ·
-    <a href="identity.html"><code>identity</code></a> &amp; <a href="always.html"><code>always</code></a> — other function-shape helpers ·
-    <a href="apply.html"><code>apply</code></a> — spread a list into positional arguments
+    <a href="identity.html"><code>fxIdentity</code></a> &amp; <a href="always.html"><code>fxAlways</code></a> — other function-shape helpers ·
+    <a href="apply.html"><code>fxApply</code></a> — spread a list into positional arguments
   </div>

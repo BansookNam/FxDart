@@ -1,6 +1,6 @@
 import 'dart:async';
 
-/// A debounced function, as returned by [debounce].
+/// A debounced function, as returned by [fxDebounce].
 ///
 /// Port of the FxTS debounced callable (JS attaches `cancel` to the
 /// function; Dart uses a callable class).
@@ -42,13 +42,13 @@ class Debounced<T> {
 /// edge instead.
 ///
 /// Port of FxTS `debounce` (`Util/debounce.ts`).
-Debounced<T> debounce<T>(
+Debounced<T> fxDebounce<T>(
   void Function(T arg) func,
   Duration wait, {
   bool leading = false,
 }) => Debounced._(func, wait, leading: leading);
 
-/// A throttled function, as returned by [throttle].
+/// A throttled function, as returned by [fxThrottle].
 class Throttled<T> {
   final void Function(T arg) _func;
   final Duration _wait;
@@ -69,7 +69,7 @@ class Throttled<T> {
 
   /// Registers a call with [arg]. The wrapped function runs at most once per
   /// [wait] window — on the leading edge, the trailing edge, or both, per the
-  /// flags passed to [throttle].
+  /// flags passed to [fxThrottle].
   void call(T arg) {
     final now = DateTime.now();
     final last = _lastCallTime;
@@ -133,28 +133,28 @@ class Throttled<T> {
 /// Creates a throttled function that invokes [func] at most once per [wait].
 ///
 /// Port of FxTS `throttle` (`Util/throttle.ts`).
-Throttled<T> throttle<T>(
+Throttled<T> fxThrottle<T>(
   void Function(T arg) func,
   Duration wait, {
   bool leading = true,
   bool trailing = true,
 }) => Throttled._(func, wait, leading: leading, trailing: trailing);
 
-/// Method spellings of [debounce] and [throttle], on the callback itself.
+/// Method spellings of [fxDebounce] and [fxThrottle], on the callback itself.
 ///
 /// Both carry the `fx` prefix on purpose. `saveDraft.debounce(…)` would read
 /// as if Dart had always had it; `saveDraft.fxDebounce(…)` says which library
 /// is wrapping the callback, and leaves the bare names free for whatever else
 /// a project puts on its function types.
 extension FxCallbackTiming<T> on void Function(T arg) {
-  /// This callback, debounced by [wait]. See [debounce].
+  /// This callback, debounced by [wait]. See [fxDebounce].
   Debounced<T> fxDebounce(Duration wait, {bool leading = false}) =>
-      debounce(this, wait, leading: leading);
+      Debounced._(this, wait, leading: leading);
 
-  /// This callback, throttled to once per [wait]. See [throttle].
+  /// This callback, throttled to once per [wait]. See [fxThrottle].
   Throttled<T> fxThrottle(
     Duration wait, {
     bool leading = true,
     bool trailing = true,
-  }) => throttle(this, wait, leading: leading, trailing: trailing);
+  }) => Throttled._(this, wait, leading: leading, trailing: trailing);
 }

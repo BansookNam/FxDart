@@ -6,26 +6,26 @@ void main() {
     group('sync', () {
       test('should be able to take the element', () {
         final res = <int>[];
-        for (final item in take(1, [1, 2, 3, 4])) {
+        for (final item in fxTake(1, [1, 2, 3, 4])) {
           res.add(item);
         }
         expect(res, equals([1]));
 
-        expect(toList(take(1, [1, 2, 3, 4])), equals([1]));
-        expect(toList(take(2, [1, 2, 3, 4])), equals([1, 2]));
-        expect(toList(take(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
-        expect(toList(take(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
-        expect(toList(take(-1, [1, 2, 3, 4])), equals([]));
+        expect(fxToList(fxTake(1, [1, 2, 3, 4])), equals([1]));
+        expect(fxToList(fxTake(2, [1, 2, 3, 4])), equals([1, 2]));
+        expect(fxToList(fxTake(4, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(fxToList(fxTake(5, [1, 2, 3, 4])), equals([1, 2, 3, 4]));
+        expect(fxToList(fxTake(-1, [1, 2, 3, 4])), equals([]));
       });
 
       test('should be able to be used in the pipeline', () {
         final res1 = pipe(
           [1, 2, 3, 4],
           [
-            (v) => map((int a) => a + 10, v),
-            (v) => filter((int a) => a % 2 == 0, v),
-            (v) => take(2, v),
-            (v) => toList(v),
+            (v) => fxMap((int a) => a + 10, v),
+            (v) => fxFilter((int a) => a % 2 == 0, v),
+            (v) => fxTake(2, v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -44,7 +44,7 @@ void main() {
       });
 
       test('should be able to take the rest element', () {
-        final it = take(5, range(1, 11)).iterator;
+        final it = fxTake(5, fxRange(1, 11)).iterator;
         it.moveNext();
         it.moveNext();
         var sum = 0;
@@ -58,7 +58,7 @@ void main() {
     group('async', () {
       test('should be able to take the element', () async {
         final res = <int>[];
-        final it = takeAsync(1, toAsync([1, 2, 3, 4])).iterator;
+        final it = fxTakeAsync(1, fxToAsync([1, 2, 3, 4])).iterator;
         while (true) {
           final r = await it.next();
           if (r.done) break;
@@ -67,30 +67,30 @@ void main() {
         expect(res, equals([1]));
 
         expect(
-          await toListAsync(takeAsync(1, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeAsync(1, fxToAsync([1, 2, 3, 4]))),
           equals([1]),
         );
         expect(
-          await toListAsync(takeAsync(2, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeAsync(2, fxToAsync([1, 2, 3, 4]))),
           equals([1, 2]),
         );
         expect(
-          await toListAsync(takeAsync(4, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeAsync(4, fxToAsync([1, 2, 3, 4]))),
           equals([1, 2, 3, 4]),
         );
         expect(
-          await toListAsync(takeAsync(5, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeAsync(5, fxToAsync([1, 2, 3, 4]))),
           equals([1, 2, 3, 4]),
         );
         expect(
-          await toListAsync(takeAsync(-1, toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxTakeAsync(-1, fxToAsync([1, 2, 3, 4]))),
           equals([]),
         );
       });
 
       test('should be able to be used in the pipeline', () async {
         final res1 = await fxAsync(
-          toAsync([1, 2, 3, 4]),
+          fxToAsync([1, 2, 3, 4]),
         ).map((a) => a + 10).filter((a) => a % 2 == 0).take(2).toList();
 
         expect(res1, equals([12, 14]));
@@ -100,7 +100,7 @@ void main() {
         'should be able to be used as a chaining method in the `fx`',
         () async {
           final res1 = await fxAsync(
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).map((a) => a + 10).filter((a) => a % 2 == 0).take(2).toList();
 
           expect(res1, equals([12, 14]));
@@ -109,14 +109,14 @@ void main() {
 
       test('should be able to take the element concurrently', () async {
         Iterable<Future<int>> source() sync* {
-          yield delay(const Duration(milliseconds: 100), 1);
-          yield delay(const Duration(milliseconds: 100), 2);
-          yield delay(const Duration(milliseconds: 100), 3);
-          yield delay(const Duration(milliseconds: 100), 4);
-          yield delay(const Duration(milliseconds: 100), 5);
+          yield fxDelay(const Duration(milliseconds: 100), 1);
+          yield fxDelay(const Duration(milliseconds: 100), 2);
+          yield fxDelay(const Duration(milliseconds: 100), 3);
+          yield fxDelay(const Duration(milliseconds: 100), 4);
+          yield fxDelay(const Duration(milliseconds: 100), 5);
         }
 
-        final it = takeAsync(3, toAsync(source())).iterator;
+        final it = fxTakeAsync(3, fxToAsync(source())).iterator;
         final sw = Stopwatch()..start();
         final values = await Future.wait([
           it.next().then((r) => r.value),

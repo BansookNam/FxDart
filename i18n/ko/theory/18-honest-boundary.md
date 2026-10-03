@@ -91,7 +91,7 @@ Dart의 예외는 검사되지 않으므로 어떤 코드든 — 여러분의 �
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> risky(String s) => either((r) {
+Either<String, int> risky(String s) => fxEither((r) {
       if (s.isEmpty) r.raise('empty');
       // Not modelled, and not caught by the signature:
       return int.parse(s); // throws on 'abc'
@@ -106,12 +106,12 @@ void main() {
   }
 
   // If you want throws folded into the failure channel, say so.
-  print(eitherCatching<String, int>(
+  print(fxEitherCatching<String, int>(
       (r) => int.parse('abc'), (e, _) => 'not a number'));
 }
 ```
 
-`eitherCatching`이 명시적인 변환이고, 명시적이라는 것이 설계입니다. 모든 던지기를
+`fxEitherCatching`이 명시적인 변환이고, 명시적이라는 것이 설계입니다. 모든 던지기를
 말없이 삼키면 진짜 버그가 도메인 실패로 바뀌고, 여러분은 프로덕션에서
 `Left('Bad state: no element')`를 하나씩 받으며 알게 될 것입니다.
 
@@ -132,7 +132,7 @@ class Config {
 
 // Inbound: a throwing API becomes a typed failure.
 Either<String, Config> loadConfig(Map<String, String> env) =>
-    eitherCatching(
+    fxEitherCatching(
       (r) {
         final raw = env['PORT'];
         r.ensureNotNull(raw, () => 'PORT is not set');
@@ -171,7 +171,7 @@ void main() {
 > `Exception`은 올바른 프로그램도 마주칠 수 있는 상황을 알립니다
 > (`FormatException`, `IOException`). 그것이 이 장에 그대로 대응됩니다. `Error`는
 > 잡아서 `Left`로 바꾸면 안 됩니다. 버그를 감추니까요. `Exception`은
-> `eitherCatching`의 훌륭한 후보입니다. 라이브러리를 쓸 때 이 관례를 지키는 것이,
+> `fxEitherCatching`의 훌륭한 후보입니다. 라이브러리를 쓸 때 이 관례를 지키는 것이,
 > 여러분의 호출자가 애초에 이 구분을 할 수 있게 해 주는 일입니다.
 
 ## 널 허용이라는 중간 지대
@@ -181,7 +181,7 @@ void main() {
 전부인가?* 맵 조회, 첫 일치 검색, 선택적 필드: 그렇습니다. 파싱, 검증, 권한 확인:
 아닙니다. 호출자가 무엇이 잘못됐는지 말하고 싶어 할 테니까요.
 
-FxDart의 `nullable` 스코프는 null 모양의 사슬도 같은 직선형 대접을 받도록
+FxDart의 `fxNullable` 스코프는 null 모양의 사슬도 같은 직선형 대접을 받도록
 존재합니다.
 
 ```dart run
@@ -198,7 +198,7 @@ final users = <String, User>{
   'u2': User('Grace', null),
 };
 
-String? managerName(String id) => nullable((r) {
+String? managerName(String id) => fxNullable((r) {
       final user = r.bind(users[id]);
       final managerId = r.bind(user.managerId);
       final manager = r.bind(users[managerId]);
@@ -234,7 +234,7 @@ void main() {
    쿼리 파라미터, 여러분의 함수에 넘어온 음수 배열 길이, 결제사가 거절한 결제.
 2. `int.parse`는 던지고 `int.tryParse`는 null을 돌려줍니다. `Either`라면 무엇을
    줬을 것이며, 무엇을 발명해야 했을까요?
-3. `eitherCatching`은 왜 `either`의 기본 동작이 아니라 별도 함수인가요? 다른
+3. `fxEitherCatching`은 왜 `fxEither`의 기본 동작이 아니라 별도 함수인가요? 다른
    선택을 했다면 따라올 버그를 서술하세요.
 4. 어떤 함수가 `Either<E, A>`를 돌려주면서 일부 입력에서는 던지기도 합니다.
    그것을 어떻게 발견하고, 코드와 시그니처 중 무엇을 바꾸겠어요?
@@ -256,6 +256,6 @@ void main() {
    그 변환이 이름을 가진 결정이라는 뜻입니다.
 4. 실패하는 입력에 대한 테스트로 발견하거나, 던질 수 있는 호출(`parse`, `!`,
    `first`, 리스트의 `[]`)을 찾아 읽어서 발견합니다. 바꿀 것은 *코드*입니다.
-   던지는 호출을 `eitherCatching`으로 감싸 실패를 모델링하거나, 버그라면
+   던지는 호출을 `fxEitherCatching`으로 감싸 실패를 모델링하거나, 버그라면
    의도적으로 전파시키세요. 하지 말아야 할 한 가지는 주석으로 적어 두고 시그니처는
    거짓말하게 두는 것입니다.

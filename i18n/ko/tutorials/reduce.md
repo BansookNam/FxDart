@@ -29,7 +29,7 @@ nextLabel: fold
   </p>
   <p>
     FxTS는 인자 개수로 <code>reduce</code>의 시드 있는 형태와 없는 형태를
-    오버로드합니다 — <code>reduce(f, iterable)</code> 대
+    오버로드합니다 — <code>fxReduce(f, iterable)</code> 대
     <code>reduce(f, seed, iterable)</code>처럼요. Dart에는 인자 개수 기반
     오버로딩이 없기 때문에, FxDart는 <code>reduce</code>를 시드 없는 형태로
     남기고 시드 있는 쪽은 <code><a href="fold.html">fold</a></code>로 이름을
@@ -63,7 +63,7 @@ nextLabel: fold
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="fold.html"><code>fold</code></a> — 시드가 있는 짝 ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — 재사용 가능한 커링된 리듀서 ·
     <a href="sum.html"><code>sum</code></a> — 숫자에 특화된 reduce ·
     <a href="concurrent.html"><code>concurrent</code></a> — 상류에서의 병렬 평가
   </div>

@@ -21,7 +21,7 @@ nextLabel: Either × pipelines
 
   <h2>강의</h2>
   <p>
-    <code>either&lt;Nel&lt;E&gt;, _&gt;(...)</code> 안에서 — 에러 타입이
+    <code>fxEither&lt;Nel&lt;E&gt;, _&gt;(...)</code> 안에서 — 에러 타입이
     <code>NonEmptyList</code>인 모든 스코프에서 — 스코프는 누적 어휘를
     갖게 됩니다:
   </p>
@@ -82,6 +82,6 @@ nextLabel: Either × pipelines
     <strong>관련 항목:</strong>
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — 에러를 실어 나르는 그릇 ·
     <a href="eitherPipelines.html">Either × 파이프라인</a> — <code>fx()</code> 체인 위에서 동시성과 함께 하는 fail-slow 검증 ·
-    <a href="raise.html"><code>either</code> &amp; Raise</a> — 이 기능이 확장하는 fail-fast 스코프 ·
+    <a href="raise.html"><code>fxEither</code> &amp; Raise</a> — 이 기능이 확장하는 fail-fast 스코프 ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>

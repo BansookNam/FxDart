@@ -35,7 +35,7 @@ Future<void> main() async {
   // events until their turn — 'started eager' prints before we even
   // return from toList().
   print('concatEager:');
-  final eagerOut = concatEager([first(), later('eager')]).toList();
+  final eagerOut = fxConcatEager([first(), later('eager')]).toList();
   print('subscribed eager');
   print(await eagerOut); // [1, 2]
 }

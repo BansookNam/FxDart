@@ -234,6 +234,18 @@ exists in `dart:core` and shuffles in place returning void, an instance member
 always beats an extension, so a getter named `shuffle` would silently call the
 wrong one.
 
+**A new top-level function** carries `fx` when its name is short. Count the
+camelCase words with any trailing `Async` and digits removed, and prefix the
+name when there are one or two: `map` → `fxMap`, `groupBy` → `fxGroupBy`,
+`mapAsync` → `fxMapAsync`. Three or more words keep the FxTS spelling
+(`mapWithIndex`, `takeUntilInclusive`). An `Async` twin follows its sync
+name, and chain members on `Fx`, `FxAsync` and `FxEvents` never take the
+prefix. The exceptions are `pipe` and `pipeLazy`, because `fxPipe` is already
+the typed composer. The rule exists because bare names collided: `join` with
+`package:path`, `isEmpty` with `package:test`, and `max`, `min` and `sleep`
+silently shadowed `dart:math` and `dart:io` (a package name beats a `dart:`
+name with no diagnostic).
+
 **Operators do not get extensions on `Iterable`.** Fifteen of them (`map`,
 `where`, `take`, `fold`, `reduce`, `join`, `any`, `every`, `expand`,
 `forEach`, `last`, `toList`, `takeWhile`, `skipWhile`, `skip`) share a name

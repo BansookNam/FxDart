@@ -12,7 +12,7 @@ Future<void> main() async {
     run: () {
       // scan1 folds without a separate seed — each partial sum IS the
       // balance, matching Rx's one-value-per-event pace.
-      final balances = scan1((acc, move) => acc + move, moves).toList();
+      final balances = fxScan1((acc, move) => acc + move, moves).toList();
       return '${balances.length}|${balances.first}|${balances.last}';
     },
   );

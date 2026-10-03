@@ -9,7 +9,7 @@ void main() {
       'should never invoke with leading and trailing both disabled',
       () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 60),
           leading: false,
@@ -28,7 +28,7 @@ void main() {
 
     test('should stay disabled across successive wait periods', () async {
       var callCount = 0;
-      final throttled = throttle<Object?>(
+      final throttled = fxThrottle<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 40),
         leading: false,
@@ -46,7 +46,7 @@ void main() {
       'should throttle rather than debounce with leading disabled',
       () async {
         final received = <int>[];
-        final throttled = throttle<int>(
+        final throttled = fxThrottle<int>(
           received.add,
           const Duration(milliseconds: 100),
           leading: false,
@@ -76,7 +76,7 @@ void main() {
       'should fire the trailing edge once per window, not once per call',
       () async {
         var callCount = 0;
-        final throttled = throttle<Object?>(
+        final throttled = fxThrottle<Object?>(
           (_) => callCount++,
           const Duration(milliseconds: 100),
           leading: false,
@@ -94,7 +94,7 @@ void main() {
 
     test('should not extend the deadline when called mid-window', () async {
       final received = <int>[];
-      final throttled = throttle<int>(
+      final throttled = fxThrottle<int>(
         received.add,
         const Duration(milliseconds: 100),
         leading: true,
@@ -112,7 +112,7 @@ void main() {
 
     test('cancel should be a no-op when nothing is pending', () {
       var callCount = 0;
-      final throttled = throttle<Object?>(
+      final throttled = fxThrottle<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 40),
         leading: false,

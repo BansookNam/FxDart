@@ -91,7 +91,7 @@ think about, which is where the bugs actually come from.
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> risky(String s) => either((r) {
+Either<String, int> risky(String s) => fxEither((r) {
       if (s.isEmpty) r.raise('empty');
       // Not modelled, and not caught by the signature:
       return int.parse(s); // throws on 'abc'
@@ -106,12 +106,12 @@ void main() {
   }
 
   // If you want throws folded into the failure channel, say so.
-  print(eitherCatching<String, int>(
+  print(fxEitherCatching<String, int>(
       (r) => int.parse('abc'), (e, _) => 'not a number'));
 }
 ```
 
-`eitherCatching` is the explicit conversion, and it being explicit is the
+`fxEitherCatching` is the explicit conversion, and it being explicit is the
 design: silently swallowing every throw would turn genuine bugs into domain
 failures, and you would find out in production, one `Left('Bad state: no
 element')` at a time.
@@ -133,7 +133,7 @@ class Config {
 
 // Inbound: a throwing API becomes a typed failure.
 Either<String, Config> loadConfig(Map<String, String> env) =>
-    eitherCatching(
+    fxEitherCatching(
       (r) {
         final raw = env['PORT'];
         r.ensureNotNull(raw, () => 'PORT is not set');
@@ -173,7 +173,7 @@ a test helper, `main`. In between, failures are values.
 > condition a correct program may still hit (`FormatException`,
 > `IOException`). That maps neatly onto this chapter: `Error` should never be
 > caught and converted into a `Left`, because doing so hides a bug;
-> `Exception` is a fine candidate for `eitherCatching`. When you write a
+> `Exception` is a fine candidate for `fxEitherCatching`. When you write a
 > library, following the convention is what lets your callers make this
 > distinction at all.
 
@@ -185,7 +185,7 @@ answer more often than typed-error enthusiasts admit — with one test: *is
 field: yes. A parse, a validation, an authorisation: no, because the caller
 will want to say what went wrong.
 
-FxDart's `nullable` scope exists so the null-shaped chain gets the same
+FxDart's `fxNullable` scope exists so the null-shaped chain gets the same
 straight-line treatment:
 
 ```dart run
@@ -202,7 +202,7 @@ final users = <String, User>{
   'u2': User('Grace', null),
 };
 
-String? managerName(String id) => nullable((r) {
+String? managerName(String id) => fxNullable((r) {
       final user = r.bind(users[id]);
       final managerId = r.bind(user.managerId);
       final manager = r.bind(users[managerId]);
@@ -239,8 +239,8 @@ bugs crash loudly.
    own function; a payment declined by the provider.
 2. `int.parse` throws and `int.tryParse` returns null. Which channel would
    `Either` have given, and what would it have had to invent?
-3. Why is `eitherCatching` a separate function rather than the default
-   behaviour of `either`? Describe the bug that would follow from the other
+3. Why is `fxEitherCatching` a separate function rather than the default
+   behaviour of `fxEither`? Describe the bug that would follow from the other
    choice.
 4. A function returns `Either<E, A>` but also throws on some inputs. How would
    you discover that, and what would you change — the code or the signature?
@@ -263,6 +263,6 @@ bugs crash loudly.
    decision with a name attached.
 4. Discover it with tests over the failing inputs, or by reading for calls that
    can throw (`parse`, `!`, `first`, `[]` on a list). Change the *code*: wrap
-   the throwing call in `eitherCatching` and model the failure, or let it
+   the throwing call in `fxEitherCatching` and model the failure, or let it
    propagate deliberately if it is a bug. The one thing not to do is document
    it in a comment and leave the signature lying.

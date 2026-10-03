@@ -8,7 +8,7 @@ Future<void> main() async {
   // fine here since the slow part -- the fetch -- already ran concurrently.
   final runningTotals = await fx([10, 20, 30])
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 100), a))
+      .map((a) => fxDelay(Duration(milliseconds: 100), a))
       .concurrent(3)
       .scan((acc, a) => acc + a, 0)
       .toList();

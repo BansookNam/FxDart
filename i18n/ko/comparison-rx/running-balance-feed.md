@@ -35,7 +35,7 @@ async: false
     RxDart의 <code>scan</code>은 시드를 받아 이벤트당 값 하나를
     내보냅니다(누산기는 인덱스도 함께 받습니다). FxDart의 시드 있는
     <code>scan</code>은 FxTS를 따라 시드 자체를 먼저 내놓으므로, 패널은
-    시드 없는 <code>scan1</code>을 사용합니다 — 0에서 시작하는 잔액이라면
+    시드 없는 <code>fxScan1</code>을 사용합니다 — 0에서 시작하는 잔액이라면
     각 부분합이 <em>곧</em> 잔액이고, 두 박자는 정확히 맞아떨어집니다.
     그 밖에 남는 잔여물은 전달 방식뿐입니다: 스트림 버전은
     <code>async</code> main을 거쳐 수집하고, pull 버전은 동기 체인

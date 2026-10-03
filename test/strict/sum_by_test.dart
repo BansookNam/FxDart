@@ -5,16 +5,16 @@ void main() {
   group('sumBy', () {
     group('sync', () {
       test('should sum the key of every element', () {
-        expect(sumBy((String s) => s.length, ['a', 'bb', 'ccc']), equals(6));
-        expect(sumBy((int n) => n * 2, [1, 2, 3]), equals(12));
+        expect(fxSumBy((String s) => s.length, ['a', 'bb', 'ccc']), equals(6));
+        expect(fxSumBy((int n) => n * 2, [1, 2, 3]), equals(12));
       });
 
       test('should return 0 for an empty iterable', () {
-        expect(sumBy((int n) => n, <int>[]), equals(0));
+        expect(fxSumBy((int n) => n, <int>[]), equals(0));
       });
 
       test('should switch to double accumulation at the first double key', () {
-        expect(sumBy((num n) => n, [1, 2, 2.5]), equals(5.5));
+        expect(fxSumBy((num n) => n, [1, 2, 2.5]), equals(5.5));
       });
 
       test('should be able to be used in the pipeline', () {
@@ -30,18 +30,18 @@ void main() {
     group('async', () {
       test('should sum the key of every element', () async {
         expect(
-          await sumByAsync((String s) => s.length, toAsync(['a', 'bb'])),
+          await fxSumByAsync((String s) => s.length, fxToAsync(['a', 'bb'])),
           equals(3),
         );
       });
 
       test('should return 0 for an empty iterable', () async {
-        expect(await sumByAsync((int n) => n, toAsync(<int>[])), equals(0));
+        expect(await fxSumByAsync((int n) => n, fxToAsync(<int>[])), equals(0));
       });
 
       test('should await async keys and be usable in the pipeline', () async {
         final res = await fx([1, 2, 3]).toAsync().sumBy(
-          (n) => delay(const Duration(milliseconds: 10), n * 10),
+          (n) => fxDelay(const Duration(milliseconds: 10), n * 10),
         );
         expect(res, equals(60));
       });

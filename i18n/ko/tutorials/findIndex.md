@@ -47,7 +47,7 @@ nextLabel: includes
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="find.html"><code>find</code></a> — 같은 탐색, 값을 반환 ·
-    <a href="includes.html"><code>includes</code></a> — 그저 "있는가?"만 확인 ·
-    <a href="nth.html"><code>nth</code></a> — 그 반대: 인덱스를 넣고 값을 받기 ·
+    <a href="includes.html"><code>fxIncludes</code></a> — 그저 "있는가?"만 확인 ·
+    <a href="nth.html"><code>fxNth</code></a> — 그 반대: 인덱스를 넣고 값을 받기 ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — 내부 동작을 떠받치는 함수
   </div>

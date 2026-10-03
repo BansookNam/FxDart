@@ -17,7 +17,7 @@ nextLabel: max
   <h2>Lecture</h2>
   <p>
     <code>min</code> is a terminal, numeric-only fold — internally it's
-    <code>fold(double.infinity, ..., iterable)</code>, comparing each element
+    <code>fxFold(double.infinity, ..., iterable)</code>, comparing each element
     against a running minimum that starts at <code>+infinity</code>.
   </p>
   <p>

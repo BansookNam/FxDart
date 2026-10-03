@@ -16,7 +16,7 @@ nextLabel: intersectionBy
 
   <h2>Lecture</h2>
   <p>
-    <code>intersection(iterable1, iterable2)</code> shares
+    <code>fxIntersection(iterable1, iterable2)</code> shares
     <code>difference</code>'s argument-order convention: the result walks
     <strong><code>iterable2</code></strong>, and keeps each element (in
     <code>iterable2</code>'s order, deduplicated) that <em>is</em> found in
@@ -28,7 +28,7 @@ nextLabel: intersectionBy
   </p>
   <p>
     Under the hood it's
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
+    <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code> — reach
     for <a href="intersectionBy.html"><code>intersectionBy</code></a>
     directly when you need to match by a computed key across two lists of
     full records rather than by value equality.
@@ -56,5 +56,5 @@ nextLabel: intersectionBy
     <a href="difference.html"><code>difference</code></a> — the exclusion counterpart ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — match by a computed key instead ·
     <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership of a single value
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — test membership of a single value
   </div>

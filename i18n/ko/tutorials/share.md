@@ -78,5 +78,5 @@ nextLabel: shareReplay
     <a href="shareReplay.html"><code>shareReplay</code></a> — 이력 버퍼를 기억하는 멀티캐스트 ·
     <a href="liveValue.html"><code>LiveValue</code></a> — 기억하는 공유: 늦은 구독자가 현재 값을 먼저 받음 ·
     <a href="tee.html"><code>tee</code></a> — 한 번의 순회에 독자 둘, 버퍼 없이 — 풀 쪽의 답 ·
-    <a href="fork.html"><code>fork</code></a> — 한 소스에 독립적인 풀 커서 둘, 버퍼를 대가로
+    <a href="fork.html"><code>fxFork</code></a> — 한 소스에 독립적인 풀 커서 둘, 버퍼를 대가로
   </div>

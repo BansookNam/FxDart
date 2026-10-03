@@ -4,7 +4,7 @@ Future<void> main() async {
   // Async chain: .indexed() is a method — with parens.
   final result = await fx(['a', 'b', 'c'])
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 50), a))
+      .map((a) => fxDelay(Duration(milliseconds: 50), a))
       .indexed()
       .toList();
 

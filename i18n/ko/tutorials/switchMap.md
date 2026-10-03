@@ -54,7 +54,7 @@ nextLabel: mergeMap
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — 자연스러운 상류 파트너: 들어가는 쿼리는 줄이고, 나오는 낡은 결과는 없앰 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — 자연스러운 상류 파트너: 들어가는 쿼리는 줄이고, 나오는 낡은 결과는 없앰 ·
     <a href="race.html"><code>race</code></a> — 연속된 스트림이 아니라 <em>형제</em> 스트림 사이의 취소 ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> — 모든 결과가 중요할 때, pull 쪽 팬아웃
   </div>

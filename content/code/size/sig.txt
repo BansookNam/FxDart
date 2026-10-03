@@ -1,5 +1,5 @@
-int count&lt;A&gt;(Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; countAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
+int fxCount&lt;A&gt;(Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; fxCountAsync&lt;A&gt;(FxAsyncIterable&lt;A&gt; iterable)
 int Fx.length              // sync chain: inherited Iterable getter, no parens
 Future&lt;int&gt; FxAsync.count()  // async chain method
-int size&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias
+int fxSize&lt;A&gt;(Iterable&lt;A&gt; iterable)  // FxTS alias

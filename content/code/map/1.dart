@@ -5,7 +5,7 @@ Future<void> main() async {
 
   final result = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .map((a) => delay(Duration(milliseconds: 200), a * 10))
+      .map((a) => fxDelay(Duration(milliseconds: 200), a * 10))
       .concurrent(3) // remove this line to see ~1200ms
       .toList();
 

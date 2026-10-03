@@ -8,5 +8,5 @@ void main() {
   print(fx(['a', 'b', 'c']).firstOrNull); // a
 
   // FxTS alias: head — the same operator.
-  print(head([10, 20, 30])); // 10
+  print(fxHead([10, 20, 30])); // 10
 }

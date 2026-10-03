@@ -24,7 +24,7 @@ nextLabel: ifEmpty
     almacena nada; los acumuladores son independientes y no tienen por qué
     compartir tipo; y los lectores han de ser folds, no pipelines. Lee esa
     página primero para el razonamiento y para saber cuándo
-    <a href="fork.html"><code>fork</code></a> es la mejor herramienta.
+    <a href="fork.html"><code>fxFork</code></a> es la mejor herramienta.
   </p>
   <p>
     Dart no tiene genéricos variádicos, así que cada aridad es su propia
@@ -45,6 +45,6 @@ nextLabel: ifEmpty
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="tee.html"><code>tee</code></a> — la forma de dos folds, y la explicación completa ·
-    <a href="fork.html"><code>fork</code></a> — lectores independientes, a costa de un búfer ·
+    <a href="fork.html"><code>fxFork</code></a> — lectores independientes, a costa de un búfer ·
     <a href="fold.html"><code>fold</code></a> — un solo fold
   </div>

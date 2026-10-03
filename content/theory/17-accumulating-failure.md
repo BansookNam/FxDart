@@ -45,7 +45,7 @@ void main() {
   final raw = ['31', 'x', '44', 'y'];
 
   // 1. zipOrAccumulate2..5 — a fixed set of independent branches.
-  print(either<Nel<String>, String>((r) => r.zipOrAccumulate2(
+  print(fxEither<Nel<String>, String>((r) => r.zipOrAccumulate2(
         (br) {
           if (raw[1] != '0') br.raise('second must be 0');
           return raw[1];
@@ -66,7 +66,7 @@ void main() {
 
   // 4. accumulate — the general scope, any number of branches,
   //    and the only one that supports dependent rules.
-  print(either<Nel<String>, int>((r) => r.accumulate((acc) {
+  print(fxEither<Nel<String>, int>((r) => r.accumulate((acc) {
         final first = acc.accumulating(
             (br) => br.bind(parseAge(raw[0])));
         final third = acc.accumulating(
@@ -120,7 +120,7 @@ class Signup {
 }
 
 Either<Nel<String>, Signup> validate(Map<String, String> form) =>
-    either((r) => r.accumulate((acc) {
+    fxEither((r) => r.accumulate((acc) {
           final email = acc.accumulating((br) {
             final v = form['email'] ?? '';
             if (!v.contains('@')) {

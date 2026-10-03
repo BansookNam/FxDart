@@ -41,7 +41,7 @@ fx(lines).map(f);</code></pre>
     .toList();</code></pre>
   <p>
     Las etapas tienen que ser enviables cuando el resultado es un
-    worker de <code>parallel</code>. <code>juxt</code> es la otra
+    worker de <code>parallel</code>. <code>fxJuxt</code> es la otra
     dirección: varias funciones, una entrada, una lista de resultados.
   </p>
   <p>
@@ -82,7 +82,7 @@ fx(lines).map(f);</code></pre>
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="pipe.html"><code>pipe</code></a> — la misma idea, sin tipos, sobre un valor ·
-    <a href="juxt.html"><code>juxt</code></a> — varias funciones, una entrada, una lista de resultados ·
+    <a href="juxt.html"><code>fxJuxt</code></a> — varias funciones, una entrada, una lista de resultados ·
     <a href="map.html"><code>map</code></a> — la misma composición en este isolate ·
     <a href="parallel.html"><code>parallel</code></a> — donde componer workers ahorra un hop
   </div>

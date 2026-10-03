@@ -49,8 +49,8 @@ nextLabel: curried &amp; uncurried
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="split.html"><code>split</code></a> — split on a plain char iterable ·
+    <a href="split.html"><code>fxSplit</code></a> — split on a plain char iterable ·
     <a href="reverse.html"><code>reverse</code></a> — reverse an Iterable, same surrogate-pair care applies to strings ·
     <a href="countBy.html"><code>countBy</code></a> — used above to tally characters ·
-    <a href="identity.html"><code>identity</code></a> — used above as the counting key
+    <a href="identity.html"><code>fxIdentity</code></a> — used above as the counting key
   </div>

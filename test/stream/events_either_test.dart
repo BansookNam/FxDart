@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 /// A delivered notification tagged with the channel it arrived on, so a test

@@ -9,7 +9,7 @@ Future<void> main() async {
   await fx([1, 2, 3])
       .toAsync()
       .peek((a) async {
-        await sleep(const Duration(milliseconds: 50));
+        await fxSleep(const Duration(milliseconds: 50));
         processed++;
       })
       .consume();

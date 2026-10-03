@@ -27,7 +27,7 @@ Future<List<Event>> fetchPage(List<List<Event>> store, int page) async {
 }
 
 FxAsync<Event> drain(List<List<Event>> store) =>
-    fx(range(0, store.length)).toAsync().flatMap((p) => fetchPage(store, p));
+    fx(fxRange(0, store.length)).toAsync().flatMap((p) => fetchPage(store, p));
 
 Future<void> main() async {
   final events = await drain(primary)

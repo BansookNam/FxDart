@@ -3,7 +3,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final user = {'name': 'kim', 'age': 32, 'city': 'seoul'};
 
-  final updated = evolve({
+  final updated = fxEvolve({
     'name': (v) => (v as String).toUpperCase(),
     'age': (v) => (v as int) + 1,
   }, user);

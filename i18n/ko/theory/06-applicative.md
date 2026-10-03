@@ -90,7 +90,7 @@ name.flatMap((n) => age.flatMap((a) => Either.right(User(n, a))));
 ## FxDart에서 오류 모으기
 
 Dart에는 `Validated` 타입이 없습니다. FxDart는 Arrow 2.x를 따라 대신 누적
-*스코프*를 제공합니다. `either` 안에서 하나 요청하세요.
+*스코프*를 제공합니다. `fxEither` 안에서 하나 요청하세요.
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -105,7 +105,7 @@ class User {
 }
 
 Either<Nel<String>, User> parse(String name, String age) =>
-    either((r) => r.zipOrAccumulate2(
+    fxEither((r) => r.zipOrAccumulate2(
           (br) {
             if (name.isEmpty) br.raise('name is empty');
             return name;
@@ -138,7 +138,7 @@ Either<Nel<String>, String> checkout(
   String qty,
   String coupon,
 ) =>
-    either((r) => r.accumulate((acc) {
+    fxEither((r) => r.accumulate((acc) {
           final i = acc.accumulating((br) {
             if (item.isEmpty) br.raise('item required');
             return item;
@@ -183,7 +183,7 @@ API가 된 것입니다.
 
 | 필요한 것 | 쓸 것 | 이유 |
 |---|---|---|
-| 2단계가 1단계의 값을 필요로 함 | `flatMap` / `either` 스코프 | 의존성이 실재함 |
+| 2단계가 1단계의 값을 필요로 함 | `flatMap` / `fxEither` 스코프 | 의존성이 실재함 |
 | 단계가 독립적이고 첫 실패면 충분 | `map2` | 가장 값싸고 단락 평가됨 |
 | 단계가 독립적이고 모든 실패를 보고 | `zipOrAccumulate` / `accumulate` | 어플리커티브 모양만이 할 수 있음 |
 | 단계가 독립적이고 느림 | 어플리커티브 + 동시성 | 독립성이 겹쳐 실행을 합법으로 만듦 |

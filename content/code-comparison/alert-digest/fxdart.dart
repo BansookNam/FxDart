@@ -44,7 +44,7 @@ void main() {
             }),
           ]);
 
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Alert digest — ERROR ${byLevel['ERROR']}, WARN ${byLevel['WARN']}',
     ...body,
   ]));

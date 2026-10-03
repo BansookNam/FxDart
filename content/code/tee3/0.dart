@@ -10,7 +10,7 @@ void main() {
   }
 
   // Three folds, still one pass — sum, peak, and how many readings there were:
-  final (total, peak, count) = tee3(
+  final (total, peak, count) = fxTee3(
       sensor(),
       (seed: 0, step: (int a, int r) => a + r),
       (seed: 0, step: (int a, int r) => r > a ? r : a),

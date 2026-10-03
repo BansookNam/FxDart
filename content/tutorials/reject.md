@@ -17,7 +17,7 @@ nextLabel: compact
   <h2>Lecture</h2>
   <p>
     <code>whereNot</code> is implemented as
-    <code>where((a) =&gt; !f(a), iterable)</code> — it exists purely for
+    <code>fxWhere((a) =&gt; !f(a), iterable)</code> — it exists purely for
     readability. <code>list.whereNot(isInvalid)</code> reads more naturally
     than <code>list.where((a) =&gt; !isInvalid(a))</code>, especially once
     the predicate already has a clear, positive name. <code>whereNot</code>
@@ -28,7 +28,7 @@ nextLabel: compact
   </p>
   <p>
     Everything about <code>where</code>'s behavior carries over unchanged:
-    it's lazy, and the async form inherits <code>whereAsync</code>'s
+    it's lazy, and the async form inherits <code>fxWhereAsync</code>'s
     dedicated concurrent path, so <code>.concurrent(n)</code> genuinely
     evaluates <code>n</code> predicates in parallel while still returning
     results in original order.
@@ -48,7 +48,7 @@ nextLabel: compact
   <div class="callout">
     <strong>Related:</strong>
     <a href="filter.html"><code>filter</code></a> — the function reject delegates to ·
-    <a href="compact.html"><code>compact</code></a> — reject nulls specifically ·
+    <a href="compact.html"><code>fxCompact</code></a> — reject nulls specifically ·
     <a href="uniq.html"><code>uniq</code></a> — remove duplicates ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
   </div>

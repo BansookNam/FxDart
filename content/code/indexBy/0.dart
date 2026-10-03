@@ -8,7 +8,7 @@ void main() {
   ];
 
   // Data-first form: last duplicate wins, earlier ones are overwritten.
-  final byId = indexBy((u) => u['id'], users);
+  final byId = fxIndexBy((u) => u['id'], users);
   print(byId);
   // {1: {id: 1, name: ann-updated}, 2: {id: 2, name: bob}}
 

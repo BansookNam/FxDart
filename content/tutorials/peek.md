@@ -30,7 +30,7 @@ nextLabel: pluck
     once per element that gets pulled through, in order, and not before.
   </p>
   <p>
-    <code>peekAsync</code> is built directly on top of <code>mapAsync</code>
+    <code>fxPeekAsync</code> is built directly on top of <code>fxMapAsync</code>
     (it awaits <code>f</code>, then re-yields the original value), so it
     shares <code>map</code>'s concurrency behavior exactly:
     <code>.concurrent(n)</code> genuinely runs <code>n</code> callbacks in
@@ -56,6 +56,6 @@ nextLabel: pluck
     <strong>Related:</strong>
     <a href="mapEffect.html"><code>mapEffect</code></a> — like peek, but can transform ·
     <a href="map.html"><code>map</code></a> — transform each element ·
-    <a href="pluck.html"><code>pluck</code></a> — pull one field out of each map ·
+    <a href="pluck.html"><code>fxPluck</code></a> — pull one field out of each map ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
   </div>

@@ -20,7 +20,7 @@ Future<void> main() async {
       sourceRuns = 0;
       // tee advances BOTH reductions on the same element, so one pass feeds
       // them both and nothing is ever buffered.
-      final (total, peak) = tee(
+      final (total, peak) = fxTee(
         readings(),
         (seed: 0, step: (int a, int r) => a + r),
         (seed: 0, step: (int a, int r) => r > a ? r : a),

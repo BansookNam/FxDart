@@ -2,7 +2,7 @@
 slug: isMatch
 title: isMatch — FxDart 101
 description: Tutorial de isMatch en FxDart: coincidencia parcial y profunda contra un patrón de Map o de lista.
-heading: <code>isMatch</code>
+heading: <code>fxIsMatch</code>
 section: 9
 crumb: isMatch
 prev: resolveProps.html
@@ -16,7 +16,7 @@ nextLabel: matches
 
   <h2>Lección</h2>
   <p>
-    <code>isMatch</code> recorre <code>pattern</code> de forma recursiva y comprueba
+    <code>fxIsMatch</code> recorre <code>pattern</code> de forma recursiva y comprueba
     que <code>target</code> lo «contiene», con reglas distintas según la forma:
   </p>
   <p>
@@ -45,13 +45,13 @@ nextLabel: matches
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>isMatch</code> para comprobar si <code>order</code> coincide con <code>{'status': 'shipped'}</code>.</p>
+  <p>Ejercicio: usa <code>fxIsMatch</code> para comprobar si <code>order</code> coincide con <code>{'status': 'shipped'}</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="matches.html"><code>matches</code></a> — la versión currificada de esto, lista para filtrar ·
-    <a href="pickBy.html"><code>pickBy</code></a> — suele acompañarla para filtrar por forma ·
+    <a href="matches.html"><code>fxMatches</code></a> — la versión currificada de esto, lista para filtrar ·
+    <a href="pickBy.html"><code>fxPickBy</code></a> — suele acompañarla para filtrar por forma ·
     <a href="find.html"><code>find</code></a> — localiza el primer elemento que coincide ·
-    <a href="omitBy.html"><code>omitBy</code></a> — descarta entradas según un predicado
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — descarta entradas según un predicado
   </div>

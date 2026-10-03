@@ -21,20 +21,20 @@ nextLabel: fromEntries
     specific reason: Dart's <code>is</code> operator can't be torn off as a
     first-class function value, but <code>filter</code>, <code>takeWhile</code>,
     <code>find</code>, and friends all want a <code>bool Function(A)</code>.
-    <code>filter(isString, mixedList)</code> reads better than
-    <code>filter((a) => a is String, mixedList)</code>, and that's the whole
+    <code>fxFilter(isString, mixedList)</code> reads better than
+    <code>fxFilter((a) => a is String, mixedList)</code>, and that's the whole
     point of this page.
   </p>
   <p>
-    <code>isNil</code> is a straight port of FxTS's "is <code>null</code> or
+    <code>fxIsNil</code> is a straight port of FxTS's "is <code>null</code> or
     <code>undefined</code>" check — since Dart collapses both into
-    <code>null</code>, it's byte-for-byte identical to <code>isNull</code>.
+    <code>null</code>, it's byte-for-byte identical to <code>fxIsNull</code>.
     Three more names exist purely for FxTS parity and are marked
-    <code>@Deprecated</code>: <code>isUndefined</code> (there's no
-    <code>undefined</code> in Dart, so it's just <code>isNull</code>),
-    <code>isArray</code> (JS <code>Array</code> → Dart <code>List</code>, so
-    it's <code>isList</code>), and <code>isObject</code> (JS plain object →
-    Dart <code>Map</code>, so it's <code>isMap</code>). Reach for the
+    <code>@Deprecated</code>: <code>fxIsUndefined</code> (there's no
+    <code>undefined</code> in Dart, so it's just <code>fxIsNull</code>),
+    <code>fxIsArray</code> (JS <code>Array</code> → Dart <code>List</code>, so
+    it's <code>fxIsList</code>), and <code>fxIsObject</code> (JS plain object →
+    Dart <code>Map</code>, so it's <code>fxIsMap</code>). Reach for the
     non-deprecated name in new code; the aliases are there so ported call
     sites still compile.
   </p>
@@ -42,7 +42,7 @@ nextLabel: fromEntries
   <h2>Demo 1 · Filter-friendly tear-offs</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · <code>isNil</code> and the deprecated aliases</h2>
+  <h2>Demo 2 · <code>fxIsNil</code> and the deprecated aliases</h2>
   {{playground:1}}
 
   <h2>Try it yourself</h2>
@@ -53,6 +53,6 @@ nextLabel: fromEntries
     <strong>Related:</strong>
     <a href="filter.html"><code>filter</code></a> — the usual place these get plugged in ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based check, not a type check ·
-    <a href="compact.html"><code>compact</code></a> — drop nulls from an iterable ·
-    <a href="matches.html"><code>matches</code></a> — a predicate for shape, not type
+    <a href="compact.html"><code>fxCompact</code></a> — drop nulls from an iterable ·
+    <a href="matches.html"><code>fxMatches</code></a> — a predicate for shape, not type
   </div>

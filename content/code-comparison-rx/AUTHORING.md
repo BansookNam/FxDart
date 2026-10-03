@@ -60,9 +60,9 @@ Chips: tier sets no count here — list every distinct fxdart function used
 
 **Chip rule:** every name in `functions:` (and optional `alsoLink:`) MUST
 have a tutorial at `content/tutorials/<name>.md` (build fails otherwise —
-check with ls). Use chain-method names (`concurrent`, not `concurrentAsync`;
+check with ls). Use chain-method names (`concurrent`, not `fxConcurrentAsync`;
 `ifEmpty` covers `defaultIfEmpty`; `uniqAdjacent` covers `uniqAdjacentBy`;
-`retry` covers `mapRetry`). For `fromStream`/`toStream`/`fxStream` use the
+`retry` covers `mapRetry`). For `fxFromStream`/`toStream`/`fxStream` use the
 chip name `streams`. `toList` never counts. RxDart operator names in prose
 (`debounceTime`, `switchMap`, …) stay plain `<code>` — they must NOT appear
 in `functions:`/`alsoLink:` (no tutorials exist for them, the build would
@@ -107,7 +107,7 @@ idiomatically too.
   (+ `dart:async`); it must NOT import rxdart. When an example needs a
   simulated *event source* (a Stream), both sides build it from `dart:async`
   primitives, duplicated **verbatim** — the fxdart side then either bridges
-  it (`fxStream`/`fromStream`) or shows the pull-native equivalent, per the
+  it (`fxStream`/`fxFromStream`) or shows the pull-native equivalent, per the
   example's point.
 - Shared data/model classes: duplicate them **verbatim** in both files.
 - Keep each file readable in a browser editor: aim ≤ 60 lines; small

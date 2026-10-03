@@ -14,7 +14,7 @@ void main() {
 
     test('negate getter matches the top-level negate', () {
       final viaGetter = isEven.negate;
-      final viaFunction = negate(isEven);
+      final viaFunction = fxNegate(isEven);
       for (final n in [-2, -1, 0, 1, 2]) {
         expect(viaGetter(n), equals(viaFunction(n)));
       }
@@ -127,8 +127,8 @@ void main() {
     });
 
     test('works with the top-level operators', () {
-      final res = toList(
-        filter(isEven.contramap<String>((s) => s.length), [
+      final res = fxToList(
+        fxFilter(isEven.contramap<String>((s) => s.length), [
           'a',
           'ab',
           'abc',

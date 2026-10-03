@@ -26,7 +26,7 @@ void main() {
     });
 
     test('is empty for an empty source', () async {
-      expect(await asyncEmpty<int>().toStream().toList(), equals(<int>[]));
+      expect(await fxAsyncEmpty<int>().toStream().toList(), equals(<int>[]));
     });
 
     test('produces one element per element consumed', () async {

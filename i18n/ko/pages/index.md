@@ -114,7 +114,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
         <li><strong>또 하나의 비동기 추상화</strong> — <code>Stream</code>으로는 동시성 역채널을 표현할 수 없기 때문에 <code>FxAsyncIterable</code>이 존재합니다. 상호 변환은 쉽지만, 익혀야 할 개념이 하나 늘어납니다.</li>
         <li><strong>학습 곡선</strong> — 지연 파이프라인으로 사고하는 방식은 명령형 반복문과 다릅니다.</li>
         <li><strong>항상 가장 빠르지는 않음</strong> — 아주 작은 핫 루프라면 손으로 쓴 <code>for</code>가 연산자 조합보다 빠를 수 있습니다. FxDart는 명료함과 I/O 바운드 작업에 최적화되어 있습니다.</li>
-        <li><strong>그대로 옮겨지지 않는 TS API도 있음</strong> — 대신 Dart다운 표기를 따릅니다. <code>curry</code>는 타입이 있는 <a href="tutorials/curried.html"><code>.curried</code></a> 확장 게터가 되었고, 기존 이름은 마이그레이션을 위한 deprecated 스텁으로 남겨 두었습니다.</li>
+        <li><strong>그대로 옮겨지지 않는 TS API도 있음</strong> — 대신 Dart다운 표기를 따릅니다. <code>fxCurry</code>는 타입이 있는 <a href="tutorials/curried.html"><code>.curried</code></a> 확장 게터가 되었고, 기존 이름은 마이그레이션을 위한 deprecated 스텁으로 남겨 두었습니다.</li>
       </ul>
     </div>
   </div>

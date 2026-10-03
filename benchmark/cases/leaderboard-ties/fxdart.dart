@@ -23,7 +23,7 @@ Future<void> main() async {
       final byScore = fx(
         players,
       ).sortBy((p) => -p.score).groupBy((p) => p.score);
-      final lines = fx(entries(byScore)).zipWithIndex().flatMap((g) {
+      final lines = fx(fxEntries(byScore)).zipWithIndex().flatMap((g) {
         final (i, (score, group)) = g;
         return group.map((p) => '#${i + 1} ${p.name} — $score pts');
       }).toList();

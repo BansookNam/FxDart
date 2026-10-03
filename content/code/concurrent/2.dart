@@ -11,7 +11,7 @@ Future<void> main() async {
 
   final result = await fx(items)
       .toAsync()
-      .map((a) => delay(const Duration(milliseconds: 200), a))
+      .map((a) => fxDelay(const Duration(milliseconds: 200), a))
       .concurrent(n)
       .toList();
 

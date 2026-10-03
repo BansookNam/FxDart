@@ -9,9 +9,9 @@ import 'map.dart';
 /// Port of FxTS `filter` (sync).
 ///
 /// ```dart
-/// filter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6]); // (0, 2, 4, 6)
+/// fxFilter((a) => a % 2 == 0, [0, 1, 2, 3, 4, 5, 6]); // (0, 2, 4, 6)
 /// ```
-Iterable<A> filter<A>(bool Function(A a) f, Iterable<A> iterable) =>
+Iterable<A> fxFilter<A>(bool Function(A a) f, Iterable<A> iterable) =>
     _FilterIterable(f, iterable);
 
 class _FilterIterable<A> extends Iterable<A>
@@ -34,8 +34,8 @@ class _FilterIterable<A> extends Iterable<A>
     }
     final r = fxIntRangeOf(source);
     if (r != null) {
-      // `range()` is the other source shape that is a plain counted loop.
-      // `filter(p, range(0, xs.length))` — walking indices to keep positional
+      // `fxRange()` is the other source shape that is a plain counted loop.
+      // `fxFilter(p, fxRange(0, xs.length))` — walking indices to keep positional
       // context — is common enough to be worth the counter.
       return _FilterRangeIterator(_f, r) as Iterator<A>;
     }
@@ -63,7 +63,7 @@ class _FilterIterable<A> extends Iterable<A>
   }
 }
 
-/// `filter(p, source)` followed by `uniq()`, as one stage.
+/// `fxFilter(p, source)` followed by `uniq()`, as one stage.
 ///
 /// The saving is one stage boundary — a `moveNext` plus a `current` read per
 /// source element — not the callbacks, which still run once each per element
@@ -152,7 +152,7 @@ class _FilterUniqIterator<A> implements Iterator<A> {
   }
 }
 
-/// `filter(p, source)` followed by `uniqBy(f)`, as one stage — see
+/// `fxFilter(p, source)` followed by `uniqBy(f)`, as one stage — see
 /// [_FilterUniqIterable].
 class _FilterUniqByIterable<A, B> extends Iterable<A> {
   _FilterUniqByIterable(this._p, this._f, this._source);
@@ -251,7 +251,7 @@ class _FilterUniqByIterator<A, B> implements Iterator<A> {
   }
 }
 
-/// [filter] over a `List`, walked by index — see [_FilterUniqByListIterator]
+/// [fxFilter] over a `List`, walked by index — see [_FilterUniqByListIterator]
 /// for why the `Iterator<A>` field is what costs.
 class _FilterListIterator<A> implements Iterator<A> {
   _FilterListIterator(this._f, this._list) : _end = _list.length;
@@ -280,7 +280,7 @@ class _FilterListIterator<A> implements Iterator<A> {
   }
 }
 
-/// [filter] over a `range()`, walked with a counter — see
+/// [fxFilter] over a `fxRange()`, walked with a counter — see
 /// [_FilterUniqByListIterator] for why the `Iterator` field is what costs.
 class _FilterRangeIterator implements Iterator<int> {
   _FilterRangeIterator(this._f, FxIntRange r)
@@ -332,7 +332,7 @@ class _FilterIterator<A> implements Iterator<A> {
   }
 }
 
-/// Like [filter], but the predicate also receives the element's 0-based
+/// Like [fxFilter], but the predicate also receives the element's 0-based
 /// position in the **input** — dropped elements still advance the count.
 ///
 /// ```dart
@@ -379,20 +379,20 @@ FxAsyncIterable<A> filterWithIndexAsync<A>(
 ) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
-    return filterAsync((A a) => f(a, i++), source).iterator;
+    return fxFilterAsync((A a) => f(a, i++), source).iterator;
   });
 }
 
-/// The opposite of [filter]: all elements [f] returns false for.
+/// The opposite of [fxFilter]: all elements [f] returns false for.
 ///
 /// Port of FxTS `reject`.
-Iterable<A> reject<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    filter((A a) => !f(a), iterable);
+Iterable<A> fxReject<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxFilter((A a) => !f(a), iterable);
 
 /// Filters `null` out and narrows the element type.
 ///
-/// Port of FxTS `compact`.
-Iterable<A> compact<A>(Iterable<A?> iterable) => _CompactIterable(iterable);
+/// Port of FxTS `fxCompact`.
+Iterable<A> fxCompact<A>(Iterable<A?> iterable) => _CompactIterable(iterable);
 
 class _CompactIterable<A> extends Iterable<A> {
   _CompactIterable(this._source);
@@ -422,13 +422,13 @@ class _CompactIterator<A> implements Iterator<A> {
 /// Maps each element through [f] and yields only the non-null results —
 /// lazily, in a single stage.
 ///
-/// `compact(map(f, xs))` computes the same values, but stacks two lazy
+/// `fxCompact(fxMap(f, xs))` computes the same values, but stacks two lazy
 /// stages: every surviving element crosses the mapping iterator's
 /// `moveNext`/`current` boundary and then the compacting one's. Here [f]
 /// both transforms and selects — the `filter_map` shape, the same bargain
 /// [takeUniqBy] strikes with its key extractor.
 ///
-/// Dart-native addition (FxTS composes `map` + `compact`). Kotlin spells it
+/// Dart-native addition (FxTS composes `map` + `fxCompact`). Kotlin spells it
 /// `mapNotNull`, Rust `filter_map`. [B] is bound to [Object], so a `null`
 /// from [f] unambiguously means *skip this element* rather than *yield
 /// null*.
@@ -506,7 +506,7 @@ FxAsyncIterable<(bool, A)> _toFilterIterable<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
-  return mapAsync((A a) async => (await f(a), a), iterable);
+  return fxMapAsync((A a) async => (await f(a), a), iterable);
 }
 
 /// The concurrent filter machinery: consumes an iterable of
@@ -587,11 +587,11 @@ FxAsyncIterable<A> _asyncConcurrent<A>(FxAsyncIterable<(bool, A)> iterable) {
   });
 }
 
-/// Async counterpart of [filter]. The predicate may return a [Future].
+/// Async counterpart of [fxFilter]. The predicate may return a [Future].
 ///
 /// Port of FxTS `filter` (async), including its dedicated concurrent path.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> filterAsync<A>(
+FxAsyncIterable<A> fxFilterAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
@@ -624,7 +624,7 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
     return DelegateAsyncIterator(
       (concurrent) {
         inner ??= _asyncConcurrent(
-          concurrentAsync(
+          fxConcurrentAsync(
             concurrent is Concurrent ? concurrent.length : 1,
             _toFilterIterable(f, iterable),
           ),
@@ -637,21 +637,21 @@ FxAsyncIterable<A> _filterAsyncLegacy<A>(
   });
 }
 
-/// Async counterpart of [reject].
+/// Async counterpart of [fxReject].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> rejectAsync<A>(
+FxAsyncIterable<A> fxRejectAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => filterAsync((A a) async => !await f(a), iterable);
+) => fxFilterAsync((A a) async => !await f(a), iterable);
 
-/// Async counterpart of [compact].
+/// Async counterpart of [fxCompact].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
-    mapAsync((A? a) => a as A, filterAsync((A? a) => a != null, iterable));
+FxAsyncIterable<A> fxCompactAsync<A>(FxAsyncIterable<A?> iterable) =>
+    fxMapAsync((A? a) => a as A, fxFilterAsync((A? a) => a != null, iterable));
 
 /// Async counterpart of [mapNotNull]. [f] may return a [Future].
 ///
-/// Spelled as `compactAsync(mapAsync(...))` rather than as a hand-written
+/// Spelled as `fxCompactAsync(fxMapAsync(...))` rather than as a hand-written
 /// iterator: on the async side a run of map/filter stages fuses into one
 /// pass (see [FxFusedAsyncIterable]), so the composed spelling already costs
 /// the single boundary [mapNotNull] needs its own iterator to reach.
@@ -659,14 +659,14 @@ FxAsyncIterable<A> compactAsync<A>(FxAsyncIterable<A?> iterable) =>
 FxAsyncIterable<B> mapNotNullAsync<A, B extends Object>(
   FutureOr<B?> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => compactAsync<B>(mapAsync<A, B?>(f, iterable));
+) => fxCompactAsync<B>(fxMapAsync<A, B?>(f, iterable));
 
 // --- uniq / set operations ----------------------------------------------
 
 /// Returns an iterable with unique values as determined by [f].
 ///
 /// Port of FxTS `uniqBy`.
-Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) {
+Iterable<A> fxUniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) {
   // Cast, not promotion — see [uniq] and `fxListRangeOf` for the shape.
   if (iterable is FxUniqByFusable<A>) {
     return (iterable as FxUniqByFusable<A>).fxFuseUniqBy<B>(f);
@@ -684,7 +684,7 @@ Iterable<A> uniqBy<A, B>(B Function(A a) f, Iterable<A> iterable) {
 abstract class FxUniqByFusable<A> {
   /// This stage followed by `uniqBy(f)`, as a single stage.
   ///
-  /// Same elements, order, and laziness as `uniqBy(f, this)` — a seen-set per
+  /// Same elements, order, and laziness as `fxUniqBy(f, this)` — a seen-set per
   /// iteration, and both callbacks running once per element consumed.
   Iterable<A> fxFuseUniqBy<B>(B Function(A a) f);
 }
@@ -753,7 +753,7 @@ class _UniqByIterator<A, B> implements Iterator<A> {
 /// A stage that can absorb this one (`map`, today) builds the fused node
 /// itself; see [FxUniqFusable] for why the choice is made here and not by
 /// inspecting the source in [_UniqIterable].
-Iterable<A> uniq<A>(Iterable<A> iterable) {
+Iterable<A> fxUniq<A>(Iterable<A> iterable) {
   // Cast, not promotion: FxUniqFusable is not a subtype of Iterable, so the
   // type test alone does not promote (same shape as fxListRangeOf).
   if (iterable is FxUniqFusable<A>) {
@@ -809,7 +809,7 @@ class _UniqIterator<A> implements Iterator<A> {
   }
 }
 
-/// Strict (non-lazy) [uniq]: dedups the whole of [iterable] immediately and
+/// Strict (non-lazy) [fxUniq]: dedups the whole of [iterable] immediately and
 /// returns the result as a `List`.
 ///
 /// Same elements in the same order as `uniq(...).toList()`. The difference is
@@ -819,16 +819,16 @@ class _UniqIterator<A> implements Iterator<A> {
 ///   result — so a chain that is iterated more than once pays for it once,
 ///   and any side effects in the upstream happen at this call.
 /// * Nothing downstream can cut the work short. `uniq(xs).take(3)` stops the
-///   upstream after 3 distinct values; `uniqStrict(xs).take(3)` dedups all of
+///   upstream after 3 distinct values; `fxUniqStrict(xs).take(3)` dedups all of
 ///   `xs` first. Never use this ahead of a short-circuiting consumer, and
 ///   never on an unbounded iterable — it will not terminate.
 ///
-/// Prefer lazy [uniq] by default; it already fuses into a single loop when
+/// Prefer lazy [fxUniq] by default; it already fuses into a single loop when
 /// the chain ends in `.toList()`. Reach for this only when the deduped list
 /// is itself the thing you want, or is iterated repeatedly.
-List<A> uniqStrict<A>(Iterable<A> iterable) => _UniqIterable(iterable).toList();
+List<A> fxUniqStrict<A>(Iterable<A> iterable) => _UniqIterable(iterable).toList();
 
-/// Strict (non-lazy) [uniqBy] — see [uniqStrict] for the trade-off.
+/// Strict (non-lazy) [fxUniqBy] — see [fxUniqStrict] for the trade-off.
 List<A> uniqByStrict<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     _UniqByIterable(f, iterable).toList();
 
@@ -897,14 +897,14 @@ List<A> _takeUniqByPulled<A, B extends Object>(
   return out;
 }
 
-/// Async counterpart of [uniqBy]. Uses then/bare pattern for sync keys.
+/// Async counterpart of [fxUniqBy]. Uses then/bare pattern for sync keys.
 ///
 /// A fused stage, so a chain that dedupes stays on the subscription drive
 /// instead of dropping to the pull protocol — the seen-set lives on the
 /// iterator, so only one `uniqBy` fuses into a run and a second starts a new
 /// one. A [Concurrent] marker falls back to [_uniqByAsyncLegacy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> uniqByAsync<A, B>(
+FxAsyncIterable<A> fxUniqByAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
@@ -927,11 +927,11 @@ FxAsyncIterable<A> _uniqByAsyncLegacy<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
-  // The pre-fusion layering, kept for the concurrent path: `filterAsync` over
+  // The pre-fusion layering, kept for the concurrent path: `fxFilterAsync` over
   // a seen-set closure carries `uniqBy` through the concurrency machinery.
   return DelegateAsyncIterable(() {
     final seen = <B>{};
-    return filterAsync((A a) {
+    return fxFilterAsync((A a) {
       final key = f(a);
       if (key is Future<B>) {
         return key.then((k) => seen.add(k));
@@ -941,12 +941,12 @@ FxAsyncIterable<A> _uniqByAsyncLegacy<A, B>(
   });
 }
 
-/// Async counterpart of [uniq].
+/// Async counterpart of [fxUniq].
 ///
 /// The element is its own key, so the fused stage carries no key function at
-/// all — one fewer call per element than `uniqByAsync(identity)`.
+/// all — one fewer call per element than `fxUniqByAsync(identity)`.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) {
+FxAsyncIterable<A> fxUniqAsync<A>(FxAsyncIterable<A> iterable) {
   const stage = FxUniqByStage(null);
   if (iterable is FxFusedAsyncIterable<A> && iterable.uniqIndex < 0) {
     final source = iterable.source;
@@ -963,7 +963,7 @@ FxAsyncIterable<A> uniqAsync<A>(FxAsyncIterable<A> iterable) {
 }
 
 /// Drops elements whose [f]-key equals the previous element's key, keeping
-/// the first of each run. Unlike [uniqBy], only *adjacent* duplicates are
+/// the first of each run. Unlike [fxUniqBy], only *adjacent* duplicates are
 /// removed, so no seen-set builds up.
 ///
 /// fxdart extension (not part of FxTS), after Rx's `distinctUntilChanged`
@@ -1013,9 +1013,9 @@ class _UniqAdjacentByIterator<A, B> implements Iterator<A> {
 /// fxdart extension (not part of FxTS) — see [uniqAdjacentBy].
 ///
 /// ```dart
-/// uniqAdjacent([1, 1, 2, 2, 2, 1]); // (1, 2, 1)
+/// fxUniqAdjacent([1, 1, 2, 2, 2, 1]); // (1, 2, 1)
 /// ```
-Iterable<A> uniqAdjacent<A>(Iterable<A> iterable) =>
+Iterable<A> fxUniqAdjacent<A>(Iterable<A> iterable) =>
     uniqAdjacentBy((A a) => a, iterable);
 
 /// Async counterpart of [uniqAdjacentBy]. The key comparison is inherently
@@ -1044,16 +1044,16 @@ FxAsyncIterable<A> uniqAdjacentByAsync<A, B>(
   });
 }
 
-/// Async counterpart of [uniqAdjacent].
+/// Async counterpart of [fxUniqAdjacent].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> uniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
+FxAsyncIterable<A> fxUniqAdjacentAsync<A>(FxAsyncIterable<A> iterable) =>
     uniqAdjacentByAsync((A a) => a, iterable);
 
 /// Returns the elements of [iterable2] whose [f]-keys do not occur in
 /// [iterable1], with duplicates removed.
 ///
 /// Port of FxTS `differenceBy`.
-Iterable<A> differenceBy<A, B>(
+Iterable<A> fxDifferenceBy<A, B>(
   B Function(A a) f,
   Iterable<A> iterable1,
   Iterable<A> iterable2,
@@ -1062,20 +1062,20 @@ Iterable<A> differenceBy<A, B>(
 /// Returns the elements of [iterable2] that do not occur in [iterable1].
 ///
 /// Port of FxTS `difference`.
-Iterable<A> difference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
-    differenceBy((A a) => a, iterable1, iterable2);
+Iterable<A> fxDifference<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    fxDifferenceBy((A a) => a, iterable1, iterable2);
 
 /// Returns the elements of [iterable2] whose [f]-keys also occur in
 /// [iterable1], with duplicates removed.
 ///
 /// Port of FxTS `intersectionBy`.
-Iterable<A> intersectionBy<A, B>(
+Iterable<A> fxIntersectionBy<A, B>(
   B Function(A a) f,
   Iterable<A> iterable1,
   Iterable<A> iterable2,
 ) => _SetOpIterable(f, iterable1, iterable2, true);
 
-/// Shared machinery of [differenceBy] / [intersectionBy]: one pass over
+/// Shared machinery of [fxDifferenceBy] / [fxIntersectionBy]: one pass over
 /// [_source2], filtering on [_source1]'s key set and deduping by element —
 /// the fused form of `uniq(filter/reject(set.contains ∘ f, iterable2))`.
 class _SetOpIterable<A, B> extends Iterable<A> {
@@ -1186,8 +1186,8 @@ class _SetOpIterator<A, B> implements Iterator<A> {
 /// Returns the elements of [iterable2] that also occur in [iterable1].
 ///
 /// Port of FxTS `intersection`.
-Iterable<A> intersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
-    intersectionBy((A a) => a, iterable1, iterable2);
+Iterable<A> fxIntersection<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+    fxIntersectionBy((A a) => a, iterable1, iterable2);
 
 FxAsyncIterable<A> _setOpAsync<A, B>(
   FutureOr<B> Function(A a) f,
@@ -1215,8 +1215,8 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
           }
           keySide = null;
           set = keys.toSet();
-          inner = uniqAsync(
-            filterAsync(
+          inner = fxUniqAsync(
+            fxFilterAsync(
               (A a) async => set!.contains(await f(a)) == keepWhenInSet,
               source,
             ),
@@ -1229,32 +1229,32 @@ FxAsyncIterable<A> _setOpAsync<A, B>(
   });
 }
 
-/// Async counterpart of [differenceBy].
+/// Async counterpart of [fxDifferenceBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> differenceByAsync<A, B>(
+FxAsyncIterable<A> fxDifferenceByAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<A> iterable2,
 ) => _setOpAsync(f, iterable1, iterable2, false);
 
-/// Async counterpart of [difference].
+/// Async counterpart of [fxDifference].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> differenceAsync<A>(
+FxAsyncIterable<A> fxDifferenceAsync<A>(
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<A> iterable2,
-) => differenceByAsync((A a) => a, iterable1, iterable2);
+) => fxDifferenceByAsync((A a) => a, iterable1, iterable2);
 
-/// Async counterpart of [intersectionBy].
+/// Async counterpart of [fxIntersectionBy].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> intersectionByAsync<A, B>(
+FxAsyncIterable<A> fxIntersectionByAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<A> iterable2,
 ) => _setOpAsync(f, iterable1, iterable2, true);
 
-/// Async counterpart of [intersection].
+/// Async counterpart of [fxIntersection].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> intersectionAsync<A>(
+FxAsyncIterable<A> fxIntersectionAsync<A>(
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<A> iterable2,
-) => intersectionByAsync((A a) => a, iterable1, iterable2);
+) => fxIntersectionByAsync((A a) => a, iterable1, iterable2);

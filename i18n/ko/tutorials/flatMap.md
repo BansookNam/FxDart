@@ -36,7 +36,7 @@ nextLabel: flat
     (<code>[x]</code>)를, 아무것도 내보내지 않으려면 빈 리스트를 반환하세요.
   </p>
   <p>
-    비동기 쪽에서는 <code>expandAsync</code>의 내부 상태 머신이 pull 사이사이에
+    비동기 쪽에서는 <code>fxExpandAsync</code>의 내부 상태 머신이 pull 사이사이에
     "지금 어느 하위 이터러블을 소진하는 중인지"를 추적해야 하므로 상류를
     <em>직렬로</em> 소비합니다. 여기에 <code>.concurrent(n)</code>을 감싸면
     이미 준비된 항목을 끌어오는 속도만 빨라질 뿐, 콜백 안에서 일어나는

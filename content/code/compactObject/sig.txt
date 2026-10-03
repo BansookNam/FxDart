@@ -1,1 +1,1 @@
-Map&lt;K, V&gt; compactObject&lt;K, V&gt;(Map&lt;K, V?&gt; map)
+Map&lt;K, V&gt; fxCompactObject&lt;K, V&gt;(Map&lt;K, V?&gt; map)

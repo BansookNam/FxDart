@@ -25,13 +25,13 @@ prevLabel: shuffle
     because deterministic randomness is broadly useful: reproducible tests,
     stable demo data, property-based fuzzing with replayable failures, or any
     place where "random, but the same every run" is what you actually want.
-    This is what <a href="shuffle.html"><code>shuffle</code></a> uses under
+    This is what <a href="shuffle.html"><code>fxShuffle</code></a> uses under
     the hood when you pass it a seed.
   </p>
   <p>
     Unlike <code>dart:math</code>'s <code>Random(seed)</code>, the sequence
     is part of the library's contract with FxTS — a seeded
-    <code>shuffle</code> in FxDart and FxTS produces the same order for the
+    <code>fxShuffle</code> in FxDart and FxTS produces the same order for the
     same seed.
   </p>
 
@@ -41,7 +41,7 @@ prevLabel: shuffle
   <h2>Demo 2 · Reproducible picks and shuffles</h2>
   <p>
     Turn the generator into whatever random shape you need — here, dice
-    rolls and a seeded <code>shuffle</code>:
+    rolls and a seeded <code>fxShuffle</code>:
   </p>
   {{playground:1}}
 
@@ -52,6 +52,6 @@ prevLabel: shuffle
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="shuffle.html"><code>shuffle</code></a> — seeded shuffling built on this generator ·
-    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>repeat</code></a> — deterministic infinite sources
+    <a href="shuffle.html"><code>fxShuffle</code></a> — seeded shuffling built on this generator ·
+    <a href="cycle.html"><code>cycle</code></a> &amp; <a href="repeat.html"><code>fxRepeat</code></a> — deterministic infinite sources
   </div>

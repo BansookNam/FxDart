@@ -36,8 +36,8 @@ nextLabel: zipWith
     있지만(<code>fx(a).zip(b)</code>) <code>zip3</code>에는 없습니다 —
     체인의 수신자는 하나인데 <code>zip3</code>는 대등한 셋을 필요로 하니까요.
     최상위 함수로 호출한 뒤 결과를 <code>fx()</code>로 감싸 이어 가세요.
-    데모의 마지막 줄이 그 방식입니다. <code>zip3Async</code>가 비동기
-    버전이고, <code>zipAsync</code>와 마찬가지로 셋의 <code>next()</code>를
+    데모의 마지막 줄이 그 방식입니다. <code>fxZip3Async</code>가 비동기
+    버전이고, <code>fxZipAsync</code>와 마찬가지로 셋의 <code>next()</code>를
     모두 발행한 뒤에 기다리므로, 레코드마다 소스들을 차례로가 아니라
     병렬로 끌어당깁니다.
   </p>
@@ -48,6 +48,6 @@ nextLabel: zipWith
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="zip.html"><code>zip</code></a> — 두 이터러블 버전, 그리고 전체 설명 ·
-    <a href="zipWith.html"><code>zipWith</code></a> — 짝짓는 대신 결합하기 ·
-    <a href="transpose.html"><code>transpose</code></a> — 개수 제한 없는 이터러블, 대신 원소 타입이 같아야 함
+    <a href="zipWith.html"><code>fxZipWith</code></a> — 짝짓는 대신 결합하기 ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — 개수 제한 없는 이터러블, 대신 원소 타입이 같아야 함
   </div>

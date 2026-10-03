@@ -1,9 +1,9 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 // Chain-method twins of the differenceBy / intersectionBy family: the free
 // functions have their own test files; these pin the receiver mapping —
-// `fx(source).differenceBy(f, other)` is `differenceBy(f, other, source)`.
+// `fx(source).differenceBy(f, other)` is `fxDifferenceBy(f, other, source)`.
 void main() {
   group('set-op chain methods', () {
     group('sync', () {
@@ -14,7 +14,7 @@ void main() {
         expect(added, equals([(id: 3, v: 'c')]));
         expect(
           added,
-          equals(differenceBy((t) => t.id, before, after).toList()),
+          equals(fxDifferenceBy((t) => t.id, before, after).toList()),
         );
       });
 
@@ -54,7 +54,7 @@ void main() {
           2,
           3,
           4,
-        ]).toAsync().differenceBy((n) => n % 3, toAsync([3])).toList();
+        ]).toAsync().differenceBy((n) => n % 3, fxToAsync([3])).toList();
         // keys of other = {0}; drops 3 (key 0), keeps 1, 2, 4 (keys 1, 2, 1)
         // deduped by value — all distinct here.
         expect(result, equals([1, 2, 4]));
@@ -65,14 +65,14 @@ void main() {
           1,
           2,
           3,
-        ]).toAsync().difference(toAsync([2])).toList();
+        ]).toAsync().difference(fxToAsync([2])).toList();
         expect(result, equals([1, 3]));
       });
 
       test('intersectionBy: values of the chain also keyed in other', () async {
         final result = await fx(['aa', 'b', 'ccc'])
             .toAsync()
-            .intersectionBy((s) => s.length, toAsync(['xx', 'yyy']))
+            .intersectionBy((s) => s.length, fxToAsync(['xx', 'yyy']))
             .toList();
         expect(result, equals(['aa', 'ccc']));
       });
@@ -82,7 +82,7 @@ void main() {
           1,
           2,
           3,
-        ]).toAsync().intersection(toAsync([3, 1])).toList();
+        ]).toAsync().intersection(fxToAsync([3, 1])).toList();
         expect(result, equals([1, 3]));
       });
     });

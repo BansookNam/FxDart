@@ -10,7 +10,7 @@ prevLabel: combineLatest
 next: switchMap.html
 nextLabel: switchMap
 ---
-  <p class="hero-sub">On every <em>source</em> event, emits <code>combine</code> of it and the other stream's latest value — the other side is context, not a trigger.</p>
+  <p class="hero-sub">On every <em>source</em> event, emits <code>fxCombine</code> of it and the other stream's latest value — the other side is context, not a trigger.</p>
 
   {{signature}}
 
@@ -21,7 +21,7 @@ nextLabel: switchMap
     the exchange rate <em>right now</em>. Two streams are involved, but
     they are not equals: one drives, the other is consulted.
     <code>withLatestFrom(other, combine)</code> encodes that asymmetry —
-    each source event emits <code>combine(event, latestOfOther)</code>,
+    each source event emits <code>fxCombine(event, latestOfOther)</code>,
     while events on <code>other</code> update its remembered value and
     emit <strong>nothing</strong>.
   </p>

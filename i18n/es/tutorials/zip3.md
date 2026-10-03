@@ -38,8 +38,8 @@ nextLabel: zipWith
     tiene un solo receptor y <code>zip3</code> necesita tres iguales. Llámalo
     como función de nivel superior y envuelve el resultado en
     <code>fx()</code> para seguir, como hace la última línea de la demo.
-    <code>zip3Async</code> es la forma asíncrona y, igual que
-    <code>zipAsync</code>, lanza las tres llamadas a <code>next()</code> antes
+    <code>fxZip3Async</code> es la forma asíncrona y, igual que
+    <code>fxZipAsync</code>, lanza las tres llamadas a <code>next()</code> antes
     de esperar ninguna, así que las fuentes se tiran en paralelo por cada
     record en lugar de una detrás de otra.
   </p>
@@ -50,6 +50,6 @@ nextLabel: zipWith
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="zip.html"><code>zip</code></a> — la forma de dos iterables, y la explicación completa ·
-    <a href="zipWith.html"><code>zipWith</code></a> — combina en vez de emparejar ·
-    <a href="transpose.html"><code>transpose</code></a> — cualquier número de iterables, a costa de un tipo de elemento común
+    <a href="zipWith.html"><code>fxZipWith</code></a> — combina en vez de emparejar ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — cualquier número de iterables, a costa de un tipo de elemento común
   </div>

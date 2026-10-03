@@ -55,7 +55,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   var evaluated = 0;
 
-  final result = fx(range(1, 1000000))
+  final result = fx(fxRange(1, 1000000))
       .map((n) {
         evaluated++;
         return n * n;
@@ -94,7 +94,7 @@ void main() {
 
   // `some` stops pulling at the first match.
   var checked = 0;
-  final found = fx(range(1, 1000)).some((n) {
+  final found = fx(fxRange(1, 1000)).some((n) {
     checked++;
     return n > 4;
   });
@@ -188,7 +188,7 @@ void main() {
 ```
 
 The guidance is short: **consume once, or materialise.** If a chain is used by
-two consumers, call `toList()` and share the list, or use `fork`/`tee`, which
+two consumers, call `toList()` and share the list, or use `fxFork`/`tee`, which
 exist precisely to split a pull into several without re-running the source.
 
 ## When this earns its keep
@@ -213,7 +213,7 @@ indirection.
    a ten-element source. How many lines print, and why?
 3. Write a chain whose callbacks run twice by accident. Then fix it two
    different ways.
-4. `fx(range(1, 1000000)).map(expensive).first` — how many times does
+4. `fx(fxRange(1, 1000000)).map(expensive).first` — how many times does
    `expensive` run? What if `.first` is replaced by `.last`?
 
 ## Solutions
@@ -227,7 +227,7 @@ indirection.
    upstream, and it stopped.
 3. Any chain assigned to a variable and consumed by two terminals, as in the
    listing above. Fix one: `final xs = chain.toList();` then use `xs` twice.
-   Fix two: use `fork`/`tee` to split one pull into two consumers, so the
+   Fix two: use `fxFork`/`tee` to split one pull into two consumers, so the
    source is still read once.
 4. Once with `.first` — one pull satisfies it. With `.last`, all 999,999 times:
    `last` has to reach the end, so there is nothing left to skip. Same chain,

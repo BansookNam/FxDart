@@ -44,6 +44,6 @@ nextLabel: …WithIndex
   <div class="callout">
     <strong>Related:</strong>
     <a href="zip.html"><code>zip</code></a> — pair two iterables together ·
-    <a href="zipWith.html"><code>zipWith</code></a> — zip and combine in one step ·
-    <a href="entries.html"><code>entries</code></a> — pair Map keys with values
+    <a href="zipWith.html"><code>fxZipWith</code></a> — zip and combine in one step ·
+    <a href="entries.html"><code>fxEntries</code></a> — pair Map keys with values
   </div>

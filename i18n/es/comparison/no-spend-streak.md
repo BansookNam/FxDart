@@ -31,7 +31,7 @@ async: false
     Una racha es un valor que se va acumulando, y ese es exactamente el
     trabajo de <code>scan</code>: todos los estados intermedios de un
     fold, conservados. El pipeline se lee como la propia definición — los
-    días (<code>range</code>), transformados con <code>map</code> a
+    días (<code>fxRange</code>), transformados con <code>map</code> a
     hubo-gasto-o-no, recorridos con <code>scan</code> hasta formar una
     racha acumulada que se reinicia en los días con gasto, y
     <code>max</code> elige el pico. El bucle nativo calcula lo mismo con
@@ -40,5 +40,5 @@ async: false
     queda fundida con la construcción de la tira que hay al lado. En la
     versión de FxDart la tira (<code>map</code> + <code>join</code>) y la
     racha son dos pipelines independientes, legibles por separado, sobre
-    el mismo <code>range</code>.
+    el mismo <code>fxRange</code>.
   </p>

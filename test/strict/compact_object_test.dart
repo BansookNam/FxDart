@@ -6,17 +6,17 @@ void main() {
   group('compactObject', () {
     test('should return identity map if there is no null property', () {
       final obj = <String, Object?>{'a': 1, 'b': 'b'};
-      expect(compactObject(obj), equals(obj));
+      expect(fxCompactObject(obj), equals(obj));
     });
 
     test('should return a map with null properties removed', () {
       final obj = <String, Object?>{'a': 1, 'b': 'b', 'c': null, 'd': null};
-      expect(compactObject(obj), equals({'a': 1, 'b': 'b'}));
+      expect(fxCompactObject(obj), equals({'a': 1, 'b': 'b'}));
     });
 
     test('should not remove any falsy values other than null', () {
       final obj = <String, Object?>{'a': 0, 'b': '', 'd': null, 'e': false};
-      expect(compactObject(obj), equals({'a': 0, 'b': '', 'e': false}));
+      expect(fxCompactObject(obj), equals({'a': 0, 'b': '', 'e': false}));
     });
   });
 }

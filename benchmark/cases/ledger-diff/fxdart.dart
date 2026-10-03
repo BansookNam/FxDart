@@ -14,9 +14,9 @@ Future<void> main() async {
     impl: 'fxdart',
     n: n,
     run: () {
-      final added = differenceBy((Tx t) => t.id, before, after);
-      final removed = differenceBy((Tx t) => t.id, after, before);
-      final common = intersectionBy((Tx t) => t.id, before, after);
+      final added = fxDifferenceBy((Tx t) => t.id, before, after);
+      final removed = fxDifferenceBy((Tx t) => t.id, after, before);
+      final common = fxIntersectionBy((Tx t) => t.id, before, after);
 
       final diffLines = fx(added)
           .sortBy((t) => t.id)

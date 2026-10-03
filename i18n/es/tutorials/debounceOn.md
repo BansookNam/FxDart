@@ -17,9 +17,9 @@ nextLabel: retryOn
   <h2>Lección</h2>
   <p>
     Las formas con Duration ya viven en
-    <code><a href="debounce.html">debounce</a></code>,
-    <code><a href="throttle.html">throttle</a></code> y
-    <code><a href="spaceBy.html">delay</a></code> — un reloj fijo, la
+    <code><a href="debounce.html">fxDebounce</a></code>,
+    <code><a href="throttle.html">fxThrottle</a></code> y
+    <code><a href="spaceBy.html">fxDelay</a></code> — un reloj fijo, la
     misma espera para cada valor. La familia <code>xOn</code> entrega
     ese reloj a un <strong>selector</strong>: cada valor produce un
     stream, y el primer evento de ese stream es el momento en que el
@@ -34,7 +34,7 @@ nextLabel: retryOn
     el primer next del interior emite el valor pendiente; un interior
     que completa sin un next lo <strong>descarta</strong>. Un valor aún
     pendiente cuando la fuente se cierra se vacía, igual que el
-    <code><a href="debounce.html">debounce</a></code> con Duration.
+    <code><a href="debounce.html">fxDebounce</a></code> con Duration.
   </p>
   <p>
     <code>delayOn(selector)</code> retiene <em>cada</em> valor hasta que
@@ -67,7 +67,7 @@ nextLabel: retryOn
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="debounce.html"><code>debounce</code></a> — la forma con Duration, y el wrapper de callback ·
-    <a href="throttle.html"><code>throttle</code></a> — la forma con Duration, leading y trailing ·
-    <a href="spaceBy.html"><code>delay</code></a> — desplazar un stream entero con un reloj fijo
+    <a href="debounce.html"><code>fxDebounce</code></a> — la forma con Duration, y el wrapper de callback ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — la forma con Duration, leading y trailing ·
+    <a href="spaceBy.html"><code>fxDelay</code></a> — desplazar un stream entero con un reloj fijo
   </div>

@@ -169,7 +169,7 @@ usually a design decision, not a shortfall.
    is methods. Name one thing FxTS can express that FxDart cannot, and one
    thing FxDart gets that FxTS does not.
 3. Scala solves `Future` + `Either` with `EitherT`; FxDart solves it with
-   `eitherAsync`. Which one generalises to a third effect, and what does the
+   `fxEitherAsync`. Which one generalises to a third effect, and what does the
    other one do instead?
 4. Which chapters of this book would need to be rewritten if Dart gained
    higher-kinded types tomorrow? Which would not change at all?
@@ -189,7 +189,7 @@ usually a design decision, not a shortfall.
    hand-written overloads.
 3. `EitherT` generalises: it is one wrapper per monad, so a third effect is
    another transformer in the stack (at the cost of lifts everywhere).
-   `eitherAsync` does not generalise — FxDart writes each useful combination by
+   `fxEitherAsync` does not generalise — FxDart writes each useful combination by
    hand, and there are only a few, because the combinations people actually use
    are few.
 4. Chapter 10 would be rewritten (it is *about* the absence), and Chapter 9's

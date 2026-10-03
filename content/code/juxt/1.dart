@@ -6,7 +6,7 @@ void main() {
     {'name': 'lee', 'age': 27},
   ];
 
-  final describe = juxt<Map<String, Object>, Object?>([
+  final describe = fxJuxt<Map<String, Object>, Object?>([
     (p) => p['name'],
     (p) => p['age'],
   ]);

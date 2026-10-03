@@ -2,7 +2,7 @@
 slug: always
 title: always — FxDart 101
 description: FxDart always tutorial: build a function that ignores its argument and always returns a fixed value, with a live playground.
-heading: <code>always</code>
+heading: <code>fxAlways</code>
 section: 10
 crumb: always
 prev: identity.html
@@ -16,7 +16,7 @@ nextLabel: tap
 
   <h2>Lecture</h2>
   <p>
-    <code>always(a)</code> closes over <code>a</code> and hands back a
+    <code>fxAlways(a)</code> closes over <code>a</code> and hands back a
     function that discards whatever it's called with and returns <code>a</code>
     every time. The optional parameter is the trick that makes it fit
     anywhere a <em>unary</em> callback is expected — a mapper, an
@@ -24,8 +24,8 @@ nextLabel: tap
     <code>(_) => a</code> by hand each time.
   </p>
   <p>
-    It's the constant counterpart to <a href="identity.html"><code>identity</code></a>:
-    <code>identity</code> passes the input through, <code>always</code>
+    It's the constant counterpart to <a href="identity.html"><code>fxIdentity</code></a>:
+    <code>fxIdentity</code> passes the input through, <code>fxAlways</code>
     throws it away. Both are plain synchronous functions with no async
     variant or chain form.
   </p>
@@ -37,21 +37,21 @@ nextLabel: tap
 
   <h2>Demo 2 · Constant fallback in a dispatch table</h2>
   <p>
-    <code>always</code> is a natural fit for <code>orElse</code> in
-    <a href="cases.html"><code>cases</code></a> — a fixed default that
+    <code>fxAlways</code> is a natural fit for <code>orElse</code> in
+    <a href="cases.html"><code>fxCases</code></a> — a fixed default that
     doesn't need to look at the unmatched value:
   </p>
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>always</code> to replace every score in this list
+  <p>Exercise: use <code>fxAlways</code> to replace every score in this list
     with the string <code>'graded'</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="identity.html"><code>identity</code></a> — pass the argument through instead ·
-    <a href="cases.html"><code>cases</code></a> — dispatch table that often pairs with always as orElse ·
-    <a href="when.html"><code>when</code></a> — conditional transform, value-in value-out ·
-    <a href="memoize.html"><code>memoize</code></a> — cache a computed value instead of a constant one
+    <a href="identity.html"><code>fxIdentity</code></a> — pass the argument through instead ·
+    <a href="cases.html"><code>fxCases</code></a> — dispatch table that often pairs with always as orElse ·
+    <a href="when.html"><code>fxWhen</code></a> — conditional transform, value-in value-out ·
+    <a href="memoize.html"><code>fxMemoize</code></a> — cache a computed value instead of a constant one
   </div>

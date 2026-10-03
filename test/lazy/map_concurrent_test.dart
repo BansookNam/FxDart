@@ -1,12 +1,12 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
   group('mapConcurrent', () {
     group('sync source', () {
       test('should map every element and keep source order', () async {
-        final result = await toListAsync(
-          mapConcurrent(3, (int n) async => n * 10, [1, 2, 3, 4, 5]),
+        final result = await fxToListAsync(
+          fxMapConcurrent(3, (int n) async => n * 10, [1, 2, 3, 4, 5]),
         );
         expect(result, equals([10, 20, 30, 40, 50]));
       });
@@ -22,8 +22,8 @@ void main() {
           return n;
         }
 
-        final result = await toListAsync(
-          mapConcurrent(3, work, [1, 2, 3, 4, 5, 6]),
+        final result = await fxToListAsync(
+          fxMapConcurrent(3, work, [1, 2, 3, 4, 5, 6]),
         );
         expect(result, equals([1, 2, 3, 4, 5, 6]));
         expect(maxInFlight, equals(3));
@@ -37,23 +37,23 @@ void main() {
             return n;
           }
 
-          final result = await toListAsync(
-            mapConcurrent(4, work, [1, 2, 3, 4]),
+          final result = await fxToListAsync(
+            fxMapConcurrent(4, work, [1, 2, 3, 4]),
           );
           expect(result, equals([1, 2, 3, 4]));
         },
       );
 
       test('should accept a synchronous callback', () async {
-        final result = await toListAsync(
-          mapConcurrent(2, (int n) => n + 1, [1, 2, 3]),
+        final result = await fxToListAsync(
+          fxMapConcurrent(2, (int n) => n + 1, [1, 2, 3]),
         );
         expect(result, equals([2, 3, 4]));
       });
 
       test('should handle an empty iterable', () async {
-        final result = await toListAsync(
-          mapConcurrent(3, (int n) async => n, <int>[]),
+        final result = await fxToListAsync(
+          fxMapConcurrent(3, (int n) async => n, <int>[]),
         );
         expect(result, isEmpty);
       });
@@ -78,8 +78,12 @@ void main() {
 
     group('async source', () {
       test('should map every element and keep source order', () async {
-        final result = await toListAsync(
-          mapConcurrentAsync(3, (int n) async => n * 10, toAsync([1, 2, 3])),
+        final result = await fxToListAsync(
+          fxMapConcurrentAsync(
+            3,
+            (int n) async => n * 10,
+            fxToAsync([1, 2, 3]),
+          ),
         );
         expect(result, equals([10, 20, 30]));
       });
@@ -87,16 +91,15 @@ void main() {
       test('should evaluate up to [concurrency] elements at once', () async {
         var inFlight = 0;
         var maxInFlight = 0;
-        final result = await fxAsync(toAsync([1, 2, 3, 4, 5, 6])).mapConcurrent(
-          3,
-          (n) async {
-            inFlight++;
-            if (inFlight > maxInFlight) maxInFlight = inFlight;
-            await Future.delayed(const Duration(milliseconds: 5));
-            inFlight--;
-            return n;
-          },
-        ).toList();
+        final result = await fxAsync(fxToAsync([1, 2, 3, 4, 5, 6]))
+            .mapConcurrent(3, (n) async {
+              inFlight++;
+              if (inFlight > maxInFlight) maxInFlight = inFlight;
+              await Future.delayed(const Duration(milliseconds: 5));
+              inFlight--;
+              return n;
+            })
+            .toList();
         expect(result, equals([1, 2, 3, 4, 5, 6]));
         expect(maxInFlight, equals(3));
       });

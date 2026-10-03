@@ -21,7 +21,7 @@ nextLabel: bounded concurrent fetch
     요청은 취소되어야 합니다 — 그렇지 않으면 느린 "da"가 빠른 "dart"를
     덮어씁니다. 그것은 <em>push</em> 일입니다:
     <code><a href="fxEvents.html">fxEvents</a></code> +
-    <code><a href="debounce.html">debounce</a></code> +
+    <code><a href="debounce.html">fxDebounce</a></code> +
     <code><a href="switchMap.html">switchMap</a></code>.
   </p>
   <p>
@@ -66,7 +66,7 @@ nextLabel: bounded concurrent fetch
     <strong>관련:</strong>
     <a href="whichSurface.html">어느 표면</a> — 이것이 push인 이유 ·
     <a href="fxEvents.html"><code>fxEvents</code></a> ·
-    <a href="debounce.html"><code>debounce</code></a> ·
+    <a href="debounce.html"><code>fxDebounce</code></a> ·
     <a href="switchMap.html"><code>switchMap</code></a> ·
     <a href="mapEither.html"><code>mapEither</code></a> ·
     <a href="job-fetch.html">한도 있는 동시 fetch</a> — I/O 일 ·

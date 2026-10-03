@@ -120,7 +120,7 @@ val result = for {
   <div class="callout">
     <strong>¿Y en FxDart?</strong> Dart no tiene ni
     <code>for</code>-comprehensions ni notación <code>do</code>, y justo por
-    eso existe el <a href="typedErrors.html">bloque <code>either((r) {
+    eso existe el <a href="typedErrors.html">bloque <code>fxEither((r) {
     ... })</code></a> de FxDart. Cumple el mismo papel que un bloque de
     comprensión (código en línea recta en lugar de una pirámide de
     <code>flatMap</code>), pero a través de un ámbito <code>Raise</code> en

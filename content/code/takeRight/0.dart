@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 void main() {
-  print(takeLast(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
+  print(fxTakeLast(3, [1, 2, 3, 4, 5, 6])); // (4, 5, 6)
   // FxTS alias: takeRight(3, [1, 2, 3, 4, 5, 6]) is identical.
 
   // Chain form:

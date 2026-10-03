@@ -6,26 +6,26 @@ void main() {
     group('sync', () {
       test('should pair each element with its successor', () {
         expect(
-          toList(pairwise([1, 2, 3, 4])),
+          fxToList(fxPairwise([1, 2, 3, 4])),
           equals([(1, 2), (2, 3), (3, 4)]),
         );
       });
 
       test('should yield nothing for fewer than two elements', () {
-        expect(toList(pairwise(<int>[])), equals([]));
-        expect(toList(pairwise([1])), equals([]));
+        expect(fxToList(fxPairwise(<int>[])), equals([]));
+        expect(fxToList(fxPairwise([1])), equals([]));
       });
 
       test('should stay lazy over an endless source', () {
         expect(
-          toList(take(3, pairwise(cycle([1, 2])))),
+          fxToList(fxTake(3, fxPairwise(fxCycle([1, 2])))),
           equals([(1, 2), (2, 1), (1, 2)]),
         );
       });
 
       test('should support repeated iteration', () {
-        final pairs = pairwise([1, 2, 3]);
-        expect(toList(pairs), toList(pairs));
+        final pairs = fxPairwise([1, 2, 3]);
+        expect(fxToList(pairs), fxToList(pairs));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
@@ -40,17 +40,23 @@ void main() {
     group('async', () {
       test('should pair like the sync form', () async {
         expect(
-          await toListAsync(pairwiseAsync(toAsync([1, 2, 3, 4]))),
+          await fxToListAsync(fxPairwiseAsync(fxToAsync([1, 2, 3, 4]))),
           equals([(1, 2), (2, 3), (3, 4)]),
         );
-        expect(await toListAsync(pairwiseAsync(asyncEmpty<int>())), equals([]));
-        expect(await toListAsync(pairwiseAsync(toAsync([1]))), equals([]));
+        expect(
+          await fxToListAsync(fxPairwiseAsync(fxAsyncEmpty<int>())),
+          equals([]),
+        );
+        expect(
+          await fxToListAsync(fxPairwiseAsync(fxToAsync([1]))),
+          equals([]),
+        );
       });
 
       test('should be paired after concurrent', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync(range(1, 7)))
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 7)))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .concurrent(3)
             .pairwise()
             .toList();
@@ -63,7 +69,7 @@ void main() {
 
       test('should propagate an upstream error', () async {
         await expectLater(
-          fxAsync(toAsync(range(1, 10)))
+          fxAsync(fxToAsync(fxRange(1, 10)))
               .map((a) {
                 if (a == 4) return Future<int>.error(Exception('err'));
                 return Future.value(a);

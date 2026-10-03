@@ -51,7 +51,7 @@ nextLabel: when
   </p>
   <p>
     <code>.negate</code>는 최상위
-    <a href="negate.html"><code>negate</code></a>를 확장 게터로 옮겨 놓은
+    <a href="negate.html"><code>fxNegate</code></a>를 확장 게터로 옮겨 놓은
     것입니다 — 같은 함수를 반대편에서 부르는 셈이죠. 호출 지점에서 더 잘
     읽히는 쪽을 쓰면 됩니다. <code>isBlank.or(isShort).negate</code>는
     왼쪽에서 오른쪽으로 읽히지만, <code>negate(...)</code>는 식 전체를 호출
@@ -70,8 +70,8 @@ nextLabel: when
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="negate.html"><code>negate</code></a> — <code>.negate</code>의 최상위 형태 ·
-    <a href="not.html"><code>not</code></a> — 술어가 아니라 bool 값 하나를 뒤집습니다 ·
+    <a href="negate.html"><code>fxNegate</code></a> — <code>.negate</code>의 최상위 형태 ·
+    <a href="not.html"><code>fxNot</code></a> — 술어가 아니라 bool 값 하나를 뒤집습니다 ·
     <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>whereNot</code></a> — 조합한 술어가 보통 놓이는 자리 ·
     <a href="predicates.html"><code>predicates</code></a> — 함께 조합할 내장 타입 술어들
   </div>

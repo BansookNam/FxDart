@@ -6,7 +6,7 @@ Future<void> main() async {
   final result = await fx(['x', 'y'])
       .toAsync()
       .cycle()
-      .map((a) => delay(const Duration(milliseconds: 50), a.toUpperCase()))
+      .map((a) => fxDelay(const Duration(milliseconds: 50), a.toUpperCase()))
       .take(5)
       .toList();
 

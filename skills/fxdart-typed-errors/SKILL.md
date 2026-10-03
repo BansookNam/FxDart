@@ -18,7 +18,7 @@ import 'package:fxdart/fxdart.dart';
 ## When to use this skill
 
 - **Functions that can fail for domain reasons** (parse, validate, look up,
-  authorize): return `Either<Failure, T>` built with `either((r) { ... })`
+  authorize): return `Either<Failure, T>` built with `fxEither((r) { ... })`
   instead of throwing, returning `null` with the reason lost, or returning
   bool + out-param shapes.
 - **Validation that should collect EVERY error** — form/config/record
@@ -29,7 +29,7 @@ import 'package:fxdart/fxdart.dart';
   keep every failure in input order" — `mapOrAccumulate(..., concurrency: k)`
   on an async chain.
 - **Migrating fpdart/dartz code**: `TaskEither`/`IO`/`Do`-notation towers
-  flatten into `eitherAsync` blocks (see the table below).
+  flatten into `fxEitherAsync` blocks (see the table below).
 
 ## When plain Dart wins — do NOT wrap these
 
@@ -37,18 +37,18 @@ import 'package:fxdart/fxdart.dart';
   keep throwing. Typed errors are for failures the caller *handles*.
 - **Simple absence with no reason to carry**: return `T?`. fxdart is
   nullable-first; there is deliberately no `Option` type. Use the
-  `nullable((r) { ... })` builder only when several nullable steps chain.
+  `fxNullable((r) { ... })` builder only when several nullable steps chain.
 - **A single fallible step**: `int.tryParse(s) ?? defaultValue` needs no
   scope. The builder earns its keep at two-plus dependent steps.
 
 ## Core model
 
-`either((r) { ... })` runs your block with a scope `r`. Inside, everything
+`fxEither((r) { ... })` runs your block with a scope `r`. Inside, everything
 is ordinary Dart — early returns, loops, `if`s. Any raise short-circuits
 the block; the builder returns `Right(value)` or `Left(error)`.
 
 ```dart
-Either<String, int> parsePort(String raw) => either((r) {
+Either<String, int> parsePort(String raw) => fxEither((r) {
   final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
   r.ensure(n > 0 && n < 65536, () => '$n is out of range');
   return n;
@@ -64,7 +64,7 @@ switch (parsePort(input)) {
 The scope vocabulary (type `r.` to discover it):
 
 - `r.bind(either)` — unwrap a `Right` or short-circuit with the `Left`.
-  Kotlin's `either { x.bind() }` becomes `either((r) { r.bind(x) })`.
+  Kotlin's `either { x.bind() }` becomes `fxEither((r) { r.bind(x) })`.
 - `r.bindAll(eithers)` — unwrap a whole collection, first `Left` wins.
 - `r.ensure(cond, () => err)` — typed-error `require`.
 - `r.ensureNotNull(x, () => err)` — returns non-null (promotion works).
@@ -73,11 +73,11 @@ The scope vocabulary (type `r.` to discover it):
 - `r.withError(transform, block)` — adapt a different error type into this
   scope (compose modules with different Failure types).
 
-Async is the same shape with `eitherAsync((r) async { ... })`; the
-nullable-first twins are `nullable`/`nullableAsync` (return `T?`).
+Async is the same shape with `fxEitherAsync((r) async { ... })`; the
+nullable-first twins are `fxNullable`/`fxNullableAsync` (return `T?`).
 
 ```dart
-Future<Either<Failure, SuccessData>> getResult() => eitherAsync((r) async {
+Future<Either<Failure, SuccessData>> getResult() => fxEitherAsync((r) async {
   final user  = r.bind(await findUser(userId));
   final order = r.bind(await findOrder(user.id));
   return SuccessData(user, order);
@@ -92,21 +92,21 @@ empty. All branches run; errors concatenate in order; failure happens at
 the end.
 
 ```dart
-final user = either<Nel<String>, User>((r) => r.zipOrAccumulate2(
+final user = fxEither<Nel<String>, User>((r) => r.zipOrAccumulate2(
   (r) => validateName(r, input),   // each branch gets its own scope
   (r) => validateAge(r, input),
   User.new,
 ));
 
 // Unbounded form — combine any number of branches:
-final user = either<Nel<String>, User>((r) => r.accumulate((acc) {
+final user = fxEither<Nel<String>, User>((r) => r.accumulate((acc) {
   final name = acc.accumulating((r) => validateName(r, input));
   final age  = acc.accumulating((r) => validateAge(r, input));
   return User(name.value, age.value);   // reads detonate if anything failed
 }));
 
 // Whole-collection validation (fail-slow):
-final parsed = either<Nel<String>, List<int>>((r) =>
+final parsed = fxEither<Nel<String>, List<int>>((r) =>
     r.mapOrAccumulate(rawInputs, (r, s) =>
         r.ensureNotNull(int.tryParse(s), () => 'bad: $s')));
 ```
@@ -135,15 +135,15 @@ final outcome = await fxStream(records)
 ## Exceptions vs raised errors — a hard boundary
 
 Raised errors are domain failures; thrown exceptions are defects and
-propagate out of `either` untouched. Capture a throw explicitly:
+propagate out of `fxEither` untouched. Capture a throw explicitly:
 
 ```dart
 Either.catching(() => jsonDecode(raw));                    // Either<Object, T>
 Either.catchingWith(ParseFailure.new, () => jsonDecode(raw)); // typed Left
-catching(() => risky(), (e, st) => fallback);              // value-level
+fxCatching(() => risky(), (e, st) => fallback);              // value-level
 ```
 
-`catching`/`catchingAsync`/`Either.catching` always rethrow the internal
+`fxCatching`/`fxCatchingAsync`/`Either.catching` always rethrow the internal
 short-circuit signal first — they are the sanctioned `catch` inside raise
 blocks.
 
@@ -151,23 +151,23 @@ blocks.
 
 | Hand-rolled / fpdart pattern | fxdart |
 |---|---|
-| `throw`/`try`/`catch` as control flow for expected failures | `either((r) { ... r.raise(err) ... })` |
-| Return `null` with the failure reason lost | `Either<Failure, T>` via `either` |
-| `e1.flatMap((a) => e2.flatMap((b) => ...))` pyramid | `either((r) { final a = r.bind(e1); final b = r.bind(e2); ... })` |
-| fpdart `TaskEither.tryCatch(...).flatMap(...)` chains | `eitherAsync((r) async { ... })` + `Either.catchingWith` |
-| fpdart `Either.Do(($) => $(x))` (footgun-laden) | `either((r) => r.bind(x))` — scope-tagged, nesting-safe |
+| `throw`/`try`/`catch` as control flow for expected failures | `fxEither((r) { ... r.raise(err) ... })` |
+| Return `null` with the failure reason lost | `Either<Failure, T>` via `fxEither` |
+| `e1.flatMap((a) => e2.flatMap((b) => ...))` pyramid | `fxEither((r) { final a = r.bind(e1); final b = r.bind(e2); ... })` |
+| fpdart `TaskEither.tryCatch(...).flatMap(...)` chains | `fxEitherAsync((r) async { ... })` + `Either.catchingWith` |
+| fpdart `Either.Do(($) => $(x))` (footgun-laden) | `fxEither((r) => r.bind(x))` — scope-tagged, nesting-safe |
 | Loop collecting error strings + flag variable | `r.mapOrAccumulate` / `r.accumulate` |
-| `if (a == null \|\| b == null) return null;` cascades | `nullable((r) { r.bind(a); r.bind(b); ... })` |
+| `if (a == null \|\| b == null) return null;` cascades | `fxNullable((r) { r.bind(a); r.bind(b); ... })` |
 
 ## Pitfalls
 
-- **Never return a LAZY pipeline from a raise block.** `either((r) =>
+- **Never return a LAZY pipeline from a raise block.** `fxEither((r) =>
   fx(xs).map((x) => r.bind(...)))` returns `Right(<unevaluated>)` and the
   deferred raise throws `RaiseLeakedError` at the distant consumption site.
   Materialize with `toList()` inside the block, or use the eager terminals
   (`sequence`, `mapOrAccumulate`).
 - **Never bare-`catch` inside a raise block** — `catch (e)` swallows the
-  short-circuit signal (pinned behavior). Use `catching`/`catchingAsync`.
+  short-circuit signal (pinned behavior). Use `fxCatching`/`fxCatchingAsync`.
   `on Exception` is already safe: the signal is an `Error`.
 - **Async: raise only in the same awaited chain.** A raise inside an
   unawaited future can't be captured — it surfaces as an unhandled zone
@@ -180,7 +180,7 @@ blocks.
   succeeds — even empty. Construct only via `NonEmptyList.of` /
   `NonEmptyList.orNull`; `==` is identity, use `deepEquals`.
 - **Error-type inference needs help at the boundary**: write
-  `either<Failure, int>((r) { ... })` when the block body doesn't pin `E`.
+  `fxEither<Failure, int>((r) { ... })` when the block body doesn't pin `E`.
 - **Exceptions beat accumulation**: a branch that *throws* aborts the whole
   accumulating scope and propagates. That is the contract, not a bug.
 

@@ -11,6 +11,6 @@ Future<void> main() async {
   save(2);
   save(3);
 
-  await sleep(const Duration(milliseconds: 150));
+  await fxSleep(const Duration(milliseconds: 150));
   print(saved); // currently [1, 2, 3] — should be [3]
 }

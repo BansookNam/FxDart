@@ -13,7 +13,7 @@ void main() {
             ('c', 'hello'),
             ('d', {'d1': 1, 'd2': 3}),
           ];
-          final res = fromEntries(arr);
+          final res = fxFromEntries(arr);
           expect(
             res,
             equals({
@@ -36,7 +36,7 @@ void main() {
             20: 2000,
             'obj': {'a1': 10, 'b1': 'hello object'},
           };
-          final res = fromEntries(entries(source));
+          final res = fxFromEntries(fxEntries(source));
           expect(res, equals(source));
         },
       );
@@ -52,7 +52,7 @@ void main() {
             ('c', 'hello'),
             ('d', {'d1': 1, 'd2': 3}),
           ];
-          final res = fromEntries(await toListAsync(toAsync(arr)));
+          final res = fxFromEntries(await fxToListAsync(fxToAsync(arr)));
           expect(
             res,
             equals({

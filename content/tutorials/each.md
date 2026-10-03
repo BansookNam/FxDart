@@ -29,11 +29,11 @@ nextLabel: consume
   <p>
     On a sync chain, <code>.forEach(f)</code> is Dart's own
     <code>Iterable.forEach</code>, inherited by <code>Fx</code>; the async
-    chain and the data-first <code>forEach(f, iterable)</code> form are
+    chain and the data-first <code>fxForEach(f, iterable)</code> form are
     supplied by fxdart so the operator reads the same everywhere.
   </p>
   <p>
-    <code>forEachAsync</code> (or <code>.forEach()</code> on an
+    <code>fxForEachAsync</code> (or <code>.forEach()</code> on an
     <code>FxAsync</code> chain) awaits <code>f</code> for every element,
     strictly in the order the elements arrive — even if some individual
     calls would finish faster than others, <code>forEach</code> always
@@ -47,7 +47,7 @@ nextLabel: consume
   <h2>Demo 2 · Async, strictly in order</h2>
   <p>
     Even though each element sleeps for a <em>different</em> length of
-    time, <code>forEachAsync</code> still processes them 1, 2, 3 — never out
+    time, <code>fxForEachAsync</code> still processes them 1, 2, 3 — never out
     of order:
   </p>
   {{playground:1}}

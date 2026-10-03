@@ -28,11 +28,11 @@ nextLabel: consume
   <p>
     동기 체인의 <code>.forEach(f)</code>는 <code>Fx</code>가 물려받은
     Dart 자체의 <code>Iterable.forEach</code>입니다. 비동기 체인과
-    data-first <code>forEach(f, iterable)</code> 형태는 fxdart가 제공하므로,
+    data-first <code>fxForEach(f, iterable)</code> 형태는 fxdart가 제공하므로,
     어디서든 같은 이름으로 읽힙니다.
   </p>
   <p>
-    <code>forEachAsync</code>(또는 <code>FxAsync</code> 체인의
+    <code>fxForEachAsync</code>(또는 <code>FxAsync</code> 체인의
     <code>.forEach()</code>)는 모든 원소에 대해 <code>f</code>를 await하되,
     원소가 도착한 순서를 엄격히 지킵니다 — 개별 호출 중 일부가 더 빨리
     끝날 수 있더라도 <code>forEach</code>는 언제나 한 번에 하나씩 순차로
@@ -46,7 +46,7 @@ nextLabel: consume
   <h2>데모 2 · 비동기, 엄격한 순서 보장</h2>
   <p>
     각 원소가 <em>서로 다른</em> 시간만큼 잠들더라도
-    <code>forEachAsync</code>는 여전히 1, 2, 3 순서로 처리합니다 — 순서가
+    <code>fxForEachAsync</code>는 여전히 1, 2, 3 순서로 처리합니다 — 순서가
     뒤바뀌는 일은 없습니다:
   </p>
   {{playground:1}}

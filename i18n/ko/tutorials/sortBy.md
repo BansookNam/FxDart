@@ -63,5 +63,5 @@ nextLabel: sortByDesc
     <strong>관련 항목:</strong>
     <a href="sort.html"><code>sort</code></a> — 이 함수가 기반으로 삼는 비교자 방식 ·
     <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — 전체 순위 대신 극값 하나만 필요할 때 ·
-    <a href="pluck.html"><code>pluck</code></a> — 정렬 없이 같은 키만 뽑아내기
+    <a href="pluck.html"><code>fxPluck</code></a> — 정렬 없이 같은 키만 뽑아내기
   </div>

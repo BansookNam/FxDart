@@ -27,7 +27,7 @@ nextLabel: zip3
     <a href="zip3.html"><code>zip3</code></a> para tres.
   </p>
   <p>
-    <code>zipAsync</code> lanza las llamadas a <code>next()</code> de ambos
+    <code>fxZipAsync</code> lanza las llamadas a <code>next()</code> de ambos
     lados <em>antes</em> de esperar a ninguna de las dos, así que tira de las
     dos fuentes en paralelo en cada par, no secuencialmente. Combinar dos
     fuentes de 100 ms por elemento sigue costando ~100 ms por par, no 200 ms.
@@ -46,8 +46,8 @@ nextLabel: zip3
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="zipWith.html"><code>zipWith</code></a> — emparejar y combinar en un solo paso ·
+    <a href="zipWith.html"><code>fxZipWith</code></a> — emparejar y combinar en un solo paso ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — emparejar con un índice creciente ·
-    <a href="transpose.html"><code>transpose</code></a> — emparejar un número arbitrario de filas ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — emparejar un número arbitrario de filas ·
     <a href="concat.html"><code>concat</code></a> — encadenar en vez de emparejar
   </div>

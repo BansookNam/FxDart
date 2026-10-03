@@ -2,7 +2,7 @@
 slug: using
 title: using — FxDart 101
 description: FxDart using and usingAsync tutorial: scope a resource to one lazy iteration — acquire on first pull, release exactly once — with a live playground.
-heading: <code>using</code>
+heading: <code>fxUsing</code>
 section: 11
 crumb: using
 prev: timeout.html
@@ -29,7 +29,7 @@ nextLabel: concurrent or parallel
     element or right before an error propagates.
   </p>
   <p>
-    The async form <code>usingAsync</code> lets all three steps be
+    The async form <code>fxUsingAsync</code> lets all three steps be
     asynchronous and composes with
     <code><a href="concurrent.html">concurrent</a></code> — release still
     fires exactly once even with overlapping pulls in flight. If
@@ -44,7 +44,7 @@ nextLabel: concurrent or parallel
     <code><a href="take.html">take</a></code> (a bounded pipeline
     completes, and completion releases) or manage the resource with
     <code>try</code>/<code>finally</code> when early exit is the plan.
-    fxdart extension (no FxTS counterpart), after Rx's <code>using</code>.
+    fxdart extension (no FxTS counterpart), after Rx's <code>fxUsing</code>.
   </p>
 
   <h2>Demo 1 · The bracket around a lazy read</h2>
@@ -61,5 +61,5 @@ nextLabel: concurrent or parallel
     <strong>Related:</strong>
     <a href="take.html"><code>take</code></a> — bound the iteration so completion (and release) is guaranteed ·
     <a href="peek.html"><code>peek</code></a> — observing values without owning a lifetime ·
-    <a href="retry.html"><code>retry</code></a> — a fresh acquire per attempt when wrapped in a factory
+    <a href="retry.html"><code>fxRetry</code></a> — a fresh acquire per attempt when wrapped in a factory
   </div>

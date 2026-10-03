@@ -63,7 +63,7 @@ nextLabel: debounced search
     false이며, 어느 쪽의 에러든 퓨처를 실패시킵니다. 같은 질문이 pull에도
     있습니다: iterable에는 <code>sequenceEqual</code> /
     <code>Fx.sequenceEqual</code>,
-    <code>sequenceEqualAsync</code> /
+    <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code>는
     <code>FxAsyncIterable</code>용입니다. Rx의
     <code>sequenceEqual</code>을 따랐습니다.

@@ -23,7 +23,7 @@ nextLabel: sampleOn
     <code>onError</code> / <code>onDone</code> 훅이 나머지 두 알림을
     덮습니다. 콜백이 throw하면 에러 이벤트가 되고 체인은 계속됩니다
     — peek가 실패한 그 이벤트는 다시 내보내지지 않습니다. fxdart
-    이벤트 레이어, Rx의 <code>tap</code> /
+    이벤트 레이어, Rx의 <code>fxTap</code> /
     <code>doOn*</code>을 따랐습니다.
   </p>
   <p>
@@ -49,11 +49,11 @@ nextLabel: sampleOn
     때는 <code>uniqAdjacent</code>를 쓰세요.
   </p>
   <p>
-    fxdart 이벤트 레이어, Rx의 <code>tap</code>,
+    fxdart 이벤트 레이어, Rx의 <code>fxTap</code>,
     갈아타지 않는 모양의 <code>catchError</code>, 그리고
     <code>finalize</code>를 따랐습니다. 이미 같은 뜻을 가진 곳에서는
     풀 레이어 이름이 이깁니다: <code>peek</code>이지
-    <code>tap</code>이 아니고, <code>takeRight</code>이지
+    <code>fxTap</code>이 아니고, <code>takeRight</code>이지
     <code>takeLast</code>가 아니고, <code>uniq</code>이지
     <code>distinct</code>가 아닙니다.
   </p>
@@ -72,5 +72,5 @@ nextLabel: sampleOn
     <strong>관련 항목:</strong>
     <a href="peek.html"><code>peek</code></a> — 값이 pull될 때 관찰하는 풀 레이어의 원본 ·
     <a href="onErrorResume.html"><code>onErrorResume</code></a> — 버리고 갈아타기; <code>handleError</code>는 계속하는 형태 ·
-    <a href="tap.html"><code>tap</code></a> — 스트림이 아니라 값 하나의 데이터-퍼스트 부수 효과
+    <a href="tap.html"><code>fxTap</code></a> — 스트림이 아니라 값 하나의 데이터-퍼스트 부수 효과
   </div>

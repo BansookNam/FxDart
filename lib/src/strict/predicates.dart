@@ -5,59 +5,59 @@ library;
 
 /// True when [a] is `null`.
 ///
-/// Port of FxTS `isNull`.
-bool isNull(Object? a) => a == null;
+/// Port of FxTS `fxIsNull`.
+bool fxIsNull(Object? a) => a == null;
 
 /// True when [a] is not `null`.
 bool isNotNull(Object? a) => a != null;
 
-/// Port of FxTS `isNil` (`null` or `undefined`). Dart has no `undefined`,
-/// so this is exactly [isNull].
-bool isNil(Object? a) => a == null;
+/// Port of FxTS `fxIsNil` (`null` or `undefined`). Dart has no `undefined`,
+/// so this is exactly [fxIsNull].
+bool fxIsNil(Object? a) => a == null;
 
-/// Exactly [isNull]: TypeScript distinguishes `undefined` from `null`, Dart
+/// Exactly [fxIsNull]: TypeScript distinguishes `undefined` from `null`, Dart
 /// has only `null`. Kept so ported FxTS code still compiles.
 @Deprecated('Dart has no undefined; use isNull instead')
-bool isUndefined(Object? a) => a == null;
+bool fxIsUndefined(Object? a) => a == null;
 
-/// True when [a] is a [bool]. Port of FxTS `isBoolean` (Dart type: `bool`).
-bool isBool(Object? a) => a is bool;
+/// True when [a] is a [bool]. Port of FxTS `fxIsBoolean` (Dart type: `bool`).
+bool fxIsBool(Object? a) => a is bool;
 
-/// FxTS-named alias of [isBool].
-bool isBoolean(Object? a) => isBool(a);
+/// FxTS-named alias of [fxIsBool].
+bool fxIsBoolean(Object? a) => fxIsBool(a);
 
-/// True when [a] is a [num]. Port of FxTS `isNumber` (Dart type: `num`).
-bool isNum(Object? a) => a is num;
+/// True when [a] is a [num]. Port of FxTS `fxIsNumber` (Dart type: `num`).
+bool fxIsNum(Object? a) => a is num;
 
-/// FxTS-named alias of [isNum].
-bool isNumber(Object? a) => isNum(a);
+/// FxTS-named alias of [fxIsNum].
+bool fxIsNumber(Object? a) => fxIsNum(a);
 
-/// True when [a] is a [String]. Port of FxTS `isString`.
-bool isString(Object? a) => a is String;
+/// True when [a] is a [String]. Port of FxTS `fxIsString`.
+bool fxIsString(Object? a) => a is String;
 
-/// True when [a] is a [DateTime]. Port of FxTS `isDate` (Dart type: `DateTime`).
+/// True when [a] is a [DateTime]. Port of FxTS `fxIsDate` (Dart type: `DateTime`).
 bool isDateTime(Object? a) => a is DateTime;
 
 /// FxTS-named alias of [isDateTime].
-bool isDate(Object? a) => isDateTime(a);
+bool fxIsDate(Object? a) => isDateTime(a);
 
-/// True when [a] is a [List]. Port of FxTS `isArray`.
-bool isList(Object? a) => a is List;
+/// True when [a] is a [List]. Port of FxTS `fxIsArray`.
+bool fxIsList(Object? a) => a is List;
 
 /// True when [a] is a [List] — JavaScript's `Array` is Dart's [List], so
-/// this is an alias of [isList] under the FxTS name.
+/// this is an alias of [fxIsList] under the FxTS name.
 @Deprecated('Use isList instead')
-bool isArray(Object? a) => a is List;
+bool fxIsArray(Object? a) => a is List;
 
-/// True when [a] is a [Map]. The closest analogue of FxTS `isObject`
+/// True when [a] is a [Map]. The closest analogue of FxTS `fxIsObject`
 /// (`typeof a === "object"`), whose plain-JS-object semantics do not exist
 /// in Dart.
-bool isMap(Object? a) => a is Map;
+bool fxIsMap(Object? a) => a is Map;
 
 /// True when [a] is a [Map] — JavaScript's plain objects are Dart's [Map]s,
-/// so this is an alias of [isMap] under the FxTS name.
+/// so this is an alias of [fxIsMap] under the FxTS name.
 @Deprecated('Use isMap instead')
-bool isObject(Object? a) => a is Map;
+bool fxIsObject(Object? a) => a is Map;
 
 /// Combinators on a unary predicate, so conditions passed to `filter`,
 /// `reject`, `takeWhile`, `dropWhile`, ... can be built from named pieces
@@ -79,8 +79,8 @@ bool isObject(Object? a) => a is Map;
 extension FxPredicateOps<T> on bool Function(T) {
   /// The logical opposite of this predicate.
   ///
-  /// The extension-getter form of the top-level `negate` — `isEven.negate`
-  /// and `negate(isEven)` are the same function.
+  /// The extension-getter form of the top-level `fxNegate` — `isEven.negate`
+  /// and `fxNegate(isEven)` are the same function.
   bool Function(T) get negate =>
       (a) => !this(a);
 

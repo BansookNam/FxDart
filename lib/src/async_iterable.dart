@@ -55,8 +55,8 @@ abstract interface class FxAsyncIterator<T> {
 
 /// Pull-based async iterable — the async counterpart of [Iterable].
 ///
-/// Obtain one from [toAsync], [fromStream], or any `*Async` operator.
-/// Consume it with `toListAsync`, `eachAsync`, `reduceAsync`, the
+/// Obtain one from [fxToAsync], [fxFromStream], or any `*Async` operator.
+/// Consume it with `fxToListAsync`, `fxEachAsync`, `fxReduceAsync`, the
 /// [FxAsync] chain, or convert it to a [Stream] with [toStream].
 abstract interface class FxAsyncIterable<T> {
   /// A fresh [FxAsyncIterator] positioned at the start of this iterable.
@@ -163,7 +163,7 @@ class SerialAsyncIterator<T> implements FxAsyncIterator<T>, StreamPullCancel {
 
 /// An empty async iterable.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> asyncEmpty<T>() => DelegateAsyncIterable(
+FxAsyncIterable<T> fxAsyncEmpty<T>() => DelegateAsyncIterable(
   () => DelegateAsyncIterator((_) async => IterResult<T>.done()),
 );
 
@@ -244,13 +244,13 @@ mixin FxFastNextGate<T> implements FxFastIterator<T> {
 /// what makes `concurrent(n)` physically parallel at the source.
 ///
 /// ```dart
-/// await toListAsync(mapAsync((a) => a + 10, toAsync([1, 2, 3]))); // [11, 12, 13]
+/// await fxToListAsync(fxMapAsync((a) => a + 10, fxToAsync([1, 2, 3]))); // [11, 12, 13]
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> toAsync<T>(Iterable<FutureOr<T>> iterable) =>
+FxAsyncIterable<T> fxToAsync<T>(Iterable<FutureOr<T>> iterable) =>
     FxIterableSourceIterable(iterable);
 
-/// The [toAsync] iterable. A marker class, like [FxStreamSourceIterable]: a
+/// The [fxToAsync] iterable. A marker class, like [FxStreamSourceIterable]: a
 /// terminal driving a fused chain over a plain [Iterable] can step the source
 /// with `moveNext()` directly (see [fxFusedDrive]) instead of wrapping every
 /// element in an [IterResult] the drive would unwrap again.
@@ -265,8 +265,8 @@ class FxIterableSourceIterable<T> implements FxAsyncIterable<T> {
   FxAsyncIterator<T> get iterator => _ToAsyncIterator(source.iterator);
 }
 
-/// The [toAsync] iterator. Deliberately NOT gated: overlapping `next()`
-/// calls each advance the sync source immediately (see [toAsync] — that is
+/// The [fxToAsync] iterator. Deliberately NOT gated: overlapping `next()`
+/// calls each advance the sync source immediately (see [fxToAsync] — that is
 /// what makes `concurrent(n)` physically parallel), and the synchronous
 /// advance is atomic so overlap is safe.
 class _ToAsyncIterator<T> implements FxFastIterator<T> {
@@ -305,25 +305,25 @@ sealed class FxStage {
   const FxStage();
 }
 
-/// A `mapAsync` stage.
+/// A `fxMapAsync` stage.
 class FxMapStage extends FxStage {
   const FxMapStage(this.f);
   final FutureOr<Object?> Function(Object? value) f;
 }
 
-/// A `filterAsync` stage.
+/// A `fxFilterAsync` stage.
 class FxFilterStage extends FxStage {
   const FxFilterStage(this.p);
   final FutureOr<bool> Function(Object? value) p;
 }
 
-/// A `takeWhileAsync` stage — a failing predicate ends the whole pipeline.
+/// A `fxTakeWhileAsync` stage — a failing predicate ends the whole pipeline.
 class FxTakeWhileStage extends FxStage {
   const FxTakeWhileStage(this.p);
   final FutureOr<bool> Function(Object? value) p;
 }
 
-/// A `dropWhileAsync` stage. Stateful like [FxScanStage]: the latch ("have we
+/// A `fxDropWhileAsync` stage. Stateful like [FxScanStage]: the latch ("have we
 /// stopped dropping yet") lives on the iterator, so at most one may be fused
 /// into a run — a second one starts a new fused iterable, exactly as a second
 /// `scan` does.
@@ -332,7 +332,7 @@ class FxDropWhileStage extends FxStage {
   final FutureOr<bool> Function(Object? value) p;
 }
 
-/// A `uniqByAsync` stage — `uniqAsync` when [f] is null (the element is its
+/// A `fxUniqByAsync` stage — `fxUniqAsync` when [f] is null (the element is its
 /// own key). Stateful like [FxScanStage]: the seen-set lives on the iterator,
 /// so at most one may be fused into a run; a second one starts a new run.
 class FxUniqByStage extends FxStage {
@@ -342,7 +342,7 @@ class FxUniqByStage extends FxStage {
   final FutureOr<Object?> Function(Object? value)? f;
 }
 
-/// A `takeAsync` stage. Stateful: the count lives on the iterator, so at most
+/// A `fxTakeAsync` stage. Stateful: the count lives on the iterator, so at most
 /// one may be fused into a run.
 ///
 /// The run ends the moment the [count]th element passes *through* this stage,
@@ -353,12 +353,12 @@ class FxUniqByStage extends FxStage {
 class FxTakeStage extends FxStage {
   const FxTakeStage(this.count);
 
-  /// How many elements pass before the run ends. Always >= 1: `takeAsync`
+  /// How many elements pass before the run ends. Always >= 1: `fxTakeAsync`
   /// keeps a non-positive count off the fused path entirely.
   final int count;
 }
 
-/// A `scanAsync` stage. Unlike the others it carries state: the running
+/// A `fxScanAsync` stage. Unlike the others it carries state: the running
 /// accumulator lives on the iterator (one scan per fused run, so one slot),
 /// and [seed] is emitted through the stages *after* this one before the
 /// source is pulled at all.
@@ -649,7 +649,7 @@ class _FusedIterator<T>
   }
 
   /// A fused [FxScanStage] emits its seed before the source is pulled — as
-  /// the standalone `scanAsync` iterator does — carried through the stages
+  /// the standalone `fxScanAsync` iterator does — carried through the stages
   /// that follow the scan.
   FutureOr<IterResult<T>> _emitSeed(FxScanLink scan) {
     final seed = scan.seed;
@@ -846,10 +846,10 @@ class _FusedIterator<T>
 /// Converts a single-subscription or broadcast [Stream] into an
 /// [FxAsyncIterable].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> fromStream<T>(Stream<T> stream) =>
+FxAsyncIterable<T> fxFromStream<T>(Stream<T> stream) =>
     FxStreamSourceIterable(stream);
 
-/// The [fromStream] iterable. A marker class: terminals that consume a
+/// The [fxFromStream] iterable. A marker class: terminals that consume a
 /// fused chain over a raw stream source can execute it by subscription
 /// (see [fxStreamDrive]) instead of pulling element by element.
 class FxStreamSourceIterable<T> implements FxAsyncIterable<T> {
@@ -1282,7 +1282,7 @@ Future<void>? fxFusedDrive<T>(
   return completer.future;
 }
 
-/// Direct subscription bridge behind [fromStream]. Same contract as the
+/// Direct subscription bridge behind [fxFromStream]. Same contract as the
 /// `StreamIterator` it replaces — lazy subscribe on the first pull, paused
 /// whenever no pull is waiting, an error answers the pull that met it and
 /// ends the iteration — but without the `StreamIterator` + serializer +
@@ -1352,7 +1352,7 @@ class _StreamBridgeIterator<T> implements FxFastIterator<T> {
 }
 
 /// Tears down resources owned by an iterator: a `fromStream*` subscription,
-/// or a `parallel` isolate pool. [fromStream] itself has no cancel — it
+/// or a `parallel` isolate pool. [fxFromStream] itself has no cancel — it
 /// pauses instead. Early-stop consumers (`take`, `head`, `find`, a cancelled
 /// `toStream` subscription) call [fxCancel] so a [ReceivePort] cannot keep an
 /// isolate alive after the consumer has stopped pulling.
@@ -1372,7 +1372,7 @@ abstract interface class StreamPullCancel {
 
 /// Cancels [it] when it is a [StreamPullCancel], or every element when it is
 /// an [Iterable] of them (the multi-source operators — `zip`, `concat`,
-/// `transpose` — hold a list). No-op otherwise, so a site can hand over
+/// `fxTranspose` — hold a list). No-op otherwise, so a site can hand over
 /// whatever it holds without testing the type first.
 ///
 /// Fire-and-forget: a `cancel` that fails is [Future.ignore]d rather than
@@ -1708,7 +1708,7 @@ class _StreamNextIterator<T>
 extension FxAsyncIterableToStream<T> on FxAsyncIterable<T> {
   /// Drives this async iterable sequentially and emits its values as a
   /// [Stream]. The [Concurrent] back-channel is not used; apply
-  /// `concurrentAsync` before converting if you need parallel evaluation.
+  /// `fxConcurrentAsync` before converting if you need parallel evaluation.
   Stream<T> toStream() {
     // Hand-written controller rather than `async*`: every `yield` in an
     // async generator crosses `_AsyncStarStreamController`, which cost ~2.5
@@ -1819,16 +1819,19 @@ class Rejected<T> extends Settled<T> {
 /// Port of FxTS `concurrent` (`Lazy/concurrent.ts`).
 ///
 /// ```dart
-/// await eachAsync(
+/// await fxEachAsync(
 ///   print,
-///   concurrentAsync(
+///   fxConcurrentAsync(
 ///     3,
-///     mapAsync((a) => delay(Duration(seconds: 1), a), toAsync([1, 2, 3, 4, 5, 6])),
+///     fxMapAsync((a) => fxDelay(Duration(seconds: 1), a), fxToAsync([1, 2, 3, 4, 5, 6])),
 ///   ),
 /// ); // finishes in ~2 seconds instead of ~6
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
+FxAsyncIterable<A> fxConcurrentAsync<A>(
+  int length,
+  FxAsyncIterable<A> iterable,
+) {
   if (length < 1) {
     throw RangeError("'length' must be positive integer");
   }
@@ -1953,7 +1956,7 @@ FxAsyncIterable<A> concurrentAsync<A>(int length, FxAsyncIterable<A> iterable) {
   });
 }
 
-/// The FIFO behind [concurrentPoolAsync]'s two buffers. Which implementation
+/// The FIFO behind [fxConcurrentPoolAsync]'s two buffers. Which implementation
 /// an iterator gets is decided once, when it starts, by
 /// [FxConfig.optimizeMemoryForConcurrentPool].
 abstract interface class _PoolFifo<E> {
@@ -1996,7 +1999,7 @@ _PoolFifo<E> _poolFifo<E>() => FxDart.config.optimizeMemoryForConcurrentPool
     ? _ListFifo<E>()
     : _QueueFifo<E>();
 
-/// Like [concurrentAsync] but yields results in **completion order** rather
+/// Like [fxConcurrentAsync] but yields results in **completion order** rather
 /// than source order, keeping up to [length] requests in flight.
 ///
 /// The pool refills on every completion rather than on demand, so a source
@@ -2006,7 +2009,7 @@ _PoolFifo<E> _poolFifo<E>() => FxDart.config.optimizeMemoryForConcurrentPool
 ///
 /// Port of FxTS `concurrentPool`.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> concurrentPoolAsync<A>(
+FxAsyncIterable<A> fxConcurrentPoolAsync<A>(
   int length,
   FxAsyncIterable<A> iterable,
 ) {
@@ -2016,7 +2019,7 @@ FxAsyncIterable<A> concurrentPoolAsync<A>(
   return FxConcurrentPoolIterable<A>(length, iterable);
 }
 
-/// The [concurrentPoolAsync] iterable. A marker class: an all-consuming
+/// The [fxConcurrentPoolAsync] iterable. A marker class: an all-consuming
 /// serial terminal can drain the pool by push (see [fxPoolDrive]) instead of
 /// answering every element through a [Completer].
 class FxConcurrentPoolIterable<T> implements FxAsyncIterable<T> {
@@ -2113,7 +2116,7 @@ FxAsyncIterator<A> _poolIterator<A>(int length, FxAsyncIterable<A> iterable) {
 }
 
 /// Terminal pool drive — the push execution model applied to
-/// [concurrentPoolAsync], the counterpart of [fxStreamDrive]. On the pull
+/// [fxConcurrentPoolAsync], the counterpart of [fxStreamDrive]. On the pull
 /// path every element crosses from the pull's `then` callback to the
 /// suspended consumer through a [Completer], which costs a microtask hop per
 /// element; here [emit] runs inside that same callback, so the element never
@@ -2233,7 +2236,7 @@ Future<void>? fxPoolDrive<T>(
 
 /// Shared helper implementing the FxTS "sequential wrap" dispatch pattern:
 /// an operator whose sequential logic is [build]; when a [Concurrent] marker
-/// arrives on the first pull, the upstream is wrapped in [concurrentAsync]
+/// arrives on the first pull, the upstream is wrapped in [fxConcurrentAsync]
 /// so items are still evaluated concurrently upstream while [build] consumes
 /// them one at a time.
 @pragma('vm:prefer-inline')
@@ -2247,7 +2250,7 @@ FxAsyncIterable<B> dispatchAsync<A, B>(
       (concurrent) {
         inner ??= build(
           concurrent is Concurrent
-              ? concurrentAsync(concurrent.length, upstream)
+              ? fxConcurrentAsync(concurrent.length, upstream)
               : upstream,
         );
         return inner!.next(concurrent);

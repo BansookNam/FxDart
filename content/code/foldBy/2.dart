@@ -5,7 +5,7 @@ void main() {
 
   // TODO: build {firstLetter: totalLettersUnderThatKey}.
   // Expected: {f: 5, k: 4, p: 4, g: 2, d: 4}
-  final totals = foldBy((String w) => w[0], 0, (n, w) => n + 1, words);
+  final totals = fxFoldBy((String w) => w[0], 0, (n, w) => n + 1, words);
 
   print(totals);
 }

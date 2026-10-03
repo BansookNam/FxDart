@@ -17,7 +17,7 @@ nextLabel: flatMap
   <h2>강의</h2>
   <p>
     소스를 열어 보면 <code>mapEffect</code>는 말 그대로
-    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code>입니다 —
+    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code>입니다 —
     같은 함수, 같은 지연 평가, 같은 시그니처죠. 오직 호출 지점에서
     <em>의도</em>를 드러내기 위해 존재합니다. 콜백의 반환값보다 그 과정에서
     벌어지는 일(로그 기록, DB 저장, 카운터 증가)이 더 중요하다면
@@ -39,7 +39,7 @@ nextLabel: flatMap
 
   <h2>데모 2 · 비동기, 그리고 동시성</h2>
   <p>
-    <code>mapEffectAsync</code>는 <code>mapAsync</code>와 완전히 같은 엔진
+    <code>fxMapEffectAsync</code>는 <code>fxMapAsync</code>와 완전히 같은 엔진
     위에서 돌아가므로 <code>.concurrent(n)</code>도 똑같이 병렬화해
     줍니다 — "처리하고 저장하는" 파이프라인에 요긴합니다:
   </p>

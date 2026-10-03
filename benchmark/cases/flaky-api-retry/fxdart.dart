@@ -25,7 +25,7 @@ Future<void> main() async {
       var attemptSum = 0;
       var ready = 0;
       for (final id in jobIds) {
-        final winner = await fx(range(1, 11))
+        final winner = await fx(fxRange(1, 11))
             .toAsync()
             .map((attempt) async => (attempt, await pollJob(id, attempt)))
             .peek((r) => log.add('  poll ${r.$1}: ${r.$2}'))

@@ -1,1 +1,1 @@
-T add&lt;T extends Object&gt;(T a, T b) => (a as dynamic) + b as T;
+T fxAdd&lt;T extends Object&gt;(T a, T b) => (a as dynamic) + b as T;

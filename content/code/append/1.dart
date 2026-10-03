@@ -4,7 +4,7 @@ Future<void> main() async {
   // The appended value may itself be a Future:
   final result = await fx([1, 2, 3])
       .toAsync()
-      .append(delay(Duration(milliseconds: 50), 4))
+      .append(fxDelay(Duration(milliseconds: 50), 4))
       .toList();
 
   print(result); // [1, 2, 3, 4]

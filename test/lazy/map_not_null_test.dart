@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, fxIsNull;
 import 'package:test/test.dart';
 
 // mapNotNull is a filter-map: `f` both transforms and selects, and a null
@@ -51,9 +51,9 @@ void main() {
       test('agrees with compact(map(f, xs)) on both source shapes', () {
         String? f(int a) => a % 3 == 0 ? 'x$a' : null;
         final list = [1, 2, 3, 4, 5, 6];
-        expect(mapNotNull(f, list), compact(map(f, list)));
+        expect(mapNotNull(f, list), fxCompact(fxMap(f, list)));
         final pulled = Iterable<int>.generate(7);
-        expect(mapNotNull(f, pulled), compact(map(f, pulled)));
+        expect(mapNotNull(f, pulled), fxCompact(fxMap(f, pulled)));
       });
 
       test('is lazy: f runs only for the elements consumed', () {
@@ -63,7 +63,7 @@ void main() {
           return a;
         }, [1, 2, 3, 4, 5]);
         expect(calls, 0);
-        expect(take(2, it), [1, 2]);
+        expect(fxTake(2, it), [1, 2]);
         expect(calls, 2);
       });
 
@@ -84,16 +84,16 @@ void main() {
         int? f(String s) => int.tryParse(s);
         final input = ['1', 'x', '3', 'y'];
         expect(
-          await toListAsync(mapNotNullAsync(f, toAsync(input))),
+          await fxToListAsync(mapNotNullAsync(f, fxToAsync(input))),
           mapNotNull(f, input),
         );
       });
 
       test('awaits an async projection and skips its nulls', () async {
-        final res = await toListAsync(
+        final res = await fxToListAsync(
           mapNotNullAsync(
             (int a) async => a.isEven ? a * 10 : null,
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ),
         );
         expect(res, [20, 40]);
@@ -101,15 +101,17 @@ void main() {
 
       test('empty input yields nothing', () async {
         expect(
-          await toListAsync(mapNotNullAsync((int a) => a, toAsync(<int>[]))),
+          await fxToListAsync(
+            mapNotNullAsync((int a) => a, fxToAsync(<int>[])),
+          ),
           isEmpty,
         );
       });
 
       test('every projection null yields nothing', () async {
         expect(
-          await toListAsync(
-            mapNotNullAsync((int a) => null, toAsync([1, 2, 3])),
+          await fxToListAsync(
+            mapNotNullAsync((int a) => null, fxToAsync([1, 2, 3])),
           ),
           isEmpty,
         );
@@ -127,7 +129,7 @@ void main() {
         int? f(String s) => int.tryParse(s);
         final input = ['1', 'x', '3'];
         expect(
-          await fxAsync(toAsync(input)).mapNotNull(f).toList(),
+          await fxAsync(fxToAsync(input)).mapNotNull(f).toList(),
           mapNotNull(f, input).toList(),
         );
       });

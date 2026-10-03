@@ -23,7 +23,7 @@ nextLabel: uniqStrict
     the FxTS spelling <code>uniqBy</code> — they're the same operator. It's the
     tool for "one row per customer," "one event per type," or dedupe by any
     field or computed value — <code>uniq</code> itself is just
-    <code>distinctBy((a) =&gt; a, iterable)</code>.
+    <code>fxDistinctBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>
     As with <code>uniq</code>, it's lazy and order-preserving: the first
@@ -33,7 +33,7 @@ nextLabel: uniqStrict
   <p>
     The same async rule applies here as with <code>uniq</code>: put the
     concurrency in an upstream fetch (<code>.map(...).concurrent(n)</code>),
-    then apply <code>distinctBy</code>/<code>distinctByAsync</code> to the
+    then apply <code>fxDistinctBy</code>/<code>fxDistinctByAsync</code> to the
     already-resolved, in-order stream.
   </p>
 

@@ -4,6 +4,9 @@
 /// `Iterable`/collection libraries have an established name for the same
 /// operation, that name is provided here as a first-class alias — both spellings
 /// are supported, and the FxDart 101 course teaches the Dart-idiomatic one.
+/// Like every short top-level name, a one- or two-word alias carries the `fx`
+/// prefix (`fxWhere`, `fxDistinct`); on the chain the plain Dart word is used
+/// (`fx(xs).where(f)`).
 ///
 /// (The lone exception is `toArray`, which was *removed* in favour of `toList`
 /// rather than aliased — it claimed a type Dart doesn't have.)
@@ -20,177 +23,183 @@ import 'strict/access.dart';
 import 'strict/aggregate.dart';
 
 // --- lazy/filter.dart ---
-/// Dart-idiomatic alias for [filter].
-Iterable<A> where<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    filter(f, iterable);
+/// Dart-idiomatic alias for [fxFilter].
+Iterable<A> fxWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxFilter(f, iterable);
 
-/// Dart-idiomatic alias for [filterAsync].
-FxAsyncIterable<A> whereAsync<A>(
+/// Dart-idiomatic alias for [fxFilterAsync].
+FxAsyncIterable<A> fxWhereAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => filterAsync(f, iterable);
+) => fxFilterAsync(f, iterable);
 
-/// Dart-idiomatic alias for [reject] (keeps items where `f` is false).
-Iterable<A> whereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    reject(f, iterable);
+/// Dart-idiomatic alias for [fxReject] (keeps items where `f` is false).
+Iterable<A> fxWhereNot<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxReject(f, iterable);
 
-/// Dart-idiomatic alias for [rejectAsync].
-FxAsyncIterable<A> whereNotAsync<A>(
+/// Dart-idiomatic alias for [fxRejectAsync].
+FxAsyncIterable<A> fxWhereNotAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => rejectAsync(f, iterable);
+) => fxRejectAsync(f, iterable);
 
-/// Dart-idiomatic alias for [compact] (drops `null`s).
-Iterable<A> nonNulls<A>(Iterable<A?> iterable) => compact(iterable);
+/// Dart-idiomatic alias for [fxCompact] (drops `null`s).
+Iterable<A> fxNonNulls<A>(Iterable<A?> iterable) => fxCompact(iterable);
 
-/// Dart-idiomatic alias for [compactAsync].
-FxAsyncIterable<A> nonNullsAsync<A>(FxAsyncIterable<A?> iterable) =>
-    compactAsync(iterable);
+/// Dart-idiomatic alias for [fxCompactAsync].
+FxAsyncIterable<A> fxNonNullsAsync<A>(FxAsyncIterable<A?> iterable) =>
+    fxCompactAsync(iterable);
 
-/// Dart-idiomatic alias for [uniq].
-Iterable<A> distinct<A>(Iterable<A> iterable) => uniq(iterable);
+/// Dart-idiomatic alias for [fxUniq].
+Iterable<A> fxDistinct<A>(Iterable<A> iterable) => fxUniq(iterable);
 
-/// Dart-idiomatic alias for [uniqAsync].
-FxAsyncIterable<A> distinctAsync<A>(FxAsyncIterable<A> iterable) =>
-    uniqAsync(iterable);
+/// Dart-idiomatic alias for [fxUniqAsync].
+FxAsyncIterable<A> fxDistinctAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxUniqAsync(iterable);
 
-/// Dart-idiomatic alias for [uniqBy].
-Iterable<A> distinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    uniqBy(f, iterable);
+/// Dart-idiomatic alias for [fxUniqBy].
+Iterable<A> fxDistinctBy<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    fxUniqBy(f, iterable);
 
-/// Dart-idiomatic alias for [uniqByAsync].
-FxAsyncIterable<A> distinctByAsync<A, B>(
+/// Dart-idiomatic alias for [fxUniqByAsync].
+FxAsyncIterable<A> fxDistinctByAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => uniqByAsync(f, iterable);
+) => fxUniqByAsync(f, iterable);
 
 // --- lazy/map.dart ---
-/// Dart-idiomatic alias for [flatMap] (matches `Iterable.expand`).
-Iterable<B> expand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
-    flatMap(f, iterable);
+/// Dart-idiomatic alias for [fxFlatMap] (matches `Iterable.expand`).
+Iterable<B> fxExpand<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
+    fxFlatMap(f, iterable);
 
-/// Dart-idiomatic alias for [flatMapAsync].
-FxAsyncIterable<B> expandAsync<A, B>(
+/// Dart-idiomatic alias for [fxFlatMapAsync].
+FxAsyncIterable<B> fxExpandAsync<A, B>(
   FutureOr<Iterable<B>> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => flatMapAsync(f, iterable);
+) => fxFlatMapAsync(f, iterable);
 
-/// Dart-idiomatic alias for [flat] (flattens [depth] levels, default 1).
-Iterable<dynamic> flattened(Iterable<dynamic> iterable, [int depth = 1]) =>
-    flat(iterable, depth);
+/// Dart-idiomatic alias for [fxFlat] (flattens [depth] levels, default 1).
+Iterable<dynamic> fxFlattened(Iterable<dynamic> iterable, [int depth = 1]) =>
+    fxFlat(iterable, depth);
 
-/// Dart-idiomatic alias for [flatAsync].
-FxAsyncIterable<dynamic> flattenedAsync(
+/// Dart-idiomatic alias for [fxFlatAsync].
+FxAsyncIterable<dynamic> fxFlattenedAsync(
   FxAsyncIterable<dynamic> iterable, [
   int depth = 1,
-]) => flatAsync(iterable, depth);
+]) => fxFlatAsync(iterable, depth);
 
 // --- lazy/take_drop.dart ---
-/// Dart-idiomatic alias for [takeRight] (the last [length] items).
-Iterable<A> takeLast<A>(int length, Iterable<A> iterable) =>
-    takeRight(length, iterable);
+/// Dart-idiomatic alias for [fxTakeRight] (the last [length] items).
+Iterable<A> fxTakeLast<A>(int length, Iterable<A> iterable) =>
+    fxTakeRight(length, iterable);
 
-/// Dart-idiomatic alias for [takeRightAsync].
-FxAsyncIterable<A> takeLastAsync<A>(int length, FxAsyncIterable<A> iterable) =>
-    takeRightAsync(length, iterable);
+/// Dart-idiomatic alias for [fxTakeRightAsync].
+FxAsyncIterable<A> fxTakeLastAsync<A>(
+  int length,
+  FxAsyncIterable<A> iterable,
+) => fxTakeRightAsync(length, iterable);
 
-/// Dart-idiomatic alias for [drop] (matches `Iterable.skip`).
-Iterable<A> skip<A>(int length, Iterable<A> iterable) => drop(length, iterable);
+/// Dart-idiomatic alias for [fxDrop] (matches `Iterable.skip`).
+Iterable<A> fxSkip<A>(int length, Iterable<A> iterable) =>
+    fxDrop(length, iterable);
 
-/// Dart-idiomatic alias for [dropAsync].
-FxAsyncIterable<A> skipAsync<A>(int length, FxAsyncIterable<A> iterable) =>
-    dropAsync(length, iterable);
+/// Dart-idiomatic alias for [fxDropAsync].
+FxAsyncIterable<A> fxSkipAsync<A>(int length, FxAsyncIterable<A> iterable) =>
+    fxDropAsync(length, iterable);
 
-/// Dart-idiomatic alias for [dropWhile] (matches `Iterable.skipWhile`).
-Iterable<A> skipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    dropWhile(f, iterable);
+/// Dart-idiomatic alias for [fxDropWhile] (matches `Iterable.skipWhile`).
+Iterable<A> fxSkipWhile<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxDropWhile(f, iterable);
 
-/// Dart-idiomatic alias for [dropWhileAsync].
-FxAsyncIterable<A> skipWhileAsync<A>(
+/// Dart-idiomatic alias for [fxDropWhileAsync].
+FxAsyncIterable<A> fxSkipWhileAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => dropWhileAsync(f, iterable);
+) => fxDropWhileAsync(f, iterable);
 
 // --- lazy/zip.dart ---
 /// Dart-idiomatic alias for [zipWithIndex] (each item paired with its index).
-Iterable<(int, A)> indexed<A>(Iterable<A> iterable) => zipWithIndex(iterable);
+Iterable<(int, A)> fxIndexed<A>(Iterable<A> iterable) => zipWithIndex(iterable);
 
 /// Dart-idiomatic alias for [zipWithIndexAsync].
-FxAsyncIterable<(int, A)> indexedAsync<A>(FxAsyncIterable<A> iterable) =>
+FxAsyncIterable<(int, A)> fxIndexedAsync<A>(FxAsyncIterable<A> iterable) =>
     zipWithIndexAsync(iterable);
 
 // --- strict/access.dart ---
-/// Dart-idiomatic alias for [head] (first item, or `null` if empty).
-A? firstOrNull<A>(Iterable<A> iterable) => head(iterable);
+/// Dart-idiomatic alias for [fxHead] (first item, or `null` if empty).
+A? firstOrNull<A>(Iterable<A> iterable) => fxHead(iterable);
 
-/// Dart-idiomatic alias for [headAsync].
+/// Dart-idiomatic alias for [fxHeadAsync].
 Future<A?> firstOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
-    headAsync(iterable);
+    fxHeadAsync(iterable);
 
-/// Dart-idiomatic alias for [last] (last item, or `null` if empty).
-A? lastOrNull<A>(Iterable<A> iterable) => last(iterable);
+/// Dart-idiomatic alias for [fxLast] (last item, or `null` if empty).
+A? lastOrNull<A>(Iterable<A> iterable) => fxLast(iterable);
 
-/// Dart-idiomatic alias for [lastAsync].
+/// Dart-idiomatic alias for [fxLastAsync].
 Future<A?> lastOrNullAsync<A>(FxAsyncIterable<A> iterable) =>
-    lastAsync(iterable);
+    fxLastAsync(iterable);
 
-/// Dart-idiomatic alias for [nth] (item at [index], or `null`).
-A? elementAtOrNull<A>(int index, Iterable<A> iterable) => nth(index, iterable);
+/// Dart-idiomatic alias for [fxNth] (item at [index], or `null`).
+A? elementAtOrNull<A>(int index, Iterable<A> iterable) =>
+    fxNth(index, iterable);
 
-/// Dart-idiomatic alias for [nthAsync].
+/// Dart-idiomatic alias for [fxNthAsync].
 Future<A?> elementAtOrNullAsync<A>(int index, FxAsyncIterable<A> iterable) =>
-    nthAsync(index, iterable);
+    fxNthAsync(index, iterable);
 
-/// Dart-idiomatic alias for [find] (first match, or `null`).
+/// Dart-idiomatic alias for [fxFind] (first match, or `null`).
 A? firstWhereOrNull<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    find(f, iterable);
+    fxFind(f, iterable);
 
-/// Dart-idiomatic alias for [findAsync].
+/// Dart-idiomatic alias for [fxFindAsync].
 Future<A?> firstWhereOrNullAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => findAsync(f, iterable);
+) => fxFindAsync(f, iterable);
 
-/// Dart-idiomatic alias for [findIndex] (index of first match, or -1).
-int indexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
-    findIndex(f, iterable);
+/// Dart-idiomatic alias for [fxFindIndex] (index of first match, or -1).
+int fxIndexWhere<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxFindIndex(f, iterable);
 
-/// Dart-idiomatic alias for [findIndexAsync].
-Future<int> indexWhereAsync<A>(
+/// Dart-idiomatic alias for [fxFindIndexAsync].
+Future<int> fxIndexWhereAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => findIndexAsync(f, iterable);
+) => fxFindIndexAsync(f, iterable);
 
 // Note: no top-level `contains` alias — it collides with `package:test`'s
 // matcher, and Dart's idiom is the inherited `.contains()` on the chain anyway.
-// The FxTS-named top-level `includes` remains.
+// The FxTS-named top-level `fxIncludes` remains.
 
-/// Dart-idiomatic alias for [some] (true if any item matches).
-bool any<A>(bool Function(A a) f, Iterable<A> iterable) => some(f, iterable);
+/// Dart-idiomatic alias for [fxSome] (true if any item matches).
+bool fxAny<A>(bool Function(A a) f, Iterable<A> iterable) =>
+    fxSome(f, iterable);
 
-/// Dart-idiomatic alias for [someAsync].
-Future<bool> anyAsync<A>(
+/// Dart-idiomatic alias for [fxSomeAsync].
+Future<bool> fxAnyAsync<A>(
   FutureOr<bool> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => someAsync(f, iterable);
+) => fxSomeAsync(f, iterable);
 
 // --- strict/aggregate.dart ---
-/// Dart-idiomatic alias for [each] (matches `Iterable.forEach`).
-void forEach<A>(void Function(A a) f, Iterable<A> iterable) =>
-    each(f, iterable);
+/// Dart-idiomatic alias for [fxEach] (matches `Iterable.forEach`).
+void fxForEach<A>(void Function(A a) f, Iterable<A> iterable) =>
+    fxEach(f, iterable);
 
-/// Dart-idiomatic alias for [eachAsync].
-Future<void> forEachAsync<A>(
+/// Dart-idiomatic alias for [fxEachAsync].
+Future<void> fxForEachAsync<A>(
   FutureOr<void> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => eachAsync(f, iterable);
+) => fxEachAsync(f, iterable);
 
-/// Dart-idiomatic alias for [size] (element count).
-int count<A>(Iterable<A> iterable) => size(iterable);
+/// Dart-idiomatic alias for [fxSize] (element count).
+int fxCount<A>(Iterable<A> iterable) => fxSize(iterable);
 
-/// Dart-idiomatic alias for [sizeAsync].
-Future<int> countAsync<A>(FxAsyncIterable<A> iterable) => sizeAsync(iterable);
+/// Dart-idiomatic alias for [fxSizeAsync].
+Future<int> fxCountAsync<A>(FxAsyncIterable<A> iterable) =>
+    fxSizeAsync(iterable);
 
-/// Dart-idiomatic alias for [toSorted] (a new sorted [List]).
-List<A> sorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
-    toSorted(f, iterable);
+/// Dart-idiomatic alias for [fxToSorted] (a new sorted [List]).
+List<A> fxSorted<A>(int Function(A a, A b) f, Iterable<A> iterable) =>
+    fxToSorted(f, iterable);

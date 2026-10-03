@@ -42,7 +42,7 @@ void main() {
           (acc, int a, i) => acc + a * i,
           source,
         );
-        final viaZip = fold(
+        final viaZip = fxFold(
           0,
           (acc, (int, int) p) => acc + p.$2 * p.$1,
           zipWithIndex(source),
@@ -71,7 +71,7 @@ void main() {
         final res = await foldWithIndexAsync(
           0,
           (acc, int a, i) => acc + a * i,
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         );
         expect(res, equals(8));
       });
@@ -80,7 +80,7 @@ void main() {
         final res = await foldWithIndexAsync(
           Future.value(0),
           (acc, int a, i) async => acc + a * i,
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         );
         expect(res, equals(8));
       });
@@ -89,21 +89,21 @@ void main() {
         final res = await foldWithIndexAsync(
           42,
           (acc, int a, i) => acc + a,
-          toAsync(<int>[]),
+          fxToAsync(<int>[]),
         );
         expect(res, equals(42));
       });
 
       test('numbers in source order under concurrency', () async {
-        final res = await fxAsync(toAsync([5, 4, 3, 2, 1]))
-            .map((a) => delay(Duration(milliseconds: a * 20), a))
+        final res = await fxAsync(fxToAsync([5, 4, 3, 2, 1]))
+            .map((a) => fxDelay(Duration(milliseconds: a * 20), a))
             .concurrent(5)
             .foldWithIndex(<(int, int)>[], (acc, a, i) => acc..add((i, a)));
         expect(res, equals([(0, 5), (1, 4), (2, 3), (3, 2), (4, 1)]));
       });
 
       test('restarts the index on every call', () async {
-        final source = toAsync([1, 2, 3]);
+        final source = fxToAsync([1, 2, 3]);
         expect(
           await foldWithIndexAsync(0, (acc, int a, i) => acc + i, source),
           equals(3),
@@ -116,7 +116,7 @@ void main() {
 
       test('is available as an fxAsync chain method', () async {
         final res = await fxAsync(
-          toAsync([1, 2, 3]),
+          fxToAsync([1, 2, 3]),
         ).foldWithIndex(0, (acc, a, i) => acc + a * i);
         expect(res, equals(8));
       });

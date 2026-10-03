@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
@@ -58,7 +58,7 @@ void main() {
       });
 
       test('should be able to be used as a chain terminal', () {
-        Either<String, int> parse(String s) => either<String, int>(
+        Either<String, int> parse(String s) => fxEither<String, int>(
           (r) => r.ensureNotNull(int.tryParse(s), () => 'bad: $s'),
         );
         final result = fx([
@@ -74,7 +74,7 @@ void main() {
     group('async', () {
       test('should collect every success when nothing failed', () async {
         final result = await flattenOrAccumulateAsync<String, int>(
-          toAsync([const Right(1), const Right(2)]),
+          fxToAsync([const Right(1), const Right(2)]),
         );
         expect(result.getOrNull(), equals([1, 2]));
       });
@@ -94,7 +94,7 @@ void main() {
         final result = await fx([1, -2, 3, -4])
             .toAsync()
             .map(
-              (n) => either<String, int>((r) {
+              (n) => fxEither<String, int>((r) {
                 r.ensure(n > 0, () => '$n is negative');
                 return n;
               }),

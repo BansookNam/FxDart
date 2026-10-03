@@ -25,7 +25,7 @@ nextLabel: foldRight
     <code>Iterable</code> de Dart ya usa para esta misma operación.
   </p>
   <p>
-    Fíjate bien en el orden de los argumentos: es <code>fold(seed, f, iterable)</code>
+    Fíjate bien en el orden de los argumentos: es <code>fxFold(seed, f, iterable)</code>
     — primero el valor inicial, luego el combinador y después la fuente — reflejando
     <code>Iterable.fold(initialValue, combine)</code> en la forma encadenada. Eso es
     distinto del <code>reduce(f, seed, iterable)</code> de FxTS, donde la
@@ -53,7 +53,7 @@ nextLabel: foldRight
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="reduce.html"><code>reduce</code></a> — la contraparte sin valor inicial ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — un reductor currificado y reutilizable ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — un reductor currificado y reutilizable ·
     <a href="sum.html"><code>sum</code></a> — un fold habitual, ya especializado ·
     <a href="scan.html"><code>scan</code></a> — como fold, pero emite perezosamente cada valor intermedio
   </div>

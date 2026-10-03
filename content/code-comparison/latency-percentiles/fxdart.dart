@@ -31,7 +31,7 @@ void main() {
 
   final rows = fx(fx(ok).groupBy((r) => r.endpoint).entries).map((e) {
     final sorted = fx(e.value).map((r) => r.ms).sort((a, b) => a.compareTo(b)).toList();
-    int pct(int q) => nth(((sorted.length - 1) * q / 100).round(), sorted)!;
+    int pct(int q) => fxNth(((sorted.length - 1) * q / 100).round(), sorted)!;
     return (e.key, pct(50), pct(95), sorted.length);
   }).toList();
 
@@ -40,7 +40,7 @@ void main() {
       'p95 ${'${r.$3}'.padLeft(3)} ms  (${r.$4} reqs)');
   final worst = fx(rows).maxBy((r) => r.$3)!;
 
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Latency percentiles (successful requests only)',
     ...lines,
     'Worst p95: ${worst.$1} at ${worst.$3} ms',

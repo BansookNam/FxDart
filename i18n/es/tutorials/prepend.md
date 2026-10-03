@@ -23,7 +23,7 @@ nextLabel: concat
     solo un valor extra por delante del resto.
   </p>
   <p>
-    <code>prependAsync</code> acepta además un <code>Future</code> como
+    <code>fxPrependAsync</code> acepta además un <code>Future</code> como
     <code>a</code>; se espera primero, antes de que la primera petición llegue a
     la fuente subyacente.
   </p>

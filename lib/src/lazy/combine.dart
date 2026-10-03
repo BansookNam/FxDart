@@ -6,14 +6,14 @@ import 'list_range.dart';
 /// Returns an iterable of numbers from [start] (inclusive) to [end]
 /// (exclusive), stepping by [step]. With one argument, counts `0..start`.
 ///
-/// Port of FxTS `range`.
+/// Port of FxTS `fxRange`.
 ///
 /// ```dart
-/// range(4);        // (0, 1, 2, 3)
-/// range(1, 4);     // (1, 2, 3)
-/// range(4, 1, -1); // (4, 3, 2)
+/// fxRange(4);        // (0, 1, 2, 3)
+/// fxRange(1, 4);     // (1, 2, 3)
+/// fxRange(4, 1, -1); // (4, 3, 2)
 /// ```
-Iterable<int> range(int start, [int? end, int step = 1]) => end == null
+Iterable<int> fxRange(int start, [int? end, int step = 1]) => end == null
     ? _RangeIterable(0, start, 1)
     : _RangeIterable(start, end, step);
 
@@ -47,7 +47,7 @@ class _RangeIterator implements Iterator<int> {
 /// Yields [value] [n] times.
 ///
 /// Port of FxTS `repeat`.
-Iterable<T> repeat<T>(int n, T value) => _RepeatIterable(n, value);
+Iterable<T> fxRepeat<T>(int n, T value) => _RepeatIterable(n, value);
 
 class _RepeatIterable<T> extends Iterable<T> {
   _RepeatIterable(this._n, this._value);
@@ -75,7 +75,7 @@ class _RepeatIterator<T> implements Iterator<T> {
 /// Yields the source, then repeats its values indefinitely.
 ///
 /// Port of FxTS `cycle`.
-Iterable<T> cycle<T>(Iterable<T> iterable) => _CycleIterable(iterable);
+Iterable<T> fxCycle<T>(Iterable<T> iterable) => _CycleIterable(iterable);
 
 class _CycleIterable<T> extends Iterable<T> {
   _CycleIterable(this._source);
@@ -110,9 +110,9 @@ class _CycleIterator<T> implements Iterator<T> {
   }
 }
 
-/// Async counterpart of [cycle].
+/// Async counterpart of [fxCycle].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
+FxAsyncIterable<T> fxCycleAsync<T>(FxAsyncIterable<T> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     final arr = <T>[];
@@ -138,12 +138,15 @@ FxAsyncIterable<T> cycleAsync<T>(FxAsyncIterable<T> iterable) {
 /// Yields all values of [iterable], then [a].
 ///
 /// Port of FxTS `append`.
-Iterable<A> append<A>(A a, Iterable<A> iterable) =>
-    concat(iterable, _SingleIterable(a));
+Iterable<A> fxAppend<A>(A a, Iterable<A> iterable) =>
+    fxConcat(iterable, _SingleIterable(a));
 
-/// Async counterpart of [append]. [a] may be a [Future].
+/// Async counterpart of [fxAppend]. [a] may be a [Future].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
+FxAsyncIterable<A> fxAppendAsync<A>(
+  FutureOr<A> a,
+  FxAsyncIterable<A> iterable,
+) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     var finished = false;
@@ -162,8 +165,8 @@ FxAsyncIterable<A> appendAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Yields [a], then all values of [iterable].
 ///
 /// Port of FxTS `prepend`.
-Iterable<A> prepend<A>(A a, Iterable<A> iterable) =>
-    concat(_SingleIterable(a), iterable);
+Iterable<A> fxPrepend<A>(A a, Iterable<A> iterable) =>
+    fxConcat(_SingleIterable(a), iterable);
 
 class _SingleIterable<A> extends Iterable<A> {
   _SingleIterable(this._value);
@@ -172,9 +175,12 @@ class _SingleIterable<A> extends Iterable<A> {
   Iterator<A> get iterator => _RepeatIterator(1, _value);
 }
 
-/// Async counterpart of [prepend]. [a] may be a [Future].
+/// Async counterpart of [fxPrepend]. [a] may be a [Future].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
+FxAsyncIterable<A> fxPrependAsync<A>(
+  FutureOr<A> a,
+  FxAsyncIterable<A> iterable,
+) {
   return DelegateAsyncIterable(() {
     final iterator = iterable.iterator;
     var isFirstItem = true;
@@ -191,7 +197,7 @@ FxAsyncIterable<A> prependAsync<A>(FutureOr<A> a, FxAsyncIterable<A> iterable) {
 /// Concatenates two iterables lazily.
 ///
 /// Port of FxTS `concat`.
-Iterable<A> concat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
+Iterable<A> fxConcat<A>(Iterable<A> iterable1, Iterable<A> iterable2) =>
     _ConcatIterable(iterable1, iterable2);
 
 class _ConcatIterable<A> extends Iterable<A> {
@@ -223,9 +229,9 @@ class _ConcatIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [concat].
+/// Async counterpart of [fxConcat].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> concatAsync<A>(
+FxAsyncIterable<A> fxConcatAsync<A>(
   FxAsyncIterable<A> iterable1,
   FxAsyncIterable<A> iterable2,
 ) {
@@ -322,11 +328,13 @@ FxAsyncIterable<A> _concatAsyncLegacy<A>(
 /// fxdart extension (not part of FxTS), after Rx's `switchIfEmpty`.
 ///
 /// ```dart
-/// ifEmpty(() => [0], [1, 2]); // (1, 2)
-/// ifEmpty(() => [0], <int>[]); // (0)
+/// fxIfEmpty(() => [0], [1, 2]); // (1, 2)
+/// fxIfEmpty(() => [0], <int>[]); // (0)
 /// ```
-Iterable<A> ifEmpty<A>(Iterable<A> Function() fallback, Iterable<A> iterable) =>
-    _IfEmptyIterable(fallback, iterable);
+Iterable<A> fxIfEmpty<A>(
+  Iterable<A> Function() fallback,
+  Iterable<A> iterable,
+) => _IfEmptyIterable(fallback, iterable);
 
 class _IfEmptyIterable<A> extends Iterable<A> {
   _IfEmptyIterable(this._fallback, this._source);
@@ -366,11 +374,11 @@ class _IfEmptyIterator<A> implements Iterator<A> {
 /// defaultIfEmpty(0, <int>[]); // (0)
 /// ```
 Iterable<A> defaultIfEmpty<A>(A value, Iterable<A> iterable) =>
-    ifEmpty(() => [value], iterable);
+    fxIfEmpty(() => [value], iterable);
 
-/// Async counterpart of [ifEmpty].
+/// Async counterpart of [fxIfEmpty].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> ifEmptyAsync<A>(
+FxAsyncIterable<A> fxIfEmptyAsync<A>(
   FxAsyncIterable<A> Function() fallback,
   FxAsyncIterable<A> iterable,
 ) {
@@ -400,13 +408,13 @@ FxAsyncIterable<A> ifEmptyAsync<A>(
 FxAsyncIterable<A> defaultIfEmptyAsync<A>(
   FutureOr<A> value,
   FxAsyncIterable<A> iterable,
-) => ifEmptyAsync(() => toAsync([value]), iterable);
+) => fxIfEmptyAsync(() => fxToAsync([value]), iterable);
 
 /// Returns the source in reverse order. A [List] source is indexed directly,
 /// back to front; any other source materializes on the first pull.
 ///
 /// Port of FxTS `reverse`.
-Iterable<A> reverse<A>(Iterable<A> iterable) => _ReverseIterable(iterable);
+Iterable<A> fxReverse<A>(Iterable<A> iterable) => _ReverseIterable(iterable);
 
 class _ReverseIterable<A> extends Iterable<A> {
   _ReverseIterable(this._source);
@@ -442,9 +450,9 @@ class _ReverseIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [reverse].
+/// Async counterpart of [fxReverse].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> reverseAsync<A>(FxAsyncIterable<A> iterable) {
+FxAsyncIterable<A> fxReverseAsync<A>(FxAsyncIterable<A> iterable) {
   return dispatchAsync(iterable, (source) {
     final iterator = source.iterator;
     Iterator<A>? reversed;
@@ -479,12 +487,12 @@ class _ForkState<T> {
 final Expando<_ForkState<Object?>> _forkStates = Expando('fxdart fork state');
 
 /// Branches a *single* iteration of [iterable] into an independent cursor:
-/// every `fork` of the same iterable object shares one underlying iterator
+/// every `fxFork` of the same iterable object shares one underlying iterator
 /// and buffer, so the source is walked only once no matter how many forks
 /// read from it.
 ///
-/// Port of FxTS `fork`.
-Iterable<T> fork<T>(Iterable<T> iterable) => _ForkIterable(iterable);
+/// Port of FxTS `fxFork`.
+Iterable<T> fxFork<T>(Iterable<T> iterable) => _ForkIterable(iterable);
 
 class _ForkIterable<T> extends Iterable<T> {
   _ForkIterable(this._source);
@@ -588,10 +596,10 @@ final Expando<_ForkAsyncState<Object?>> _forkAsyncStates = Expando(
   'fxdart async fork state',
 );
 
-/// Async counterpart of [fork]. All forks of the same [FxAsyncIterable]
+/// Async counterpart of [fxFork]. All forks of the same [FxAsyncIterable]
 /// object share one underlying iterator and buffer.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
+FxAsyncIterable<T> fxForkAsync<T>(FxAsyncIterable<T> iterable) {
   var state = _forkAsyncStates[iterable] as _ForkAsyncState<T>?;
   if (state == null) {
     state = _ForkAsyncState<T>(iterable.iterator);
@@ -665,16 +673,16 @@ FxAsyncIterable<T> forkAsync<T>(FxAsyncIterable<T> iterable) {
 
 /// Yields the `(key, value)` pairs of [map] as records.
 ///
-/// Port of FxTS `entries` (TS objects/Maps become Dart Maps).
-Iterable<(K, V)> entries<K, V>(Map<K, V> map) =>
+/// Port of FxTS `fxEntries` (TS objects/Maps become Dart Maps).
+Iterable<(K, V)> fxEntries<K, V>(Map<K, V> map) =>
     map.entries.map((e) => (e.key, e.value));
 
 /// Yields the keys of [map].
 ///
-/// Port of FxTS `keys`.
-Iterable<K> keys<K, V>(Map<K, V> map) => map.keys;
+/// Port of FxTS `fxKeys`.
+Iterable<K> fxKeys<K, V>(Map<K, V> map) => map.keys;
 
 /// Yields the values of [map].
 ///
-/// Port of FxTS `values`.
-Iterable<V> values<K, V>(Map<K, V> map) => map.values;
+/// Port of FxTS `fxValues`.
+Iterable<V> fxValues<K, V>(Map<K, V> map) => map.values;

@@ -1,1 +1,1 @@
-bool isEmpty(Object? value)
+bool fxIsEmpty(Object? value)

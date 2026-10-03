@@ -2,7 +2,7 @@
 slug: juxt
 title: juxt — FxDart 101
 description: FxDart juxt tutorial: apply several functions to the same value and collect all the results, with a live playground.
-heading: <code>juxt</code>
+heading: <code>fxJuxt</code>
 section: 10
 crumb: juxt
 prev: apply.html
@@ -16,14 +16,14 @@ nextLabel: fxPipe
 
   <h2>Lecture</h2>
   <p>
-    Give <code>juxt</code> a list of functions that all accept the same
+    Give <code>fxJuxt</code> a list of functions that all accept the same
     input, and it gives you back one function that runs the input through
     every one of them and returns a <code>List</code> of the results, in
     order. It's a compact way to compute several independent views of a
     single value without repeating yourself.
   </p>
   <p>
-    FxTS's <code>juxt</code> is variadic and can accept functions with
+    FxTS's <code>fxJuxt</code> is variadic and can accept functions with
     different argument counts. Dart has no variadic generics, so FxDart's
     version takes a single unary function <code>T -&gt; R</code> per entry
     — still enough to cover the common case of "run these N read-only
@@ -40,14 +40,14 @@ nextLabel: fxPipe
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>juxt</code> to compute the <code>sum</code> and
+  <p>Exercise: use <code>fxJuxt</code> to compute the <code>sum</code> and
     <code>average</code> of this list in a single pass.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="apply.html"><code>apply</code></a> — call a function with a dynamic argument list ·
-    <a href="cases.html"><code>cases</code></a> — pick one function based on a predicate instead of running them all ·
+    <a href="apply.html"><code>fxApply</code></a> — call a function with a dynamic argument list ·
+    <a href="cases.html"><code>fxCases</code></a> — pick one function based on a predicate instead of running them all ·
     <a href="min.html"><code>min</code></a> / <a href="max.html"><code>max</code></a> — used together in the demo above ·
     <a href="zip.html"><code>zip</code></a> — combine values from two sequences instead of one
   </div>

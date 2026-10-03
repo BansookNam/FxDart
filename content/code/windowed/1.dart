@@ -17,6 +17,6 @@ void main() {
   // [[1, 2, 3], [2, 3, 4], [3, 4], [4]]
 
   // Lazy: an endless source is fine — only what you take is computed.
-  print(fx(range(1, 1000000)).windowed(4, step: 4).take(2).toList());
+  print(fx(fxRange(1, 1000000)).windowed(4, step: 4).take(2).toList());
   // [[1, 2, 3, 4], [5, 6, 7, 8]]
 }

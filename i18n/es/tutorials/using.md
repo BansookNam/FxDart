@@ -2,7 +2,7 @@
 slug: using
 title: using — FxDart 101
 description: Tutorial de using y usingAsync en FxDart: acota un recurso a una iteración perezosa — adquiere en el primer pull, libera exactamente una vez — con playground en vivo.
-heading: <code>using</code>
+heading: <code>fxUsing</code>
 section: 11
 crumb: using
 prev: timeout.html
@@ -29,7 +29,7 @@ nextLabel: concurrent or parallel
     último elemento o justo antes de que un error se propague.
   </p>
   <p>
-    La forma async <code>usingAsync</code> permite que los tres pasos
+    La forma async <code>fxUsingAsync</code> permite que los tres pasos
     sean asíncronos y compone con
     <code><a href="concurrent.html">concurrent</a></code> — release sigue
     disparándose exactamente una vez aunque haya pulls solapados en
@@ -45,7 +45,7 @@ nextLabel: concurrent or parallel
     completa, y completar libera) o gestiona el recurso con
     <code>try</code>/<code>finally</code> cuando la salida anticipada sea
     el plan. Extensión de fxdart (sin contraparte en FxTS), inspirada en
-    el <code>using</code> de Rx.
+    el <code>fxUsing</code> de Rx.
   </p>
 
   <h2>Demo 1 · El paréntesis alrededor de una lectura perezosa</h2>
@@ -62,5 +62,5 @@ nextLabel: concurrent or parallel
     <strong>Relacionado:</strong>
     <a href="take.html"><code>take</code></a> — acota la iteración para garantizar la compleción (y la liberación) ·
     <a href="peek.html"><code>peek</code></a> — observar valores sin poseer una vida útil ·
-    <a href="retry.html"><code>retry</code></a> — un acquire nuevo por intento cuando se envuelve en una factoría
+    <a href="retry.html"><code>fxRetry</code></a> — un acquire nuevo por intento cuando se envuelve en una factoría
   </div>

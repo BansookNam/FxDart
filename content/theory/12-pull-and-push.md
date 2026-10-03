@@ -54,7 +54,7 @@ import 'package:fxdart/fxdart.dart';
 void main() async {
   var produced = 0;
 
-  final source = fx(range(1, 1000)).map((n) {
+  final source = fx(fxRange(1, 1000)).map((n) {
     produced++;
     return n;
   }).toAsync();
@@ -203,7 +203,7 @@ feels nicer.
 3. A paged HTTP API returns 100 rows per request. Model it both ways, then say
    which one makes "stop after the first match" cheaper — and by how many
    requests.
-4. `Stream` has `asBroadcastStream`; pull chains have `fork`/`tee`. Both let
+4. `Stream` has `asBroadcastStream`; pull chains have `fxFork`/`tee`. Both let
    two consumers see one source. What is the essential difference in what
    happens when one consumer is slow?
 
@@ -226,7 +226,7 @@ feels nicer.
    several pages by then — the difference is unbounded and grows with latency.
 4. `asBroadcastStream` gives every listener the same events at the producer's
    pace: a slow listener either buffers or drops, and it cannot slow the
-   producer down. `fork`/`tee` split a *pull*, so the shared source advances
+   producer down. `fxFork`/`tee` split a *pull*, so the shared source advances
    only when both consumers have asked — the slow consumer holds the fast one
    back, which is backpressure working as designed, and is the right default
    when correctness matters more than liveness.

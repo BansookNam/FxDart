@@ -61,7 +61,7 @@ void main() {
   group('FxShuffleEntry — .fxShuffle', () {
     test('is the same as shuffle(), seeded', () {
       final xs = [1, 2, 3, 4, 5, 6, 7, 8];
-      expect(xs.fxShuffle(42), shuffle(xs, 42));
+      expect(xs.fxShuffle(42), fxShuffle(xs, 42));
     });
 
     test('does not mutate the receiver', () {
@@ -82,8 +82,8 @@ void main() {
     test('async counterpart matches shuffleAsync()', () async {
       final xs = [1, 2, 3, 4, 5, 6];
       expect(
-        await toAsync(xs).fxShuffle(9),
-        await shuffleAsync(toAsync(xs), 9),
+        await fxToAsync(xs).fxShuffle(9),
+        await fxShuffleAsync(fxToAsync(xs), 9),
       );
     });
   });

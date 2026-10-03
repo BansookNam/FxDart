@@ -114,7 +114,7 @@ description: FxDart é uma biblioteca de programação funcional para Dart, port
         <li><strong>Uma segunda abstração assíncrona</strong> — <code>FxAsyncIterable</code> existe porque <code>Stream</code> não consegue expressar o canal de retorno da concorrência; a ponte é fácil, mas é mais um conceito a aprender.</li>
         <li><strong>Curva de aprendizado</strong> — pensar em pipelines preguiçosos é diferente de loops imperativos.</li>
         <li><strong>Nem sempre o mais rápido</strong> — em hot loops minúsculos, um <code>for</code> escrito à mão pode superar a composição de operadores; o FxDart otimiza para clareza e trabalho I/O-bound.</li>
-        <li><strong>Algumas APIs do TS não portam literalmente</strong> — elas ganham grafias nativas do Dart: <code>curry</code> vira o getter de extensão tipado <a href="tutorials/curried.html"><code>.curried</code></a>, com os nomes antigos mantidos como stubs deprecados para migração.</li>
+        <li><strong>Algumas APIs do TS não portam literalmente</strong> — elas ganham grafias nativas do Dart: <code>fxCurry</code> vira o getter de extensão tipado <a href="tutorials/curried.html"><code>.curried</code></a>, com os nomes antigos mantidos como stubs deprecados para migração.</li>
       </ul>
     </div>
   </div>

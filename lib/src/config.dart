@@ -6,7 +6,7 @@
 class FxConfig {
   FxConfig._();
 
-  /// Keeps `concurrentPoolAsync`'s two internal buffers — settled results
+  /// Keeps `fxConcurrentPoolAsync`'s two internal buffers — settled results
   /// waiting for a consumer, and consumer pulls waiting for a result — in
   /// plain growable `List`s — the original implementation — instead of the
   /// `Queue`s used by default.
@@ -14,7 +14,7 @@ class FxConfig {
   /// The `List` form dequeues with `removeAt(0)`, which is O(length). That is
   /// free while the buffers stay short — they do whenever the source is
   /// genuinely slower than the consumer, which is the normal shape of a
-  /// concurrency pool. But `concurrentPoolAsync` refills its pool on every
+  /// concurrency pool. But `fxConcurrentPoolAsync` refills its pool on every
   /// completion without waiting for a pull, so a source that resolves faster
   /// than the consumer drains (cached lookups, `Future.value`, futures that
   /// are already complete) lets the ready buffer run ahead to O(n) and turns

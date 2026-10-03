@@ -12,7 +12,7 @@ Future<String> fetchConfig() async {
 
 void main() async {
   // Run again on failure — up to 4 runs, waiting a little longer each time:
-  final config = await retry(
+  final config = await fxRetry(
     4,
     fetchConfig,
     delay: (failed) {

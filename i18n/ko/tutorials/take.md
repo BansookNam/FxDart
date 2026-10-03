@@ -18,15 +18,15 @@ nextLabel: takeRight
   <p>
     <code>take</code>는 지연 파이프라인을 유한하게 유지하는 장치입니다.
     <code>length</code>개를 내보낸 순간 소스에서 값을 끌어오는 것을
-    멈추므로, 상류는 그 이상의 요청을 받지 않습니다. <code>range</code>,
+    멈추므로, 상류는 그 이상의 요청을 받지 않습니다. <code>fxRange</code>,
     <code>repeat</code>, <code>cycle</code> 같은 FxDart 소스는 무한할 수
     있기 때문에, 파이프라인을 애초에 안전하게 실행할 수 있게 해 주는 것이
     <code>take</code>뿐인 경우도 많습니다.
   </p>
   <p>
-    data-first 함수(<code>take(n, iterable)</code>)와 체인
+    data-first 함수(<code>fxTake(n, iterable)</code>)와 체인
     메서드(<code>fx(iterable).take(n)</code>) 두 가지로 제공됩니다.
-    비동기 쪽에서 <code>takeAsync</code>/<code>.take()</code>는 그대로
+    비동기 쪽에서 <code>fxTakeAsync</code>/<code>.take()</code>는 그대로
     통과시키는 역할만 합니다. 상류를 직렬화하지 않으므로, 체인 위쪽의
     <code>concurrent(n)</code>은 <code>take</code>가 필요한 만큼을 채울
     때까지 계속 겹쳐서 값을 끌어옵니다.
@@ -53,6 +53,6 @@ nextLabel: takeRight
     <strong>관련 항목:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — 앞의 n개 대신 뒤의 n개 ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — 술어로 가져오기 ·
-    <a href="range.html"><code>range</code></a> · <a href="cycle.html"><code>cycle</code></a> — 무한 소스 ·
+    <a href="range.html"><code>fxRange</code></a> · <a href="cycle.html"><code>cycle</code></a> — 무한 소스 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>

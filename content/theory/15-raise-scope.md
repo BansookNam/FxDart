@@ -13,7 +13,7 @@ description: How FxDart gets straight-line code out of failing steps without do-
 > - the leak rule — the one way to misuse a scope, and how the library catches it
 > - what you gain and lose against `flatMap` chains
 
-## What `either` is
+## What `fxEither` is
 
 Chapter 7 used the scope and did not open it. Here is the shape:
 
@@ -25,7 +25,7 @@ Either<String, int> half(int n) => n.isEven
     : Either.left('odd: $n');
 
 void main() {
-  final result = either<String, int>((r) {
+  final result = fxEither<String, int>((r) {
     final a = r.bind(half(20)); // 10
     final b = r.bind(half(a)); // 5
     final c = r.bind(half(b)); // odd → exits here
@@ -36,15 +36,15 @@ void main() {
 }
 ```
 
-`either` runs your block with a `Raise<E>` object. `r.bind` looks at an
+`fxEither` runs your block with a `Raise<E>` object. `r.bind` looks at an
 `Either`: on a `Right` it returns the value, on a `Left` it **abandons the
-block entirely** and makes `either` return that `Left`. No pyramid, no
+block entirely** and makes `fxEither` return that `Left`. No pyramid, no
 `flatMap`, and the block reads top to bottom.
 
 The mechanism is a control-flow escape: `raise` throws a private marker that
-`either` catches at the boundary and converts into a `Left`. Because the throw
+`fxEither` catches at the boundary and converts into a `Left`. Because the throw
 and the catch are both inside the library, the escape is *delimited* — it can
-only ever travel as far as the enclosing `either`, and no further.
+only ever travel as far as the enclosing `fxEither`, and no further.
 
 ![Where the exit lands](diagrams/t15-1-scope-exit.svg)
 
@@ -61,12 +61,12 @@ FxDart's scope is not a rewrite. Nothing is transformed; a real object is
 passed in, and control leaves the block by a mechanism the language already
 has. The trade is exact:
 
-| | Desugaring (`do`, `for`) | Scope (`either`, Arrow's `Raise`) |
+| | Desugaring (`do`, `for`) | Scope (`fxEither`, Arrow's `Raise`) |
 |---|---|---|
 | Works for | any monad the types can name | the effects the library wrote |
 | Needs | higher-kinded types | nothing special |
 | Failure exit | returning a short-circuited value | non-local jump, caught at the boundary |
-| Composes with `async` | needs a transformer | naturally — `eitherAsync` |
+| Composes with `async` | needs a transformer | naturally — `fxEitherAsync` |
 | Extensible by you | yes, by defining a monad | no |
 
 The last two rows are the reason the choice is defensible rather than merely
@@ -85,14 +85,14 @@ Future<Either<String, int>> lookup(String key) async {
 }
 
 void main() async {
-  final ok = await eitherAsync<String, String>((r) async {
+  final ok = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('port'));
     final host = r.bind(await lookup('port'));
     return 'http://$host:$port';
   });
   print(ok);
 
-  final bad = await eitherAsync<String, String>((r) async {
+  final bad = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('nope'));
     return 'never: $port';
   });
@@ -118,27 +118,27 @@ int? parseTeen(String s) {
 
 void main() {
   // Failure as a typed value.
-  print(either<String, int>((r) {
+  print(fxEither<String, int>((r) {
     final n = r.ensureNotNull(
         parseTeen('15'), () => 'not a teen');
     return n * 2;
   }));
 
   // Failure as null — no error value to carry.
-  print(nullable((r) {
+  print(fxNullable((r) {
     final n = r.bind(parseTeen('15'));
     return n * 2;
   }));
-  print(nullable((r) {
+  print(fxNullable((r) {
     final n = r.bind(parseTeen('42'));
     return n * 2;
   }));
 
   // Failure as a thrown exception, handled at the boundary.
-  print(catching<int>(() => int.parse('nope'), (e, _) => -1));
+  print(fxCatching<int>(() => int.parse('nope'), (e, _) => -1));
 
   // …or converted straight into a Left.
-  print(eitherCatching<String, int>(
+  print(fxEitherCatching<String, int>(
       (r) => int.parse('nope'), (e, _) => 'not a number'));
 }
 ```
@@ -158,7 +158,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   late Raise<String> escaped;
 
-  final result = either<String, int>((r) {
+  final result = fxEither<String, int>((r) {
     escaped = r; // capturing the scope object…
     return 1;
   });
@@ -175,7 +175,7 @@ void main() {
 The library detects it and throws `RaiseLeakedError` rather than letting a
 stray control-flow jump escape into unrelated code. In practice the rule bites
 in one place: **do not use `r` inside a callback that runs later** — an
-unawaited future, a timer, a stream listener. Inside `eitherAsync`, stay on the
+unawaited future, a timer, a stream listener. Inside `fxEitherAsync`, stay on the
 awaited chain; that is the same rule stated for async.
 
 > 🎓 **This is an old idea with a new name.** A delimited continuation captures
@@ -203,11 +203,11 @@ forbids.
 
 1. Rewrite the first listing as a `flatMap` chain. Which version makes it
    easier to add a guard — "fail if the value drops below 3" — between steps?
-2. What does `either` return when the block throws a genuine exception rather
+2. What does `fxEither` return when the block throws a genuine exception rather
    than raising? Try it, and explain why that is the right default.
 3. Why can a scope not be resumed — that is, why is there no `r.recover(...)`
    that continues the block after a failure? Answer in terms of the mechanism.
-4. `nullable` has no error value at all. What is its `E` type, and what does
+4. `fxNullable` has no error value at all. What is its `E` type, and what does
    that tell you about the relationship between `Either<E, A>` and `A?`?
 
 ## Solutions
@@ -217,13 +217,13 @@ forbids.
    Right(v))` — a new nesting level and a new lambda — where the scope version
    adds one line: `r.ensure(a >= 3, () => 'too small')`. Guards are where the
    scope pulls ahead decisively.
-2. The exception propagates out of `either` unchanged. That is right because a
+2. The exception propagates out of `fxEither` unchanged. That is right because a
    thrown exception means "something happened that this error type does not
    describe" — silently converting it into a `Left` would launder a bug into a
-   domain failure. `eitherCatching` exists for when you *do* want the
+   domain failure. `fxEitherCatching` exists for when you *do* want the
    conversion, and it is a separate function precisely so the choice is
    explicit. Chapter 18 develops this boundary.
-3. Because the escape is implemented as a throw: by the time `either` sees the
+3. Because the escape is implemented as a throw: by the time `fxEither` sees the
    failure, the block's stack frames are already unwound and its local
    variables are gone. Resuming would require capturing the continuation before
    unwinding, which is the half of delimited continuations `Raise` deliberately

@@ -39,7 +39,7 @@ fx(lines).map(f);</code></pre>
     .toList();</code></pre>
   <p>
     Stages must be sendable when the result is a
-    <code>parallel</code> worker. <code>juxt</code> is the other
+    <code>parallel</code> worker. <code>fxJuxt</code> is the other
     direction: several functions, one input, a list of results.
   </p>
   <p>
@@ -79,7 +79,7 @@ fx(lines).map(f);</code></pre>
   <div class="callout">
     <strong>Related:</strong>
     <a href="pipe.html"><code>pipe</code></a> — the same idea, untyped, over a value ·
-    <a href="juxt.html"><code>juxt</code></a> — several functions, one input, a list of results ·
+    <a href="juxt.html"><code>fxJuxt</code></a> — several functions, one input, a list of results ·
     <a href="map.html"><code>map</code></a> — the same composition on this isolate ·
     <a href="parallel.html"><code>parallel</code></a> — where composing workers saves a hop
   </div>

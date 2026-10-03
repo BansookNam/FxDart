@@ -135,7 +135,7 @@ void main() {
     });
 
     test('workers < 1 throws', () {
-      expect(() => parallel(0, doubleIt, [1]), throwsRangeError);
+      expect(() => fxParallel(0, doubleIt, [1]), throwsRangeError);
     });
 
     test('propagates a worker error as itself', () async {
@@ -180,7 +180,7 @@ void main() {
     });
 
     test('cancel on the iterator ends further pulls', () async {
-      final it = parallel(4, doubleIt, [1, 2, 3, 4, 5, 6, 7, 8]).iterator;
+      final it = fxParallel(4, doubleIt, [1, 2, 3, 4, 5, 6, 7, 8]).iterator;
       expect((await it.next()).value, 2);
       await (it as StreamPullCancel).cancel();
       expect((await it.next()).done, isTrue);
@@ -191,7 +191,7 @@ void main() {
     });
 
     test('overlapping next() keeps source order', () async {
-      final it = parallel(2, doubleIt, [1, 2, 3, 4, 5, 6]).iterator;
+      final it = fxParallel(2, doubleIt, [1, 2, 3, 4, 5, 6]).iterator;
       final marker = Concurrent.of(3);
       final results = await Future.wait([
         it.next(marker),
@@ -251,7 +251,7 @@ void main() {
       // Was a CPU-bound stopwatch race, which is a benchmark rather than a
       // test: at ~2ms of work per item the signal sat inside the noise, and
       // it failed under coverage instrumentation on a shared runner
-      // (serial 8ms, paired 8ms, needed < 6.8ms). A blocking `sleep` in the
+      // (serial 8ms, paired 8ms, needed < 6.8ms). A blocking `fxSleep` in the
       // worker measures the pool's dispatch instead of the machine's cores,
       // so it neither competes for CPU nor depends on how many cores exist.
       final serial = Stopwatch()..start();
@@ -277,7 +277,7 @@ void main() {
     });
 
     test('parallelAsync rejects workers < 1', () {
-      expect(() => parallelAsync(0, doubleIt, toAsync([1])), throwsRangeError);
+      expect(() => fxParallelAsync(0, doubleIt, fxToAsync([1])), throwsRangeError);
     });
 
     test('a worker error that cannot be sent arrives as its text', () async {
@@ -300,7 +300,7 @@ void main() {
       // The worker is still running when the cancel lands, so the error
       // surfaces *after* it — the pull must answer done rather than throw
       // an error nobody is waiting for any more.
-      final it = parallel(1, slowThrow, [1, 2, 3]).iterator;
+      final it = fxParallel(1, slowThrow, [1, 2, 3]).iterator;
       final pull = it.next();
       await Future<void>.delayed(const Duration(milliseconds: 10));
       await (it as StreamPullCancel).cancel();
@@ -310,7 +310,7 @@ void main() {
     test('cancel while the pool is still spawning kills it', () async {
       // `cancel` lands inside `_ensurePool`'s await, so the pool is born
       // already unwanted and must be killed rather than stored.
-      final it = parallel(2, slowDouble, [1, 2, 3, 4]).iterator;
+      final it = fxParallel(2, slowDouble, [1, 2, 3, 4]).iterator;
       final pull = it.next();
       await (it as StreamPullCancel).cancel();
       expect((await pull).done, isTrue);
@@ -321,7 +321,7 @@ void main() {
       // One worker and several slow items, so an item is waiting for a
       // worker rather than running on one when the pool is killed. Its
       // completer must be settled, not abandoned.
-      final it = parallel(1, slowDouble, [1, 2, 3, 4, 5, 6]).iterator;
+      final it = fxParallel(1, slowDouble, [1, 2, 3, 4, 5, 6]).iterator;
       expect((await it.next()).value, 2);
       final pending = it.next();
       await (it as StreamPullCancel).cancel();
@@ -337,10 +337,10 @@ void main() {
     });
 
     test('cancel during the first async pull, before spawn', () async {
-      final it = parallelAsync(
+      final it = fxParallelAsync(
         2,
         doubleIt,
-        toAsync<int>([
+        fxToAsync<int>([
           Future<int>.delayed(const Duration(milliseconds: 50), () => 1),
           2,
           3,
@@ -462,7 +462,7 @@ void main() {
         throw StateError('async source boom');
       }
 
-      final it = parallelAsync(2, doubleIt, fromStreamNext(bad())).iterator;
+      final it = fxParallelAsync(2, doubleIt, fromStreamNext(bad())).iterator;
       try {
         while (true) {
           final r = await it.next();
@@ -485,7 +485,7 @@ void main() {
         equals(src),
       );
       expect(
-        await toListAsync(parallelAsync(2, identityNullable, toAsync(src))),
+        await fxToListAsync(fxParallelAsync(2, identityNullable, fxToAsync(src))),
         equals(src),
       );
     });
@@ -496,7 +496,7 @@ void main() {
         equals([2, 4, 6]),
       );
       expect(
-        await toListAsync(mapParallel(2, doubleIt, [1, 2])),
+        await fxToListAsync(fxMapParallel(2, doubleIt, [1, 2])),
         equals([2, 4]),
       );
       expect(
@@ -504,12 +504,12 @@ void main() {
         equals([2, 4]),
       );
       expect(
-        await toListAsync(mapParallelAsync(1, doubleIt, toAsync([3]))),
+        await fxToListAsync(fxMapParallelAsync(1, doubleIt, fxToAsync([3]))),
         equals([6]),
       );
-      expect(() => mapParallel(0, doubleIt, [1]), throwsRangeError);
+      expect(() => fxMapParallel(0, doubleIt, [1]), throwsRangeError);
       expect(
-        () => mapParallelAsync(0, doubleIt, toAsync([1])),
+        () => fxMapParallelAsync(0, doubleIt, fxToAsync([1])),
         throwsRangeError,
       );
     });
@@ -547,25 +547,25 @@ void main() {
 
     test('chunk < 1 throws', () {
       expect(() => fx([1]).parallel(2, doubleIt, chunk: 0), throwsRangeError);
-      expect(() => parallel(2, doubleIt, [1], chunk: -1), throwsRangeError);
+      expect(() => fxParallel(2, doubleIt, [1], chunk: -1), throwsRangeError);
       expect(
-        () => parallelAsync(2, doubleIt, toAsync([1]), chunk: 0),
+        () => fxParallelAsync(2, doubleIt, fxToAsync([1]), chunk: 0),
         throwsRangeError,
       );
       expect(
         () => fx([1]).toAsync().parallel(2, doubleIt, chunk: 0),
         throwsRangeError,
       );
-      expect(() => mapParallel(2, doubleIt, [1], chunk: 0), throwsRangeError);
+      expect(() => fxMapParallel(2, doubleIt, [1], chunk: 0), throwsRangeError);
       expect(
-        () => mapParallelAsync(2, doubleIt, toAsync([1]), chunk: 0),
+        () => fxMapParallelAsync(2, doubleIt, fxToAsync([1]), chunk: 0),
         throwsRangeError,
       );
     });
 
     test('an async source batches too', () async {
       expect(
-        await toListAsync(parallelAsync(3, doubleIt, toAsync(src), chunk: 4)),
+        await fxToListAsync(fxParallelAsync(3, doubleIt, fxToAsync(src), chunk: 4)),
         equals(want),
       );
       expect(
@@ -573,8 +573,8 @@ void main() {
         equals(want),
       );
       expect(
-        await toListAsync(
-          parallelAsync(2, doubleIt, toAsync(<int>[]), chunk: 4),
+        await fxToListAsync(
+          fxParallelAsync(2, doubleIt, fxToAsync(<int>[]), chunk: 4),
         ),
         equals(<int>[]),
       );
@@ -693,7 +693,7 @@ void main() {
       final controller = StreamController<int>();
       addTearDown(controller.close);
       final it = fxAsync(
-        parallelAsync(2, doubleIt, fromStreamNext(controller.stream), chunk: 4),
+        fxParallelAsync(2, doubleIt, fromStreamNext(controller.stream), chunk: 4),
       ).iterator;
       final pull = it.next();
       controller.add(1);
@@ -724,7 +724,7 @@ void main() {
         equals(want),
       );
       expect(
-        await toListAsync(mapParallel(2, doubleIt, src, chunk: 8)),
+        await fxToListAsync(fxMapParallel(2, doubleIt, src, chunk: 8)),
         equals(want),
       );
       expect(
@@ -732,8 +732,8 @@ void main() {
         equals(want),
       );
       expect(
-        await toListAsync(
-          mapParallelAsync(2, doubleIt, toAsync(src), chunk: 8),
+        await fxToListAsync(
+          fxMapParallelAsync(2, doubleIt, fxToAsync(src), chunk: 8),
         ),
         equals(want),
       );

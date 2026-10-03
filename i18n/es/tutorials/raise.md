@@ -2,7 +2,7 @@
 slug: raise
 title: el constructor either &amp; el ámbito Raise — FxDart 101
 description: Tutorial de raise en FxDart: los constructores either y eitherAsync, y el vocabulario del ámbito Raise — bind, ensure, ensureNotNull, recover, withError, raise.
-heading: <code>either</code> &amp; el ámbito <code>Raise</code>
+heading: <code>fxEither</code> &amp; el ámbito <code>Raise</code>
 section: 13
 crumb: either &amp; Raise
 prev: eitherCombinators.html
@@ -46,7 +46,7 @@ nextLabel: nullable
     ámbito, que el constructor captura en su frontera. Por eso los retornos
     tempranos, los bucles y los <code>if</code> funcionan sin más dentro del
     bloque, y por eso los constructores anidados nunca capturan los errores de
-    los demás. <code>eitherAsync</code> es el gemelo asíncrono — mismo
+    los demás. <code>fxEitherAsync</code> es el gemelo asíncrono — mismo
     vocabulario, con <code>await</code> permitido (elevar errores solo dentro
     de la misma cadena de awaits).
   </p>
@@ -65,8 +65,8 @@ nextLabel: nullable
     El parseo real falla por dos vías a la vez: tus reglas
     <em>lanzan con raise</em> errores tipados, mientras la plataforma
     (<code>int.parse</code>, <code>jsonDecode</code>) <em>lanza
-    excepciones</em>. <code>eitherCatching</code> es <code>either</code> +
-    <code>catching</code> en un solo builder — el bloque puede hacer raise
+    excepciones</em>. <code>fxEitherCatching</code> es <code>fxEither</code> +
+    <code>fxCatching</code> en un solo builder — el bloque puede hacer raise
     o lanzar, y el segundo argumento convierte cualquier excepción lanzada
     en el mismo error tipado. La señal de raise nunca se le entrega.
     <code>recover</code> acepta la misma cláusula opcional
@@ -90,14 +90,14 @@ nextLabel: nullable
     <a href="eitherPipelines.html">terminales ansiosos de Either</a>; un raise
     diferido falla ruidosamente con <code>RaiseLeakedError</code>. (2) Nunca
     uses un <code>catch</code> pelado dentro de un bloque raise — usa
-    <code>catching</code>/<code>catchingAsync</code>, que siempre dejan pasar
+    <code>fxCatching</code>/<code>fxCatchingAsync</code>, que siempre dejan pasar
     la señal de cortocircuito.
   </div>
 
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="either.html"><code>Either</code></a> — el tipo frontera ·
-    <a href="nullable.html"><code>nullable</code></a> — el gemelo sin información que devuelve <code>T?</code> ·
+    <a href="nullable.html"><code>fxNullable</code></a> — el gemelo sin información que devuelve <code>T?</code> ·
     <a href="accumulate.html">acumulación</a> — recoge todos los fallos ·
     <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>

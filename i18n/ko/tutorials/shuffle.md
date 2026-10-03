@@ -2,7 +2,7 @@
 slug: shuffle
 title: shuffle — FxDart 101
 description: FxDart shuffle 튜토리얼: 재현 가능한 순서를 위한 시드를 옵션으로 받는 Fisher-Yates 셔플, 동기와 비동기 모두를 라이브 플레이그라운드와 함께 다룹니다.
-heading: <code>shuffle</code>
+heading: <code>fxShuffle</code>
 section: 12
 crumb: shuffle
 next: createSeededRandom.html
@@ -14,7 +14,7 @@ nextLabel: createSeededRandom
 
   <h2>강의</h2>
   <p>
-    <code>shuffle</code>은 <code>iterable</code>의 원소에 Fisher-Yates 셔플을
+    <code>fxShuffle</code>은 <code>iterable</code>의 원소에 Fisher-Yates 셔플을
     적용해 완전히 새로운 <code>List&lt;T&gt;</code>를 반환합니다 —
     입력은 절대 변경되지 않습니다. 시드 없이 호출하면
     <code>dart:math</code>의 <code>Random</code>을 사용하므로 호출할 때마다
@@ -31,8 +31,8 @@ nextLabel: createSeededRandom
     같은 곳에 유용합니다.
   </p>
   <p>
-    <code>shuffleAsync</code>는 <code>*Async</code> 짝입니다. 내부적으로
-    <code>toListAsync</code>를 통해 <code>FxAsyncIterable</code>을 먼저
+    <code>fxShuffleAsync</code>는 <code>*Async</code> 짝입니다. 내부적으로
+    <code>fxToListAsync</code>를 통해 <code>FxAsyncIterable</code>을 먼저
     구체화한 다음 그 결과를 섞기 때문에, 같은 시드를 주면 시드 기반 비동기
     셔플은 동기 버전과 완전히 동일한 순서를 만들어냅니다.
   </p>
@@ -51,12 +51,12 @@ nextLabel: createSeededRandom
 
   <h2>메서드 표기</h2>
   <p>
-    <code>xs.fxShuffle(seed)</code>는 <code>shuffle(xs, seed)</code>이고,
+    <code>xs.fxShuffle(seed)</code>는 <code>fxShuffle(xs, seed)</code>이고,
     <code>FxAsyncIterable</code>에서 같은 이름은
-    <code>shuffleAsync</code>입니다.
+    <code>fxShuffleAsync</code>입니다.
   </p>
   <p>
-    이름이 <code>shuffle</code>이 아닌 것은 취향 문제가 아닙니다.
+    이름이 <code>fxShuffle</code>이 아닌 것은 취향 문제가 아닙니다.
     <code>List.shuffle</code>은 이미 <code>dart:core</code>에 있고,
     <strong>제자리에서 섞고 void를 돌려줍니다</strong>. 인스턴스 멤버는 항상
     확장을 이기므로 <code>List</code>를 수신자로 두면 조용히 엉뚱한 쪽이
@@ -71,8 +71,8 @@ final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — 콜백에 대한 호출 빈도 제한 ·
-    <a href="debounce.html"><code>debounce</code></a> — 조용해질 때까지 기다리는 빈도 제한 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — 콜백에 대한 호출 빈도 제한 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — 조용해질 때까지 기다리는 빈도 제한 ·
     <a href="toAsync.html"><code>toAsync</code></a> — shuffleAsync에 쓰도록 리스트를 끌어올리기 ·
     <a href="sort.html"><code>sort</code></a> — 정반대의 발상: 결정적인 순서
   </div>

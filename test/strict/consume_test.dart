@@ -13,19 +13,19 @@ void main() {
     group('sync', () {
       test('should be consumed the given number', () {
         final seen = <int>[];
-        consume(_sideEffectGen(seen), 2);
+        fxConsume(_sideEffectGen(seen), 2);
         expect(seen, equals([1, 2]));
       });
 
       test('should consume everything when n is omitted', () {
         final seen = <int>[];
-        consume(_sideEffectGen(seen));
+        fxConsume(_sideEffectGen(seen));
         expect(seen, equals([1, 2, 3, 4, 5]));
       });
 
       test('should consume everything when n exceeds the length', () {
         final seen = <int>[];
-        consume(_sideEffectGen(seen), 100);
+        fxConsume(_sideEffectGen(seen), 100);
         expect(seen, equals([1, 2, 3, 4, 5]));
       });
 
@@ -41,8 +41,8 @@ void main() {
     group('async', () {
       test('should be consumed the given number', () async {
         final seen = <int>[];
-        await consumeAsync(
-          peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])),
+        await fxConsumeAsync(
+          fxPeekAsync((a) => seen.add(a), fxToAsync([1, 2, 3, 4, 5])),
           2,
         );
         expect(seen, equals([1, 2]));
@@ -50,8 +50,8 @@ void main() {
 
       test('should consume everything when n is omitted', () async {
         final seen = <int>[];
-        await consumeAsync(
-          peekAsync((a) => seen.add(a), toAsync([1, 2, 3, 4, 5])),
+        await fxConsumeAsync(
+          fxPeekAsync((a) => seen.add(a), fxToAsync([1, 2, 3, 4, 5])),
         );
         expect(seen, equals([1, 2, 3, 4, 5]));
       });

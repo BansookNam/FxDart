@@ -24,7 +24,7 @@ nextLabel: zip
     the first source has.
   </p>
   <p>
-    <code>concatAsync</code> is a pass-through, like <code>take</code> and
+    <code>fxConcatAsync</code> is a pass-through, like <code>take</code> and
     <code>concat</code>'s async cousins: it doesn't serialize either side
     internally, so a <code>concurrent(n)</code> further downstream still
     gets to overlap pulls against whichever side is currently active.

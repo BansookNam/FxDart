@@ -2,7 +2,7 @@
 slug: debounce
 title: debounce — FxDart 101
 description: FxDart debounce 튜토리얼 — 호출이 잠잠해질 때까지 함수 실행을 미루는 방법, leading 옵션과 cancel(), 그리고 라이브 플레이그라운드까지.
-heading: <code>debounce</code>
+heading: <code>fxDebounce</code>
 section: 12
 crumb: debounce
 prev: parallel.html
@@ -16,7 +16,7 @@ nextLabel: throttle
 
   <h2>강의</h2>
   <p>
-    <code>debounce</code>는 콜백을 감싸서, 짧은 시간에 몰린 반복 호출을
+    <code>fxDebounce</code>는 콜백을 감싸서, 짧은 시간에 몰린 반복 호출을
     하나의 호출로 합쳐 줍니다. 호출이 있을 때마다 <code>wait</code> 길이의
     타이머가 다시 시작되고, 감싼 <code>func</code>는 다른 호출 없이
     <code>wait</code>가 <em>온전히</em> 지났을 때 비로소 실행됩니다 — 그리고 마지막 호출에
@@ -54,7 +54,7 @@ nextLabel: throttle
   <p>
     콜백 쪽에서 같은 것을 메서드로 부를 수 있습니다.
     <code>saveDraft.fxDebounce(wait)</code>는
-    <code>debounce(saveDraft, wait)</code>와 같고, 이름 붙은 인자도 그대로
+    <code>fxDebounce(saveDraft, wait)</code>와 같고, 이름 붙은 인자도 그대로
     받습니다.
   </p>
   <pre><code>void saveDraft(String text) =&gt; _post(text);
@@ -69,7 +69,7 @@ save('hello');   // only this one reaches _post</code></pre>
     <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
   </p>
   <h2>직접 해 보기</h2>
-  <p>연습: <code>save</code>를 <code>debounce</code>로 감싸(wait는 100ms)
+  <p>연습: <code>save</code>를 <code>fxDebounce</code>로 감싸(wait는 100ms)
     아래 연속 호출 중 마지막 값만 살아남게 만들어 보세요.</p>
   {{playground:2}}
 
@@ -87,8 +87,8 @@ save('hello');   // only this one reaches _post</code></pre>
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — 타이밍 데모를 만드는 재료 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — 타이밍 데모를 만드는 재료 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한 ·
-    <a href="shuffle.html"><code>shuffle</code></a> — 시드를 지정하는 난수
+    <a href="shuffle.html"><code>fxShuffle</code></a> — 시드를 지정하는 난수
   </div>

@@ -5,20 +5,20 @@ void main() {
   group('uniqStrict', () {
     test('removes duplicates, keeping the first occurrence', () {
       expect(
-        uniqStrict('marpple'.split('')),
+        fxUniqStrict('marpple'.split('')),
         equals(['m', 'a', 'r', 'p', 'l', 'e']),
       );
-      expect(uniqStrict([1, 2, 3, 4]), equals([1, 2, 3, 4]));
-      expect(uniqStrict(<int>[]), equals(<int>[]));
+      expect(fxUniqStrict([1, 2, 3, 4]), equals([1, 2, 3, 4]));
+      expect(fxUniqStrict(<int>[]), equals(<int>[]));
     });
 
     test('agrees element-for-element with lazy uniq', () {
       final input = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5];
-      expect(uniqStrict(input), equals(uniq(input).toList()));
+      expect(fxUniqStrict(input), equals(fxUniq(input).toList()));
     });
 
     test('keeps distinct (identity-unequal) map objects', () {
-      final res = uniqStrict([
+      final res = fxUniqStrict([
         {'v': 1},
         {'v': 1},
       ]);
@@ -27,7 +27,7 @@ void main() {
 
     test('returns a growable list independent of a List source', () {
       final src = [1, 2, 3];
-      final out = uniqStrict(src);
+      final out = fxUniqStrict(src);
       expect(identical(out, src), isFalse);
       out.add(4);
       expect(src, equals([1, 2, 3]));
@@ -35,8 +35,8 @@ void main() {
 
     test('evaluates the upstream once, at the call', () {
       var calls = 0;
-      final chain = uniqStrict(
-        map((int a) {
+      final chain = fxUniqStrict(
+        fxMap((int a) {
           calls++;
           return a % 3;
         }, [1, 2, 3, 4, 5, 6]),
@@ -49,8 +49,8 @@ void main() {
 
     test('by contrast, lazy uniq re-runs the upstream per iteration', () {
       var calls = 0;
-      final lazy = uniq(
-        map((int a) {
+      final lazy = fxUniq(
+        fxMap((int a) {
           calls++;
           return a % 3;
         }, [1, 2, 3, 4, 5, 6]),
@@ -82,8 +82,8 @@ void main() {
     });
 
     test('lazy uniq().toList(growable: false) fuses into a fixed list', () {
-      final res = uniq(
-        map((int a) => a % 3, [1, 2, 3, 4, 5, 6]),
+      final res = fxUniq(
+        fxMap((int a) => a % 3, [1, 2, 3, 4, 5, 6]),
       ).toList(growable: false);
       expect(res, equals([1, 2, 0]));
       expect(() => res.add(9), throwsUnsupportedError);
@@ -91,10 +91,10 @@ void main() {
 
     test('does NOT short-circuit a downstream take', () {
       var scanned = 0;
-      Iterable<int> counted() => map((int a) {
+      Iterable<int> counted() => fxMap((int a) {
         scanned++;
         return a;
-      }, range(0, 1000));
+      }, fxRange(0, 1000));
 
       scanned = 0;
       fx(counted()).uniq().take(3).toList();
@@ -123,7 +123,7 @@ void main() {
       final input = ['a', 'bb', 'c', 'ddd', 'ee', 'f'];
       expect(
         uniqByStrict((String s) => s.length, input),
-        equals(uniqBy((String s) => s.length, input).toList()),
+        equals(fxUniqBy((String s) => s.length, input).toList()),
       );
     });
 
@@ -146,7 +146,7 @@ void main() {
     });
 
     test('lazy uniqBy().toList(growable: false) fuses into a fixed list', () {
-      final res = uniqBy((String s) => s.length, [
+      final res = fxUniqBy((String s) => s.length, [
         'a',
         'bb',
         'c',

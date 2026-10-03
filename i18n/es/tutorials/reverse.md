@@ -24,7 +24,7 @@ nextLabel: fork
     finitas y bufferizables: nunca terminará con una fuente infinita.
   </p>
   <p>
-    <code>reverseAsync</code> sigue la misma regla: primero espera todos los
+    <code>fxReverseAsync</code> sigue la misma regla: primero espera todos los
     elementos de aguas arriba y luego los reproduce del final al principio. Si
     solo necesitas la cola de una secuencia en lugar de una inversión de
     verdad, prefiere <code>takeRight</code>: también materializa, pero al menos

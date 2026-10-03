@@ -26,14 +26,14 @@ void main() {
   group('indexBy', () {
     group('sync', () {
       test("should be grouped index by the callback to given 'Iterable'", () {
-        final res = indexBy((Obj a) => a.category, given);
+        final res = fxIndexBy((Obj a) => a.category, given);
         expect(res, equals(then1));
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = indexBy(
+        final res = fxIndexBy(
           (Obj a) => a.category,
-          filter((Obj a) => a.category != 'clothes', given),
+          fxFilter((Obj a) => a.category != 'clothes', given),
         );
         expect(res, equals(then2));
       });
@@ -50,15 +50,18 @@ void main() {
       test(
         "should be grouped index by the callback to given 'AsyncIterable'",
         () async {
-          final res = await indexByAsync((Obj a) => a.category, toAsync(given));
+          final res = await fxIndexByAsync(
+            (Obj a) => a.category,
+            fxToAsync(given),
+          );
           expect(res, equals(then1));
         },
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await indexByAsync(
+        final res = await fxIndexByAsync(
           (Obj a) => a.category,
-          filterAsync((Obj a) => a.category != 'clothes', toAsync(given)),
+          fxFilterAsync((Obj a) => a.category != 'clothes', fxToAsync(given)),
         );
         expect(res, equals(then2));
       });
@@ -84,9 +87,9 @@ void main() {
           (id: 4, name: 'Dave', role: UserRole.guest),
         ];
 
-        final usersByRole = indexBy((user) => user.role, users);
+        final usersByRole = fxIndexBy((user) => user.role, users);
 
-        final entriesResult = fx(entries(usersByRole))
+        final entriesResult = fx(fxEntries(usersByRole))
             .map((e) => (role: e.$1, userName: e.$2.name, userId: e.$2.id))
             .toList();
 
@@ -114,9 +117,9 @@ void main() {
           (id: 4, title: 'Task 4', priority: 'high'), // overwrites Task 2
         ];
 
-        final tasksByPriority = indexBy((task) => task.priority, tasks);
+        final tasksByPriority = fxIndexBy((task) => task.priority, tasks);
 
-        final result = fx(entries(tasksByPriority))
+        final result = fx(fxEntries(tasksByPriority))
             .map(
               (e) => (
                 priority: e.$1,
@@ -146,7 +149,7 @@ void main() {
           (id: 3, status: pending), // overwrites first pending
         ];
 
-        final result = indexBy((item) => item.status, items);
+        final result = fxIndexBy((item) => item.status, items);
 
         expect(
           result,
@@ -165,9 +168,9 @@ void main() {
           (name: 'item3', status: 'active'), // overwrites item1
         ];
 
-        final result = await indexByAsync(
+        final result = await fxIndexByAsync(
           (item) async => item.status,
-          toAsync(items),
+          fxToAsync(items),
         );
 
         expect(

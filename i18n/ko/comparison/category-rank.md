@@ -43,6 +43,6 @@ async: false
     솔직히 말하면 <code>package:collection</code>은 그룹핑을 잘 커버하고,
     일회성 리포트라면 네이티브 버전도 괜찮습니다. 체인의 값어치는
     리포트가 자랄수록 드러납니다 — 단계가 하나 늘 때마다(필터 하나, 두
-    번째 순위 기준 하나) 또 한 번의 <code>entries</code> 왕복 대신
+    번째 순위 기준 하나) 또 한 번의 <code>fxEntries</code> 왕복 대신
     파이프라인이 연장됩니다.
   </p>

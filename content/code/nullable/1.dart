@@ -7,7 +7,7 @@ const configs = {
 
 // Every fallible hop is one r.bind — no `?.` staircases, no `??` towers,
 // and unlike `?.` you can also assert conditions along the way.
-int? port(String env) => nullable((r) {
+int? port(String env) => fxNullable((r) {
   final cfg = r.ensureNotNull(configs[env]);
   final n = r.bind(int.tryParse(r.bind(cfg['port'])));
   r.ensure(n > 0);

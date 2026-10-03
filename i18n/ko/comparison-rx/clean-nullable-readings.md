@@ -26,7 +26,7 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    <code>whereNotNull</code>은 <em>곧</em> <code>compact</code>입니다 —
+    <code>whereNotNull</code>은 <em>곧</em> <code>fxCompact</code>입니다 —
     같은 연산자가 각 라이브러리의 명명 규칙을 입고 있을 뿐입니다. 둘 다
     필터링 너머의 중요한 일을 합니다: <strong>정적 타입을 좁혀서</strong>
     <code>double?</code> 요소 타입을 <code>double</code>로 바꿉니다.

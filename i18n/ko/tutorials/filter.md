@@ -29,7 +29,7 @@ nextLabel: reject
     데모 1을 참고하세요.
   </p>
   <p>
-    <code>whereAsync</code>는 <code>mapAsync</code>의 구현을 재사용하지 않고
+    <code>fxWhereAsync</code>는 <code>fxMapAsync</code>의 구현을 재사용하지 않고
     자체 동시성 구현을 갖고 있습니다. <code>.concurrent(n)</code>을 붙이면
     술어 <code>n</code>개가 병렬로 평가되지만, 통과한 원소는 여전히 원래
     순서대로 하류로 내보내집니다 — 동시성은 처리량을 바꿀 뿐 결과를 바꾸지
@@ -49,7 +49,7 @@ nextLabel: reject
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="reject.html"><code>reject</code></a> — where의 정반대 ·
-    <a href="compact.html"><code>compact</code></a> — null을 걸러 내기 ·
+    <a href="compact.html"><code>fxCompact</code></a> — null을 걸러 내기 ·
     <a href="map.html"><code>map</code></a> — 남기고 버리는 대신 변환하기 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>

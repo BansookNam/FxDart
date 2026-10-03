@@ -6,8 +6,8 @@ void main() {
     {'name': 'lee', 'age': 27},
   ];
 
-  final names = fx(users).map((u) => prop('name', u)).toList();
+  final names = fx(users).map((u) => fxProp('name', u)).toList();
   print(names); // [kim, lee]
 
-  print(pluck('name', users).toList()); // [kim, lee] — same result, one call
+  print(fxPluck('name', users).toList()); // [kim, lee] — same result, one call
 }

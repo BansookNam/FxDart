@@ -5,7 +5,7 @@ Future<void> main() async {
   // every element to count them.
   final n = await fx(['a', 'bb', 'ccc', 'd'])
       .toAsync()
-      .filter((s) => delay(const Duration(milliseconds: 100), s.length > 1))
+      .filter((s) => fxDelay(const Duration(milliseconds: 100), s.length > 1))
       .count();
 
   print(n); // 2

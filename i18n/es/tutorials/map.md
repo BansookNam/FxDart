@@ -24,7 +24,7 @@ nextLabel: mapEffect
     necesitas.
   </p>
   <p>
-    Viene en forma data-first (<code>map(f, iterable)</code>) y como método de
+    Viene en forma data-first (<code>fxMap(f, iterable)</code>) y como método de
     cadena (<code>fx(iterable).map(f)</code>). Ambas devuelven el mismo
     resultado perezoso.
   </p>
@@ -36,7 +36,7 @@ nextLabel: mapEffect
 
   <h2>Demo 2 · Asíncrono, con concurrencia</h2>
   <p>
-    <code>mapAsync</code> (o <code>.toAsync().map(...)</code>) acepta una
+    <code>fxMapAsync</code> (o <code>.toAsync().map(...)</code>) acepta una
     función asíncrona. Por sí sola espera cada elemento en orden; añade
     <code>concurrent(n)</code> y aguas arriba se evalúan <code>n</code>
     elementos a la vez — los resultados siguen llegando en orden:

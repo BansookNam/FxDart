@@ -23,7 +23,7 @@ nextLabel: ifEmpty
     전진시키므로 소스는 정확히 한 번만 순회되고 버퍼링도 없으며, 누산기들은
     서로 독립적이고 타입이 같을 필요도 없고, 리더는 파이프라인이 아니라
     폴드여야 합니다. 그 이유와,
-    <a href="fork.html"><code>fork</code></a>가 더 나은 선택인 경우는 그
+    <a href="fork.html"><code>fxFork</code></a>가 더 나은 선택인 경우는 그
     페이지를 먼저 읽어 보세요.
   </p>
   <p>
@@ -45,6 +45,6 @@ nextLabel: ifEmpty
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="tee.html"><code>tee</code></a> — 두 폴드 버전, 그리고 전체 설명 ·
-    <a href="fork.html"><code>fork</code></a> — 버퍼를 대가로 한 독립 리더 ·
+    <a href="fork.html"><code>fxFork</code></a> — 버퍼를 대가로 한 독립 리더 ·
     <a href="fold.html"><code>fold</code></a> — 폴드 하나
   </div>

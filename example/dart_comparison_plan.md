@@ -44,7 +44,7 @@ content/code-comparison/<slug>/expected.txt  # captured stdout, written by harne
 3. Doubles printed via `toStringAsFixed(...)` — VM prints `25.0` where DDC prints `25`; formatting sidesteps the mismatch.
 4. Native implementations must be idiomatic (collection-for, `where/map/fold`, `package:collection`, `Stream` APIs) — no strawmen.
 5. Tier membership counts real operators — trivial terminals (`toList`) don't count toward the tier's function count.
-6. Chain-form naming on pages (`.toAsync().map(...).concurrent(3)`); mention top-level data-first forms (`mapAsync`, `concurrentAsync`) once in the TOC intro, not per page.
+6. Chain-form naming on pages (`.toAsync().map(...).concurrent(3)`); mention top-level data-first forms (`fxMapAsync`, `fxConcurrentAsync`) once in the TOC intro, not per page.
 7. `content/code-comparison/` gets its own `analysis_options.yaml` (strict — don't inherit content/'s relaxed unused-import rules).
 
 ## 6. Generator changes (`tool/build_docs.dart`)

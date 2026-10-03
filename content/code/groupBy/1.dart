@@ -7,7 +7,7 @@ Future<void> main() async {
   // key selector for each element.
   final byFirstLetter = await fx(users)
       .toAsync()
-      .groupBy((u) => delay(const Duration(milliseconds: 100), u[0]));
+      .groupBy((u) => fxDelay(const Duration(milliseconds: 100), u[0]));
 
   print(byFirstLetter); // {a: [ann, al], b: [bob, bea], c: [cid]}
 }

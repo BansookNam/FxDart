@@ -14,7 +14,7 @@ Future<String> fetchManifest() async {
 Future<void> main() async {
   // retry re-runs the function — up to 3 attempts in total, rethrowing
   // the last error once the budget is spent.
-  final payload = await retry(3, fetchManifest);
+  final payload = await fxRetry(3, fetchManifest);
 
   print(payload);
   print('attempts: $attempts');

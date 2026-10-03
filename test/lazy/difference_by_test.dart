@@ -9,7 +9,7 @@ void main() {
       test(
         'should return all elements in iterable2 not contained in iterable1',
         () {
-          final iter = differenceBy(
+          final iter = fxDifferenceBy(
             (Map<String, int> a) => a['x'],
             [
               {'x': 1},
@@ -22,7 +22,7 @@ void main() {
             ],
           );
           expect(
-            toList(iter),
+            fxToList(iter),
             equals([
               {'x': 2},
               {'x': 3},
@@ -30,8 +30,8 @@ void main() {
           );
 
           expect(
-            toList(
-              differenceBy(
+            fxToList(
+              fxDifferenceBy(
                 (String a) => a,
                 'abcd'.split(''),
                 'cdefg'.split(''),
@@ -47,14 +47,14 @@ void main() {
       test(
         'should return all elements in iterable2 not contained in iterable1',
         () async {
-          final res = await toListAsync(
-            differenceByAsync(
+          final res = await fxToListAsync(
+            fxDifferenceByAsync(
               (Map<String, int> a) => a['x'],
-              toAsync([
+              fxToAsync([
                 {'x': 1},
                 {'x': 4},
               ]),
-              toAsync([
+              fxToAsync([
                 {'x': 1},
                 {'x': 2},
                 {'x': 3},
@@ -70,11 +70,11 @@ void main() {
           );
 
           expect(
-            await toListAsync(
-              differenceByAsync(
+            await fxToListAsync(
+              fxDifferenceByAsync(
                 (String a) => a,
-                toAsync('abcd'.split('')),
-                toAsync('cdefg'.split('')),
+                fxToAsync('abcd'.split('')),
+                fxToAsync('cdefg'.split('')),
               ),
             ),
             equals(['e', 'f', 'g']),
@@ -83,11 +83,11 @@ void main() {
       );
 
       test('should support an async callback', () async {
-        final res = await toListAsync(
-          differenceByAsync(
+        final res = await fxToListAsync(
+          fxDifferenceByAsync(
             (int a) async => a % 10,
-            toAsync([1, 2]),
-            toAsync([11, 13, 21]),
+            fxToAsync([1, 2]),
+            fxToAsync([11, 13, 21]),
           ),
         );
         expect(res, equals([13]));
@@ -98,7 +98,7 @@ void main() {
         () async {
           final mock1 = ConcurrentMock<int>();
           final mock2 = ConcurrentMock<int>();
-          final it = differenceByAsync((int a) => a, mock1, mock2).iterator;
+          final it = fxDifferenceByAsync((int a) => a, mock1, mock2).iterator;
           await it.next(Concurrent.of(2));
           // Only iterable2 is evaluated concurrently, as in FxTS.
           expect(mock2.received?.length, equals(2));

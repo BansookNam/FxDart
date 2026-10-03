@@ -48,7 +48,7 @@ nextLabel: whenComplete
     chain stays single-subscription. <code>using</code> acquires a
     resource on listen, mirrors it, and releases exactly once — the
     push counterpart of pull
-    <code><a href="using.html">using</a></code>.
+    <code><a href="using.html">fxUsing</a></code>.
     <code>fromPattern(add, remove)</code> is the typical
     <code>on</code>/<code>off</code> bridge. And
     <code>create(init)</code> calls <code>init</code> with an
@@ -78,6 +78,6 @@ nextLabel: whenComplete
   <div class="callout">
     <strong>Related:</strong>
     <a href="fxEvents.html"><code>fxEvents</code></a> — wrapping a Stream you already have ·
-    <a href="using.html"><code>using</code></a> — the pull-layer original: acquire on first pull, release once ·
+    <a href="using.html"><code>fxUsing</code></a> — the pull-layer original: acquire on first pull, release once ·
     <a href="share.html"><code>share</code></a> — when one run of a chain needs many listeners
   </div>

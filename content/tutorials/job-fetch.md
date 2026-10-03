@@ -66,7 +66,7 @@ prevLabel: debounced search
     <a href="whichSurface.html">which surface</a> — why this is pull-async ·
     <a href="concurrent.html"><code>concurrent</code></a> ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> ·
-    <a href="retry.html"><code>retry</code> / <code>mapRetry</code></a> ·
+    <a href="retry.html"><code>fxRetry</code> / <code>mapRetry</code></a> ·
     <a href="eitherPipelines.html"><code>mapOrAccumulate</code></a> ·
     <a href="job-search.html">debounced search</a> — the time job ·
     <a href="../DartComparison/bounded-concurrency.html">Dart vs FxDart: two at a time</a>

@@ -6,7 +6,7 @@
 // cannot be a range (slow path).
 // fxdart exports predicates named isNull/isNotNull/isEmpty; this file wants
 // matcher's versions of those names, and none of fxdart's.
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 /// A source that is emphatically not a List, so no range can be derived.
@@ -23,42 +23,48 @@ void main() {
 
       for (final n in [-1, 0, 1, 3, 8, 9, 100]) {
         test('take($n)', () {
-          expect(toList(take(n, list)), toList(take(n, gen(8))));
+          expect(fxToList(fxTake(n, list)), fxToList(fxTake(n, gen(8))));
         });
         test('drop($n)', () {
-          expect(toList(drop(n, list)), toList(drop(n, gen(8))));
+          expect(fxToList(fxDrop(n, list)), fxToList(fxDrop(n, gen(8))));
         });
         if (n >= 0) {
           test('takeRight($n)', () {
-            expect(toList(takeRight(n, list)), toList(takeRight(n, gen(8))));
+            expect(
+              fxToList(fxTakeRight(n, list)),
+              fxToList(fxTakeRight(n, gen(8))),
+            );
           });
           test('dropRight($n)', () {
-            expect(toList(dropRight(n, list)), toList(dropRight(n, gen(8))));
+            expect(
+              fxToList(fxDropRight(n, list)),
+              fxToList(fxDropRight(n, gen(8))),
+            );
           });
         }
       }
 
       test('compose: ranges nest without materialising', () {
-        expect(toList(drop(2, take(6, list))), [2, 3, 4, 5]);
-        expect(toList(take(3, drop(2, list))), [2, 3, 4]);
-        expect(toList(dropRight(2, drop(2, list))), [2, 3, 4, 5]);
-        expect(toList(takeRight(2, drop(2, take(6, list)))), [4, 5]);
+        expect(fxToList(fxDrop(2, fxTake(6, list))), [2, 3, 4, 5]);
+        expect(fxToList(fxTake(3, fxDrop(2, list))), [2, 3, 4]);
+        expect(fxToList(fxDropRight(2, fxDrop(2, list))), [2, 3, 4, 5]);
+        expect(fxToList(fxTakeRight(2, fxDrop(2, fxTake(6, list)))), [4, 5]);
         // Over-dropping from both ends collapses to empty, never negative.
-        expect(toList(dropRight(9, drop(4, list))), <int>[]);
-        expect(toList(take(4, drop(100, list))), <int>[]);
+        expect(fxToList(fxDropRight(9, fxDrop(4, list))), <int>[]);
+        expect(fxToList(fxTake(4, fxDrop(100, list))), <int>[]);
       });
 
       test('every composition matches the pulled form', () {
         for (var a = 0; a <= 9; a++) {
           for (var b = 0; b <= 9; b++) {
             expect(
-              toList(drop(b, take(a, list))),
-              toList(drop(b, take(a, gen(8)))),
+              fxToList(fxDrop(b, fxTake(a, list))),
+              fxToList(fxDrop(b, fxTake(a, gen(8)))),
               reason: 'drop($b, take($a))',
             );
             expect(
-              toList(takeRight(b, dropRight(a, list))),
-              toList(takeRight(b, dropRight(a, gen(8)))),
+              fxToList(fxTakeRight(b, fxDropRight(a, list))),
+              fxToList(fxTakeRight(b, fxDropRight(a, gen(8)))),
               reason: 'takeRight($b, dropRight($a))',
             );
           }
@@ -69,50 +75,50 @@ void main() {
     group('the source is still read lazily and freshly', () {
       test('drop over a List reflects later writes to that List', () {
         final list = [1, 2, 3];
-        final dropped = drop(1, list);
+        final dropped = fxDrop(1, list);
         list[2] = 30;
-        expect(toList(dropped), [2, 30]);
+        expect(fxToList(dropped), [2, 30]);
       });
 
       test('each iteration of a range starts over', () {
-        final dropped = drop(1, [1, 2, 3]);
-        expect(toList(dropped), [2, 3]);
-        expect(toList(dropped), [2, 3]);
+        final dropped = fxDrop(1, [1, 2, 3]);
+        expect(fxToList(dropped), [2, 3]);
+        expect(fxToList(dropped), [2, 3]);
       });
 
       test('take stays lazy over an infinite source', () {
-        expect(toList(take(3, cycle([1, 2]))), [1, 2, 1]);
+        expect(fxToList(fxTake(3, fxCycle([1, 2]))), [1, 2, 1]);
       });
     });
 
     group('zip resolves each side independently', () {
       test('List with List', () {
-        expect(toList(zip([1, 2, 3], [4, 5])), [(1, 4), (2, 5)]);
-        expect(toList(zip([1, 2], [4, 5, 6])), [(1, 4), (2, 5)]);
+        expect(fxToList(fxZip([1, 2, 3], [4, 5])), [(1, 4), (2, 5)]);
+        expect(fxToList(fxZip([1, 2], [4, 5, 6])), [(1, 4), (2, 5)]);
       });
 
       test('List with a shifted List — the sliding-window shape', () {
         final xs = [1, 2, 3, 4];
-        expect(toList(zip(xs, drop(1, xs))), [(1, 2), (2, 3), (3, 4)]);
-        expect(toList(zip(drop(1, xs), drop(2, xs))), [(2, 3), (3, 4)]);
-        expect(toList(zip(zip(xs, drop(1, xs)), drop(2, xs))), [
+        expect(fxToList(fxZip(xs, fxDrop(1, xs))), [(1, 2), (2, 3), (3, 4)]);
+        expect(fxToList(fxZip(fxDrop(1, xs), fxDrop(2, xs))), [(2, 3), (3, 4)]);
+        expect(fxToList(fxZip(fxZip(xs, fxDrop(1, xs)), fxDrop(2, xs))), [
           ((1, 2), 3),
           ((2, 3), 4),
         ]);
       });
 
       test('range on the left, pulled on the right', () {
-        expect(toList(zip([1, 2, 3], gen(2))), [(1, 0), (2, 1)]);
-        expect(toList(zip(drop(1, [1, 2, 3]), gen(5))), [(2, 0), (3, 1)]);
+        expect(fxToList(fxZip([1, 2, 3], gen(2))), [(1, 0), (2, 1)]);
+        expect(fxToList(fxZip(fxDrop(1, [1, 2, 3]), gen(5))), [(2, 0), (3, 1)]);
       });
 
       test('pulled on the left, range on the right', () {
-        expect(toList(zip(gen(2), [1, 2, 3])), [(0, 1), (1, 2)]);
-        expect(toList(zip(gen(5), drop(1, [1, 2, 3]))), [(0, 2), (1, 3)]);
+        expect(fxToList(fxZip(gen(2), [1, 2, 3])), [(0, 1), (1, 2)]);
+        expect(fxToList(fxZip(gen(5), fxDrop(1, [1, 2, 3]))), [(0, 2), (1, 3)]);
       });
 
       test('neither side a range', () {
-        expect(toList(zip(gen(2), gen(5))), [(0, 0), (1, 1)]);
+        expect(fxToList(fxZip(gen(2), gen(5))), [(0, 0), (1, 1)]);
       });
 
       test('pull counts match the iterator form when one side is a range', () {
@@ -120,13 +126,13 @@ void main() {
         // source that runs out is still asked once more than it yields, and
         // the right side is never pulled for that final attempt.
         var leftPulls = 0;
-        final left = peek((_) => leftPulls++, gen(2));
-        expect(toList(zip(left, [10, 20, 30])), [(0, 10), (1, 20)]);
+        final left = fxPeek((_) => leftPulls++, gen(2));
+        expect(fxToList(fxZip(left, [10, 20, 30])), [(0, 10), (1, 20)]);
         expect(leftPulls, 2);
 
         var rightPulls = 0;
-        final right = peek((_) => rightPulls++, gen(5));
-        expect(toList(zip([10, 20], right)), [(10, 0), (20, 1)]);
+        final right = fxPeek((_) => rightPulls++, gen(5));
+        expect(fxToList(fxZip([10, 20], right)), [(10, 0), (20, 1)]);
         // Left exhausts first, so the right side is never pulled a third time.
         expect(rightPulls, 2);
       });
@@ -135,7 +141,7 @@ void main() {
     group('zip3', () {
       test('all three ranges', () {
         final xs = [1, 2, 3, 4, 5];
-        expect(toList(zip3(xs, drop(1, xs), drop(2, xs))), [
+        expect(fxToList(fxZip3(xs, fxDrop(1, xs), fxDrop(2, xs))), [
           (1, 2, 3),
           (2, 3, 4),
           (3, 4, 5),
@@ -143,17 +149,17 @@ void main() {
       });
 
       test('stops at the shortest side whichever it is', () {
-        expect(toList(zip3([1], [2, 3], [4, 5])), [(1, 2, 4)]);
-        expect(toList(zip3([1, 2], [3], [4, 5])), [(1, 3, 4)]);
-        expect(toList(zip3([1, 2], [3, 4], [5])), [(1, 3, 5)]);
+        expect(fxToList(fxZip3([1], [2, 3], [4, 5])), [(1, 2, 4)]);
+        expect(fxToList(fxZip3([1, 2], [3], [4, 5])), [(1, 3, 4)]);
+        expect(fxToList(fxZip3([1, 2], [3, 4], [5])), [(1, 3, 5)]);
       });
 
       test('a single pulled side disables the indexed path', () {
-        expect(toList(zip3([1, 2, 3], [4, 5, 6], gen(2))), [
+        expect(fxToList(fxZip3([1, 2, 3], [4, 5, 6], gen(2))), [
           (1, 4, 0),
           (2, 5, 1),
         ]);
-        expect(toList(zip3(gen(2), [4, 5, 6], [7, 8, 9])), [
+        expect(fxToList(fxZip3(gen(2), [4, 5, 6], [7, 8, 9])), [
           (0, 4, 7),
           (1, 5, 8),
         ]);
@@ -161,7 +167,7 @@ void main() {
 
       test('reachable from the chain', () {
         final xs = [1, 2, 3, 4];
-        expect(fx(xs).zip3(drop(1, xs), drop(2, xs)).toList(), [
+        expect(fx(xs).zip3(fxDrop(1, xs), fxDrop(2, xs)).toList(), [
           (1, 2, 3),
           (2, 3, 4),
         ]);
@@ -175,26 +181,29 @@ void main() {
       final xs = [1, 2, 3, 4];
 
       test('passing the chain equals passing the operator result', () {
-        expect(toList(zip(xs, fx(xs).drop(1))), toList(zip(xs, drop(1, xs))));
         expect(
-          toList(zip3(xs, fx(xs).drop(1), fx(xs).drop(2))),
-          toList(zip3(xs, drop(1, xs), drop(2, xs))),
+          fxToList(fxZip(xs, fx(xs).drop(1))),
+          fxToList(fxZip(xs, fxDrop(1, xs))),
         );
         expect(
-          toList(windowed(2, fx(xs).drop(1))),
-          toList(windowed(2, drop(1, xs))),
+          fxToList(fxZip3(xs, fx(xs).drop(1), fx(xs).drop(2))),
+          fxToList(fxZip3(xs, fxDrop(1, xs), fxDrop(2, xs))),
+        );
+        expect(
+          fxToList(fxWindowed(2, fx(xs).drop(1))),
+          fxToList(fxWindowed(2, fxDrop(1, xs))),
         );
       });
 
       test('a chain of ranges composes like the top-level form', () {
         expect(
-          toList(zip(xs, fx(xs).drop(1).take(2))),
-          toList(zip(xs, take(2, drop(1, xs)))),
+          fxToList(fxZip(xs, fx(xs).drop(1).take(2))),
+          fxToList(fxZip(xs, fxTake(2, fxDrop(1, xs)))),
         );
       });
 
       test('a non-range chain still zips correctly', () {
-        expect(toList(zip(xs, fx(xs).map((a) => a * 10))), [
+        expect(fxToList(fxZip(xs, fx(xs).map((a) => a * 10))), [
           (1, 10),
           (2, 20),
           (3, 30),
@@ -211,9 +220,9 @@ void main() {
           for (final partial in [false, true]) {
             test('size=$size step=$step partial=$partial', () {
               expect(
-                toList(windowed(size, list, step: step, partial: partial)),
-                toList(
-                  windowed(
+                fxToList(fxWindowed(size, list, step: step, partial: partial)),
+                fxToList(
+                  fxWindowed(
                     size,
                     gen(7).map((i) => i + 1),
                     step: step,
@@ -229,15 +238,15 @@ void main() {
       test('chunk over a List matches the pulled form', () {
         for (var size = 1; size <= 8; size++) {
           expect(
-            toList(chunk(size, list)),
-            toList(chunk(size, gen(7).map((i) => i + 1))),
+            fxToList(fxChunk(size, list)),
+            fxToList(fxChunk(size, gen(7).map((i) => i + 1))),
             reason: 'chunk($size)',
           );
         }
       });
 
       test('windows are growable and independent', () {
-        final ws = toList(windowed(2, list));
+        final ws = fxToList(fxWindowed(2, list));
         expect(ws.first, [1, 2]);
         expect(ws[1], [2, 3]);
         // Each window is a copy the caller owns, not a view onto `list`, and
@@ -252,16 +261,16 @@ void main() {
       });
 
       test('an empty or too-short source yields nothing without partial', () {
-        expect(toList(windowed(3, <int>[])), <int>[]);
-        expect(toList(windowed(3, [1, 2])), <int>[]);
-        expect(toList(windowed(3, [1, 2], partial: true)), [
+        expect(fxToList(fxWindowed(3, <int>[])), <int>[]);
+        expect(fxToList(fxWindowed(3, [1, 2])), <int>[]);
+        expect(fxToList(fxWindowed(3, [1, 2], partial: true)), [
           [1, 2],
           [2],
         ]);
       });
 
       test('windowed over a dropped List', () {
-        expect(toList(windowed(2, drop(2, list))), [
+        expect(fxToList(fxWindowed(2, fxDrop(2, list))), [
           [3, 4],
           [4, 5],
           [5, 6],

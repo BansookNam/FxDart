@@ -7,10 +7,10 @@ void main() {
   group('uniqBy', () {
     group('sync', () {
       test('should be removed duplicate values by the callback', () {
-        final res1 = uniqBy((String a) => a, 'marpple'.split(''));
+        final res1 = fxUniqBy((String a) => a, 'marpple'.split(''));
         expect(res1.toList(), equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = uniqBy((Map<String, int> a) => a['age'], [
+        final res2 = fxUniqBy((Map<String, int> a) => a['age'], [
           {'age': 21},
           {'age': 22},
           {'age': 21},
@@ -26,7 +26,7 @@ void main() {
           ]),
         );
 
-        final res3 = uniqBy((int a) => a, [1, 2, 3, 4]);
+        final res3 = fxUniqBy((int a) => a, [1, 2, 3, 4]);
         expect(res3.toList(), equals([1, 2, 3, 4]));
       });
 
@@ -40,11 +40,11 @@ void main() {
 
         // Keyed on the last digit, so the 3rd and 4th elements are dropped.
         expect(
-          uniqBy((int a) => a % 10, generated()).toList(),
+          fxUniqBy((int a) => a % 10, generated()).toList(),
           equals([11, 22]),
         );
         expect(
-          uniqBy((int a) => a % 10, generated()).toList(growable: false),
+          fxUniqBy((int a) => a % 10, generated()).toList(growable: false),
           equals([11, 22]),
         );
       });
@@ -61,15 +61,15 @@ void main() {
 
     group('async', () {
       test('should be removed duplicate values by the callback', () async {
-        final res1 = await toListAsync(
-          uniqByAsync((String a) => a, toAsync('marpple'.split(''))),
+        final res1 = await fxToListAsync(
+          fxUniqByAsync((String a) => a, fxToAsync('marpple'.split(''))),
         );
         expect(res1, equals(['m', 'a', 'r', 'p', 'l', 'e']));
 
-        final res2 = await toListAsync(
-          uniqByAsync(
+        final res2 = await fxToListAsync(
+          fxUniqByAsync(
             (Map<String, int> a) => a['age'],
-            toAsync([
+            fxToAsync([
               {'age': 21},
               {'age': 22},
               {'age': 21},
@@ -87,24 +87,27 @@ void main() {
           ]),
         );
 
-        final res3 = await toListAsync(
-          uniqByAsync((int a) => a, toAsync([1, 2, 3, 4])),
+        final res3 = await fxToListAsync(
+          fxUniqByAsync((int a) => a, fxToAsync([1, 2, 3, 4])),
         );
         expect(res3, equals([1, 2, 3, 4]));
       });
 
       test('should await a key callback that returns a Future', () async {
-        final res = await toListAsync(
-          uniqByAsync((int a) async => a % 3, toAsync([1, 2, 3, 4, 5, 6, 7])),
+        final res = await fxToListAsync(
+          fxUniqByAsync(
+            (int a) async => a % 3,
+            fxToAsync([1, 2, 3, 4, 5, 6, 7]),
+          ),
         );
         expect(res, equals([1, 2, 3]));
       });
 
       test('should handle a key callback that is sometimes async', () async {
-        final res = await toListAsync(
-          uniqByAsync(
+        final res = await fxToListAsync(
+          fxUniqByAsync(
             (int a) => a.isEven ? Future.value(a % 3) : a % 3,
-            toAsync([1, 2, 3, 4, 5, 6]),
+            fxToAsync([1, 2, 3, 4, 5, 6]),
           ),
         );
         expect(res, equals([1, 2, 3]));
@@ -124,7 +127,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = uniqByAsync((int a) => a, mock).iterator;
+          final it = fxUniqByAsync((int a) => a, mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

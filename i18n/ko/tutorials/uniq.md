@@ -20,7 +20,7 @@ nextLabel: uniqBy
     <code>Set</code>에 담아 두고, 각 원소를 처음 등장할 때만 방출합니다.
     <code>distinct</code>가 Dart다운 이름이고, fxdart는 FxTS식 표기인
     <code>uniq</code>도 함께 받습니다 — 같은 연산자입니다. 구현은
-    <code>uniqBy((a) =&gt; a, iterable)</code>, 즉 항등 키를 쓰는
+    <code>fxUniqBy((a) =&gt; a, iterable)</code>, 즉 항등 키를 쓰는
     형태이므로, 값 전체의 동등성이 아닌 다른 기준으로 중복을 없애야 한다면
     <a href="uniqBy.html"><code>uniqBy</code></a>를 쓰면 됩니다.
   </p>
@@ -31,7 +31,7 @@ nextLabel: uniqBy
   </p>
   <p>
     비동기 쪽에서는 동시성이 상류의 fetch 단계에 머무는 한
-    <code>distinctAsync</code>를 <code>.concurrent(n)</code>과 함께 써도
+    <code>fxDistinctAsync</code>를 <code>.concurrent(n)</code>과 함께 써도
     안전합니다. 먼저 <code>.map(...).concurrent(n)</code>으로 가져온 뒤,
     이미 해소되어 순서가 정해진 결과에 <code>.distinct()</code>를 적용하세요.
     데모 2가 그 예입니다.
@@ -53,5 +53,5 @@ nextLabel: uniqBy
     <a href="uniqBy.html"><code>uniqBy</code></a> — 계산된 키 기준으로 중복 제거 ·
     <a href="difference.html"><code>difference</code></a> — 다른 이터러블에 있는 원소 제거 ·
     <a href="intersection.html"><code>intersection</code></a> — 공통 원소만 남기기 ·
-    <a href="compact.html"><code>compact</code></a> — null 제거
+    <a href="compact.html"><code>fxCompact</code></a> — null 제거
   </div>

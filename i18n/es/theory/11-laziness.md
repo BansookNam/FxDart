@@ -60,7 +60,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   var evaluated = 0;
 
-  final result = fx(range(1, 1000000))
+  final result = fx(fxRange(1, 1000000))
       .map((n) {
         evaluated++;
         return n * n;
@@ -101,7 +101,7 @@ void main() {
 
   // `some` stops pulling at the first match.
   var checked = 0;
-  final found = fx(range(1, 1000)).some((n) {
+  final found = fx(fxRange(1, 1000)).some((n) {
     checked++;
     return n > 4;
   });
@@ -197,7 +197,7 @@ void main() {
 ```
 
 La guía es corta: **consume una vez, o materializa.** Si una cadena la usan
-dos consumidores, llama a `toList()` y comparte la lista, o usa `fork`/`tee`,
+dos consumidores, llama a `toList()` y comparte la lista, o usa `fxFork`/`tee`,
 que existen precisamente para dividir un pull en varios sin volver a ejecutar
 la fuente.
 
@@ -225,7 +225,7 @@ tubería, que es el precio de la indirección.
    y por qué?
 3. Escribe una cadena cuyos callbacks se ejecuten dos veces por accidente.
    Luego arréglala de dos formas distintas.
-4. `fx(range(1, 1000000)).map(expensive).first` — ¿cuántas veces se ejecuta
+4. `fx(fxRange(1, 1000000)).map(expensive).first` — ¿cuántas veces se ejecuta
    `expensive`? ¿Y si `.first` se sustituye por `.last`?
 
 ## Soluciones
@@ -240,7 +240,7 @@ tubería, que es el precio de la indirección.
    es lo que impulsa la etapa anterior, y se detuvo.
 3. Cualquier cadena asignada a una variable y consumida por dos terminales,
    como en el listado de arriba. Arreglo uno: `final xs = chain.toList();` y
-   luego usa `xs` dos veces. Arreglo dos: usa `fork`/`tee` para dividir un
+   luego usa `xs` dos veces. Arreglo dos: usa `fxFork`/`tee` para dividir un
    pull en dos consumidores, de modo que la fuente se siga leyendo una sola
    vez.
 4. Una vez con `.first` — un pull le basta. Con `.last`, las 999.999 veces:

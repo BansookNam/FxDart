@@ -2,7 +2,7 @@
 slug: fork
 title: fork — FxDart 101
 description: FxDart fork 튜토리얼: 소스를 한 번만 순회해 버퍼에 담고, 이를 여러 독립 리더로 분기합니다. 라이브 플레이그라운드 포함.
-heading: <code>fork</code>
+heading: <code>fxFork</code>
 section: 6
 crumb: fork
 prev: reverse.html
@@ -20,8 +20,8 @@ nextLabel: tee
     돌아갑니다 — <code>sync*</code> 제너레이터는 새 <code>.iterator</code>를
     요청할 때마다 처음부터 다시 시작하니까요. 값을 만드는 비용이 비쌀 때
     이는 낭비이거나 아예 잘못된 동작입니다. 네트워크 요청, 느린 계산,
-    한 번만 읽을 수 있는 스트림이 그렇죠. <code>fork</code>가 이 문제를
-    해결합니다. <code>fork(iterable)</code>을 <em>같은</em>
+    한 번만 읽을 수 있는 스트림이 그렇죠. <code>fxFork</code>가 이 문제를
+    해결합니다. <code>fxFork(iterable)</code>을 <em>같은</em>
     <code>iterable</code> 객체로 호출할 때마다, 공유되며 지연 방식으로
     커지는 하나의 버퍼 위에 독립적인 커서가 만들어집니다. 몇 개의 fork가
     어떤 순서로 읽든 하부 소스는 정확히 한 번만 순회됩니다.
@@ -33,7 +33,7 @@ nextLabel: tee
     안 됩니다. 각 fork는 자기 속도대로 소비할 수 있습니다. 한 fork가 앞서
     나가면 소스에서 새 값을 끌어와 공유 버퍼에 덧붙이고, 뒤처진 fork는
     이미 버퍼에 있는 값을 추가 비용 없이 다시 읽을 뿐입니다.
-    <code>forkAsync</code>는 <code>FxAsyncIterable</code>에 대해 같은 방식으로
+    <code>fxForkAsync</code>는 <code>FxAsyncIterable</code>에 대해 같은 방식으로
     동작하며, 여러 fork에서 동시에 발생한 하류 요구가 공유 비동기 소스를
     병렬로 끌어당기게 해 줍니다.
   </p>
@@ -59,7 +59,7 @@ nextLabel: tee
 
   <h2>직접 해 보기</h2>
   <p>
-    연습: 지금은 <code>readings</code>가 <code>fork</code> 없이 두 번
+    연습: 지금은 <code>readings</code>가 <code>fxFork</code> 없이 두 번
     순회되어 <code>sensor()</code>가 두 번 실행되고 <code>reads</code>가
     6이 됩니다. 각 소비자마다 <code>readings</code>를 fork해서 센서를
     한 번만 읽도록 만들어 보세요(<code>reads</code>는 3이 되어야 합니다).
@@ -70,5 +70,5 @@ nextLabel: tee
     <strong>관련 항목:</strong>
     <a href="peek.html"><code>peek</code></a> — 분기 없이 들여다보기 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 한 분기 안에서의 병렬 평가 ·
-    <a href="memoize.html"><code>memoize</code></a> — 시퀀스 전체가 아니라 값 하나를 캐시
+    <a href="memoize.html"><code>fxMemoize</code></a> — 시퀀스 전체가 아니라 값 하나를 캐시
   </div>

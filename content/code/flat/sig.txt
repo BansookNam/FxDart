@@ -1,5 +1,5 @@
-Iterable&lt;dynamic&gt; flattened(Iterable&lt;dynamic&gt; iterable, [int depth = 1])
-FxAsyncIterable&lt;dynamic&gt; flattenedAsync(FxAsyncIterable&lt;dynamic&gt; iterable, [int depth = 1])
+Iterable&lt;dynamic&gt; fxFlattened(Iterable&lt;dynamic&gt; iterable, [int depth = 1])
+FxAsyncIterable&lt;dynamic&gt; fxFlattenedAsync(FxAsyncIterable&lt;dynamic&gt; iterable, [int depth = 1])
 Fx&lt;dynamic&gt; Fx.flattened([int depth = 1])        // chain
 FxAsync&lt;dynamic&gt; FxAsync.flattened([int depth = 1])
 Iterable&lt;dynamic&gt; flat(...)        // FxTS alias

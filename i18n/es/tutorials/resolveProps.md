@@ -2,7 +2,7 @@
 slug: resolveProps
 title: resolveProps — FxDart 101
 description: Tutorial de resolveProps en FxDart: espera todos los valores de un Map a la vez, el análogo con forma de mapa de Future.wait.
-heading: <code>resolveProps</code>
+heading: <code>fxResolveProps</code>
 section: 9
 crumb: resolveProps
 prev: compactObject.html
@@ -16,7 +16,7 @@ nextLabel: isMatch
 
   <h2>Lección</h2>
   <p>
-    <code>resolveProps</code> resuelve un tipo de problema concreto y muy
+    <code>fxResolveProps</code> resuelve un tipo de problema concreto y muy
     habitual: tienes un <code>Map</code> cuyos valores son una mezcla de
     valores normales y <code>Future</code>s —por ejemplo, varias llamadas a API
     independientes indexadas por nombre de campo— y quieres recibir un único
@@ -30,7 +30,7 @@ nextLabel: isMatch
     <em>crea</em>, no cuando se espera. Así que si construyes el mapa con
     <code>delay(...)</code> o con peticiones que ya están en vuelo como valores
     —la forma habitual de llamar a esta función—, todas ellas ya se están
-    ejecutando cuando <code>resolveProps</code> recibe el mapa; su bucle
+    ejecutando cuando <code>fxResolveProps</code> recibe el mapa; su bucle
     secuencial de <code>await</code> se limita a leer resultados que en su
     mayoría ya están listos, no a decidir cuándo empieza el trabajo. La demo de
     abajo lo demuestra con un cronómetro.
@@ -44,13 +44,13 @@ nextLabel: isMatch
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>resolveProps</code> para esperar todos los valores de <code>requests</code>.</p>
+  <p>Ejercicio: usa <code>fxResolveProps</code> para esperar todos los valores de <code>requests</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="evolve.html"><code>evolve</code></a> — el primo síncrono, que transforma en lugar de esperar ·
+    <a href="evolve.html"><code>fxEvolve</code></a> — el primo síncrono, que transforma en lugar de esperar ·
     <a href="concurrent.html"><code>concurrent</code></a> — la versión con forma de iterable de «ejecutar cosas a la vez» ·
-    <a href="delay.html"><code>delay &amp; sleep</code></a> — se usan para construir los futures de la demo ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — construye un Map desde cero
+    <a href="delay.html"><code>fxDelay &amp; fxSleep</code></a> — se usan para construir los futures de la demo ·
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — construye un Map desde cero
   </div>

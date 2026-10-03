@@ -1,5 +1,5 @@
 /// CSV export (Round 2 feature).
-/// Entries become maps, `pick` keeps the exported columns, and rows are
+/// Entries become maps, `fxPick` keeps the exported columns, and rows are
 /// `map` → `join`ed into the final text — string building as a pipeline.
 library;
 
@@ -26,7 +26,7 @@ String _escape(Object? value) {
 }
 
 /// Pipeline: `sortBy` (date) → `map` (entry → full field map) → `map`
-/// (`pick` the exported columns) → `map` (escape + `join` cells) — then the
+/// (`fxPick` the exported columns) → `map` (escape + `join` cells) — then the
 /// header is `prepend`ed and everything joins with newlines.
 String entriesToCsv(
   List<Entry> entries, {
@@ -46,10 +46,10 @@ String entriesToCsv(
           'done': e.done ? 'yes' : 'no',
           'dueDate': e.dueDate == null ? '' : _ymd(e.dueDate!),
         };
-        return pick(csvColumns, full);
+        return fxPick(csvColumns, full);
       })
-      .map((row) => join(',', map((c) => _escape(row[c]), csvColumns)));
+      .map((row) => fxJoin(',', fxMap((c) => _escape(row[c]), csvColumns)));
 
   // fxdart's own `join` finishes the pipeline — no List materialization.
-  return join('\n', prepend(csvColumns.join(','), rows));
+  return fxJoin('\n', fxPrepend(csvColumns.join(','), rows));
 }

@@ -28,14 +28,14 @@ nextLabel: entries
   <p>
     Un caso límite que conviene conocer: ciclar una fuente <em>vacía</em> no
     emite nada en absoluto, en lugar de dar vueltas eternamente sobre cero
-    elementos — así que <code>cycle([])</code> es seguro y simplemente produce
+    elementos — así que <code>fxCycle([])</code> es seguro y simplemente produce
     un resultado vacío.
   </p>
   <p>
     Es una pieza natural para el reparto round-robin (recorrer en ciclo una
     lista corta de trabajadores/colores/huecos mientras haces map sobre una más
     larga) o para repetir una secuencia asíncrona corta y modelar así un bucle
-    de sondeo. La forma asíncrona, <code>cycleAsync</code> (o <code>.cycle()</code>
+    de sondeo. La forma asíncrona, <code>fxCycleAsync</code> (o <code>.cycle()</code>
     en una cadena <code>FxAsync</code>), hace el búfer y el bucle igual, pero
     tira de cada vuelta a través del protocolo asíncrono habitual.
   </p>
@@ -52,8 +52,8 @@ nextLabel: entries
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="range.html"><code>range</code></a> — una secuencia de conteo finita ·
-    <a href="repeat.html"><code>repeat</code></a> — repite un único valor, un número fijo de veces ·
+    <a href="range.html"><code>fxRange</code></a> — una secuencia de conteo finita ·
+    <a href="repeat.html"><code>fxRepeat</code></a> — repite un único valor, un número fijo de veces ·
     <a href="take.html"><code>take</code></a> — el límite que cycle casi siempre necesita ·
     <a href="concurrent.html"><code>concurrent</code></a> — solapa el trabajo de un cycle asíncrono
   </div>

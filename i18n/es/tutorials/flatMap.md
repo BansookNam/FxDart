@@ -38,7 +38,7 @@ nextLabel: flat
     valor por entrada, o una lista vacía para no emitir ninguno.
   </p>
   <p>
-    En el lado asíncrono, la máquina de estados interna de <code>expandAsync</code>
+    En el lado asíncrono, la máquina de estados interna de <code>fxExpandAsync</code>
     tiene que recordar «qué subiterable estoy vaciando ahora mismo» entre extracciones,
     así que consume lo que tiene aguas arriba <em>en serie</em>: envolverlo en
     <code>.concurrent(n)</code> solo acelera la extracción de elementos

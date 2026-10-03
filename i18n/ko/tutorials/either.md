@@ -34,7 +34,7 @@ nextLabel: Either combinators
     이어 붙이고, <code>getOrNull</code>/<code>getOrElse</code>는 평범한
     Dart로 돌아가는 다리입니다. <code>Either</code>는 <em>경계에서</em>
     살아야 하는 타입입니다. 계산 안쪽에서는
-    <a href="raise.html"><code>either</code> 빌더</a>를 쓰세요. 거기서는 각
+    <a href="raise.html"><code>fxEither</code> 빌더</a>를 쓰세요. 거기서는 각
     단계가 <code>flatMap</code> 피라미드가 아니라 일직선
     <code>r.bind</code> 한 줄입니다.
   </p>
@@ -71,7 +71,7 @@ nextLabel: Either combinators
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="raise.html"><code>either</code> 빌더</a> — 일직선 코드로 Either 만들기 ·
+    <a href="raise.html"><code>fxEither</code> 빌더</a> — 일직선 코드로 Either 만들기 ·
     <a href="accumulate.html">에러 누적</a> — 첫 실패만이 아니라 모든 실패를 모으기 ·
     <a href="eitherPipelines.html">Either × 파이프라인</a> — 체인 위의 <code>rights</code>, <code>lefts</code>, <code>sequence</code> ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>

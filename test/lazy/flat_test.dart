@@ -6,7 +6,7 @@ void main() {
     group('sync', () {
       test('should be flattened', () {
         final acc = <dynamic>[];
-        for (final a in flat([
+        for (final a in fxFlat([
           [1, 2],
           3,
           4,
@@ -18,7 +18,7 @@ void main() {
         expect(acc, equals([1, 2, 3, 4, 5, 6, 7]));
 
         final res = [
-          ...flat([
+          ...fxFlat([
             [1, 2],
             3,
             4,
@@ -42,9 +42,9 @@ void main() {
             [4, 5],
           ],
           [
-            (v) => flat(v),
-            (v) => map((a) => (a as int) + 10, v),
-            (v) => toList(v),
+            (v) => fxFlat(v),
+            (v) => fxMap((a) => (a as int) + 10, v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -66,8 +66,8 @@ void main() {
     group('async', () {
       test('should be flattened', () async {
         final acc = <dynamic>[];
-        final it = flatAsync(
-          toAsync<dynamic>([
+        final it = fxFlatAsync(
+          fxToAsync<dynamic>([
             [1, 2],
             3,
             4,
@@ -82,9 +82,9 @@ void main() {
         }
         expect(acc, equals([1, 2, 3, 4, 5, 6, 7]));
 
-        final res = await toListAsync(
-          flatAsync(
-            toAsync<dynamic>([
+        final res = await fxToListAsync(
+          fxFlatAsync(
+            fxToAsync<dynamic>([
               [1, 2],
               3,
               4,
@@ -103,8 +103,8 @@ void main() {
 
       test('should be able to be used in the pipeline', () async {
         final res = await fxAsync(
-          flatAsync(
-            toAsync<dynamic>([
+          fxFlatAsync(
+            fxToAsync<dynamic>([
               1,
               2,
               3,
@@ -120,7 +120,7 @@ void main() {
         'should be able to be used as a chaining method in the `fx`',
         () async {
           final res = await fxAsync(
-            toAsync<dynamic>([
+            fxToAsync<dynamic>([
               1,
               2,
               3,
@@ -135,7 +135,7 @@ void main() {
       test('should be flattened concurrently', () async {
         final res =
             fxAsync(
-                  toAsync<List<int>>([
+                  fxToAsync<List<int>>([
                     [1],
                     [2],
                     [3, 4],
@@ -146,7 +146,7 @@ void main() {
                     [14],
                   ]),
                 )
-                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .map((a) => fxDelay(const Duration(milliseconds: 50), a))
                 .flat()
                 .concurrent(3);
 
@@ -333,8 +333,8 @@ void main() {
         for (var i = 0; i < cases.length; i++) {
           final (input, depth, size, expected) = cases[i];
           test('case #$i (depth=$depth, concurrency=$size)', () async {
-            final res = await fxAsync(toAsync<dynamic>(input))
-                .map((a) => delay(const Duration(milliseconds: 30), a))
+            final res = await fxAsync(fxToAsync<dynamic>(input))
+                .map((a) => fxDelay(const Duration(milliseconds: 30), a))
                 .flat(depth)
                 .concurrent(size)
                 .toList();
@@ -345,8 +345,8 @@ void main() {
       });
 
       test('should be flattened concurrently with chunk', () async {
-        final res = await fxAsync(toAsync(range(1, 7)))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
+        final res = await fxAsync(fxToAsync(fxRange(1, 7)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a))
             .chunk(2)
             .flat()
             .concurrent(3)
@@ -358,8 +358,8 @@ void main() {
       test('should be flattened concurrently with filter', () async {
         final res =
             await fxAsync(
-                  flatAsync(
-                    toAsync<dynamic>([
+                  fxFlatAsync(
+                    fxToAsync<dynamic>([
                       [1],
                       [2],
                       [3],
@@ -368,7 +368,7 @@ void main() {
                     2,
                   ),
                 )
-                .map((a) => delay(const Duration(milliseconds: 50), a))
+                .map((a) => fxDelay(const Duration(milliseconds: 50), a))
                 .filter((a) => (a as int) % 2 == 0)
                 .take(2)
                 .concurrent(4)
@@ -384,8 +384,8 @@ void main() {
         }
 
         await expectLater(
-          fxAsync(toAsync(source()))
-              .map((a) => delay(const Duration(milliseconds: 50), a))
+          fxAsync(fxToAsync(source()))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a))
               .flat()
               .concurrent(2)
               .toList(),
@@ -396,7 +396,7 @@ void main() {
       test('should be able to handle errors', () async {
         await expectLater(
           fxAsync(
-                toAsync([
+                fxToAsync([
                   [1, 2, 3],
                   [1, 2, 3],
                   [1, 2, 3],
@@ -404,7 +404,7 @@ void main() {
                 ]),
               )
               .map<List<int>>((a) async {
-                await delay(const Duration(milliseconds: 50), a);
+                await fxDelay(const Duration(milliseconds: 50), a);
                 throw Exception('err');
               })
               .flat()

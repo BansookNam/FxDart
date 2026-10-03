@@ -15,30 +15,30 @@ void main() {
     };
 
     test('should return empty array if no properties requested', () {
-      expect(props(<String>[], obj), equals(<String?>[]));
+      expect(fxProps(<String>[], obj), equals(<String?>[]));
     });
 
     test('should return values for requested properties', () {
-      expect(props(['a', 'e'], obj), equals(['v1', 'v5']));
+      expect(fxProps(['a', 'e'], obj), equals(['v1', 'v5']));
     });
 
     test('should preserve order', () {
-      expect(props(['f', 'c', 'e'], obj), equals(['v6', 'v3', 'v5']));
+      expect(fxProps(['f', 'c', 'e'], obj), equals(['v6', 'v3', 'v5']));
     });
 
     test('should return null for nonexistent properties', () {
-      expect(props(['a', 'nonexistent'], obj), equals(['v1', null]));
+      expect(fxProps(['a', 'nonexistent'], obj), equals(['v1', null]));
     });
 
     test('should be able to be used in the pipeline', () async {
       final syncRes = pipe(obj, [
-        (Map<String, String> m) => props(['a', 'b'], m),
-        (List<String?> vs) => toList(vs),
+        (Map<String, String> m) => fxProps(['a', 'b'], m),
+        (List<String?> vs) => fxToList(vs),
       ]);
       expect(syncRes, equals(['v1', 'v2']));
 
       final asyncRes = await pipe(Future.value(obj), [
-        (Map<String, String> m) => props(['a', 'b'], m),
+        (Map<String, String> m) => fxProps(['a', 'b'], m),
       ]);
       expect(asyncRes, equals(['v1', 'v2']));
     });

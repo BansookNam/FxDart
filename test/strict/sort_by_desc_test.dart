@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
@@ -63,7 +63,7 @@ void main() {
         final input = [3, 1, 4, 5, 9, 2, 6];
         expect(
           sortByDesc((int n) => n, input),
-          equals(sortBy((int n) => n, input).reversed.toList()),
+          equals(fxSortBy((int n) => n, input).reversed.toList()),
         );
       });
 
@@ -89,7 +89,7 @@ void main() {
     group('async', () {
       test('should sort descending', () async {
         expect(
-          await sortByDescAsync((int n) => n, toAsync([2, 9, 5])),
+          await sortByDescAsync((int n) => n, fxToAsync([2, 9, 5])),
           equals([9, 5, 2]),
         );
       });

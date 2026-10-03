@@ -7,7 +7,7 @@ Future<void> main() async {
   print(fx([1, 2]).sequenceEqual([1])); // false — length mismatch
 
   // Pull / async
-  print(await fx([1, 2]).toAsync().sequenceEqual(toAsync([1, 2]))); // true
+  print(await fx([1, 2]).toAsync().sequenceEqual(fxToAsync([1, 2]))); // true
 
   // Push / events — same values, same order, complete together.
   print(

@@ -5,12 +5,12 @@ void main() {
   group('lte(less than or equal to)', () {
     group('currying (closures)', () {
       test('given array then should return values the pivot is lte', () {
-        final result = fx([4, 5, 6]).filter((x) => lte(5, x)).toList();
+        final result = fx([4, 5, 6]).filter((x) => fxLte(5, x)).toList();
         expect(result, equals([5, 6]));
       });
 
       test('given array then should return empty array', () {
-        final result = fx([6, 7]).filter((x) => lte(8, x)).toList();
+        final result = fx([6, 7]).filter((x) => fxLte(8, x)).toList();
         expect(result, equals(<int>[]));
       });
 
@@ -21,12 +21,16 @@ void main() {
           'c',
           'd',
           'e',
-        ]).filter((x) => lte('d', x)).toList();
+        ]).filter((x) => fxLte('d', x)).toList();
         expect(result, equals(['d', 'e']));
       });
 
       test('given string array then should return empty array', () {
-        final result = fx(['b', 'c', 'd']).filter((x) => lte('e', x)).toList();
+        final result = fx([
+          'b',
+          'c',
+          'd',
+        ]).filter((x) => fxLte('e', x)).toList();
         expect(result, equals(<String>[]));
       });
 
@@ -35,7 +39,7 @@ void main() {
           DateTime(2022, 3, 10),
           DateTime(2022, 4, 9),
           DateTime(2022, 4, 10),
-        ]).filter((x) => lte(DateTime(2022, 4, 8), x)).toList();
+        ]).filter((x) => fxLte(DateTime(2022, 4, 8), x)).toList();
         expect(result, equals([DateTime(2022, 4, 9), DateTime(2022, 4, 10)]));
       });
 
@@ -43,53 +47,53 @@ void main() {
         final result = fx([
           DateTime(2021, 5, 10),
           DateTime(2021, 4, 9),
-        ]).filter((x) => lte(DateTime.now(), x)).toList();
+        ]).filter((x) => fxLte(DateTime.now(), x)).toList();
         expect(result, equals(<DateTime>[]));
       });
     });
 
     group('eager evaluation', () {
       test('should return true that the first number is less than second', () {
-        expect(lte(1, 5), isTrue);
+        expect(fxLte(1, 5), isTrue);
       });
       test('should return true that the first number is equal to second', () {
-        expect(lte(5, 5), isTrue);
+        expect(fxLte(5, 5), isTrue);
       });
       test(
         'should return false that the first number is not less than or not equal to second',
         () {
-          expect(lte(5, 1), isFalse);
+          expect(fxLte(5, 1), isFalse);
         },
       );
 
       test('should return true that the first char is less than second', () {
-        expect(lte('a', 'b'), isTrue);
+        expect(fxLte('a', 'b'), isTrue);
       });
       test('should return true that the first char is equal to second', () {
-        expect(lte('b', 'b'), isTrue);
+        expect(fxLte('b', 'b'), isTrue);
       });
       test(
         'should return false that the first char is not less than or not equal to second',
         () {
-          expect(lte('c', 'b'), isFalse);
+          expect(fxLte('c', 'b'), isFalse);
         },
       );
 
       test('should return true that the first Date is less than second', () {
-        expect(lte(DateTime(2021, 5, 11), DateTime.now()), isTrue);
+        expect(fxLte(DateTime(2021, 5, 11), DateTime.now()), isTrue);
       });
       test('should return true that the first Date is equal to second', () {
-        expect(lte(DateTime(2021, 5, 11), DateTime(2021, 5, 11)), isTrue);
+        expect(fxLte(DateTime(2021, 5, 11), DateTime(2021, 5, 11)), isTrue);
       });
       test(
         'should return false that the first Date is not less than second',
         () {
-          expect(lte(DateTime.now(), DateTime(2021, 5, 11)), isFalse);
+          expect(fxLte(DateTime.now(), DateTime(2021, 5, 11)), isFalse);
         },
       );
 
       test('should throw ArgumentError on mixed types', () {
-        expect(() => lte(1, 'a'), throwsArgumentError);
+        expect(() => fxLte(1, 'a'), throwsArgumentError);
       });
     });
   });

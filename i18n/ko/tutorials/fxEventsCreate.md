@@ -47,7 +47,7 @@ nextLabel: whenComplete
     리슨마다 새 내부 스트림을 만듭니다 — 래퍼가 아니라 팩토리가; 체인
     자체는 단일 구독으로 남습니다. <code>using</code>은 리슨에서
     자원을 얻고, 그것을 미러링하고, 정확히 한 번 해제합니다 — 풀
-    쪽 <code><a href="using.html">using</a></code>의 푸시 짝입니다.
+    쪽 <code><a href="using.html">fxUsing</a></code>의 푸시 짝입니다.
     <code>fromPattern(add, remove)</code>는 전형적인
     <code>on</code>/<code>off</code> 다리입니다. 그리고
     <code>create(init)</code>는 <code>EventEmitter</code>와 함께
@@ -78,6 +78,6 @@ nextLabel: whenComplete
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="fxEvents.html"><code>fxEvents</code></a> — 이미 가진 Stream을 감싸기 ·
-    <a href="using.html"><code>using</code></a> — 풀 레이어의 원본: 첫 pull에서 획득, 한 번 해제 ·
+    <a href="using.html"><code>fxUsing</code></a> — 풀 레이어의 원본: 첫 pull에서 획득, 한 번 해제 ·
     <a href="share.html"><code>share</code></a> — 체인 한 번의 실행에 리스너가 여럿 필요할 때
   </div>

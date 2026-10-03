@@ -2,12 +2,12 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   // joinAsync collects every value first, then joins them.
-  final csv = await joinAsync(
+  final csv = await fxJoinAsync(
       ',',
-      toAsync([
-        delay(const Duration(milliseconds: 100), 'a'),
-        delay(const Duration(milliseconds: 100), 'b'),
-        delay(const Duration(milliseconds: 100), 'c'),
+      fxToAsync([
+        fxDelay(const Duration(milliseconds: 100), 'a'),
+        fxDelay(const Duration(milliseconds: 100), 'b'),
+        fxDelay(const Duration(milliseconds: 100), 'c'),
       ]));
   print(csv); // a,b,c
 

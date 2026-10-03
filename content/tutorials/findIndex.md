@@ -47,7 +47,7 @@ nextLabel: includes
   <div class="callout">
     <strong>Related:</strong>
     <a href="find.html"><code>find</code></a> — same search, returns the value ·
-    <a href="includes.html"><code>includes</code></a> — just "is it there?" ·
-    <a href="nth.html"><code>nth</code></a> — the inverse: index in, value out ·
+    <a href="includes.html"><code>fxIncludes</code></a> — just "is it there?" ·
+    <a href="nth.html"><code>fxNth</code></a> — the inverse: index in, value out ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers this under the hood
   </div>

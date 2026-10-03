@@ -7,7 +7,7 @@ void main() {
   ];
 
   final parsed = fx(rawRows)
-      .map((r) => evolve({
+      .map((r) => fxEvolve({
             'price': (v) => double.parse(v as String),
             'qty': (v) => int.parse(v as String),
           }, r))

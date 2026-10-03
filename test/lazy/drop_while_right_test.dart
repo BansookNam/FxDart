@@ -10,35 +10,35 @@ void main() {
     group('sync', () {
       test('drops the trailing run', () {
         expect(
-          toList(dropWhileRight((int a) => a == 0, [1, 2, 0, 0])),
+          fxToList(dropWhileRight((int a) => a == 0, [1, 2, 0, 0])),
           equals([1, 2]),
         );
       });
 
       test('drops nothing when the last element already fails', () {
         expect(
-          toList(dropWhileRight((int a) => a == 0, [0, 0, 1])),
+          fxToList(dropWhileRight((int a) => a == 0, [0, 0, 1])),
           equals([0, 0, 1]),
         );
       });
 
       test('drops everything when every element matches', () {
         expect(
-          toList(dropWhileRight((int a) => a > 0, [1, 2, 3])),
+          fxToList(dropWhileRight((int a) => a > 0, [1, 2, 3])),
           equals(<int>[]),
         );
       });
 
       test('is empty for an empty source', () {
         expect(
-          toList(dropWhileRight((int a) => true, <int>[])),
+          fxToList(dropWhileRight((int a) => true, <int>[])),
           equals(<int>[]),
         );
       });
 
       test('an interior matching run is kept, not dropped', () {
         expect(
-          toList(dropWhileRight((int a) => a.isEven, [2, 2, 1, 4])),
+          fxToList(dropWhileRight((int a) => a.isEven, [2, 2, 1, 4])),
           equals([2, 2, 1]),
         );
       });
@@ -53,8 +53,8 @@ void main() {
           [0],
         ]) {
           expect(
-            toList(dropWhileRight((int a) => a == 0, lazily(source))),
-            equals(toList(dropWhileRight((int a) => a == 0, source))),
+            fxToList(dropWhileRight((int a) => a == 0, lazily(source))),
+            equals(fxToList(dropWhileRight((int a) => a == 0, source))),
             reason: '$source',
           );
         }
@@ -82,7 +82,7 @@ void main() {
       });
 
       test('trims a trailing suffix, the usual use', () {
-        final res = toList(
+        final res = fxToList(
           dropWhileRight((String c) => c == ' ', ['a', 'b', ' ', ' ', ' ']),
         );
         expect(res, equals(['a', 'b']));
@@ -98,22 +98,22 @@ void main() {
 
     group('async', () {
       test('drops the trailing run', () async {
-        final res = await toListAsync(
-          dropWhileRightAsync((int a) => a == 0, toAsync([1, 2, 0, 0])),
+        final res = await fxToListAsync(
+          dropWhileRightAsync((int a) => a == 0, fxToAsync([1, 2, 0, 0])),
         );
         expect(res, equals([1, 2]));
       });
 
       test('drops nothing when the last value already fails', () async {
-        final res = await toListAsync(
-          dropWhileRightAsync((int a) => a == 0, toAsync([0, 0, 1])),
+        final res = await fxToListAsync(
+          dropWhileRightAsync((int a) => a == 0, fxToAsync([0, 0, 1])),
         );
         expect(res, equals([0, 0, 1]));
       });
 
       test('is empty for an empty source', () async {
-        final res = await toListAsync(
-          dropWhileRightAsync((int a) => true, toAsync(<int>[])),
+        final res = await fxToListAsync(
+          dropWhileRightAsync((int a) => true, fxToAsync(<int>[])),
         );
         expect(res, equals(<int>[]));
       });
@@ -121,23 +121,23 @@ void main() {
       test('agrees with the sync form', () async {
         final source = [2, 2, 1, 4, 4];
         expect(
-          await toListAsync(
-            dropWhileRightAsync((int a) => a.isEven, toAsync(source)),
+          await fxToListAsync(
+            dropWhileRightAsync((int a) => a.isEven, fxToAsync(source)),
           ),
-          equals(toList(dropWhileRight((int a) => a.isEven, source))),
+          equals(fxToList(dropWhileRight((int a) => a.isEven, source))),
         );
       });
 
       test('is available as an fxAsync chain method', () async {
         final res = await fxAsync(
-          toAsync([1, 2, 0, 0]),
+          fxToAsync([1, 2, 0, 0]),
         ).dropWhileRight((a) => a == 0).toList();
         expect(res, equals([1, 2]));
       });
 
       test('works downstream of a concurrent stage', () async {
-        final res = await fxAsync(toAsync([1, 2, 0, 0]))
-            .map((a) => delay(const Duration(milliseconds: 5), a))
+        final res = await fxAsync(fxToAsync([1, 2, 0, 0]))
+            .map((a) => fxDelay(const Duration(milliseconds: 5), a))
             .concurrent(3)
             .dropWhileRight((a) => a == 0)
             .toList();

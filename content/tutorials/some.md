@@ -29,7 +29,7 @@ nextLabel: predicates
     On a sync chain, <code>.any(f)</code> comes straight from Dart's
     <code>Iterable</code> — <code>Fx</code> inherits it — so it needs no
     special definition. The async chain and the data-first
-    <code>any(f, iterable)</code> form are supplied by fxdart, and the FxTS
+    <code>fxAny(f, iterable)</code> form are supplied by fxdart, and the FxTS
     spelling <code>some</code> still works in every position.
   </p>
 
@@ -46,7 +46,7 @@ nextLabel: predicates
   <div class="callout">
     <strong>Related:</strong>
     <a href="every.html"><code>every</code></a> — the "all of them" counterpart ·
-    <a href="includes.html"><code>includes</code></a> — a specialization of <code>any</code> ·
+    <a href="includes.html"><code>fxIncludes</code></a> — a specialization of <code>any</code> ·
     <a href="find.html"><code>find</code></a> — get the matching element, not just a bool ·
     <a href="predicates.html"><code>predicates</code></a> — ready-made predicates to pair with <code>any</code>
   </div>

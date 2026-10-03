@@ -35,11 +35,11 @@ nextLabel: scan
     Dart 포팅판은 이를 솔직히 인정하고 <code>Iterable&lt;dynamic&gt;</code>을
     반환합니다. 평탄화하려는 데이터의 모양을 알고 있고 타입이 붙은 결과를
     원한다면 <a href="flatMap.html"><code>flatMap</code></a>을 쓰세요.
-    <code>flatMap((row) =&gt; row, matrix)</code>라고 쓰면 정확히 한 단계
+    <code>fxFlatMap((row) =&gt; row, matrix)</code>라고 쓰면 정확히 한 단계
     깊이의 균일한 데이터를 타입이 유지된 채로 평탄화할 수 있습니다.
   </p>
   <p>
-    FxTS의 <code>flat</code>과 마찬가지로 <code>flattenedAsync</code>도 값이
+    FxTS의 <code>flat</code>과 마찬가지로 <code>fxFlattenedAsync</code>도 값이
     도착한 시점에 이미 <em>동기</em> <code>Iterable</code>인 중첩만 파고듭니다 —
     중첩 컬렉션 안에 들어 있는 <code>Future</code>를 await하지는 않습니다.
     중첩된 리스트들을 병렬로 가져오고 싶다면 상류에

@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 Either<String, int> parse(String s) =>
-    either((r) => r.ensureNotNull(int.tryParse(s), () => 'bad: $s'));
+    fxEither((r) => r.ensureNotNull(int.tryParse(s), () => 'bad: $s'));
 
 void main() async {
   final verdicts = fx(['1', 'x', '3', 'y']).map(parse).toList();

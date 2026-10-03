@@ -6,9 +6,9 @@ void main() {
     {'id': 2, 'name': 'lee', 'ssn': '222-22'},
   ];
 
-  final redacted = fx(users).map((u) => omit(['ssn'], u)).toList();
+  final redacted = fx(users).map((u) => fxOmit(['ssn'], u)).toList();
   print(redacted); // [{id: 1, name: kim}, {id: 2, name: lee}]
 
   // Omitting a key that doesn't exist is a no-op:
-  print(omit(['nickname'], users[0])); // {id: 1, name: kim, ssn: 111-11}
+  print(fxOmit(['nickname'], users[0])); // {id: 1, name: kim, ssn: 111-11}
 }

@@ -92,7 +92,7 @@ operators watch the error channel; a `Left` is not an error event.
 
 - **Cold until a terminal.** `fxEvents(s).peek(print)` prints nothing
   until `listen` / `toList` / `head`.
-- **Do not debounce a pull pipeline with `sleep`.** If the job is time,
+- **Do not debounce a pull pipeline with `fxSleep`.** If the job is time,
   it is this skill, not `toAsync`.
 - **`share()` resubscribes** when the last listener leaves before
   complete (`reset: true` default). Completion is not undone.
@@ -112,5 +112,5 @@ Events 101 (section 14): https://bansooknam.github.io/FxDart/101/
 Honest push-vs-pull catalog: https://bansooknam.github.io/FxDart/RxDartComparison/
 
 For collections, `concurrent(n)`, and pull pipelines, load the sibling
-**`fxdart-pipelines`**. For `either` / `Raise` / accumulation, load
+**`fxdart-pipelines`**. For `fxEither` / `Raise` / accumulation, load
 **`fxdart-typed-errors`**.

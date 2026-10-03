@@ -30,9 +30,9 @@ Future<void> main() async {
   // The bracket: the resource is acquired on the first pull, read lazily,
   // and released exactly once — after the last row, or right before an
   // error would propagate.
-  final rows = await fxAsync(usingAsync(
+  final rows = await fxAsync(fxUsingAsync(
     () => cursor = LedgerCursor(),
-    (c) => toAsync(Iterable.generate(c.length, c.read)),
+    (c) => fxToAsync(Iterable.generate(c.length, c.read)),
     (c) => c.close(),
   )).toList();
 

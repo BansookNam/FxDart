@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 // EitherNel<E, A> = Either<Nel<E>, A>: the failure side carries EVERY error.
 EitherNel<String, (String, int)> validate(String name, int age) =>
-    either((r) => r.zipOrAccumulate2(
+    fxEither((r) => r.zipOrAccumulate2(
           (r) {
             r.ensure(name.isNotEmpty, () => 'name is empty');
             return name;

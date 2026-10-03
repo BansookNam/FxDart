@@ -14,7 +14,7 @@ void main() {
     {'id': 3, 'name': 'park'},
   ];
 
-  final allowed = differenceBy((u) => u['id'], blocked, users);
-  print(toList(allowed));
+  final allowed = fxDifferenceBy((u) => u['id'], blocked, users);
+  print(fxToList(allowed));
   // [{id: 1, name: kim}, {id: 3, name: park}]
 }

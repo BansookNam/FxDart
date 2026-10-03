@@ -27,7 +27,7 @@ nextLabel: drop
   </p>
   <p>
     FxTS originally named this <code>takeUntil</code>; FxDart keeps
-    <code>takeUntil</code> (and <code>takeUntilAsync</code>) around as a
+    <code>takeUntil</code> (and <code>fxTakeUntilAsync</code>) around as a
     <code>@Deprecated</code> alias for source parity, but new code should
     call <code>takeUntilInclusive</code> directly.
   </p>

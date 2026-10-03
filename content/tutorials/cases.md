@@ -2,7 +2,7 @@
 slug: cases
 title: cases — FxDart 101
 description: FxDart cases tutorial: build a predicate/mapper dispatch table with an optional default, with a live playground.
-heading: <code>cases</code>
+heading: <code>fxCases</code>
 section: 10
 crumb: cases
 prev: throwIf.html
@@ -16,7 +16,7 @@ nextLabel: add
 
   <h2>Lecture</h2>
   <p>
-    <code>cases</code> builds a matcher out of a list of
+    <code>fxCases</code> builds a matcher out of a list of
     <code>(predicate, mapper)</code> pairs: it tries each pair in order, and
     the first one whose predicate returns true has its mapper applied to
     produce the result. It's a functional stand-in for a chain of
@@ -26,7 +26,7 @@ nextLabel: add
   </p>
   <p>
     <strong>This shape differs from FxTS on purpose.</strong> FxTS's
-    <code>cases</code> is variadic: each <code>[predicate, mapper]</code> pair
+    <code>fxCases</code> is variadic: each <code>[predicate, mapper]</code> pair
     is its own trailing argument, with an optional final bare function acting
     as the default, and TypeScript's overloaded generics type each arity by
     hand. Dart has neither variadic generics nor per-arity overloads, so
@@ -37,7 +37,7 @@ nextLabel: add
     so the default is never confused with just another pair.
   </p>
   <p>
-    If nothing matches and no <code>orElse</code> is given, <code>cases</code>
+    If nothing matches and no <code>orElse</code> is given, <code>fxCases</code>
     falls back to returning <code>value</code> itself — which only compiles
     at the call site if <code>T</code> happens to also satisfy <code>R</code>
     — otherwise it throws a <code>StateError</code> at runtime. In practice,
@@ -58,8 +58,8 @@ nextLabel: add
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="when.html"><code>when</code></a> / <a href="unless.html"><code>unless</code></a> — a single predicate, same result type ·
-    <a href="throwError.html"><code>throwError</code></a> — a common orElse when no match should be fatal ·
-    <a href="always.html"><code>always</code></a> — a constant orElse ·
-    <a href="matches.html"><code>matches</code></a> — a predicate you can plug into a case
+    <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — a single predicate, same result type ·
+    <a href="throwError.html"><code>fxThrowError</code></a> — a common orElse when no match should be fatal ·
+    <a href="always.html"><code>fxAlways</code></a> — a constant orElse ·
+    <a href="matches.html"><code>fxMatches</code></a> — a predicate you can plug into a case
   </div>

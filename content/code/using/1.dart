@@ -18,9 +18,9 @@ void main() async {
 
   // release runs BEFORE the error propagates — exactly once:
   try {
-    await toListAsync(usingAsync(
+    await fxToListAsync(fxUsingAsync(
       () async => cursor,
-      (c) => mapAsync(parse, toAsync(['1', '2', 'oops', '4'])),
+      (c) => fxMapAsync(parse, fxToAsync(['1', '2', 'oops', '4'])),
       (c) async => c.close(),
     ));
   } catch (e) {

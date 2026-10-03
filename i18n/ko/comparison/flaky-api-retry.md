@@ -21,7 +21,7 @@ async: true
     모두 실행할 때마다 같은 결과를 출력합니다.
   </p>
   <p>
-    FxDart 버전은 재시도를 데이터로 씁니다: <code>range(1, 11)</code>이
+    FxDart 버전은 재시도를 데이터로 씁니다: <code>fxRange(1, 11)</code>이
     폴링 일정이고, <code>map</code>이 전송이고, <code>peek</code>이
     로그를 기록하고, <code>dropWhile</code> + <code>head</code>가 성공
     정책입니다. 체인이 지연 평가되고 값을 한 번에 하나씩만 끌어오기

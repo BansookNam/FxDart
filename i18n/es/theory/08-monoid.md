@@ -17,11 +17,11 @@ description: Una combinación asociativa más un elemento identidad — el álge
 
 Un **semigrupo** es un tipo con una operación binaria asociativa:
 
-`combine(a, combine(b, c)) == combine(combine(a, b), c)`
+`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
 
 Un **monoide** es un semigrupo con un elemento identidad:
 
-`combine(empty, a) == a == combine(a, empty)`
+`fxCombine(empty, a) == a == fxCombine(a, empty)`
 
 Eso es todo. `int` con `+` y `0`; `int` con `*` y `1`; `String` con `+` y `''`;
 `List` con `+` y `[]`; `bool` con `&&` y `true`. Has usado todos ellos hoy.
@@ -167,7 +167,7 @@ del capítulo 3, aplicado al canal de errores.
 > pasada» es un único fold sobre un monoide producto, y una media es ese fold
 > más una división. Las funciones hacia un monoide forman un monoide
 > (`(f + g)(x) = f(x) + g(x)`), y las endofunciones forman un monoide bajo
-> composición con `identity` como unidad — que es la frase escondida dentro de
+> composición con `fxIdentity` como unidad — que es la frase escondida dentro de
 > «una mónada es un monoide en la categoría de los endofunctores»: `flatten` es
 > la combinación, `of` es la identidad, y las tres leyes monádicas del
 > capítulo 1 son estas dos leyes disfrazadas.

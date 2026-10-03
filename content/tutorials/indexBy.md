@@ -51,5 +51,5 @@ nextLabel: countBy
     <strong>Related:</strong>
     <a href="groupBy.html"><code>groupBy</code></a> — keeps every duplicate instead of overwriting ·
     <a href="countBy.html"><code>countBy</code></a> — tally instead of keeping the value ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from key/value pairs directly
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — build a Map from key/value pairs directly
   </div>

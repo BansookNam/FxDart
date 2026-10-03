@@ -15,7 +15,7 @@ description: Cómo FxDart saca código lineal de pasos que fallan sin do-notatio
 >   librería la detecta
 > - qué ganas y qué pierdes frente a cadenas de `flatMap`
 
-## Qué es `either`
+## Qué es `fxEither`
 
 El capítulo 7 usó el ámbito y no lo abrió. Esta es la forma:
 
@@ -27,7 +27,7 @@ Either<String, int> half(int n) => n.isEven
     : Either.left('odd: $n');
 
 void main() {
-  final result = either<String, int>((r) {
+  final result = fxEither<String, int>((r) {
     final a = r.bind(half(20)); // 10
     final b = r.bind(half(a)); // 5
     final c = r.bind(half(b)); // odd → exits here
@@ -38,15 +38,15 @@ void main() {
 }
 ```
 
-`either` ejecuta tu bloque con un objeto `Raise<E>`. `r.bind` mira un `Either`:
+`fxEither` ejecuta tu bloque con un objeto `Raise<E>`. `r.bind` mira un `Either`:
 en un `Right` devuelve el valor, en un `Left` **abandona el bloque por
-completo** y hace que `either` devuelva ese `Left`. Sin pirámide, sin
+completo** y hace que `fxEither` devuelva ese `Left`. Sin pirámide, sin
 `flatMap`, y el bloque se lee de arriba abajo.
 
 El mecanismo es un escape de flujo de control: `raise` lanza un marcador
-privado que `either` captura en la frontera y convierte en un `Left`. Como el
+privado que `fxEither` captura en la frontera y convierte en un `Left`. Como el
 throw y el catch están ambos dentro de la librería, el escape es *delimitado*
-— solo puede viajar hasta el `either` que lo envuelve, y no más allá.
+— solo puede viajar hasta el `fxEither` que lo envuelve, y no más allá.
 
 ![Dónde aterriza la salida](diagrams/t15-1-scope-exit.svg)
 
@@ -63,12 +63,12 @@ El ámbito de FxDart no es una reescritura. Nada se transforma; se pasa un
 objeto real, y el control sale del bloque mediante un mecanismo que el
 lenguaje ya tiene. El trato es exacto:
 
-| | Azúcar sintáctico (`do`, `for`) | Ámbito (`either`, `Raise` de Arrow) |
+| | Azúcar sintáctico (`do`, `for`) | Ámbito (`fxEither`, `Raise` de Arrow) |
 |---|---|---|
 | Funciona para | cualquier mónada que los tipos puedan nombrar | los efectos que la librería escribió |
 | Necesita | tipos de orden superior | nada especial |
 | Salida de fallo | devolver un valor cortocircuitado | salto no local, capturado en la frontera |
-| Compone con `async` | necesita un transformador | de forma natural — `eitherAsync` |
+| Compone con `async` | necesita un transformador | de forma natural — `fxEitherAsync` |
 | Extensible por ti | sí, definiendo una mónada | no |
 
 Las dos últimas filas son la razón de que la elección sea defendible en vez de
@@ -88,14 +88,14 @@ Future<Either<String, int>> lookup(String key) async {
 }
 
 void main() async {
-  final ok = await eitherAsync<String, String>((r) async {
+  final ok = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('port'));
     final host = r.bind(await lookup('port'));
     return 'http://$host:$port';
   });
   print(ok);
 
-  final bad = await eitherAsync<String, String>((r) async {
+  final bad = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('nope'));
     return 'never: $port';
   });
@@ -121,27 +121,27 @@ int? parseTeen(String s) {
 
 void main() {
   // Failure as a typed value.
-  print(either<String, int>((r) {
+  print(fxEither<String, int>((r) {
     final n = r.ensureNotNull(
         parseTeen('15'), () => 'not a teen');
     return n * 2;
   }));
 
   // Failure as null — no error value to carry.
-  print(nullable((r) {
+  print(fxNullable((r) {
     final n = r.bind(parseTeen('15'));
     return n * 2;
   }));
-  print(nullable((r) {
+  print(fxNullable((r) {
     final n = r.bind(parseTeen('42'));
     return n * 2;
   }));
 
   // Failure as a thrown exception, handled at the boundary.
-  print(catching<int>(() => int.parse('nope'), (e, _) => -1));
+  print(fxCatching<int>(() => int.parse('nope'), (e, _) => -1));
 
   // …or converted straight into a Left.
-  print(eitherCatching<String, int>(
+  print(fxEitherCatching<String, int>(
       (r) => int.parse('nope'), (e, _) => 'not a number'));
 }
 ```
@@ -161,7 +161,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   late Raise<String> escaped;
 
-  final result = either<String, int>((r) {
+  final result = fxEither<String, int>((r) {
     escaped = r; // capturing the scope object…
     return 1;
   });
@@ -179,7 +179,7 @@ La librería lo detecta y lanza `RaiseLeakedError` en vez de dejar que un salto
 de flujo de control perdido escape a código no relacionado. En la práctica la
 regla muerde en un solo lugar: **no uses `r` dentro de un callback que se
 ejecuta más tarde** — un future sin `await`, un timer, un listener de stream.
-Dentro de `eitherAsync`, quédate en la cadena esperada; esa es la misma regla
+Dentro de `fxEitherAsync`, quédate en la cadena esperada; esa es la misma regla
 enunciada para async.
 
 > 🎓 **Esta es una idea antigua con un nombre nuevo.** Una continuación
@@ -209,13 +209,13 @@ ejecutará más tarde, que es lo que la regla de la fuga prohíbe.
 1. Reescribe el primer listado como una cadena de `flatMap`. ¿Qué versión hace
    más fácil añadir una guarda — «falla si el valor cae por debajo de 3» —
    entre pasos?
-2. ¿Qué devuelve `either` cuando el bloque lanza una excepción genuina en vez
+2. ¿Qué devuelve `fxEither` cuando el bloque lanza una excepción genuina en vez
    de hacer raise? Pruébalo, y explica por qué ese es el comportamiento por
    defecto correcto.
 3. ¿Por qué un ámbito no puede reanudarse — es decir, por qué no hay un
    `r.recover(...)` que continúe el bloque después de un fallo? Responde en
    términos del mecanismo.
-4. `nullable` no tiene ningún valor de error. ¿Cuál es su tipo `E`, y qué te
+4. `fxNullable` no tiene ningún valor de error. ¿Cuál es su tipo `E`, y qué te
    dice eso sobre la relación entre `Either<E, A>` y `A?`?
 
 ## Soluciones
@@ -225,13 +225,13 @@ ejecutará más tarde, que es lo que la regla de la fuga prohíbe.
    Right(v))` — un nuevo nivel de anidación y una nueva lambda — donde la
    versión de ámbito añade una línea: `r.ensure(a >= 3, () => 'too small')`.
    Las guardas son donde el ámbito toma una ventaja decisiva.
-2. La excepción se propaga fuera de `either` sin cambios. Eso es correcto
+2. La excepción se propaga fuera de `fxEither` sin cambios. Eso es correcto
    porque una excepción lanzada significa «pasó algo que este tipo de error no
    describe» — convertirla silenciosamente en un `Left` lavaría un bug hasta
-   convertirlo en un fallo de dominio. `eitherCatching` existe para cuando *sí*
+   convertirlo en un fallo de dominio. `fxEitherCatching` existe para cuando *sí*
    quieres la conversión, y es una función separada precisamente para que la
    elección sea explícita. El capítulo 18 desarrolla esta frontera.
-3. Porque el escape está implementado como un throw: para cuando `either` ve el
+3. Porque el escape está implementado como un throw: para cuando `fxEither` ve el
    fallo, los marcos de pila del bloque ya se han desenrollado y sus variables
    locales han desaparecido. Reanudar requeriría capturar la continuación antes
    del desenrollado, que es la mitad de las continuaciones delimitadas que

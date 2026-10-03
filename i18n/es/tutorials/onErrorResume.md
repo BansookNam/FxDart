@@ -71,7 +71,7 @@ nextLabel: attempt
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="retry.html"><code>retry</code></a> — el original de la capa pull, con gancho de backoff y ámbito por elemento ·
+    <a href="retry.html"><code>fxRetry</code></a> — el original de la capa pull, con gancho de backoff y ámbito por elemento ·
     <a href="attempt.html"><code>attempt</code></a> — los mismos fallos, como <code>Left</code>s tipados en el canal de valores ·
     <a href="either.html"><code>Either</code></a> — errores como valores con tipo en vez de eventos de los que recuperarse
   </div>

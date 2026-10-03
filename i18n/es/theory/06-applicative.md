@@ -95,7 +95,7 @@ una implementación es libre de mirar las dos y concatenar sus fallos.
 ## Acumular, en FxDart
 
 Dart no tiene un tipo `Validated`; FxDart sigue a Arrow 2.x y ofrece en su
-lugar un *ámbito* acumulador. Dentro de `either`, pide uno:
+lugar un *ámbito* acumulador. Dentro de `fxEither`, pide uno:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -110,7 +110,7 @@ class User {
 }
 
 Either<Nel<String>, User> parse(String name, String age) =>
-    either((r) => r.zipOrAccumulate2(
+    fxEither((r) => r.zipOrAccumulate2(
           (br) {
             if (name.isEmpty) br.raise('name is empty');
             return name;
@@ -144,7 +144,7 @@ Either<Nel<String>, String> checkout(
   String qty,
   String coupon,
 ) =>
-    either((r) => r.accumulate((acc) {
+    fxEither((r) => r.accumulate((acc) {
           final i = acc.accumulating((br) {
             if (item.isEmpty) br.raise('item required');
             return item;
@@ -191,7 +191,7 @@ capítulo, convertida en API.
 
 | Necesitas | Usa | Porque |
 |---|---|---|
-| El paso 2 necesita el valor del paso 1 | `flatMap` / ámbito `either` | La dependencia es real |
+| El paso 2 necesita el valor del paso 1 | `flatMap` / ámbito `fxEither` | La dependencia es real |
 | Los pasos son independientes, basta el primer fallo | `map2` | Lo más barato, y cortocircuita |
 | Los pasos son independientes, informa de todos los fallos | `zipOrAccumulate` / `accumulate` | Solo la forma applicative puede |
 | Los pasos son independientes y lentos | Applicative + concurrencia | La independencia es lo que hace legal el solape |

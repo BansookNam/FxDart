@@ -1,6 +1,6 @@
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> parse(String s) => either(
+Either<String, int> parse(String s) => fxEither(
     (r) => r.ensureNotNull(int.tryParse(s), () => '"$s" is not a number'));
 
 void main() {

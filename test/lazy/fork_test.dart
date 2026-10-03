@@ -7,8 +7,8 @@ void main() {
       test('should be forked iterable (number)', () {
         final arr = [1, 2, 3];
 
-        final iter1 = fork(arr).iterator;
-        final iter2 = fork(arr).iterator;
+        final iter1 = fxFork(arr).iterator;
+        final iter2 = fxFork(arr).iterator;
 
         expect(iter1.moveNext(), isTrue);
         expect(iter1.current, equals(1));
@@ -30,32 +30,32 @@ void main() {
       test('should be forked iterable (string chars)', () {
         final arr = 'abc'.split('');
 
-        expect(toList(fork(arr)), equals(['a', 'b', 'c']));
-        expect(toList(fork(arr)), equals(['a', 'b', 'c']));
+        expect(fxToList(fxFork(arr)), equals(['a', 'b', 'c']));
+        expect(fxToList(fxFork(arr)), equals(['a', 'b', 'c']));
       });
 
       test('should walk a shared lazy source only once', () {
         var evaluations = 0;
-        final arr = map((int a) {
+        final arr = fxMap((int a) {
           evaluations++;
           return a + 10;
         }, [1, 2, 3]);
 
-        final iter1 = fork(arr);
-        final iter2 = fork(arr);
-        final iter3 = map((int a) => '$a', fork(arr));
+        final iter1 = fxFork(arr);
+        final iter2 = fxFork(arr);
+        final iter3 = fxMap((int a) => '$a', fxFork(arr));
 
-        expect(toList(iter1), equals([11, 12, 13]));
-        expect(toList(iter2), equals([11, 12, 13]));
-        expect(toList(iter3), equals(['11', '12', '13']));
+        expect(fxToList(iter1), equals([11, 12, 13]));
+        expect(fxToList(iter2), equals([11, 12, 13]));
+        expect(fxToList(iter3), equals(['11', '12', '13']));
         expect(evaluations, equals(3));
       });
 
       test('forked iterator proceeds independently of other forks', () {
-        final arr = map((int a) => a + 10, [1, 2, 3]);
+        final arr = fxMap((int a) => a + 10, [1, 2, 3]);
 
-        final iter1 = fork(arr).iterator;
-        final iter2 = fork(arr).iterator;
+        final iter1 = fxFork(arr).iterator;
+        final iter2 = fxFork(arr).iterator;
 
         expect(iter1.moveNext(), isTrue);
         expect(iter1.current, equals(11));
@@ -82,13 +82,13 @@ void main() {
           // Dart forks share one buffered iteration per iterable object and
           // always replay from the beginning of that buffer (unlike JS, where
           // fork(iterator) continues from the iterator's current position).
-          final arr = map((int a) => a + 10, [1, 2, 3]);
+          final arr = fxMap((int a) => a + 10, [1, 2, 3]);
 
-          final iter1 = fork(arr).iterator;
+          final iter1 = fxFork(arr).iterator;
           expect(iter1.moveNext(), isTrue);
           expect(iter1.current, equals(11));
 
-          final iter2 = fork(arr).iterator;
+          final iter2 = fxFork(arr).iterator;
           expect(iter2.moveNext(), isTrue);
           expect(iter2.current, equals(11));
           expect(iter2.moveNext(), isTrue);
@@ -110,10 +110,10 @@ void main() {
 
     group('async', () {
       test('should be forked iterable (number)', () async {
-        final arr = toAsync([1, 2, 3]);
+        final arr = fxToAsync([1, 2, 3]);
 
-        final iter1 = forkAsync(arr).iterator;
-        final iter2 = forkAsync(arr).iterator;
+        final iter1 = fxForkAsync(arr).iterator;
+        final iter2 = fxForkAsync(arr).iterator;
 
         expect((await iter1.next()).value, equals(1));
         expect((await iter1.next()).value, equals(2));
@@ -127,29 +127,29 @@ void main() {
       });
 
       test('should be forked iterable (string chars)', () async {
-        final arr = toAsync('abc'.split(''));
+        final arr = fxToAsync('abc'.split(''));
 
-        expect(await toListAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
-        expect(await toListAsync(forkAsync(arr)), equals(['a', 'b', 'c']));
+        expect(await fxToListAsync(fxForkAsync(arr)), equals(['a', 'b', 'c']));
+        expect(await fxToListAsync(fxForkAsync(arr)), equals(['a', 'b', 'c']));
       });
 
       test('should walk a shared lazy source only once', () async {
         var evaluations = 0;
-        final arr = mapAsync((int a) {
+        final arr = fxMapAsync((int a) {
           evaluations++;
           return a + 10;
-        }, toAsync([1, 2, 3]));
+        }, fxToAsync([1, 2, 3]));
 
-        expect(await toListAsync(forkAsync(arr)), equals([11, 12, 13]));
-        expect(await toListAsync(forkAsync(arr)), equals([11, 12, 13]));
+        expect(await fxToListAsync(fxForkAsync(arr)), equals([11, 12, 13]));
+        expect(await fxToListAsync(fxForkAsync(arr)), equals([11, 12, 13]));
         expect(evaluations, equals(3));
       });
 
       test('forked iterator proceeds independently of other forks', () async {
-        final arr = mapAsync((int a) => a + 10, toAsync([1, 2, 3]));
+        final arr = fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3]));
 
-        final iter1 = forkAsync(arr).iterator;
-        final iter2 = forkAsync(arr).iterator;
+        final iter1 = fxForkAsync(arr).iterator;
+        final iter2 = fxForkAsync(arr).iterator;
 
         expect((await iter1.next()).value, equals(11));
         expect((await iter1.next()).value, equals(12));
@@ -167,34 +167,34 @@ void main() {
       test(
         'forked iterables should each be fully consumable with concurrent',
         () async {
-          final iter = mapAsync(
-            (int a) => delay(const Duration(milliseconds: 50), a),
-            toAsync(range(10)),
+          final iter = fxMapAsync(
+            (int a) => fxDelay(const Duration(milliseconds: 50), a),
+            fxToAsync(fxRange(10)),
           );
 
-          final forked1 = forkAsync(iter);
-          final forked2 = forkAsync(iter);
+          final forked1 = fxForkAsync(iter);
+          final forked2 = fxForkAsync(iter);
 
-          final arr1 = await toListAsync(concurrentAsync(5, forked1));
+          final arr1 = await fxToListAsync(fxConcurrentAsync(5, forked1));
           expect(arr1, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
 
           // The second fork replays the shared buffer without re-evaluating.
           final sw = Stopwatch()..start();
-          final arr2 = await toListAsync(concurrentAsync(5, forked2));
+          final arr2 = await fxToListAsync(fxConcurrentAsync(5, forked2));
           expect(arr2, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
           expect(sw.elapsedMilliseconds, lessThan(200));
         },
       );
 
       test('forked iterable should be consumed concurrently', () async {
-        final iter = mapAsync(
-          (int a) => delay(const Duration(milliseconds: 100), a),
-          toAsync(range(10)),
+        final iter = fxMapAsync(
+          (int a) => fxDelay(const Duration(milliseconds: 100), a),
+          fxToAsync(fxRange(10)),
         );
 
-        final forked = forkAsync(iter);
+        final forked = fxForkAsync(iter);
         final sw = Stopwatch()..start();
-        final arr = await toListAsync(concurrentAsync(5, forked));
+        final arr = await fxToListAsync(fxConcurrentAsync(5, forked));
         expect(arr, equals([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]));
         // sequential is ~1000ms; concurrent(5) should be ~200ms
         expect(sw.elapsedMilliseconds, lessThan(700));
@@ -211,8 +211,8 @@ void main() {
             throw StateError('sync error');
           }();
 
-          final iter1 = fork(errorIterable).iterator;
-          final iter2 = fork(errorIterable).iterator;
+          final iter1 = fxFork(errorIterable).iterator;
+          final iter2 = fxFork(errorIterable).iterator;
 
           expect(iter1.moveNext(), isTrue);
           expect(iter1.current, equals(1));
@@ -232,14 +232,14 @@ void main() {
       test(
         'should propagate errors from async iterator to all forked iterators',
         () async {
-          final errorIterable = toAsync(() sync* {
+          final errorIterable = fxToAsync(() sync* {
             yield Future.value(1);
             yield Future.value(2);
             yield Future<int>.error(StateError('async error'));
           }());
 
-          final iter1 = forkAsync(errorIterable).iterator;
-          final iter2 = forkAsync(errorIterable).iterator;
+          final iter1 = fxForkAsync(errorIterable).iterator;
+          final iter2 = fxForkAsync(errorIterable).iterator;
 
           expect((await iter1.next()).value, equals(1));
           expect((await iter2.next()).value, equals(1));
@@ -255,11 +255,11 @@ void main() {
 
     group('memory optimization', () {
       test('should handle large datasets with multiple forks (sync)', () {
-        final arr = map((int a) => a + 1, range(500));
+        final arr = fxMap((int a) => a + 1, fxRange(500));
 
-        final fork1 = fork(arr).iterator;
-        final fork2 = fork(arr).iterator;
-        final fork3 = fork(arr).iterator;
+        final fork1 = fxFork(arr).iterator;
+        final fork2 = fxFork(arr).iterator;
+        final fork3 = fxFork(arr).iterator;
 
         final results1 = <int>[];
         for (var i = 0; i < 100; i++) {
@@ -290,10 +290,10 @@ void main() {
       test(
         'should handle large datasets with multiple forks (async)',
         () async {
-          final arr = mapAsync((int a) => a + 1, toAsync(range(200)));
+          final arr = fxMapAsync((int a) => a + 1, fxToAsync(fxRange(200)));
 
-          final fork1 = forkAsync(arr).iterator;
-          final fork2 = forkAsync(arr).iterator;
+          final fork1 = fxForkAsync(arr).iterator;
+          final fork2 = fxForkAsync(arr).iterator;
 
           final results1 = <int>[];
           for (var i = 0; i < 50; i++) {
@@ -324,8 +324,8 @@ void main() {
 
       test('should remove fork from tracking when completed (sync)', () {
         final arr = [1, 2, 3];
-        final iter1 = fork(arr).iterator;
-        final iter2 = fork(arr).iterator;
+        final iter1 = fxFork(arr).iterator;
+        final iter2 = fxFork(arr).iterator;
 
         while (iter1.moveNext()) {}
 
@@ -339,9 +339,9 @@ void main() {
       });
 
       test('should remove fork from tracking when completed (async)', () async {
-        final arr = toAsync([1, 2, 3]);
-        final iter1 = forkAsync(arr).iterator;
-        final iter2 = forkAsync(arr).iterator;
+        final arr = fxToAsync([1, 2, 3]);
+        final iter1 = fxForkAsync(arr).iterator;
+        final iter2 = fxForkAsync(arr).iterator;
 
         while (!(await iter1.next()).done) {}
 

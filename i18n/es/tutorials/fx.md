@@ -30,7 +30,7 @@ nextLabel: pipe
   </p>
   <p>
     Esta pereza es lo que permite a FxDart encadenar sin riesgo sobre secuencias
-    enormes o infinitas (<code>range</code>, <code>cycle</code>, <code>repeat</code>):
+    enormes o infinitas (<code>fxRange</code>, <code>cycle</code>, <code>repeat</code>):
     mientras algo aguas abajo — normalmente <code>take(n)</code> — decida
     cuántos valores pedir de verdad, los pasos de aguas arriba solo se
     ejecutan esas veces.
@@ -39,7 +39,7 @@ nextLabel: pipe
     <code>fx</code> es la mitad <em>síncrona</em> de la cadena. Sus equivalentes
     asíncronos son <code>fxAsync</code>, que envuelve un
     <code>FxAsyncIterable</code> (lo que obtienes de <code>toAsync</code>,
-    <code>fromStream</code> o cualquier función <code>*Async</code>), y
+    <code>fxFromStream</code> o cualquier función <code>*Async</code>), y
     <code>fxStream</code>, un atajo que envuelve directamente un <code>Stream</code>
     de Dart. Ambos devuelven una cadena <code>FxAsync&lt;T&gt;</code> cuyos
     métodos aceptan funciones que pueden devolver un <code>Future</code>, y
@@ -49,7 +49,7 @@ nextLabel: pipe
   </p>
   <p>
     ¿Y por qué existe esto, en lugar de llamar sin más a funciones de nivel
-    superior como <code>map(f, iterable)</code>? Porque Dart no puede tipar un
+    superior como <code>fxMap(f, iterable)</code>? Porque Dart no puede tipar un
     <code>pipe</code> variádico como sí hace TypeScript en FxTS (lo verás en la
     siguiente lección): el encadenado con <code>fx()</code> es la forma que tiene
     FxDart de ofrecer pipelines totalmente tipados y con autocompletado.
@@ -138,8 +138,16 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
   <p>
     La convención es una sola regla: un punto de entrada lleva <code>fx</code>
     en el nombre. Dice en qué librería estás entrando y deja el nombre desnudo
-    — <code>toAsync</code>, <code>shuffle</code>, <code>debounce</code> —
-    libre para lo que el proyecto quiera poner en ese tipo.
+    — <code>shuffle</code>, <code>debounce</code> — libre para lo que el
+    proyecto quiera poner en ese tipo. Las funciones de nivel superior cortas
+    siguen la misma regla por la misma razón: <code>fxMap</code>,
+    <code>fxRange</code> y <code>fxGroupBy</code> no pueden chocar con el
+    <code>max</code> de <code>dart:math</code>, el <code>sleep</code> de
+    <code>dart:io</code> ni el <code>join</code> de <code>package:path</code>.
+    Los nombres largos que no chocan con nada (<code>mapWithIndex</code>,
+    <code>takeUntilInclusive</code>) conservan la grafía de FxTS, y los métodos
+    de la cadena nunca llevan el prefijo: siempre es
+    <code>fx(xs).map(f)</code>.
   </p>
   <table>
     <thead><tr><th>Receptor</th><th>Getter</th><th>Equivale a</th></tr></thead>
@@ -147,14 +155,14 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
       <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
       <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
-      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>fxToAsync(xs)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>fxShuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>fxShuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>fxDebounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>fxThrottle(f, w)</code></a></td></tr>
     </tbody>
   </table>
   <p>

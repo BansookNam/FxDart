@@ -20,7 +20,7 @@ async: true
     the code below, so both versions print the same thing every run.
   </p>
   <p>
-    The FxDart version writes the retry as data: <code>range(1, 11)</code>
+    The FxDart version writes the retry as data: <code>fxRange(1, 11)</code>
     is the poll schedule, <code>map</code> is the transport,
     <code>peek</code> records the log, and <code>dropWhile</code> +
     <code>head</code> is the success policy. Because the chain is lazy and

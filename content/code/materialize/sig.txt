@@ -7,7 +7,7 @@ FxEvents&lt;(Duration dt, T value)&gt; FxEvents&lt;T&gt;.intervals({DateTime Fun
 (FxEvents&lt;T&gt; matches, FxEvents&lt;T&gt; rest) FxEvents&lt;T&gt;.partition(bool Function(T) test)
 Future&lt;bool&gt; FxEvents&lt;T&gt;.sequenceEqual(Stream&lt;T&gt; other, {bool Function(T, T)? eq})
 
-bool sequenceEqual&lt;T&gt;(Iterable&lt;T&gt; a, Iterable&lt;T&gt; b, [bool Function(T, T)? eq])
-Future&lt;bool&gt; sequenceEqualAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; a, FxAsyncIterable&lt;T&gt; b, [bool Function(T, T)? eq])
+bool fxSequenceEqual&lt;T&gt;(Iterable&lt;T&gt; a, Iterable&lt;T&gt; b, [bool Function(T, T)? eq])
+Future&lt;bool&gt; fxSequenceEqualAsync&lt;T&gt;(FxAsyncIterable&lt;T&gt; a, FxAsyncIterable&lt;T&gt; b, [bool Function(T, T)? eq])
 bool Fx.sequenceEqual(Iterable&lt;T&gt; other, [bool Function(T, T)? eq])
 Future&lt;bool&gt; FxAsync.sequenceEqual(FxAsyncIterable&lt;T&gt; other, [bool Function(T, T)? eq])

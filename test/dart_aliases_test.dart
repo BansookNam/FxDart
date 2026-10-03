@@ -51,12 +51,12 @@ void main() {
     });
     test('firstWhereOrNull == find, indexWhere == findIndex', () {
       expect(fx([1, 2, 3]).firstWhereOrNull((a) => a > 1), equals(2));
-      expect(fx([1, 2, 3]).firstWhereOrNull((a) => a > 9), isNull);
+      expect(fx([1, 2, 3]).firstWhereOrNull((a) => a > 9), fxIsNull);
       expect(fx([1, 2, 3]).indexWhere((a) => a == 3), equals(2));
     });
     test('inherited Dart names still work on the chain', () {
       expect(xs.firstOrNull, equals(1)); // head
-      expect(fx(<int>[]).firstOrNull, isNull);
+      expect(fx(<int>[]).firstOrNull, fxIsNull);
       expect(fx([1, 2, 3]).any((a) => a > 2), isTrue); // some
       expect(fx([1, 2, 3]).length, equals(3)); // size
     });
@@ -132,7 +132,7 @@ void main() {
       );
       expect(
         await fx([1, 2, 3]).toAsync().firstWhereOrNull((a) => a > 9),
-        isNull,
+        fxIsNull,
       );
       expect(
         await fx([1, 2, 3]).toAsync().indexWhere((a) => a == 3),
@@ -141,62 +141,71 @@ void main() {
     });
     test('lastOrNull == last', () async {
       expect(await fx([1, 2, 3]).toAsync().lastOrNull(), equals(3));
-      expect(await fx(<int>[]).toAsync().lastOrNull(), isNull);
+      expect(await fx(<int>[]).toAsync().lastOrNull(), fxIsNull);
     });
   });
 
   group('top-level aliases', () {
     test('where/whereNot/nonNulls/distinct/expand/skip', () {
-      expect(toList(where((int a) => a.isEven, [1, 2, 3, 4])), equals([2, 4]));
       expect(
-        toList(whereNot((int a) => a.isEven, [1, 2, 3, 4])),
+        fxToList(fxWhere((int a) => a.isEven, [1, 2, 3, 4])),
+        equals([2, 4]),
+      );
+      expect(
+        fxToList(fxWhereNot((int a) => a.isEven, [1, 2, 3, 4])),
         equals([1, 3]),
       );
-      expect(toList(nonNulls([1, null, 2, null, 3])), equals([1, 2, 3]));
-      expect(toList(distinct([1, 1, 2, 3])), equals([1, 2, 3]));
-      expect(toList(skip(2, [1, 2, 3, 4])), equals([3, 4]));
+      expect(fxToList(fxNonNulls([1, null, 2, null, 3])), equals([1, 2, 3]));
+      expect(fxToList(fxDistinct([1, 1, 2, 3])), equals([1, 2, 3]));
+      expect(fxToList(fxSkip(2, [1, 2, 3, 4])), equals([3, 4]));
     });
     test('distinctBy/expand/flattened/takeLast/skipWhile/forEach', () {
       expect(
-        toList(distinctBy((String s) => s.length, ['a', 'bb', 'cc'])),
+        fxToList(fxDistinctBy((String s) => s.length, ['a', 'bb', 'cc'])),
         equals(['a', 'bb']),
       );
-      expect(toList(expand((int a) => [a, a], [1, 2])), equals([1, 1, 2, 2]));
       expect(
-        toList(
-          flattened([
+        fxToList(fxExpand((int a) => [a, a], [1, 2])),
+        equals([1, 1, 2, 2]),
+      );
+      expect(
+        fxToList(
+          fxFlattened([
             [1],
             [2, 3],
           ]),
         ),
         equals([1, 2, 3]),
       );
-      expect(toList(takeLast(2, [1, 2, 3, 4])), equals([3, 4]));
-      expect(toList(skipWhile((int a) => a < 3, [1, 2, 3, 4])), equals([3, 4]));
+      expect(fxToList(fxTakeLast(2, [1, 2, 3, 4])), equals([3, 4]));
+      expect(
+        fxToList(fxSkipWhile((int a) => a < 3, [1, 2, 3, 4])),
+        equals([3, 4]),
+      );
 
       final seen = <int>[];
-      forEach(seen.add, [1, 2, 3]);
+      fxForEach(seen.add, [1, 2, 3]);
       expect(seen, equals([1, 2, 3]));
     });
     test('access + aggregate aliases', () {
       expect(firstOrNull([1, 2, 3]), equals(1));
-      expect(firstOrNull(<int>[]), isNull);
+      expect(firstOrNull(<int>[]), fxIsNull);
       expect(lastOrNull([1, 2, 3]), equals(3));
       expect(elementAtOrNull(1, [1, 2, 3]), equals(2));
       expect(firstWhereOrNull((int a) => a > 1, [1, 2, 3]), equals(2));
-      expect(indexWhere((int a) => a == 3, [1, 2, 3]), equals(2));
-      expect(any((int a) => a > 2, [1, 2, 3]), isTrue);
-      expect(count([1, 2, 3]), equals(3));
-      expect(toList(indexed(['a', 'b'])), equals([(0, 'a'), (1, 'b')]));
-      expect(sorted((int a, int b) => a - b, [3, 1, 2]), equals([1, 2, 3]));
+      expect(fxIndexWhere((int a) => a == 3, [1, 2, 3]), equals(2));
+      expect(fxAny((int a) => a > 2, [1, 2, 3]), isTrue);
+      expect(fxCount([1, 2, 3]), equals(3));
+      expect(fxToList(fxIndexed(['a', 'b'])), equals([(0, 'a'), (1, 'b')]));
+      expect(fxSorted((int a, int b) => a - b, [3, 1, 2]), equals([1, 2, 3]));
     });
     test('predicate + unicode aliases (both spellings)', () {
-      expect(isBool(true), isTrue);
-      expect(isBoolean(true), isTrue);
-      expect(isNum(1), isTrue);
-      expect(isNumber(1), isTrue);
+      expect(fxIsBool(true), isTrue);
+      expect(fxIsBoolean(true), isTrue);
+      expect(fxIsNum(1), isTrue);
+      expect(fxIsNumber(1), isTrue);
       expect(isDateTime(DateTime(2024)), isTrue);
-      expect(isDate(DateTime(2024)), isTrue);
+      expect(fxIsDate(DateTime(2024)), isTrue);
       expect(unicodeToList('ab'), equals(['a', 'b']));
       expect(unicodeToArray('ab'), equals(['a', 'b']));
     });
@@ -205,43 +214,48 @@ void main() {
   group('top-level async aliases', () {
     test('whereAsync/whereNotAsync/nonNullsAsync', () async {
       expect(
-        await toListAsync(
-          whereAsync((int a) => a.isEven, toAsync([1, 2, 3, 4])),
+        await fxToListAsync(
+          fxWhereAsync((int a) => a.isEven, fxToAsync([1, 2, 3, 4])),
         ),
         equals([2, 4]),
       );
       expect(
-        await toListAsync(
-          whereNotAsync((int a) => a.isEven, toAsync([1, 2, 3, 4])),
+        await fxToListAsync(
+          fxWhereNotAsync((int a) => a.isEven, fxToAsync([1, 2, 3, 4])),
         ),
         equals([1, 3]),
       );
       expect(
-        await toListAsync(nonNullsAsync(toAsync(<int?>[1, null, 2]))),
+        await fxToListAsync(fxNonNullsAsync(fxToAsync(<int?>[1, null, 2]))),
         equals([1, 2]),
       );
     });
     test('distinctAsync/distinctByAsync', () async {
       expect(
-        await toListAsync(distinctAsync(toAsync([1, 1, 2, 3]))),
+        await fxToListAsync(fxDistinctAsync(fxToAsync([1, 1, 2, 3]))),
         equals([1, 2, 3]),
       );
       expect(
-        await toListAsync(
-          distinctByAsync((String s) => s.length, toAsync(['a', 'bb', 'cc'])),
+        await fxToListAsync(
+          fxDistinctByAsync(
+            (String s) => s.length,
+            fxToAsync(['a', 'bb', 'cc']),
+          ),
         ),
         equals(['a', 'bb']),
       );
     });
     test('expandAsync/flattenedAsync', () async {
       expect(
-        await toListAsync(expandAsync((int a) => [a, a], toAsync([1, 2]))),
+        await fxToListAsync(
+          fxExpandAsync((int a) => [a, a], fxToAsync([1, 2])),
+        ),
         equals([1, 1, 2, 2]),
       );
       expect(
-        await toListAsync(
-          flattenedAsync(
-            toAsync([
+        await fxToListAsync(
+          fxFlattenedAsync(
+            fxToAsync([
               [1],
               [2, 3],
             ]),
@@ -252,46 +266,46 @@ void main() {
     });
     test('takeLastAsync/skipAsync/skipWhileAsync', () async {
       expect(
-        await toListAsync(takeLastAsync(2, toAsync([1, 2, 3, 4]))),
+        await fxToListAsync(fxTakeLastAsync(2, fxToAsync([1, 2, 3, 4]))),
         equals([3, 4]),
       );
       expect(
-        await toListAsync(skipAsync(2, toAsync([1, 2, 3, 4]))),
+        await fxToListAsync(fxSkipAsync(2, fxToAsync([1, 2, 3, 4]))),
         equals([3, 4]),
       );
       expect(
-        await toListAsync(
-          skipWhileAsync((int a) => a < 3, toAsync([1, 2, 3, 4])),
+        await fxToListAsync(
+          fxSkipWhileAsync((int a) => a < 3, fxToAsync([1, 2, 3, 4])),
         ),
         equals([3, 4]),
       );
     });
     test('indexedAsync', () async {
       expect(
-        await toListAsync(indexedAsync(toAsync(['a', 'b']))),
+        await fxToListAsync(fxIndexedAsync(fxToAsync(['a', 'b']))),
         equals([(0, 'a'), (1, 'b')]),
       );
     });
     test('access aliases', () async {
-      expect(await firstOrNullAsync(toAsync([1, 2, 3])), equals(1));
-      expect(await firstOrNullAsync(toAsync(<int>[])), isNull);
-      expect(await lastOrNullAsync(toAsync([1, 2, 3])), equals(3));
-      expect(await elementAtOrNullAsync(1, toAsync([1, 2, 3])), equals(2));
+      expect(await firstOrNullAsync(fxToAsync([1, 2, 3])), equals(1));
+      expect(await firstOrNullAsync(fxToAsync(<int>[])), fxIsNull);
+      expect(await lastOrNullAsync(fxToAsync([1, 2, 3])), equals(3));
+      expect(await elementAtOrNullAsync(1, fxToAsync([1, 2, 3])), equals(2));
       expect(
-        await firstWhereOrNullAsync((int a) => a > 1, toAsync([1, 2, 3])),
+        await firstWhereOrNullAsync((int a) => a > 1, fxToAsync([1, 2, 3])),
         equals(2),
       );
       expect(
-        await indexWhereAsync((int a) => a == 3, toAsync([1, 2, 3])),
+        await fxIndexWhereAsync((int a) => a == 3, fxToAsync([1, 2, 3])),
         equals(2),
       );
-      expect(await anyAsync((int a) => a > 2, toAsync([1, 2, 3])), isTrue);
+      expect(await fxAnyAsync((int a) => a > 2, fxToAsync([1, 2, 3])), isTrue);
     });
     test('aggregate aliases', () async {
       final seen = <int>[];
-      await forEachAsync(seen.add, toAsync([1, 2, 3]));
+      await fxForEachAsync(seen.add, fxToAsync([1, 2, 3]));
       expect(seen, equals([1, 2, 3]));
-      expect(await countAsync(toAsync([1, 2, 3])), equals(3));
+      expect(await fxCountAsync(fxToAsync([1, 2, 3])), equals(3));
     });
   });
 }

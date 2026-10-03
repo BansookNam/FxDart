@@ -7,7 +7,7 @@ section: 13
 crumb: naming
 ---
   <p class="hero-sub">
-    <code>either</code> 뒤에 있는 이 기능은 다른 생태계에서 유명한 이름들을
+    <code>fxEither</code> 뒤에 있는 이 기능은 다른 생태계에서 유명한 이름들을
     갖고 있습니다 — <a href="monad.html"><em>Monad</em></a>,
     <em>Railway-oriented programming</em>. 이 페이지는 FxDart가 왜 일부러
     그 어떤 이름도 쓰지 않는지 설명합니다. (모나드가 처음이라면
@@ -20,7 +20,7 @@ crumb: naming
     핵심은 모나딕 스타일이 <em>아니라는</em> 것입니다 — 이 기능은
     <strong>대체</strong>를 위해 존재합니다. <code>flatMap</code> 연쇄를
     일직선 코드로 바꾸는 것이죠. <a href="typedErrors.html">타입 있는 에러 페이지</a>에서 본
-    그대로입니다: <code>either((r) { ... })</code> 블록은 중첩
+    그대로입니다: <code>fxEither((r) { ... })</code> 블록은 중첩
     <code>flatMap</code> 피라미드의 대안이지, 그것을 감싼 포장이 아닙니다.
   </p>
   <p>

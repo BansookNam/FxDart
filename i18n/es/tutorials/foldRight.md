@@ -48,7 +48,7 @@ nextLabel: reduceLazy
   <p>
     Ambos son estrictos donde <code>fold</code> no lo es. Caminar hacia atrás
     exige saber dónde está el final, así que una fuente que no sea
-    <code>List</code> se materializa primero y <code>foldRightAsync</code>
+    <code>List</code> se materializa primero y <code>fxFoldRightAsync</code>
     vacía el stream antes de empezar: nunca lo apuntes a una fuente infinita.
   </p>
 

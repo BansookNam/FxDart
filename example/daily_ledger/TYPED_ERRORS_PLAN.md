@@ -47,7 +47,7 @@ The pitch is **not** "typed errors are faster" or "exceptions are bad". It is:
 - **Accumulation** — `try`/`catch` structurally cannot report five bad fields
   at once. `zipOrAccumulate5` can. This is the one thing native Dart has no
   answer for, and it is where the app leans hardest.
-- **Straight-line code** — inside `either((r) { … })` you write ordinary Dart
+- **Straight-line code** — inside `fxEither((r) { … })` you write ordinary Dart
   with `r.ensure` / `r.bind`, not a `flatMap` pyramid.
 
 The costs are stated too, in the About dialog and in the Health screen's
@@ -127,14 +127,14 @@ lecture second.
 ### 4.1 Chapter 1 — `Either`: CSV import rows
 
 **Change `lib/logic/import.dart`.** Today `parseRow` returns
-`(Entry?, ImportIssue?)` and the caller runs `compact` twice to split the
+`(Entry?, ImportIssue?)` and the caller runs `fxCompact` twice to split the
 stream. That tuple *is* an `Either` with the type system switched off.
 
 ```dart
 // before (round 7)
 (Entry?, ImportIssue?) parseRow(int line, String raw) { … }
-final entries = compact(fx(parsed).map((p) => p.$1)).toList();
-final issues  = compact(fx(parsed).map((p) => p.$2)).toList();
+final entries = fxCompact(fx(parsed).map((p) => p.$1)).toList();
+final issues  = fxCompact(fx(parsed).map((p) => p.$2)).toList();
 
 // after
 Either<RowError, Entry> parseRow(int line, String raw) => …;
@@ -160,14 +160,14 @@ The import dialog renders each row with `row.fold(…)`, badge counts with
 `isLeft`/`isRight`, and the "unknown category" recovery path with
 `Either.recover` (§7).
 
-### 4.2 Chapter 2 — `either` & `Raise` scope: one row, one scope
+### 4.2 Chapter 2 — `fxEither` & `Raise` scope: one row, one scope
 
 Inside `parseRow`, the eight early `return (null, issue(…))` statements
 collapse into straight-line Dart:
 
 ```dart
 Either<RowError, Entry> parseRow(int line, String raw) =>
-  either<RowError, Entry>((r) {
+  fxEither<RowError, Entry>((r) {
     // field validators raise FieldError; this scope raises RowError.
     // withError is the adapter between the two error types.
     return r.withError(
@@ -182,7 +182,7 @@ Either<RowError, Entry> parseRow(int line, String raw) =>
           () => FieldError('row', 'expected ${csvColumns.length} columns, '
               'got ${cells.length}'),
         );
-        final row = fromEntries(fx(csvColumns).zip(cells));
+        final row = fxFromEntries(fx(csvColumns).zip(cells));
         return fr.bind(entryFromRow(row, line: line)); // Either<FieldError,Entry>
       },
     );
@@ -209,12 +209,12 @@ Scope-first, exactly as the lecture teaches: the validators take `r` and
 return the *parsed value*, never an `Either`. Composition happens at the
 call site — fail-fast in the CSV row (`§4.2`), fail-slow in the form (`§4.5`).
 
-`catching` wraps the throwing primitives (`double.parse`, `DateTime` math)
+`fxCatching` wraps the throwing primitives (`double.parse`, `DateTime` math)
 so a malformed cell becomes a `FieldError` and never an escaped exception —
 and, critically, never swallows fxdart's own raise signal the way a bare
 `catch` would.
 
-### 4.3 Chapter 3 — `nullable`: "missing on purpose"
+### 4.3 Chapter 3 — `fxNullable`: "missing on purpose"
 
 Not every absence is an error. Three genuine spots, all currently written as
 `?.`/`??` ladders:
@@ -225,7 +225,7 @@ Not every absence is an error. Three genuine spots, all currently written as
 
    ```dart
    BudgetStatus? budgetStatusFor(LedgerData d, String categoryId, DateTime m) =>
-     nullable((r) {
+     fxNullable((r) {
        final limit    = r.bind(d.budgets[categoryId]);   // null → no status
        final category = r.bind(byId(d.categories, categoryId));
        r.ensure(limit > 0);
@@ -237,7 +237,7 @@ Not every absence is an error. Three genuine spots, all currently written as
    negative net; `r.ensure(…)` twice, no error value to report because the UI
    just hides the card.
 
-3. **`nullableAsync`** — `LedgerState.restoreLastCategory()`: reads the
+3. **`fxNullableAsync`** — `LedgerState.restoreLastCategory()`: reads the
    last-used category id from the box, resolves it against the live category
    list, and yields `null` if either step misses. Async because the box read
    is awaited.
@@ -285,7 +285,7 @@ function that returns every problem at once:
 ```dart
 // lib/logic/validate.dart
 EitherNel<FieldError, Entry> validateDraft(EntryDraft d, List<Category> known) =>
-  either<Nel<FieldError>, Entry>((r) => r.zipOrAccumulate5(
+  fxEither<Nel<FieldError>, Entry>((r) => r.zipOrAccumulate5(
     (fr) => vTitle(fr, d.title),
     (fr) => vType(fr, d.type),
     (fr) => vAmount(fr, d.amount, d.type),
@@ -357,7 +357,7 @@ switch (mode) {
 
 `rights()` / `lefts()` back the two count badges ("47 ok · 3 problems") when
 only one side is needed and allocating the pair would be waste. The top-level
-`rights` / `lefts` / `separateEither` / `sequenceEither` / `mapOrAccumulate`
+`rights` / `lefts` / `fxSeparateEither` / `fxSequenceEither` / `mapOrAccumulate`
 functions are used by `health.dart`, which works over plain `List`s coming out
 of the audit rules rather than over an `Fx` chain — both call styles appear in
 the app on purpose, because the lecture shows both.
@@ -369,7 +369,7 @@ the rest is fine". It becomes:
 ```dart
 Future<Either<Nel<BoxError>, LedgerData>> loadAll({…}) async {
   final boxes = fx(['entries', 'categories', 'rules', 'budgets']).toAsync()
-      .map((b) => delay(boxLatency, b))
+      .map((b) => fxDelay(boxLatency, b))
       .peek((b) => onLoaded?.call(b));
 
   // Report mode: every broken box, three at a time (the concurrent(n)
@@ -385,10 +385,10 @@ Future<Either<Nel<BoxError>, LedgerData>> loadAll({…}) async {
 - `mapOrAccumulateAsync` with `concurrency: 3` — the default path. Keeps the
   round-1 concurrency demo *and* gains fail-slow reporting; the loading screen
   shows a per-box ✓/✗ as each resolves.
-- `FxAsyncEitherOps.sequence()` / `sequenceEitherAsync` — the strict path,
+- `FxAsyncEitherOps.sequence()` / `fxSequenceEitherAsync` — the strict path,
   reachable from a toggle on the loading screen so the difference (stops
   pulling at the first `Left`) is observable in the box checklist.
-- `eitherAsync` — the outer scope of `LedgerState.load()`.
+- `fxEitherAsync` — the outer scope of `LedgerState.load()`.
 
 `LedgerState` gains `Nel<BoxError>? loadError`; `app_shell.dart`'s
 `_LoadingScreen` renders the `ErrorPanel` with a Retry button instead of
@@ -446,8 +446,8 @@ gets a test (`expect(() => …, throwsA(isA<RaiseLeakedError>()))`).
 | File | Change |
 | ---- | ------ |
 | `lib/logic/import.dart` | tuples → `Either<RowError, Entry>`; three strictness modes |
-| `lib/logic/budgets.dart` | `budgetStatusFor` via `nullable` |
-| `lib/logic/forecast.dart` | `runwayEstimate` via `nullable` |
+| `lib/logic/budgets.dart` | `budgetStatusFor` via `fxNullable` |
+| `lib/logic/forecast.dart` | `runwayEstimate` via `fxNullable` |
 | `lib/data/ledger_repository.dart` | `loadAll` → `Either<Nel<BoxError>, LedgerData>` |
 | `lib/state/ledger_state.dart` | `loadError`, `restoreLastCategory` |
 | `lib/ui/entry_form.dart` | `FormState.validate` → `validateDraft`; fail-fast toggle |
@@ -577,18 +577,18 @@ coverage is a goal, dropped if it ever reads as filler.
 | Member | Call site |
 | ------ | --------- |
 | `Raise.raise` | every validator in `validate.dart` |
-| `either` | `parseRow`, `validateDraft`, `auditLedger` |
-| `eitherAsync` | `LedgerState.load()` |
-| `foldRaise` | `errors.dart` — the app's own builder `issueOr<A>()`, folding a raise into the `(A?, LedgerError?)` record the widget layer prefers. The primitive is public precisely for this |
-| `foldRaiseAsync` | async twin of `issueOr`, used by `loadAll`'s partial-data path |
-| `nullable` | `budgetStatusFor`, `runwayEstimate` |
-| `nullableAsync` | `restoreLastCategory` |
+| `fxEither` | `parseRow`, `validateDraft`, `auditLedger` |
+| `fxEitherAsync` | `LedgerState.load()` |
+| `fxFoldRaise` | `errors.dart` — the app's own builder `issueOr<A>()`, folding a raise into the `(A?, LedgerError?)` record the widget layer prefers. The primitive is public precisely for this |
+| `fxFoldRaiseAsync` | async twin of `issueOr`, used by `loadAll`'s partial-data path |
+| `fxNullable` | `budgetStatusFor`, `runwayEstimate` |
+| `fxNullableAsync` | `restoreLastCategory` |
 | `SingletonRaise.bind` | `budgetStatusFor` — `r.bind(d.budgets[id])` |
 | `SingletonRaise.ensure` | `runwayEstimate` — `r.ensure(months.length >= 2)` |
 | `SingletonRaise.ensureNotNull` | `restoreLastCategory` |
 | `SingletonRaise.none` | `runwayEstimate` early exit on a non-negative net |
-| `catching` | `double.parse` / `int.parse` inside validators |
-| `catchingAsync` | Hive box read in `readBox` |
+| `fxCatching` | `double.parse` / `int.parse` inside validators |
+| `fxCatchingAsync` | Hive box read in `readBox` |
 | `RaiseOps.bind` | `parseRow` — binds the field-level `Either` |
 | `RaiseOps.bindAll` | import "Apply" — binds every row at once in strict mode |
 | `RaiseOps.ensure` | column-count / title / amount checks |
@@ -640,12 +640,12 @@ coverage is a goal, dropped if it ever reads as filler.
 | `FxEitherOps.rights()` | Health "ok count" badge |
 | `FxEitherOps.lefts()` | Health "problem count" badge |
 | `FxAccumulateOps.mapOrAccumulate` | import Report mode |
-| `separateEither` (top-level) | `health.dart` over a plain `List` |
-| `sequenceEither` (top-level) | `health.dart` strict contrast card |
+| `fxSeparateEither` (top-level) | `health.dart` over a plain `List` |
+| `fxSequenceEither` (top-level) | `health.dart` strict contrast card |
 | `rights` / `lefts` (top-level) | `health.dart` contrast card |
 | `mapOrAccumulate` (top-level) | `health.dart` contrast card — three terminals, one input, side by side |
 | `FxAsyncEitherOps.sequence()` | `loadAll` strict path (loading-screen toggle) |
-| `sequenceEitherAsync` | same, called directly in the strict branch |
+| `fxSequenceEitherAsync` | same, called directly in the strict branch |
 | `FxAsyncAccumulateOps.mapOrAccumulate` | `loadAll` default path, `concurrency: 3` |
 | `mapOrAccumulateAsync` | the `concurrency:` argument is passed here explicitly in `readAllBoxes` |
 
@@ -686,7 +686,7 @@ Same protocol as `plan.md`: each round is one commit series, 10 feedbacks +
   rewrite with the fail-fast/fail-slow toggle, `error_panel.dart`,
   `zipOrAccumulate2/3/4` sites. Chapters 4, 5.
 - **Round 12 — async & nullable.** `loadAll`, `LedgerState.loadError`,
-  loading-screen error state and strict toggle, `nullable` sites.
+  loading-screen error state and strict toggle, `fxNullable` sites.
   Chapters 3, 6 (async half).
 - **Round 13 — the Health tab & explainers.** `health_screen.dart`,
   `health.dart`, the `PipelineExplanation` extensions, the typed-error link

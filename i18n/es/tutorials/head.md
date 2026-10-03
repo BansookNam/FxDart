@@ -59,7 +59,7 @@ nextLabel: last
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="last.html"><code>last</code></a> — la misma idea desde el otro extremo ·
-    <a href="nth.html"><code>nth</code></a> — extrae cualquier índice ·
+    <a href="nth.html"><code>fxNth</code></a> — extrae cualquier índice ·
     <a href="find.html"><code>find</code></a> — la primera coincidencia con un predicado ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — comprobación de vacío basada en el valor
   </div>

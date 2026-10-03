@@ -9,7 +9,7 @@ void main() {
   group('debounce', () {
     test('should delay the function call', () async {
       var callCount = 0;
-      final debounced = debounce<Object?>(
+      final debounced = fxDebounce<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 60),
       );
@@ -26,7 +26,7 @@ void main() {
 
     test('should reset delay if called again before wait time', () async {
       var callCount = 0;
-      final debounced = debounce<Object?>(
+      final debounced = fxDebounce<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 60),
       );
@@ -44,7 +44,7 @@ void main() {
 
     test('should call immediately if leading is true', () async {
       var callCount = 0;
-      final debounced = debounce<Object?>(
+      final debounced = fxDebounce<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 60),
         leading: true,
@@ -65,7 +65,7 @@ void main() {
 
     test('should use latest arguments', () async {
       final received = <int>[];
-      final debounced = debounce<int>(
+      final debounced = fxDebounce<int>(
         received.add,
         const Duration(milliseconds: 60),
       );
@@ -80,7 +80,7 @@ void main() {
 
     test('should cancel the delayed execution', () async {
       var callCount = 0;
-      final debounced = debounce<Object?>(
+      final debounced = fxDebounce<Object?>(
         (_) => callCount++,
         const Duration(milliseconds: 60),
       );

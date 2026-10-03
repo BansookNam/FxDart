@@ -3,7 +3,7 @@ import 'package:fxdart/fxdart.dart';
 Future<void> main() async {
   // fromStream() lifts any Stream into an FxAsyncIterable.
   final stream = Stream.fromIterable([1, 2, 3, 4, 5]);
-  final doubled = await toListAsync(mapAsync((a) => a * 2, fromStream(stream)));
+  final doubled = await fxToListAsync(fxMapAsync((a) => a * 2, fxFromStream(stream)));
   print(doubled); // [2, 4, 6, 8, 10]
 
   // fxStream() does the same but hands back a chainable FxAsync directly.

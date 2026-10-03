@@ -2,7 +2,7 @@
 slug: throwIf
 title: throwIf — FxDart 101
 description: FxDart throwIf tutorial: throw conditionally, otherwise pass the value through, with a live playground.
-heading: <code>throwIf</code>
+heading: <code>fxThrowIf</code>
 section: 10
 crumb: throwIf
 prev: throwError.html
@@ -16,7 +16,7 @@ nextLabel: cases
 
   <h2>Lecture</h2>
   <p>
-    <code>throwIf(predicate, toError, value)</code> is a guard clause you can
+    <code>fxThrowIf(predicate, toError, value)</code> is a guard clause you can
     drop mid-expression: if <code>predicate(value)</code> is true, it throws
     <code>toError(value)</code>; otherwise it hands <code>value</code> back
     unchanged. That makes it convenient inside a <code>map</code> callback,
@@ -24,7 +24,7 @@ nextLabel: cases
     pipeline and fail loudly the moment one is invalid.
   </p>
   <p>
-    It's essentially <a href="when.html"><code>when</code></a> where the
+    It's essentially <a href="when.html"><code>fxWhen</code></a> where the
     "then" branch always throws instead of returning a value — so wrap any
     call site in <code>try</code>/<code>catch</code> to observe or recover
     from the failure.
@@ -41,14 +41,14 @@ nextLabel: cases
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>throwIf</code> to guard against zero stock while
+  <p>Exercise: use <code>fxThrowIf</code> to guard against zero stock while
     summing this inventory.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="throwError.html"><code>throwError</code></a> — a standalone throwing function, no condition ·
-    <a href="when.html"><code>when</code></a> — substitute a value instead of throwing ·
-    <a href="cases.html"><code>cases</code></a> — dispatch across multiple predicates ·
-    <a href="add.html"><code>add</code></a> — used above as the reducer
+    <a href="throwError.html"><code>fxThrowError</code></a> — a standalone throwing function, no condition ·
+    <a href="when.html"><code>fxWhen</code></a> — substitute a value instead of throwing ·
+    <a href="cases.html"><code>fxCases</code></a> — dispatch across multiple predicates ·
+    <a href="add.html"><code>fxAdd</code></a> — used above as the reducer
   </div>

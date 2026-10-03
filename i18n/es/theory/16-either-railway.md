@@ -104,7 +104,7 @@ Either<RangeError2, int> inStock(int n) =>
 
 void main() {
   // mapLeft lifts both into the pipeline's own error type.
-  Either<OrderError, int> order(String raw) => either((r) {
+  Either<OrderError, int> order(String raw) => fxEither((r) {
         final n = r.bind(
             parse(raw).mapLeft((e) => BadInput('$e')));
         final ok = r.bind(
@@ -186,7 +186,7 @@ void main() {
   print(fx(rows).map(parseRow).sequence());
 
   // Everything that failed, and everything that did not.
-  final (errors, values) = separateEither(rows.map(parseRow));
+  final (errors, values) = fxSeparateEither(rows.map(parseRow));
   print('imported ${values.length}, rejected: $errors');
 
   // Keep going, but report every reason at the end.
@@ -231,7 +231,7 @@ interpolación es una excepción disfrazada de tipo con pasos extra.
 3. Tienes `Either<A, T>` de un módulo y `Either<B, T>` de otro, y quien llama
    quiere `Either<C, T>`. Esboza las tres llamadas a `mapLeft` y di dónde
    pertenecen en una aplicación por capas.
-4. `separateEither` devuelve `(errors, values)`. ¿Por qué ese orden, y qué
+4. `fxSeparateEither` devuelve `(errors, values)`. ¿Por qué ese orden, y qué
    consecuencia tiene la elección para leer código de un vistazo?
 
 ## Soluciones

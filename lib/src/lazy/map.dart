@@ -16,9 +16,9 @@ import 'list_range.dart';
 /// Port of FxTS `map` (sync).
 ///
 /// ```dart
-/// map((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
+/// fxMap((a) => a + 10, [1, 2, 3, 4]); // (11, 12, 13, 14)
 /// ```
-Iterable<B> map<A, B>(B Function(A a) f, Iterable<A> iterable) {
+Iterable<B> fxMap<A, B>(B Function(A a) f, Iterable<A> iterable) {
   // Resolved once, when the chain is built — never per element. Cast, not
   // promotion: FxMapFusable is not a subtype of Iterable, so the type test
   // alone does not promote (the shape `uniqBy` uses for FxUniqByFusable).
@@ -97,7 +97,7 @@ class _MapIterable<A, B> extends Iterable<B> implements FxUniqFusable<B> {
   }
 }
 
-/// [map] over a `List`, walked by index.
+/// [fxMap] over a `List`, walked by index.
 ///
 /// Rejected in 0.8.0 on the strength of a before/after `results.json` diff
 /// that showed a −3.8% median; that comparison was later shown to be unable
@@ -139,7 +139,7 @@ class _MapIterator<A, B> implements Iterator<B> {
   }
 }
 
-/// `map(f, source)` followed by `uniq()`, as one stage — see [FxUniqFusable].
+/// `fxMap(f, source)` followed by `uniq()`, as one stage — see [FxUniqFusable].
 ///
 /// Lazily equivalent to both halves it replaces: [_f] runs once per element
 /// consumed, the seen set is per-iteration, and a downstream `take` still cuts
@@ -208,7 +208,7 @@ class _MapUniqIterator<A, B> implements Iterator<B> {
   }
 }
 
-/// Like [map], but the callback also receives the element's 0-based
+/// Like [fxMap], but the callback also receives the element's 0-based
 /// position.
 ///
 /// Not an FxTS port. `zipWithIndex` + `map` over the pair already expressed
@@ -277,18 +277,18 @@ FxAsyncIterable<B> mapWithIndexAsync<A, B>(
   // same shape as [zipWithIndexAsync].
   return dispatchAsync(iterable, (source) {
     var i = 0;
-    return mapAsync((A a) => f(a, i++), source).iterator;
+    return fxMapAsync((A a) => f(a, i++), source).iterator;
   });
 }
 
-/// Async counterpart of [map]. The callback may return a [Future].
+/// Async counterpart of [fxMap]. The callback may return a [Future].
 ///
 /// ```dart
-/// await toListAsync(mapAsync((a) async => a + 10, toAsync([1, 2, 3])));
+/// await fxToListAsync(fxMapAsync((a) async => a + 10, fxToAsync([1, 2, 3])));
 /// // [11, 12, 13]
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapAsync<A, B>(
+FxAsyncIterable<B> fxMapAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
@@ -334,41 +334,41 @@ FxAsyncIterable<B> _mapAsyncLegacy<A, B>(
   });
 }
 
-/// Identical to [map], but intended for side effects by convention.
-Iterable<B> mapEffect<A, B>(B Function(A a) f, Iterable<A> iterable) =>
-    map(f, iterable);
+/// Identical to [fxMap], but intended for side effects by convention.
+Iterable<B> fxMapEffect<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+    fxMap(f, iterable);
 
-/// Identical to [mapAsync], but intended for side effects by convention.
+/// Identical to [fxMapAsync], but intended for side effects by convention.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapEffectAsync<A, B>(
+FxAsyncIterable<B> fxMapEffectAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => mapAsync(f, iterable);
+) => fxMapAsync(f, iterable);
 
 /// Maps [f] over [iterable] with up to [concurrency] elements in flight at
 /// once, yielding results in source order — the pre-combined form of
-/// `toAsync` → `mapAsync` → `concurrentAsync`.
+/// `toAsync` → `fxMapAsync` → `fxConcurrentAsync`.
 ///
 /// Dart-native addition (FxTS pipes `concurrent` as a separate step).
 ///
 /// ```dart
-/// await toListAsync(mapConcurrent(3, fetchProfile, users));
+/// await fxToListAsync(fxMapConcurrent(3, fetchProfile, users));
 /// ```
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapConcurrent<A, B>(
+FxAsyncIterable<B> fxMapConcurrent<A, B>(
   int concurrency,
   FutureOr<B> Function(A a) f,
   Iterable<A> iterable,
-) => concurrentAsync(concurrency, mapAsync(f, toAsync(iterable)));
+) => fxConcurrentAsync(concurrency, fxMapAsync(f, fxToAsync(iterable)));
 
-/// Async-source counterpart of [mapConcurrent] — the pre-combined form of
-/// `mapAsync` → `concurrentAsync`.
+/// Async-source counterpart of [fxMapConcurrent] — the pre-combined form of
+/// `fxMapAsync` → `fxConcurrentAsync`.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapConcurrentAsync<A, B>(
+FxAsyncIterable<B> fxMapConcurrentAsync<A, B>(
   int concurrency,
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => concurrentAsync(concurrency, mapAsync(f, iterable));
+) => fxConcurrentAsync(concurrency, fxMapAsync(f, iterable));
 
 /// Lazily pairs each element with the value [f] derives from it — the input
 /// stays beside its result, so no hand-built `(x, f(x))` records.
@@ -376,9 +376,9 @@ FxAsyncIterable<B> mapConcurrentAsync<A, B>(
 /// Dart-native addition (no FxTS counterpart).
 ///
 /// ```dart
-/// attach((w) => w.length, ['a', 'bb']); // (('a', 1), ('bb', 2))
+/// fxAttach((w) => w.length, ['a', 'bb']); // (('a', 1), ('bb', 2))
 /// ```
-Iterable<(A, B)> attach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
+Iterable<(A, B)> fxAttach<A, B>(B Function(A a) f, Iterable<A> iterable) =>
     _AttachIterable(f, iterable);
 
 class _AttachIterable<A, B> extends Iterable<(A, B)> {
@@ -406,19 +406,19 @@ class _AttachIterator<A, B> implements Iterator<(A, B)> {
   }
 }
 
-/// Async counterpart of [attach]. Built on [mapAsync], so overlapping
+/// Async counterpart of [fxAttach]. Built on [fxMapAsync], so overlapping
 /// `next()` calls start overlapping upstream pulls — it composes with
-/// `concurrentAsync` like any other async operator.
+/// `fxConcurrentAsync` like any other async operator.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<(A, B)> attachAsync<A, B>(
+FxAsyncIterable<(A, B)> fxAttachAsync<A, B>(
   FutureOr<B> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => mapAsync((A a) async => (a, await f(a)), iterable);
+) => fxMapAsync((A a) async => (a, await f(a)), iterable);
 
 /// Iterates over each element, applying [f] without changing the values.
 ///
 /// Port of FxTS `peek`.
-Iterable<A> peek<A>(void Function(A a) f, Iterable<A> iterable) =>
+Iterable<A> fxPeek<A>(void Function(A a) f, Iterable<A> iterable) =>
     _PeekIterable(f, iterable);
 
 class _PeekIterable<A> extends Iterable<A> {
@@ -447,16 +447,16 @@ class _PeekIterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [peek].
+/// Async counterpart of [fxPeek].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> peekAsync<A>(
+FxAsyncIterable<A> fxPeekAsync<A>(
   FutureOr<void> Function(A a) f,
   FxAsyncIterable<A> iterable,
-) => mapAsync((A a) {
+) => fxMapAsync((A a) {
   // then/bare, not `async`+`await`: an `async` wrapper allocates a Future and
   // suspends once per element even when [f] is synchronous — which `peek`
   // usually is, since its whole job is a side effect. Same shape as
-  // `uniqByAsync`; 0.7.4 measured the async-function form at 1.4x the
+  // `fxUniqByAsync`; 0.7.4 measured the async-function form at 1.4x the
   // then/bare form for synchronous callbacks.
   final r = f(a);
   if (r is Future) return r.then((_) => a);
@@ -465,16 +465,16 @@ FxAsyncIterable<A> peekAsync<A>(
 
 /// Extracts the value under [key] from each map in [iterable].
 ///
-/// Port of FxTS `pluck`.
-Iterable<V?> pluck<K, V>(K key, Iterable<Map<K, V>> iterable) =>
-    map((Map<K, V> a) => a[key], iterable);
+/// Port of FxTS `fxPluck`.
+Iterable<V?> fxPluck<K, V>(K key, Iterable<Map<K, V>> iterable) =>
+    fxMap((Map<K, V> a) => a[key], iterable);
 
-/// Async counterpart of [pluck].
+/// Async counterpart of [fxPluck].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<V?> pluckAsync<K, V>(
+FxAsyncIterable<V?> fxPluckAsync<K, V>(
   K key,
   FxAsyncIterable<Map<K, V>> iterable,
-) => mapAsync((Map<K, V> a) => a[key], iterable);
+) => fxMapAsync((Map<K, V> a) => a[key], iterable);
 
 bool _isFlatAble(Object? a) => a is Iterable && a is! String;
 
@@ -483,15 +483,15 @@ bool _isFlatAble(Object? a) => a is Iterable && a is! String;
 ///
 /// Nested element types cannot be expressed in Dart's type system the way
 /// TypeScript's `DeepFlat` does, so this returns `Iterable<dynamic>`.
-/// Prefer [flatMap] when a typed result is possible.
+/// Prefer [fxFlatMap] when a typed result is possible.
 ///
 /// Port of FxTS `flat`.
 ///
 /// ```dart
-/// flat([1, [2, 3], [4, [5]]]);    // (1, 2, 3, 4, [5])
-/// flat([1, [2, [3]]], 2);         // (1, 2, 3)
+/// fxFlat([1, [2, 3], [4, [5]]]);    // (1, 2, 3, 4, [5])
+/// fxFlat([1, [2, [3]]], 2);         // (1, 2, 3)
 /// ```
-Iterable<dynamic> flat(Iterable<dynamic> iterable, [int depth = 1]) =>
+Iterable<dynamic> fxFlat(Iterable<dynamic> iterable, [int depth = 1]) =>
     _FlatIterable(iterable, depth);
 
 class _FlatIterable extends Iterable<dynamic> {
@@ -539,10 +539,10 @@ class _FlatIterator implements Iterator<dynamic> {
   }
 }
 
-/// Async counterpart of [flat]. Only *sync* nested iterables are flattened,
+/// Async counterpart of [fxFlat]. Only *sync* nested iterables are flattened,
 /// mirroring FxTS behavior.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<dynamic> flatAsync(
+FxAsyncIterable<dynamic> fxFlatAsync(
   FxAsyncIterable<dynamic> iterable, [
   int depth = 1,
 ]) {
@@ -582,8 +582,10 @@ FxAsyncIterable<dynamic> flatAsync(
 /// Unlike FxTS `flatMap` (which flattens any mix of values one level), the
 /// Dart port requires the callback to return an `Iterable<B>` so the result
 /// can stay typed — same contract as `Iterable.expand`.
-Iterable<B> flatMap<A, B>(Iterable<B> Function(A a) f, Iterable<A> iterable) =>
-    _FlatMapIterable(f, iterable);
+Iterable<B> fxFlatMap<A, B>(
+  Iterable<B> Function(A a) f,
+  Iterable<A> iterable,
+) => _FlatMapIterable(f, iterable);
 
 class _FlatMapIterable<A, B> extends Iterable<B> {
   _FlatMapIterable(this._f, this._source);
@@ -617,7 +619,7 @@ class _FlatMapIterator<A, B> implements Iterator<B> {
   }
 }
 
-/// Like [flatMap], but the callback also receives the source element's
+/// Like [fxFlatMap], but the callback also receives the source element's
 /// 0-based position. The index counts *source* elements, not emitted ones.
 ///
 /// ```dart
@@ -669,20 +671,20 @@ FxAsyncIterable<B> flatMapWithIndexAsync<A, B>(
 ) {
   return dispatchAsync(iterable, (source) {
     var i = 0;
-    return flatMapAsync((A a) => f(a, i++), source).iterator;
+    return fxFlatMapAsync((A a) => f(a, i++), source).iterator;
   });
 }
 
-/// Async counterpart of [flatMap].
+/// Async counterpart of [fxFlatMap].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> flatMapAsync<A, B>(
+FxAsyncIterable<B> fxFlatMapAsync<A, B>(
   FutureOr<Iterable<B>> Function(A a) f,
   FxAsyncIterable<A> iterable,
 ) {
   return DelegateAsyncIterable(() => _FlatMapAsyncIterator<A, B>(f, iterable));
 }
 
-/// The [flatMapAsync] iterator: elements of an already-open inner iterable
+/// The [fxFlatMapAsync] iterator: elements of an already-open inner iterable
 /// are served synchronously via the fast-pull path; a Concurrent marker on a
 /// fresh iterator falls back to [_flatMapAsyncLegacy]'s dispatch layering.
 class _FlatMapAsyncIterator<A, B>
@@ -807,9 +809,9 @@ FxAsyncIterable<B> _flatMapAsyncLegacy<A, B>(
 /// Port of FxTS `scan` (seeded form).
 ///
 /// ```dart
-/// scan((acc, a) => acc + a, 10, [1, 2, 3]); // (10, 11, 13, 16)
+/// fxScan((acc, a) => acc + a, 10, [1, 2, 3]); // (10, 11, 13, 16)
 /// ```
-Iterable<B> scan<A, B>(
+Iterable<B> fxScan<A, B>(
   B Function(B acc, A a) f,
   B seed,
   Iterable<A> iterable,
@@ -871,7 +873,7 @@ class _ScanIterator<A, B> implements Iterator<B> {
   }
 }
 
-/// `scan(f, seed, source)` followed by `map(g)`, as one stage — see
+/// `fxScan(f, seed, source)` followed by `map(g)`, as one stage — see
 /// [FxMapFusable].
 ///
 /// The accumulator step and [_g] run inside a single `moveNext` (or a single
@@ -906,7 +908,7 @@ class _ScanMapIterable<A, B, C> extends Iterable<C> {
   ///
   /// A `toList` consumes everything anyway, so the source shape is resolved
   /// once here rather than pulled: a [FxListRange] is walked by index and a
-  /// [FxIntRange] (what `range()` produces) by counter, leaving [_f] and [_g]
+  /// [FxIntRange] (what `fxRange()` produces) by counter, leaving [_f] and [_g]
   /// as the only calls per element. [_f], [_g], the accumulator and the bounds
   /// are copied into locals first, so none of them is reloaded through the
   /// receiver on every iteration (see [_MapUniqIterable.toList]).
@@ -989,11 +991,11 @@ class _ScanMapIterator<A, B, C> implements Iterator<C> {
   }
 }
 
-/// [scan] without a seed: the first element is used as the seed.
+/// [fxScan] without a seed: the first element is used as the seed.
 /// Returns an empty iterable when [iterable] is empty.
 ///
 /// Port of FxTS `scan(f, iterable)`.
-Iterable<A> scan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
+Iterable<A> fxScan1<A>(A Function(A acc, A a) f, Iterable<A> iterable) =>
     _Scan1Iterable(f, iterable);
 
 class _Scan1Iterable<A> extends Iterable<A> {
@@ -1039,9 +1041,9 @@ class _Scan1Iterator<A> implements Iterator<A> {
   }
 }
 
-/// Async counterpart of [scan].
+/// Async counterpart of [fxScan].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> scanAsync<A, B>(
+FxAsyncIterable<B> fxScanAsync<A, B>(
   FutureOr<B> Function(B acc, A a) f,
   FutureOr<B> seed,
   FxAsyncIterable<A> iterable,
@@ -1105,9 +1107,9 @@ FxAsyncIterable<B> _scanAsyncLegacy<A, B>(
   });
 }
 
-/// Async counterpart of [scan1].
+/// Async counterpart of [fxScan1].
 @pragma('vm:prefer-inline')
-FxAsyncIterable<A> scan1Async<A>(
+FxAsyncIterable<A> fxScan1Async<A>(
   FutureOr<A> Function(A acc, A a) f,
   FxAsyncIterable<A> iterable,
 ) {
@@ -1140,25 +1142,25 @@ FxAsyncIterable<A> scan1Async<A>(
 /// Folds [seed] into each value with [f] and emits every intermediate
 /// accumulation — n values in, n values out.
 ///
-/// This is [scan] without the seed in the output. [scan] and Kotlin's
-/// `runningFold` emit `seed` first and so produce n+1 values; [mapAccum],
+/// This is [fxScan] without the seed in the output. [fxScan] and Kotlin's
+/// `runningFold` emit `seed` first and so produce n+1 values; [fxMapAccum],
 /// Rust's `Iterator::scan`, Haskell's `mapAccumL` and RxDart's `scan`
-/// produce n. Use [scan] when the starting state is part of the answer
-/// (a ledger's opening balance), [mapAccum] when it is only the state the
+/// produce n. Use [fxScan] when the starting state is part of the answer
+/// (a ledger's opening balance), [fxMapAccum] when it is only the state the
 /// first element folds into — the case that otherwise ends in a trailing
 /// `.drop(1)`.
 ///
 /// [f] runs exactly once per element, in order, and the accumulator is
 /// per-iteration: iterating twice starts from [seed] both times.
 ///
-/// Argument order matches [scan] deliberately — `scan` to `mapAccum` is a
+/// Argument order matches [fxScan] deliberately — `scan` to `mapAccum` is a
 /// one-word edit.
 ///
 /// ```dart
-/// mapAccum((acc, a) => acc + a, 0, [1, 2, 3]); // (1, 3, 6)
-/// scan((acc, a) => acc + a, 0, [1, 2, 3]); //     (0, 1, 3, 6)
+/// fxMapAccum((acc, a) => acc + a, 0, [1, 2, 3]); // (1, 3, 6)
+/// fxScan((acc, a) => acc + a, 0, [1, 2, 3]); //     (0, 1, 3, 6)
 /// ```
-Iterable<B> mapAccum<A, B>(
+Iterable<B> fxMapAccum<A, B>(
   B Function(B acc, A a) f,
   B seed,
   Iterable<A> iterable,
@@ -1221,10 +1223,10 @@ class _MapAccumIterator<A, B> implements Iterator<B> {
   }
 }
 
-/// Async counterpart of [mapAccum]. [seed] and [f] may each return a
+/// Async counterpart of [fxMapAccum]. [seed] and [f] may each return a
 /// [Future]; values are folded in source order.
 @pragma('vm:prefer-inline')
-FxAsyncIterable<B> mapAccumAsync<A, B>(
+FxAsyncIterable<B> fxMapAccumAsync<A, B>(
   FutureOr<B> Function(B acc, A a) f,
   FutureOr<B> seed,
   FxAsyncIterable<A> iterable,

@@ -1,0 +1,2485 @@
+# Data-driven fixes: `dart fix --apply` migrates code written against
+# fxdart < 0.9.0, where short top-level functions had no `fx` prefix.
+# See CHANGELOG.md, 0.9.0. Generated from the 0.9.0 rename map.
+version: 1
+transforms:
+  - title: "Rename to 'fxAdd'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'add'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAdd'
+  - title: "Rename to 'fxAlways'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'always'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAlways'
+  - title: "Rename to 'fxAny'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'any'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAny'
+  - title: "Rename to 'fxAnyAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'anyAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAnyAsync'
+  - title: "Rename to 'fxAppend'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'append'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAppend'
+  - title: "Rename to 'fxAppendAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'appendAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAppendAsync'
+  - title: "Rename to 'fxApply'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'apply'
+    changes:
+      - kind: 'rename'
+        newName: 'fxApply'
+  - title: "Rename to 'fxAsyncEmpty'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'asyncEmpty'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAsyncEmpty'
+  - title: "Rename to 'fxAttach'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'attach'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAttach'
+  - title: "Rename to 'fxAttachAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'attachAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAttachAsync'
+  - title: "Rename to 'fxAverage'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'average'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAverage'
+  - title: "Rename to 'fxAverageAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'averageAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAverageAsync'
+  - title: "Rename to 'fxAverageBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'averageBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAverageBy'
+  - title: "Rename to 'fxAverageByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'averageByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxAverageByAsync'
+  - title: "Rename to 'fxBottomBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'bottomBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxBottomBy'
+  - title: "Rename to 'fxBottomByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'bottomByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxBottomByAsync'
+  - title: "Rename to 'fxCases'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'cases'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCases'
+  - title: "Rename to 'fxCatching'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'catching'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCatching'
+  - title: "Rename to 'fxCatchingAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'catchingAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCatchingAsync'
+  - title: "Rename to 'fxChunk'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'chunk'
+    changes:
+      - kind: 'rename'
+        newName: 'fxChunk'
+  - title: "Rename to 'fxChunkAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'chunkAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxChunkAsync'
+  - title: "Rename to 'fxCombine'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'combine'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCombine'
+  - title: "Rename to 'fxCompact'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'compact'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCompact'
+  - title: "Rename to 'fxCompactAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'compactAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCompactAsync'
+  - title: "Rename to 'fxCompactObject'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'compactObject'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCompactObject'
+  - title: "Rename to 'fxCompress'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'compress'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCompress'
+  - title: "Rename to 'fxCompressAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'compressAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCompressAsync'
+  - title: "Rename to 'fxConcat'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'concat'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConcat'
+  - title: "Rename to 'fxConcatAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'concatAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConcatAsync'
+  - title: "Rename to 'fxConcatEager'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'concatEager'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConcatEager'
+  - title: "Rename to 'fxConcurrentAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'concurrentAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConcurrentAsync'
+  - title: "Rename to 'fxConcurrentPoolAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'concurrentPoolAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConcurrentPoolAsync'
+  - title: "Rename to 'fxConsume'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'consume'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConsume'
+  - title: "Rename to 'fxConsumeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'consumeAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxConsumeAsync'
+  - title: "Rename to 'fxCount'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'count'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCount'
+  - title: "Rename to 'fxCountAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'countAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCountAsync'
+  - title: "Rename to 'fxCountBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'countBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCountBy'
+  - title: "Rename to 'fxCountByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'countByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCountByAsync'
+  - title: "Rename to 'fxCountWhere'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'countWhere'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCountWhere'
+  - title: "Rename to 'fxCountWhereAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'countWhereAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCountWhereAsync'
+  - title: "Rename to 'fxCurry'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'curry'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCurry'
+  - title: "Rename to 'fxCycle'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'cycle'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCycle'
+  - title: "Rename to 'fxCycleAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'cycleAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxCycleAsync'
+  - title: "Rename to 'fxDebounce'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'debounce'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDebounce'
+  - title: "Rename to 'fxDelay'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'delay'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDelay'
+  - title: "Rename to 'fxDifference'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'difference'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDifference'
+  - title: "Rename to 'fxDifferenceAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'differenceAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDifferenceAsync'
+  - title: "Rename to 'fxDifferenceBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'differenceBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDifferenceBy'
+  - title: "Rename to 'fxDifferenceByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'differenceByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDifferenceByAsync'
+  - title: "Rename to 'fxDistinct'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'distinct'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDistinct'
+  - title: "Rename to 'fxDistinctAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'distinctAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDistinctAsync'
+  - title: "Rename to 'fxDistinctBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'distinctBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDistinctBy'
+  - title: "Rename to 'fxDistinctByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'distinctByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDistinctByAsync'
+  - title: "Rename to 'fxDrop'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'drop'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDrop'
+  - title: "Rename to 'fxDropAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropAsync'
+  - title: "Rename to 'fxDropRight'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropRight'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropRight'
+  - title: "Rename to 'fxDropRightAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropRightAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropRightAsync'
+  - title: "Rename to 'fxDropUntil'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropUntil'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropUntil'
+  - title: "Rename to 'fxDropUntilAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropUntilAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropUntilAsync'
+  - title: "Rename to 'fxDropWhile'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropWhile'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropWhile'
+  - title: "Rename to 'fxDropWhileAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'dropWhileAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxDropWhileAsync'
+  - title: "Rename to 'fxEach'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'each'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEach'
+  - title: "Rename to 'fxEachAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'eachAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEachAsync'
+  - title: "Rename to 'fxEither'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'either'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEither'
+  - title: "Rename to 'fxEitherAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'eitherAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEitherAsync'
+  - title: "Rename to 'fxEitherCatching'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'eitherCatching'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEitherCatching'
+  - title: "Rename to 'fxEitherCatchingAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'eitherCatchingAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEitherCatchingAsync'
+  - title: "Rename to 'fxEntries'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'entries'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEntries'
+  - title: "Rename to 'fxEvery'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'every'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEvery'
+  - title: "Rename to 'fxEveryAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'everyAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEveryAsync'
+  - title: "Rename to 'fxEvolve'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'evolve'
+    changes:
+      - kind: 'rename'
+        newName: 'fxEvolve'
+  - title: "Rename to 'fxExpand'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'expand'
+    changes:
+      - kind: 'rename'
+        newName: 'fxExpand'
+  - title: "Rename to 'fxExpandAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'expandAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxExpandAsync'
+  - title: "Rename to 'fxFilter'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'filter'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFilter'
+  - title: "Rename to 'fxFilterAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'filterAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFilterAsync'
+  - title: "Rename to 'fxFind'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'find'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFind'
+  - title: "Rename to 'fxFindAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'findAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFindAsync'
+  - title: "Rename to 'fxFindIndex'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'findIndex'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFindIndex'
+  - title: "Rename to 'fxFindIndexAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'findIndexAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFindIndexAsync'
+  - title: "Rename to 'fxFlat'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flat'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlat'
+  - title: "Rename to 'fxFlatAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flatAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlatAsync'
+  - title: "Rename to 'fxFlatMap'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flatMap'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlatMap'
+  - title: "Rename to 'fxFlatMapAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flatMapAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlatMapAsync'
+  - title: "Rename to 'fxFlattened'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flattened'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlattened'
+  - title: "Rename to 'fxFlattenedAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'flattenedAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFlattenedAsync'
+  - title: "Rename to 'fxFold'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'fold'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFold'
+  - title: "Rename to 'fxFoldAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldAsync'
+  - title: "Rename to 'fxFoldBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldBy'
+  - title: "Rename to 'fxFoldByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldByAsync'
+  - title: "Rename to 'fxFoldRaise'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldRaise'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldRaise'
+  - title: "Rename to 'fxFoldRaiseAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldRaiseAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldRaiseAsync'
+  - title: "Rename to 'fxFoldRight'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldRight'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldRight'
+  - title: "Rename to 'fxFoldRightAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'foldRightAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFoldRightAsync'
+  - title: "Rename to 'fxForEach'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'forEach'
+    changes:
+      - kind: 'rename'
+        newName: 'fxForEach'
+  - title: "Rename to 'fxForEachAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'forEachAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxForEachAsync'
+  - title: "Rename to 'fxFork'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'fork'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFork'
+  - title: "Rename to 'fxForkAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'forkAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxForkAsync'
+  - title: "Rename to 'fxFromEntries'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'fromEntries'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFromEntries'
+  - title: "Rename to 'fxFromStream'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'fromStream'
+    changes:
+      - kind: 'rename'
+        newName: 'fxFromStream'
+  - title: "Rename to 'fxGroupBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'groupBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGroupBy'
+  - title: "Rename to 'fxGroupByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'groupByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGroupByAsync'
+  - title: "Rename to 'fxGroupedBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'groupedBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGroupedBy'
+  - title: "Rename to 'fxGroupedByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'groupedByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGroupedByAsync'
+  - title: "Rename to 'fxGt'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'gt'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGt'
+  - title: "Rename to 'fxGte'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'gte'
+    changes:
+      - kind: 'rename'
+        newName: 'fxGte'
+  - title: "Rename to 'fxHead'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'head'
+    changes:
+      - kind: 'rename'
+        newName: 'fxHead'
+  - title: "Rename to 'fxHeadAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'headAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxHeadAsync'
+  - title: "Rename to 'fxIdentity'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'identity'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIdentity'
+  - title: "Rename to 'fxIfEmpty'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'ifEmpty'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIfEmpty'
+  - title: "Rename to 'fxIfEmptyAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'ifEmptyAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIfEmptyAsync'
+  - title: "Rename to 'fxIncludes'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'includes'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIncludes'
+  - title: "Rename to 'fxIncludesAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'includesAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIncludesAsync'
+  - title: "Rename to 'fxIndexBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexBy'
+  - title: "Rename to 'fxIndexByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexByAsync'
+  - title: "Rename to 'fxIndexed'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexed'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexed'
+  - title: "Rename to 'fxIndexedAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexedAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexedAsync'
+  - title: "Rename to 'fxIndexWhere'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexWhere'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexWhere'
+  - title: "Rename to 'fxIndexWhereAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'indexWhereAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIndexWhereAsync'
+  - title: "Rename to 'fxIntersection'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'intersection'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIntersection'
+  - title: "Rename to 'fxIntersectionAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'intersectionAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIntersectionAsync'
+  - title: "Rename to 'fxIntersectionBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'intersectionBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIntersectionBy'
+  - title: "Rename to 'fxIntersectionByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'intersectionByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIntersectionByAsync'
+  - title: "Rename to 'fxIsArray'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isArray'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsArray'
+  - title: "Rename to 'fxIsBool'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isBool'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsBool'
+  - title: "Rename to 'fxIsBoolean'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isBoolean'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsBoolean'
+  - title: "Rename to 'fxIsDate'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isDate'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsDate'
+  - title: "Rename to 'fxIsEmpty'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isEmpty'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsEmpty'
+  - title: "Rename to 'fxIsList'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isList'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsList'
+  - title: "Rename to 'fxIsMap'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isMap'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsMap'
+  - title: "Rename to 'fxIsMatch'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isMatch'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsMatch'
+  - title: "Rename to 'fxIsNil'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isNil'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsNil'
+  - title: "Rename to 'fxIsNull'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isNull'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsNull'
+  - title: "Rename to 'fxIsNum'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isNum'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsNum'
+  - title: "Rename to 'fxIsNumber'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isNumber'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsNumber'
+  - title: "Rename to 'fxIsObject'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isObject'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsObject'
+  - title: "Rename to 'fxIsString'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isString'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsString'
+  - title: "Rename to 'fxIsUndefined'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'isUndefined'
+    changes:
+      - kind: 'rename'
+        newName: 'fxIsUndefined'
+  - title: "Rename to 'fxJoin'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'join'
+    changes:
+      - kind: 'rename'
+        newName: 'fxJoin'
+  - title: "Rename to 'fxJoinAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'joinAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxJoinAsync'
+  - title: "Rename to 'fxJuxt'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'juxt'
+    changes:
+      - kind: 'rename'
+        newName: 'fxJuxt'
+  - title: "Rename to 'fxKeys'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'keys'
+    changes:
+      - kind: 'rename'
+        newName: 'fxKeys'
+  - title: "Rename to 'fxLast'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'last'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLast'
+  - title: "Rename to 'fxLastAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'lastAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLastAsync'
+  - title: "Rename to 'fxLefts'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'lefts'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLefts'
+  - title: "Rename to 'fxLeftsAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'leftsAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLeftsAsync'
+  - title: "Rename to 'fxLt'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'lt'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLt'
+  - title: "Rename to 'fxLte'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'lte'
+    changes:
+      - kind: 'rename'
+        newName: 'fxLte'
+  - title: "Rename to 'fxMap'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'map'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMap'
+  - title: "Rename to 'fxMapAccum'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapAccum'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapAccum'
+  - title: "Rename to 'fxMapAccumAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapAccumAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapAccumAsync'
+  - title: "Rename to 'fxMapAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapAsync'
+  - title: "Rename to 'fxMapCatching'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapCatching'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapCatching'
+  - title: "Rename to 'fxMapCatchingAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapCatchingAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapCatchingAsync'
+  - title: "Rename to 'fxMapConcurrent'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapConcurrent'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapConcurrent'
+  - title: "Rename to 'fxMapConcurrentAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapConcurrentAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapConcurrentAsync'
+  - title: "Rename to 'fxMapEffect'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapEffect'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapEffect'
+  - title: "Rename to 'fxMapEffectAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapEffectAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapEffectAsync'
+  - title: "Rename to 'fxMapEntries'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapEntries'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapEntries'
+  - title: "Rename to 'fxMapKeys'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapKeys'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapKeys'
+  - title: "Rename to 'fxMapParallel'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapParallel'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapParallel'
+  - title: "Rename to 'fxMapParallelAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapParallelAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapParallelAsync'
+  - title: "Rename to 'fxMapRetryAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapRetryAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapRetryAsync'
+  - title: "Rename to 'fxMapValues'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'mapValues'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMapValues'
+  - title: "Rename to 'fxMatches'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'matches'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMatches'
+  - title: "Rename to 'fxMax'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'max'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMax'
+  - title: "Rename to 'fxMaxAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'maxAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMaxAsync'
+  - title: "Rename to 'fxMaxBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'maxBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMaxBy'
+  - title: "Rename to 'fxMaxByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'maxByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMaxByAsync'
+  - title: "Rename to 'fxMemoize'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'memoize'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMemoize'
+  - title: "Rename to 'fxMin'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'min'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMin'
+  - title: "Rename to 'fxMinAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'minAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMinAsync'
+  - title: "Rename to 'fxMinBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'minBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMinBy'
+  - title: "Rename to 'fxMinByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'minByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxMinByAsync'
+  - title: "Rename to 'fxNegate'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'negate'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNegate'
+  - title: "Rename to 'fxNone'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'none'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNone'
+  - title: "Rename to 'fxNoneAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'noneAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNoneAsync'
+  - title: "Rename to 'fxNonNulls'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nonNulls'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNonNulls'
+  - title: "Rename to 'fxNonNullsAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nonNullsAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNonNullsAsync'
+  - title: "Rename to 'fxNoop'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'noop'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNoop'
+  - title: "Rename to 'fxNot'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'not'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNot'
+  - title: "Rename to 'fxNth'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nth'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNth'
+  - title: "Rename to 'fxNthAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nthAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNthAsync'
+  - title: "Rename to 'fxNullable'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nullable'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNullable'
+  - title: "Rename to 'fxNullableAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'nullableAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxNullableAsync'
+  - title: "Rename to 'fxOmit'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'omit'
+    changes:
+      - kind: 'rename'
+        newName: 'fxOmit'
+  - title: "Rename to 'fxOmitBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'omitBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxOmitBy'
+  - title: "Rename to 'fxPairwise'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pairwise'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPairwise'
+  - title: "Rename to 'fxPairwiseAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pairwiseAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPairwiseAsync'
+  - title: "Rename to 'fxParallel'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'parallel'
+    changes:
+      - kind: 'rename'
+        newName: 'fxParallel'
+  - title: "Rename to 'fxParallelAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'parallelAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxParallelAsync'
+  - title: "Rename to 'fxParallelOn'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'parallelOn'
+    changes:
+      - kind: 'rename'
+        newName: 'fxParallelOn'
+  - title: "Rename to 'fxParallelOnAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'parallelOnAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxParallelOnAsync'
+  - title: "Rename to 'fxPartition'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'partition'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPartition'
+  - title: "Rename to 'fxPartitionAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'partitionAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPartitionAsync'
+  - title: "Rename to 'fxPeek'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'peek'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPeek'
+  - title: "Rename to 'fxPeekAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'peekAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPeekAsync'
+  - title: "Rename to 'fxPick'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pick'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPick'
+  - title: "Rename to 'fxPickBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pickBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPickBy'
+  - title: "Rename to 'fxPipe1'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pipe1'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPipe1'
+  - title: "Rename to 'fxPluck'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pluck'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPluck'
+  - title: "Rename to 'fxPluckAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'pluckAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPluckAsync'
+  - title: "Rename to 'fxPrepend'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'prepend'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPrepend'
+  - title: "Rename to 'fxPrependAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'prependAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxPrependAsync'
+  - title: "Rename to 'fxProduct'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'product'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProduct'
+  - title: "Rename to 'fxProductAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'productAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProductAsync'
+  - title: "Rename to 'fxProductBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'productBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProductBy'
+  - title: "Rename to 'fxProductByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'productByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProductByAsync'
+  - title: "Rename to 'fxProp'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'prop'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProp'
+  - title: "Rename to 'fxProps'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'props'
+    changes:
+      - kind: 'rename'
+        newName: 'fxProps'
+  - title: "Rename to 'fxRange'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'range'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRange'
+  - title: "Rename to 'fxReduce'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reduce'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReduce'
+  - title: "Rename to 'fxReduceAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reduceAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReduceAsync'
+  - title: "Rename to 'fxReduceLazy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reduceLazy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReduceLazy'
+  - title: "Rename to 'fxReject'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reject'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReject'
+  - title: "Rename to 'fxRejectAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'rejectAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRejectAsync'
+  - title: "Rename to 'fxRepeat'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'repeat'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRepeat'
+  - title: "Rename to 'fxResolveProps'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'resolveProps'
+    changes:
+      - kind: 'rename'
+        newName: 'fxResolveProps'
+  - title: "Rename to 'fxRetry'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'retry'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRetry'
+  - title: "Rename to 'fxReverse'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reverse'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReverse'
+  - title: "Rename to 'fxReverseAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'reverseAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxReverseAsync'
+  - title: "Rename to 'fxRights'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'rights'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRights'
+  - title: "Rename to 'fxRightsAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'rightsAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxRightsAsync'
+  - title: "Rename to 'fxScan'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'scan'
+    changes:
+      - kind: 'rename'
+        newName: 'fxScan'
+  - title: "Rename to 'fxScan1'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'scan1'
+    changes:
+      - kind: 'rename'
+        newName: 'fxScan1'
+  - title: "Rename to 'fxScan1Async'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'scan1Async'
+    changes:
+      - kind: 'rename'
+        newName: 'fxScan1Async'
+  - title: "Rename to 'fxScanAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'scanAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxScanAsync'
+  - title: "Rename to 'fxSeparateEither'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'separateEither'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSeparateEither'
+  - title: "Rename to 'fxSeparateEitherAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'separateEitherAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSeparateEitherAsync'
+  - title: "Rename to 'fxSequenceEither'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sequenceEither'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSequenceEither'
+  - title: "Rename to 'fxSequenceEitherAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sequenceEitherAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSequenceEitherAsync'
+  - title: "Rename to 'fxSequenceEqual'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sequenceEqual'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSequenceEqual'
+  - title: "Rename to 'fxSequenceEqualAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sequenceEqualAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSequenceEqualAsync'
+  - title: "Rename to 'fxShuffle'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'shuffle'
+    changes:
+      - kind: 'rename'
+        newName: 'fxShuffle'
+  - title: "Rename to 'fxShuffleAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'shuffleAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxShuffleAsync'
+  - title: "Rename to 'fxSize'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'size'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSize'
+  - title: "Rename to 'fxSizeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sizeAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSizeAsync'
+  - title: "Rename to 'fxSkip'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'skip'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSkip'
+  - title: "Rename to 'fxSkipAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'skipAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSkipAsync'
+  - title: "Rename to 'fxSkipWhile'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'skipWhile'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSkipWhile'
+  - title: "Rename to 'fxSkipWhileAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'skipWhileAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSkipWhileAsync'
+  - title: "Rename to 'fxSleep'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sleep'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSleep'
+  - title: "Rename to 'fxSlice'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'slice'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSlice'
+  - title: "Rename to 'fxSliceAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sliceAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSliceAsync'
+  - title: "Rename to 'fxSome'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'some'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSome'
+  - title: "Rename to 'fxSomeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'someAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSomeAsync'
+  - title: "Rename to 'fxSort'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sort'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSort'
+  - title: "Rename to 'fxSortAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sortAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSortAsync'
+  - title: "Rename to 'fxSortBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sortBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSortBy'
+  - title: "Rename to 'fxSortByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sortByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSortByAsync'
+  - title: "Rename to 'fxSorted'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sorted'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSorted'
+  - title: "Rename to 'fxSplit'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'split'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSplit'
+  - title: "Rename to 'fxSplitAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'splitAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSplitAsync'
+  - title: "Rename to 'fxSum'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sum'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSum'
+  - title: "Rename to 'fxSumAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sumAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSumAsync'
+  - title: "Rename to 'fxSumBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sumBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSumBy'
+  - title: "Rename to 'fxSumByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sumByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSumByAsync'
+  - title: "Rename to 'fxSumStrings'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'sumStrings'
+    changes:
+      - kind: 'rename'
+        newName: 'fxSumStrings'
+  - title: "Rename to 'fxTake'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'take'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTake'
+  - title: "Rename to 'fxTakeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeAsync'
+  - title: "Rename to 'fxTakeLast'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeLast'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeLast'
+  - title: "Rename to 'fxTakeLastAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeLastAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeLastAsync'
+  - title: "Rename to 'fxTakeRight'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeRight'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeRight'
+  - title: "Rename to 'fxTakeRightAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeRightAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeRightAsync'
+  - title: "Rename to 'fxTakeUntil'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeUntil'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeUntil'
+  - title: "Rename to 'fxTakeUntilAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeUntilAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeUntilAsync'
+  - title: "Rename to 'fxTakeWhile'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeWhile'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeWhile'
+  - title: "Rename to 'fxTakeWhileAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'takeWhileAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTakeWhileAsync'
+  - title: "Rename to 'fxTap'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'tap'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTap'
+  - title: "Rename to 'fxTee'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'tee'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTee'
+  - title: "Rename to 'fxTee3'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'tee3'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTee3'
+  - title: "Rename to 'fxTeeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'teeAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTeeAsync'
+  - title: "Rename to 'fxThrottle'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'throttle'
+    changes:
+      - kind: 'rename'
+        newName: 'fxThrottle'
+  - title: "Rename to 'fxThrowError'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'throwError'
+    changes:
+      - kind: 'rename'
+        newName: 'fxThrowError'
+  - title: "Rename to 'fxThrowIf'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'throwIf'
+    changes:
+      - kind: 'rename'
+        newName: 'fxThrowIf'
+  - title: "Rename to 'fxTimeoutAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'timeoutAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTimeoutAsync'
+  - title: "Rename to 'fxToAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'toAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxToAsync'
+  - title: "Rename to 'fxToList'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'toList'
+    changes:
+      - kind: 'rename'
+        newName: 'fxToList'
+  - title: "Rename to 'fxToListAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'toListAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxToListAsync'
+  - title: "Rename to 'fxToPairs'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'toPairs'
+    changes:
+      - kind: 'rename'
+        newName: 'fxToPairs'
+  - title: "Rename to 'fxTopBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'topBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTopBy'
+  - title: "Rename to 'fxTopByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'topByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTopByAsync'
+  - title: "Rename to 'fxToSorted'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'toSorted'
+    changes:
+      - kind: 'rename'
+        newName: 'fxToSorted'
+  - title: "Rename to 'fxTranspose'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'transpose'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTranspose'
+  - title: "Rename to 'fxTransposeAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'transposeAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxTransposeAsync'
+  - title: "Rename to 'fxUniq'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniq'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniq'
+  - title: "Rename to 'fxUniqAdjacent'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqAdjacent'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqAdjacent'
+  - title: "Rename to 'fxUniqAdjacentAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqAdjacentAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqAdjacentAsync'
+  - title: "Rename to 'fxUniqAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqAsync'
+  - title: "Rename to 'fxUniqBy'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqBy'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqBy'
+  - title: "Rename to 'fxUniqByAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqByAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqByAsync'
+  - title: "Rename to 'fxUniqStrict'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'uniqStrict'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUniqStrict'
+  - title: "Rename to 'fxUnless'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'unless'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUnless'
+  - title: "Rename to 'fxUnzip'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'unzip'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUnzip'
+  - title: "Rename to 'fxUnzipAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'unzipAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUnzipAsync'
+  - title: "Rename to 'fxUsing'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'using'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUsing'
+  - title: "Rename to 'fxUsingAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'usingAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxUsingAsync'
+  - title: "Rename to 'fxValues'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'values'
+    changes:
+      - kind: 'rename'
+        newName: 'fxValues'
+  - title: "Rename to 'fxWhen'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'when'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWhen'
+  - title: "Rename to 'fxWhere'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'where'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWhere'
+  - title: "Rename to 'fxWhereAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'whereAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWhereAsync'
+  - title: "Rename to 'fxWhereNot'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'whereNot'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWhereNot'
+  - title: "Rename to 'fxWhereNotAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'whereNotAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWhereNotAsync'
+  - title: "Rename to 'fxWindowed'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'windowed'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWindowed'
+  - title: "Rename to 'fxWindowedAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'windowedAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxWindowedAsync'
+  - title: "Rename to 'fxZip'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zip'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZip'
+  - title: "Rename to 'fxZip3'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zip3'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZip3'
+  - title: "Rename to 'fxZip3Async'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zip3Async'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZip3Async'
+  - title: "Rename to 'fxZipAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zipAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZipAsync'
+  - title: "Rename to 'fxZipWith'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zipWith'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZipWith'
+  - title: "Rename to 'fxZipWithAsync'"
+    date: 2026-10-03
+    element:
+      uris: ['package:fxdart/fxdart.dart']
+      function: 'zipWithAsync'
+    changes:
+      - kind: 'rename'
+        newName: 'fxZipWithAsync'

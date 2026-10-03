@@ -2,7 +2,7 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   var calls = 0;
-  final square = memoize<int, int>((n) {
+  final square = fxMemoize<int, int>((n) {
     calls++;
     return n * n;
   });

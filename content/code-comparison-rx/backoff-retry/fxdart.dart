@@ -14,7 +14,7 @@ Future<String> fetchRates() async {
 Future<void> main() async {
   // Backoff is the delay hook: it receives the failure count (1, 2, …)
   // and returns how long to wait before the next attempt.
-  final payload = await retry(3, fetchRates, delay: (failed) {
+  final payload = await fxRetry(3, fetchRates, delay: (failed) {
     final ms = 40 * failed;
     backoffMs.add(ms);
     return Duration(milliseconds: ms);

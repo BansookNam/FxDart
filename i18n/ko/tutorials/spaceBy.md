@@ -17,8 +17,8 @@ nextLabel: debounceOn
   <h2>강의</h2>
   <p>
     속도 제한은 언제나 무언가를 대가로 치르고, 진짜 질문은 <em>무엇을</em>
-    치르느냐입니다. <code><a href="throttle.html">throttle</a></code>과
-    <code><a href="debounce.html">debounce</a></code>는
+    치르느냐입니다. <code><a href="throttle.html">fxThrottle</a></code>과
+    <code><a href="debounce.html">fxDebounce</a></code>는
     <strong>이벤트</strong>로 치릅니다: 창마다 하나를 남기고 나머지를
     버리는데, 이벤트가 연속적인 무언가의 표본이고 오래된 것이 쓸모없을
     때 옳습니다. <code>spaceBy(gap)</code>는 대신 <strong>시간</strong>으로
@@ -63,7 +63,7 @@ nextLabel: debounceOn
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — 손실이 있는 대응물: 창마다 하나, 즉시 ·
-    <a href="debounce.html"><code>debounce</code></a> — 버스트가 끝나기를 기다렸다가 마지막 값 취하기 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — 손실이 있는 대응물: 창마다 하나, 즉시 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — 버스트가 끝나기를 기다렸다가 마지막 값 취하기 ·
     <a href="chunkOn.html"><code>chunkEvery</code></a> — 역시 모든 이벤트를 지키되, 펼치는 대신 묶기
   </div>

@@ -1,1 +1,1 @@
-bool isMatch(Object? target, Object? pattern)
+bool fxIsMatch(Object? target, Object? pattern)

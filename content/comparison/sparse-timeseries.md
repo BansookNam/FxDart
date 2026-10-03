@@ -27,7 +27,7 @@ async: false
   <h2>Why they differ</h2>
   <p>
     Gap-filling means driving the pipeline from the <em>calendar</em>, not
-    from the data: <code>range(1, 15)</code> generates every day,
+    from the data: <code>fxRange(1, 15)</code> generates every day,
     <code>groupBy</code> answers "what happened that day", and
     <code>sumBy</code> over a possibly-empty group yields the 0.00 for quiet
     days for free. The weekly rollup is then <code>chunk(7)</code> +

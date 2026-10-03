@@ -10,7 +10,7 @@ void main() {
   group('filter', () {
     group('sync', () {
       test('should be filtered by the callback', () {
-        final res = [...filter(mod, range(1, 10))];
+        final res = [...fxFilter(mod, fxRange(1, 10))];
         expect(res, equals([2, 4, 6, 8]));
       });
 
@@ -23,20 +23,20 @@ void main() {
           }
         }
 
-        expect(filter(mod, generated()).toList(), equals([2, 4, 6, 8]));
+        expect(fxFilter(mod, generated()).toList(), equals([2, 4, 6, 8]));
         expect(
-          filter(mod, generated()).toList(growable: false),
+          fxFilter(mod, generated()).toList(growable: false),
           equals([2, 4, 6, 8]),
         );
         expect(
-          filter(mod, [1, 2, 3, 4, 5, 6, 7, 8, 9]).toList(),
-          equals(filter(mod, generated()).toList()),
+          fxFilter(mod, [1, 2, 3, 4, 5, 6, 7, 8, 9]).toList(),
+          equals(fxFilter(mod, generated()).toList()),
         );
       });
 
       test('should be able to handle an error', () {
         expect(
-          () => toList(filter<int>((a) => throw 'err', range(1, 10))),
+          () => fxToList(fxFilter<int>((a) => throw 'err', fxRange(1, 10))),
           throwsA(equals('err')),
         );
       });
@@ -44,7 +44,7 @@ void main() {
       test('should be able to be used in the pipeline', () {
         final res = pipe(
           [1, 2, 3, 4],
-          [(v) => filter((int a) => a % 2 == 0, v), (v) => toList(v)],
+          [(v) => fxFilter((int a) => a % 2 == 0, v), (v) => fxToList(v)],
         );
 
         expect(res, equals([2, 4]));
@@ -60,7 +60,7 @@ void main() {
     group('async', () {
       test('should be filtered by the callback', () async {
         final res = <int>[];
-        final it = filterAsync(modAsync, toAsync(range(1, 10))).iterator;
+        final it = fxFilterAsync(modAsync, fxToAsync(fxRange(1, 10))).iterator;
         while (true) {
           final r = await it.next();
           if (r.done) break;
@@ -71,8 +71,8 @@ void main() {
 
       test('should be able to handle an error', () async {
         await expectLater(
-          toListAsync(
-            filterAsync<int>((a) => throw 'err', toAsync(range(1, 10))),
+          fxToListAsync(
+            fxFilterAsync<int>((a) => throw 'err', fxToAsync(fxRange(1, 10))),
           ),
           throwsA(equals('err')),
         );
@@ -82,10 +82,10 @@ void main() {
         'should be able to handle an error when the callback is asynchronous',
         () async {
           await expectLater(
-            toListAsync(
-              filterAsync<int>(
+            fxToListAsync(
+              fxFilterAsync<int>(
                 (a) => Future<bool>.error(Exception('err')),
-                toAsync(range(1, 10)),
+                fxToAsync(fxRange(1, 10)),
               ),
             ),
             throwsException,
@@ -97,7 +97,7 @@ void main() {
         'should be able to handle an error when working concurrent',
         () async {
           await expectLater(
-            fxAsync(toAsync(range(1, 51)))
+            fxAsync(fxToAsync(fxRange(1, 51)))
                 .filter((a) {
                   if (a == 7) throw 'err';
                   return a % 2 == 0;
@@ -111,8 +111,10 @@ void main() {
 
       test('should be filtered by callback concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync(range(1, 21)))
-            .filter((a) => delay(const Duration(milliseconds: 100), a % 2 == 0))
+        final res = await fxAsync(fxToAsync(fxRange(1, 21)))
+            .filter(
+              (a) => fxDelay(const Duration(milliseconds: 100), a % 2 == 0),
+            )
             .concurrent(10)
             .toList();
         sw.stop();
@@ -123,8 +125,8 @@ void main() {
       });
 
       test("should be able to call with 'next'", () async {
-        final res = fxAsync(toAsync(range(1, 20)))
-            .map((a) => delay(const Duration(milliseconds: 50), a))
+        final res = fxAsync(fxToAsync(fxRange(1, 20)))
+            .map((a) => fxDelay(const Duration(milliseconds: 50), a))
             .filter((a) => a % 2 == 0 || a % 3 == 0)
             .concurrent(2);
 
@@ -139,8 +141,8 @@ void main() {
       });
 
       test('should be empty when all elements are filtered', () async {
-        final res = await fxAsync(toAsync(range(1, 20)))
-            .filter((a) => delay(const Duration(milliseconds: 20), false))
+        final res = await fxAsync(fxToAsync(fxRange(1, 20)))
+            .filter((a) => fxDelay(const Duration(milliseconds: 20), false))
             .concurrent(2)
             .toList();
         expect(res, equals([]));
@@ -149,8 +151,8 @@ void main() {
       test(
         'should be having all elements when all elements are not filtered',
         () async {
-          final res = await fxAsync(toAsync(range(1, 20)))
-              .filter((a) => delay(const Duration(milliseconds: 20), true))
+          final res = await fxAsync(fxToAsync(fxRange(1, 20)))
+              .filter((a) => fxDelay(const Duration(milliseconds: 20), true))
               .concurrent(2)
               .toList();
 
@@ -184,10 +186,10 @@ void main() {
       test(
         "should be filtered by the callback 'take' - 'filter' - 'concurrent'",
         () async {
-          final res = await fxAsync(toAsync(range(1, 21)))
+          final res = await fxAsync(fxToAsync(fxRange(1, 21)))
               .take(10)
               .filter(
-                (a) => delay(const Duration(milliseconds: 50), a % 2 == 0),
+                (a) => fxDelay(const Duration(milliseconds: 50), a % 2 == 0),
               )
               .concurrent(5)
               .toList();
@@ -199,9 +201,9 @@ void main() {
       test(
         "should be filtered by the callback 'filter' - 'take' - 'concurrent'",
         () async {
-          final res = await fxAsync(toAsync(range(1, 51)))
+          final res = await fxAsync(fxToAsync(fxRange(1, 51)))
               .filter(
-                (a) => delay(const Duration(milliseconds: 50), a % 2 == 0),
+                (a) => fxDelay(const Duration(milliseconds: 50), a % 2 == 0),
               )
               .take(10)
               .concurrent(10)
@@ -214,8 +216,8 @@ void main() {
       test(
         "should be filtered by the callback 'map' - 'filter' - 'concurrent'",
         () async {
-          final res = await fxAsync(toAsync(range(1, 21)))
-              .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+          final res = await fxAsync(fxToAsync(fxRange(1, 21)))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
               .filter((a) => a % 2 == 0)
               .concurrent(10)
               .toList();
@@ -227,14 +229,14 @@ void main() {
       test(
         "should be filtered by the callback 'map' - 'filter' - 'concurrent' - 'take'",
         () async {
-          final res = await fxAsync(toAsync(range(1, 10)))
-              .map((a) => delay(const Duration(milliseconds: 50), a))
+          final res = await fxAsync(fxToAsync(fxRange(1, 10)))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a))
               .filter((a) => a > 0)
               .concurrent(5)
               .take(8)
               .toList();
 
-          expect(res, equals([...range(1, 9)]));
+          expect(res, equals([...fxRange(1, 9)]));
         },
       );
 
@@ -242,8 +244,8 @@ void main() {
         'should be able to handle an error when the callback is asynchronous',
         () async {
           await expectLater(
-            fxAsync(toAsync(range(1, 1000)))
-                .map((a) => delay(const Duration(milliseconds: 50), a + 10))
+            fxAsync(fxToAsync(fxRange(1, 1000)))
+                .map((a) => fxDelay(const Duration(milliseconds: 50), a + 10))
                 .filter((a) {
                   if (a == 14) throw Exception('err');
                   return a > 20;
@@ -259,9 +261,9 @@ void main() {
         'should be able to handle errors when the callback is asynchronous',
         () async {
           await expectLater(
-            fxAsync(toAsync(range(1, 1000)))
+            fxAsync(fxToAsync(fxRange(1, 1000)))
                 .map<int>((a) async {
-                  await delay(const Duration(milliseconds: 50), a);
+                  await fxDelay(const Duration(milliseconds: 50), a);
                   throw Exception('err');
                 })
                 .filter((a) => a % 2 == 0)
@@ -273,8 +275,8 @@ void main() {
       );
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toListAsync(
-          filterAsync((a) => a % 2 == 0, toAsync([1, 2, 3, 4])),
+        final res = await fxToListAsync(
+          fxFilterAsync((a) => a % 2 == 0, fxToAsync([1, 2, 3, 4])),
         );
 
         expect(res, equals([2, 4]));
@@ -284,7 +286,7 @@ void main() {
         'should be able to be used as a chaining method in the `fx`',
         () async {
           final res = await fxAsync(
-            toAsync([1, 2, 3, 4]),
+            fxToAsync([1, 2, 3, 4]),
           ).filter((a) => a % 2 == 0).toList();
 
           expect(res, equals([2, 4]));
@@ -294,9 +296,9 @@ void main() {
       test(
         "should be consumed 'AsyncIterable' as many times as called with 'next'",
         () async {
-          final source = SharedAsyncIterable(toAsync(range(1, 21)));
+          final source = SharedAsyncIterable(fxToAsync(fxRange(1, 21)));
           final res = fxAsync(source)
-              .map((a) => delay(const Duration(milliseconds: 50), a))
+              .map((a) => fxDelay(const Duration(milliseconds: 50), a))
               .filter((a) => a % 2 == 0)
               .concurrent(3);
 

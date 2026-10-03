@@ -53,7 +53,7 @@ nextLabel: nth
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="head.html"><code>head</code></a> — O(1)로 얻는 반대쪽 끝 ·
-    <a href="nth.html"><code>nth</code></a> — 원하는 인덱스 꺼내기 ·
+    <a href="nth.html"><code>fxNth</code></a> — 원하는 인덱스 꺼내기 ·
     <a href="find.html"><code>find</code></a> — 술어에 처음 걸리는 값 ·
     <a href="reverse.html"><code>reverse</code></a> — 시퀀스 전체 뒤집기
   </div>

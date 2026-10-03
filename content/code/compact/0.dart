@@ -5,8 +5,8 @@ void main() {
 
   // Data-first form. The input element type is int?; the output is
   // Iterable<int> -- nonNulls narrows the type, not just the values.
-  final Iterable<int> tightened = nonNulls(withGaps);
-  print(toList(tightened)); // [1, 2, 3]
+  final Iterable<int> tightened = fxNonNulls(withGaps);
+  print(fxToList(tightened)); // [1, 2, 3]
   // FxTS alias: compact(withGaps) does the same thing.
 
   // On the sync chain, .nonNulls is an inherited Iterable getter (no parens).

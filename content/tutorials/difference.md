@@ -16,7 +16,7 @@ nextLabel: differenceBy
 
   <h2>Lecture</h2>
   <p>
-    Read the signature carefully: <code>difference(iterable1, iterable2)</code>
+    Read the signature carefully: <code>fxDifference(iterable1, iterable2)</code>
     walks <strong><code>iterable2</code></strong> and yields each of its
     elements that is <em>not</em> found in <code>iterable1</code>
     (deduplicated, like <code>uniq</code>). <code>iterable1</code> is only
@@ -28,7 +28,7 @@ nextLabel: differenceBy
     list" and <code>iterable2</code> as "the list you're filtering."
   </p>
   <p>
-    Internally it's <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code> —
+    Internally it's <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code> —
     see <a href="differenceBy.html"><code>differenceBy</code></a> if you
     need to compare by a computed key instead of value equality.
   </p>
@@ -57,5 +57,5 @@ nextLabel: differenceBy
     <a href="differenceBy.html"><code>differenceBy</code></a> — the same, by a computed key ·
     <a href="intersection.html"><code>intersection</code></a> — keep the shared elements instead ·
     <a href="uniq.html"><code>uniq</code></a> — dedupe a single iterable ·
-    <a href="../tutorials/includes.html"><code>includes</code></a> — test membership in a single iterable
+    <a href="../tutorials/includes.html"><code>fxIncludes</code></a> — test membership in a single iterable
   </div>

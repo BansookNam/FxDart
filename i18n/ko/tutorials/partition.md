@@ -30,9 +30,9 @@ nextLabel: head
     <strong>레코드</strong>를 씁니다: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>.
     두 리스트는 <code>.$1</code>(통과)과 <code>.$2</code>(탈락)로 꺼내거나,
     패턴 매칭 문법으로 바로 구조 분해할 수 있습니다:
-    <code>final (pass, fail) = partition(f, iterable);</code>. 이는 FxDart의
+    <code>final (pass, fail) = fxPartition(f, iterable);</code>. 이는 FxDart의
     다른 곳에서 <code><a href="zip.html">zip</a></code>과
-    <code><a href="entries.html">entries</a></code>가 따르는 튜플-레코드
+    <code><a href="entries.html">fxEntries</a></code>가 따르는 튜플-레코드
     규약과 동일합니다.
   </p>
   <p>

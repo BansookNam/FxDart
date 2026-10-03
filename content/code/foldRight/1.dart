@@ -15,6 +15,6 @@ Future<void> main() async {
 
   // Async drains the stream first — there is no end to start from until it
   // has arrived.
-  final source = toAsync([1, 2, 3]);
-  print(await foldRightAsync<int, int>(0, (acc, a) => a - acc, source)); // 2
+  final source = fxToAsync([1, 2, 3]);
+  print(await fxFoldRightAsync<int, int>(0, (acc, a) => a - acc, source)); // 2
 }

@@ -20,21 +20,21 @@ void main() {
   group('fromStream', () {
     test('should convert a single-subscription stream', () async {
       expect(
-        await toListAsync(fromStream(Stream.fromIterable([1, 2, 3]))),
+        await fxToListAsync(fxFromStream(Stream.fromIterable([1, 2, 3]))),
         equals([1, 2, 3]),
       );
     });
 
     test('should convert an empty stream', () async {
       expect(
-        await toListAsync(fromStream(const Stream<int>.empty())),
+        await fxToListAsync(fxFromStream(const Stream<int>.empty())),
         equals([]),
       );
     });
 
     test('should convert a broadcast stream', () async {
       final controller = StreamController<int>.broadcast();
-      final future = toListAsync(fromStream(controller.stream));
+      final future = fxToListAsync(fxFromStream(controller.stream));
       // Give the iterator a turn to subscribe before emitting.
       await Future<void>.delayed(Duration.zero);
       controller
@@ -46,16 +46,16 @@ void main() {
 
     test('should propagate a stream error', () {
       expect(
-        toListAsync(fromStream(Stream<int>.error(StateError('boom')))),
+        fxToListAsync(fxFromStream(Stream<int>.error(StateError('boom')))),
         throwsStateError,
       );
     });
 
     test('should be able to be used in the pipeline', () async {
       final res = await pipe(Stream.fromIterable([1, 2, 3]), [
-        (Stream<int> s) => fromStream(s),
-        (FxAsyncIterable<int> a) => filterAsync((n) => n.isOdd, a),
-        (FxAsyncIterable<int> a) => toListAsync(a),
+        (Stream<int> s) => fxFromStream(s),
+        (FxAsyncIterable<int> a) => fxFilterAsync((n) => n.isOdd, a),
+        (FxAsyncIterable<int> a) => fxToListAsync(a),
       ]);
       expect(res, equals([1, 3]));
     });
@@ -63,15 +63,17 @@ void main() {
 
   group('toStream', () {
     test('should emit every value of the async iterable', () async {
-      expect(await toAsync([1, 2, 3]).toStream().toList(), equals([1, 2, 3]));
+      expect(await fxToAsync([1, 2, 3]).toStream().toList(), equals([1, 2, 3]));
     });
 
     test('should emit nothing for an empty async iterable', () async {
-      expect(await toAsync(<int>[]).toStream().toList(), equals([]));
+      expect(await fxToAsync(<int>[]).toStream().toList(), equals([]));
     });
 
     test('should round-trip through fromStream', () async {
-      final res = await toListAsync(fromStream(toAsync([1, 2, 3]).toStream()));
+      final res = await fxToListAsync(
+        fxFromStream(fxToAsync([1, 2, 3]).toStream()),
+      );
       expect(res, equals([1, 2, 3]));
     });
   });
@@ -79,11 +81,11 @@ void main() {
   group('concurrentAsync', () {
     test('should throw when length is less than 1', () {
       expect(
-        () => concurrentAsync(0, toAsync([1, 2, 3])),
+        () => fxConcurrentAsync(0, fxToAsync([1, 2, 3])),
         throwsA(isA<RangeError>()),
       );
       expect(
-        () => concurrentAsync(-1, toAsync([1, 2, 3])),
+        () => fxConcurrentAsync(-1, fxToAsync([1, 2, 3])),
         throwsA(isA<RangeError>()),
       );
     });
@@ -92,11 +94,11 @@ void main() {
   group('concurrentPoolAsync', () {
     test('should throw when length is less than 1', () {
       expect(
-        () => concurrentPoolAsync(0, toAsync([1, 2, 3])),
+        () => fxConcurrentPoolAsync(0, fxToAsync([1, 2, 3])),
         throwsA(isA<RangeError>()),
       );
       expect(
-        () => concurrentPoolAsync(-1, toAsync([1, 2, 3])),
+        () => fxConcurrentPoolAsync(-1, fxToAsync([1, 2, 3])),
         throwsA(isA<RangeError>()),
       );
     });

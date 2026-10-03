@@ -64,7 +64,7 @@ class LedgerRepository {
   Future<LedgerData> loadAll({void Function(String box)? onLoaded}) async {
     final loaded = await fx(['entries', 'categories', 'rules', 'budgets'])
         .toAsync()
-        .map((box) => delay(boxLatency, box)) // simulated slow IO per box
+        .map((box) => fxDelay(boxLatency, box)) // simulated slow IO per box
         .peek((box) => onLoaded?.call(box))
         .concurrent(3)
         .toList();

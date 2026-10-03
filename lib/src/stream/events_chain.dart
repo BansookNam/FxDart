@@ -17,7 +17,7 @@ extension FxEventsChain<T> on FxEvents<T> {
   ///
   /// A throwing callback becomes an error event and the chain continues;
   /// the event whose peek failed is not re-emitted. fxdart events layer,
-  /// after Rx's `tap` / `doOn*`.
+  /// after Rx's `fxTap` / `doOn*`.
   FxEvents<T> peek(
     void Function(T)? onData, {
     void Function(Object, StackTrace)? onError,

@@ -115,19 +115,19 @@ Either<String, int> parsePort(String s) {
 
 void main() {
   final results = ['8080', 'x', '9000'].map(parsePort).toList();
-  final (bad, good) = separateEither(results);
+  final (bad, good) = fxSeparateEither(results);
   print('kept: $good');
   print('dropped: $bad');
 
   // …or take just one side.
-  print(rights(results));
-  print(lefts(results));
+  print(fxRights(results));
+  print(fxLefts(results));
 }
 ```
 
 Elegir entre ellos es una decisión de producto, no técnica: una herramienta de
-importación quiere `separateEither`, un cargador de configuración quiere
-`flattenOrAccumulate`, un manejador de API quiere `sequenceEither`.
+importación quiere `fxSeparateEither`, un cargador de configuración quiere
+`flattenOrAccumulate`, un manejador de API quiere `fxSequenceEither`.
 
 ## La gemela asíncrona
 
@@ -176,9 +176,9 @@ canal de retorno que hace que el límite sea real y no una recomendación.
 
 ## El coste de no tenerlo genéricamente
 
-Cuenta las versiones del código de arriba: `sequenceEither`,
-`flattenOrAccumulate`, `mapOrAccumulate`, `separateEither` — más
-`sequenceEitherAsync`, `flattenOrAccumulateAsync` y `mapOrAccumulateAsync`
+Cuenta las versiones del código de arriba: `fxSequenceEither`,
+`flattenOrAccumulate`, `mapOrAccumulate`, `fxSeparateEither` — más
+`fxSequenceEitherAsync`, `flattenOrAccumulateAsync` y `mapOrAccumulateAsync`
 para cadenas asíncronas. Siete funciones donde un lenguaje con tipos de orden
 superior escribe una.
 
@@ -196,7 +196,7 @@ importación, cargar N registros, abanicarse hacia N servicios. Si has escrito
 más de dos veces, eso es un recorrido y deberías decirlo.
 
 Sáltatelo cuando la colección tenga un elemento (usa el `Either` directamente),
-cuando necesites semántica de éxito parcial (eso es `separateEither`), o cuando
+cuando necesites semántica de éxito parcial (eso es `fxSeparateEither`), o cuando
 el bucle haga de verdad algo por elemento que no sea un map puro — un recorrido
 que esconde un efecto colateral es peor que el bucle al que sustituyó.
 

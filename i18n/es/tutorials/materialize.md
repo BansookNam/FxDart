@@ -71,7 +71,7 @@ nextLabel: debounced search
     fallar el future. La misma pregunta existe en pull:
     <code>sequenceEqual</code> /
     <code>Fx.sequenceEqual</code> para iterables,
-    <code>sequenceEqualAsync</code> /
+    <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code> para
     <code>FxAsyncIterable</code>s. Siguiendo a
     <code>sequenceEqual</code> de Rx.

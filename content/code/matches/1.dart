@@ -7,9 +7,9 @@ void main() {
     {'type': 'click', 'x': 9},
   ];
 
-  print(filter(matches({'type': 'click'}), events).toList());
+  print(fxFilter(fxMatches({'type': 'click'}), events).toList());
   // [{type: click, x: 1}, {type: click, x: 9}]
 
-  print(find(matches({'type': 'scroll'}), events));
+  print(fxFind(fxMatches({'type': 'scroll'}), events));
   // {type: scroll, y: 5}
 }

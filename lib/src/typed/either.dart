@@ -18,7 +18,7 @@ typedef EitherNel<E, A> = Either<NonEmptyList<E>, A>;
 /// }
 /// ```
 ///
-/// Prefer building Eithers with the [raise_.either] builder over chaining
+/// Prefer building Eithers with the [raise_.fxEither] builder over chaining
 /// `flatMap` — inside the builder you write straight-line Dart.
 sealed class Either<L, R> {
   const Either();
@@ -126,7 +126,7 @@ sealed class Either<L, R> {
   }
 
   /// 5-ary [map2]. Arity capped at 5, like `zipOrAccumulate2..5` and
-  /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `either`
+  /// `Curry2..Curry5` — beyond that, chain [flatMap] or use the `fxEither`
   /// builder.
   Either<L, T> map5<B, C, D, E, T>(
     Either<L, B> b,
@@ -261,7 +261,7 @@ sealed class Either<L, R> {
     R Function(raise_.Raise<L2> r, L error) transform,
   ) => switch (this) {
     Right(:final value) => Right(value),
-    Left(:final value) => raise_.either((r) => transform(r, value)),
+    Left(:final value) => raise_.fxEither((r) => transform(r, value)),
   };
 
   /// Runs [block], capturing any thrown object into a [Left].
@@ -269,7 +269,7 @@ sealed class Either<L, R> {
   /// The library's own raise signal is rethrown, never captured — the port
   /// of Arrow's `Either.catch` + non-fatal discipline.
   static Either<Object, R> catching<R>(R Function() block) =>
-      raise_.catching<Either<Object, R>>(
+      raise_.fxCatching<Either<Object, R>>(
         () => Right(block()),
         (error, stackTrace) => Left(error),
       );
@@ -278,7 +278,7 @@ sealed class Either<L, R> {
   static Either<L, R> catchingWith<L, R>(
     L Function(Object error, StackTrace stackTrace) onError,
     R Function() block,
-  ) => raise_.catching<Either<L, R>>(
+  ) => raise_.fxCatching<Either<L, R>>(
     () => Right(block()),
     (error, stackTrace) => Left(onError(error, stackTrace)),
   );

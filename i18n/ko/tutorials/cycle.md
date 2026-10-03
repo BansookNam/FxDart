@@ -27,13 +27,13 @@ nextLabel: entries
   <p>
     알아 둘 만한 특수한 경우가 하나 있습니다. <em>빈</em> 소스를 순환시키면
     원소 0개를 영원히 도는 대신 아무것도 내보내지 않습니다 — 즉
-    <code>cycle([])</code>은 안전하며 그냥 빈 결과를 만듭니다.
+    <code>fxCycle([])</code>은 안전하며 그냥 빈 결과를 만듭니다.
   </p>
   <p>
     라운드 로빈 할당(더 긴 컬렉션을 map으로 순회하면서 작업자, 색상, 슬롯
     같은 작은 리스트를 돌려 쓰는 경우)이나, 짧은 비동기 시퀀스를 반복해
     폴링 루프를 흉내 내는 데 딱 맞는 구성 요소입니다. 비동기 버전인
-    <code>cycleAsync</code>(또는 <code>FxAsync</code> 체인에서의
+    <code>fxCycleAsync</code>(또는 <code>FxAsync</code> 체인에서의
     <code>.cycle()</code>)도 같은 방식으로 버퍼링하고 반복하되, 매 회차를
     평소의 비동기 프로토콜로 끌어당깁니다.
   </p>
@@ -50,8 +50,8 @@ nextLabel: entries
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="range.html"><code>range</code></a> — 유한한 수 세기 시퀀스 ·
-    <a href="repeat.html"><code>repeat</code></a> — 하나의 값을 정해진 횟수만큼 반복합니다 ·
+    <a href="range.html"><code>fxRange</code></a> — 유한한 수 세기 시퀀스 ·
+    <a href="repeat.html"><code>fxRepeat</code></a> — 하나의 값을 정해진 횟수만큼 반복합니다 ·
     <a href="take.html"><code>take</code></a> — cycle에 거의 언제나 필요한 제한 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 cycle의 작업을 겹쳐 실행합니다
   </div>

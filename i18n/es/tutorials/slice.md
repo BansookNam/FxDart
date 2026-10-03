@@ -25,7 +25,7 @@ nextLabel: chunk
   <p>
     Ojo con el orden de los argumentos en la forma data-first: a diferencia de
     la mayoría de funciones de FxDart, el <code>iterable</code> va en
-    <strong>medio</strong>: <code>slice(start, iterable, [end])</code>,
+    <strong>medio</strong>: <code>fxSlice(start, iterable, [end])</code>,
     igual que en FxTS. La forma encadenada no tiene esta rareza, porque el
     iterable es el receptor: <code>fx(iterable).slice(start, end)</code>. Por
     dentro, <code>slice</code> se limita a recorrer la fuente una vez contando

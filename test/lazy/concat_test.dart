@@ -8,7 +8,7 @@ void main() {
     group('sync', () {
       test("should be concatenated given two 'Iterable'", () {
         expect(
-          toList(concat([1, 2, 3], [4, 5, 6])),
+          fxToList(fxConcat([1, 2, 3], [4, 5, 6])),
           equals([1, 2, 3, 4, 5, 6]),
         );
       });
@@ -21,31 +21,33 @@ void main() {
 
     group('async', () {
       test("should be concatenated given two 'AsyncIterable'", () async {
-        final a = mapAsync(
-          (int x) => delay(const Duration(milliseconds: 50), x),
-          toAsync([1, 2]),
+        final a = fxMapAsync(
+          (int x) => fxDelay(const Duration(milliseconds: 50), x),
+          fxToAsync([1, 2]),
         );
-        final b = mapAsync(
-          (int x) => delay(const Duration(milliseconds: 50), x),
-          toAsync([3, 4]),
+        final b = fxMapAsync(
+          (int x) => fxDelay(const Duration(milliseconds: 50), x),
+          fxToAsync([3, 4]),
         );
-        final res = await toListAsync(concatAsync(a, b));
+        final res = await fxToListAsync(fxConcatAsync(a, b));
         expect(res, equals([1, 2, 3, 4]));
       });
 
       test(
         "should be concatenated given two 'AsyncIterable' concurrently",
         () async {
-          final a = mapAsync(
-            (int x) => delay(const Duration(milliseconds: 100), x),
-            toAsync([1, 2, 3]),
+          final a = fxMapAsync(
+            (int x) => fxDelay(const Duration(milliseconds: 100), x),
+            fxToAsync([1, 2, 3]),
           );
-          final b = mapAsync(
-            (int x) => delay(const Duration(milliseconds: 100), x),
-            toAsync([4, 5, 6]),
+          final b = fxMapAsync(
+            (int x) => fxDelay(const Duration(milliseconds: 100), x),
+            fxToAsync([4, 5, 6]),
           );
           final sw = Stopwatch()..start();
-          final res = await toListAsync(concurrentAsync(2, concatAsync(a, b)));
+          final res = await fxToListAsync(
+            fxConcurrentAsync(2, fxConcatAsync(a, b)),
+          );
           expect(res, equals([1, 2, 3, 4, 5, 6]));
           // sequential is ~600ms; concurrent(2) should be ~300ms
           expect(sw.elapsedMilliseconds, lessThan(500));
@@ -55,8 +57,8 @@ void main() {
       test(
         "should be concatenated given 'Iterable' and 'AsyncIterable'",
         () async {
-          final res1 = await toListAsync(
-            concatAsync(toAsync([1, 2, 3]), toAsync([4, 5, 6])),
+          final res1 = await fxToListAsync(
+            fxConcatAsync(fxToAsync([1, 2, 3]), fxToAsync([4, 5, 6])),
           );
           expect(res1, equals([1, 2, 3, 4, 5, 6]));
 
@@ -64,7 +66,7 @@ void main() {
             1,
             2,
             3,
-          ]).toAsync().concat(toAsync([4, 5, 6])).toList();
+          ]).toAsync().concat(fxToAsync([4, 5, 6])).toList();
           expect(res2, equals([1, 2, 3, 4, 5, 6]));
         },
       );
@@ -73,7 +75,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = concatAsync(mock, toAsync([1, 2, 3])).iterator;
+          final it = fxConcatAsync(mock, fxToAsync([1, 2, 3])).iterator;
           final concurrent = Concurrent.of(2);
           await it.next(concurrent);
           expect(mock.received, same(concurrent));

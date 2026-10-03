@@ -12,7 +12,7 @@ void main() {
 
   group('FxEvents.empty', () {
     test('closes without emitting', () async {
-      expect(await FxEvents<int>.empty().toList(), isEmpty);
+      expect(await FxEvents<int>.empty().toList(), fxIsEmpty);
     });
   });
 
@@ -25,7 +25,7 @@ void main() {
         onDone: () => done = true,
       );
       await Future<void>.delayed(const Duration(milliseconds: 20));
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
       expect(done, isFalse);
       await sub.cancel();
     });
@@ -62,7 +62,7 @@ void main() {
         await sub.cancel();
         pending.complete(1);
         await Future<void>.delayed(Duration.zero);
-        expect(seen, isEmpty);
+        expect(seen, fxIsEmpty);
       },
     );
 
@@ -105,7 +105,7 @@ void main() {
       ).listen(seen.add);
       await sub.cancel();
       await Future<void>.delayed(const Duration(milliseconds: 60));
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
     });
   });
 
@@ -136,7 +136,7 @@ void main() {
       ).listen(seen.add);
       await sub.cancel();
       await Future<void>.delayed(const Duration(milliseconds: 60));
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
     });
   });
 
@@ -155,7 +155,7 @@ void main() {
     test('empty factory stream closes empty', () async {
       expect(
         await FxEvents<int>.defer(() => Stream<int>.empty()).toList(),
-        isEmpty,
+        fxIsEmpty,
       );
     });
 
@@ -166,7 +166,7 @@ void main() {
       await sub.cancel();
       inner.add(1);
       await Future<void>.delayed(Duration.zero);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
       await inner.close();
     });
 
@@ -193,7 +193,7 @@ void main() {
       sub.pause();
       inner.add(1);
       await Future<void>.delayed(Duration.zero);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
       sub.resume();
       await Future<void>.delayed(Duration.zero);
       expect(seen, equals([1]));
@@ -206,7 +206,7 @@ void main() {
     test('empty: condition fails on the seed', () async {
       expect(
         await FxEvents.generate(0, (n) => false, (n) => n + 1).toList(),
-        isEmpty,
+        fxIsEmpty,
       );
     });
 
@@ -233,7 +233,7 @@ void main() {
       ).listen(seen.add);
       await sub.cancel();
       await Future<void>.delayed(Duration.zero);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
     });
 
     test('forwards a throw from the condition', () async {
@@ -282,14 +282,14 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(seen, equals([7]));
       await sub.cancel();
-      expect(handlers, isEmpty);
+      expect(handlers, fxIsEmpty);
     });
 
     test('empty: listen and cancel with no events', () async {
       final seen = <int>[];
       final sub = FxEvents<int>.fromPattern((_) {}, (_) {}).listen(seen.add);
       await sub.cancel();
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
     });
 
     test('forwards a throw from add', () async {
@@ -330,7 +330,7 @@ void main() {
           (_) => Stream<int>.empty(),
           (_) => released++,
         ).toList(),
-        isEmpty,
+        fxIsEmpty,
       );
       expect(released, 1);
     });
@@ -346,7 +346,7 @@ void main() {
       ).listen(seen.add);
       await sub.cancel();
       expect(released, 1);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
       await inner.close();
     });
 
@@ -424,7 +424,7 @@ void main() {
       sub.pause();
       inner.add(1);
       await Future<void>.delayed(Duration.zero);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
       sub.resume();
       await Future<void>.delayed(Duration.zero);
       expect(seen, equals([1]));
@@ -437,7 +437,7 @@ void main() {
     test('empty: close with no events', () async {
       expect(
         await FxEvents<int>.create((emit) => emit.close()).toList(),
-        isEmpty,
+        fxIsEmpty,
       );
     });
 
@@ -466,7 +466,7 @@ void main() {
       await sub.cancel();
       await Future<void>.delayed(const Duration(milliseconds: 50));
       expect(cancelled, isTrue);
-      expect(seen, isEmpty);
+      expect(seen, fxIsEmpty);
     });
 
     test('forwards addError', () async {
@@ -502,7 +502,7 @@ void main() {
           emit.close();
           throw StateError('after close');
         }).toList(),
-        isEmpty,
+        fxIsEmpty,
       );
     });
 

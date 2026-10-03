@@ -48,7 +48,7 @@ nextLabel: reduceLazy
   <p>
     Both are strict where <code>fold</code> is not. Walking backwards means
     knowing where the end is, so a source that isn't a <code>List</code> is
-    materialized first and <code>foldRightAsync</code> drains the stream
+    materialized first and <code>fxFoldRightAsync</code> drains the stream
     before it starts — never point it at an infinite source.
   </p>
 

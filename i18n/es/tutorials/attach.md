@@ -30,7 +30,7 @@ nextLabel: filter
     de modo que el respaldo
     <code>r.$2&nbsp;??&nbsp;r.$1.listPrice</code> y la etiqueta «¿de qué
     SKU era esto?» siguen al alcance. La forma async está construida sobre
-    <code>mapAsync</code>, así que es segura en paralelo — pon
+    <code>fxMapAsync</code>, así que es segura en paralelo — pon
     <code><a href="concurrent.html">concurrent(n)</a></code> después y
     corren <em>n</em> búsquedas a la vez.
   </p>

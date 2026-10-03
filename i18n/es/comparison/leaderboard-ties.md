@@ -33,7 +33,7 @@ async: false
     compruebas reproduciendo el bucle en tu cabeza. La versión con FxDart
     declara la estructura en su lugar: <code>sortBy</code> descendente,
     <code>groupBy</code> por puntuación (un grupo por puesto), recorrer los
-    grupos con <code>entries</code> + <code>zipWithIndex</code> (índice de
+    grupos con <code>fxEntries</code> + <code>zipWithIndex</code> (índice de
     grupo = puesto) y <code>flatMap</code> para devolver cada grupo a líneas
     de jugador. «Las puntuaciones iguales comparten puesto» deja de ser un
     comportamiento emergente del bucle y pasa a ser la forma del pipeline.

@@ -2,7 +2,7 @@
 slug: compress
 title: compress — FxDart 101
 description: Tutorial de compress en FxDart: filtra un iterable con una lista paralela de booleanos, con un playground en vivo.
-heading: <code>compress</code>
+heading: <code>fxCompress</code>
 section: 4
 crumb: compress
 prev: intersectionBy.html
@@ -16,10 +16,10 @@ nextLabel: take
 
   <h2>Lección</h2>
   <p>
-    <code>compress</code> es una máscara posicional: el elemento <code>i</code> de
+    <code>fxCompress</code> es una máscara posicional: el elemento <code>i</code> de
     <code>iterable</code> sobrevive solo si <code>selectors[i]</code> es
     <code>true</code>. Está construido directamente a partir de dos funciones que ya
-    conoces — <code>map((r) =&gt; r.$2, filter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    conoces — <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
     combina la máscara con los datos, filtra los pares que dan true y desempaqueta. Eso
     también significa que hereda el comportamiento de <code>zip</code> ante longitudes
     distintas: la iteración se detiene en cuanto se agota el <em>más corto</em> de
@@ -42,7 +42,7 @@ nextLabel: take
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>compress</code> para quedarte solo con las respuestas
+  <p>Ejercicio: usa <code>fxCompress</code> para quedarte solo con las respuestas
     correctas.</p>
   {{playground:2}}
 

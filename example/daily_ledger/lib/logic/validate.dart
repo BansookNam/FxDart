@@ -49,11 +49,11 @@ DateTime vDate(Raise<FieldError> r, String raw, {String field = 'date'}) {
 
 EntryType vType(Raise<FieldError> r, String raw, {String field = 'type'}) =>
     r.ensureNotNull(
-      find((EntryType t) => t.name == raw.trim(), EntryType.values),
+      fxFind((EntryType t) => t.name == raw.trim(), EntryType.values),
       () => FieldError(
         field,
         'unknown type "$raw" — want '
-        '${join('|', map((EntryType t) => t.name, EntryType.values))}',
+        '${fxJoin('|', fxMap((EntryType t) => t.name, EntryType.values))}',
       ),
     );
 
@@ -223,7 +223,7 @@ class BudgetDraft {
 EitherNel<FieldError, (Category, double)> validateBudget(
   BudgetDraft d,
   Map<String, Category> byId,
-) => either<Nel<FieldError>, (Category, double)>(
+) => fxEither<Nel<FieldError>, (Category, double)>(
   (r) => r.zipOrAccumulate2(
     (fr) => vCategoryId(fr, d.categoryId, EntryType.expense, byId),
     (fr) => vBudgetLimit(fr, d.amount),
@@ -299,7 +299,7 @@ Entry _entryFrom(
 EitherNel<FieldError, Entry> validateDraft(
   EntryDraft d,
   Map<String, Category> byId,
-) => either<Nel<FieldError>, Entry>(
+) => fxEither<Nel<FieldError>, Entry>(
   (r) => r.zipOrAccumulate5(
     (fr) => vTitle(fr, d.title),
     (fr) => vAmount(fr, d.amount, d.type),
@@ -321,12 +321,12 @@ EitherNel<FieldError, Entry> validateDraft(
 /// plain raise scope, so the first problem ends it.
 ///
 /// Kept alongside [validateDraft] because the form ships a toggle between the
-/// two — the contrast is the demo, and it is one `either` block versus one
+/// two — the contrast is the demo, and it is one `fxEither` block versus one
 /// `zipOrAccumulate5` call over identical validators.
 Either<FieldError, Entry> validateDraftFailFast(
   EntryDraft d,
   Map<String, Category> byId,
-) => either((r) {
+) => fxEither((r) {
   final title = vTitle(r, d.title);
   final amount = vAmount(r, d.amount, d.type);
   final category = vCategoryId(r, d.categoryId, d.type, byId);

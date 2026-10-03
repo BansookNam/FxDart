@@ -61,6 +61,6 @@ nextLabel: windowOn
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="chunk.html"><code>chunk</code></a> — Iterable을 개수로 묶는 풀 레이어의 원본 ·
-    <a href="throttle.html"><code>throttle</code></a> — 창마다 전부가 아니라 하나만 원할 때 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — 창마다 전부가 아니라 하나만 원할 때 ·
     <a href="spaceBy.html"><code>spaceBy</code></a> — 버스트를 늦추는 다른 방법: 묶는 대신 늘이기
   </div>

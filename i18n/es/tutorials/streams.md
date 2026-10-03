@@ -14,7 +14,7 @@ nextLabel: concurrent
 
   <h2>Lección</h2>
   <p>
-    <code>fromStream</code> convierte cualquier <code>Stream</code> —de
+    <code>fxFromStream</code> convierte cualquier <code>Stream</code> —de
     suscripción única o broadcast— en un <code>FxAsyncIterable</code>, para
     que puedas aplicar todo el conjunto de operadores de FxDart
     (<code>map</code>, <code>filter</code>, <code>concurrent</code>, …) sobre
@@ -57,7 +57,7 @@ nextLabel: concurrent
     </tbody>
   </table>
   <p>
-    <code>fromStream</code> es el valor por defecto y el que usa la Demo 1,
+    <code>fxFromStream</code> es el valor por defecto y el que usa la Demo 1,
     porque un fichero o un socket no deberían perder bytes. Usa latest
     cuando una UI solo le importa la lectura actual, chunked cuando el
     consumidor quiere trabajo en lotes, y next cuando los eventos viejos
@@ -82,7 +82,7 @@ nextLabel: concurrent
   <h2>Demo 3 · Cuatro formas de tirar de un stream</h2>
   <p>
     Un ráfaga síncrona de 1, 2, 3 llega mientras un pull ya está
-    esperando. <code>fromStream</code> conserva cada valor;
+    esperando. <code>fxFromStream</code> conserva cada valor;
     <code>fromStreamLatest</code> conserva solo el más nuevo;
     <code>fromStreamChunked</code> los emite como una lista;
     <code>fromStreamNext</code> conserva solo el valor que encontró el

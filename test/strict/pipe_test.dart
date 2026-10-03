@@ -18,9 +18,9 @@ void main() {
         final res = pipe(
           [1, 2, 3, 4, 5],
           [
-            (Iterable<int> n) => map((int a) => a + 5, n),
-            (Iterable<int> n) => filter((int a) => a % 2 == 0, n),
-            (Iterable<int> n) => fold(0, (int a, int b) => a + b, n),
+            (Iterable<int> n) => fxMap((int a) => a + 5, n),
+            (Iterable<int> n) => fxFilter((int a) => a % 2 == 0, n),
+            (Iterable<int> n) => fxFold(0, (int a, int b) => a + b, n),
           ],
         );
         expect(res, equals(24));
@@ -31,20 +31,20 @@ void main() {
       test(
         "should work when the composed function deals with 'AsyncIterable'",
         () async {
-          final res1 = await pipe(toAsync([1, 2, 3, 4, 5]), [
-            (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
-            (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
+          final res1 = await pipe(fxToAsync([1, 2, 3, 4, 5]), [
+            (FxAsyncIterable<int> n) => fxMapAsync((int a) => a + 5, n),
+            (FxAsyncIterable<int> n) => fxFilterAsync((int a) => a % 2 == 0, n),
             (FxAsyncIterable<int> n) =>
-                foldAsync(0, (int a, int b) => a + b, n),
+                fxFoldAsync(0, (int a, int b) => a + b, n),
           ]);
 
           expect(res1, equals(24));
 
-          final res2 = await pipe(toAsync([1, 2, 3, 4, 5]), [
-            (FxAsyncIterable<int> n) => mapAsync((int a) => a + 5, n),
-            (FxAsyncIterable<int> n) => filterAsync((int a) => a % 2 == 0, n),
-            (FxAsyncIterable<int> n) => toListAsync(n),
-            (List<int> n) => fold(0, (int a, int b) => a + b, n),
+          final res2 = await pipe(fxToAsync([1, 2, 3, 4, 5]), [
+            (FxAsyncIterable<int> n) => fxMapAsync((int a) => a + 5, n),
+            (FxAsyncIterable<int> n) => fxFilterAsync((int a) => a % 2 == 0, n),
+            (FxAsyncIterable<int> n) => fxToListAsync(n),
+            (List<int> n) => fxFold(0, (int a, int b) => a + b, n),
           ]);
 
           expect(res2, equals(24));
@@ -58,7 +58,7 @@ void main() {
             [1, 2, 3],
             [
               (List<int> v) => Future.value(v),
-              (List<int> v) => toList(map((int a) => a + 1, v)),
+              (List<int> v) => fxToList(fxMap((int a) => a + 1, v)),
             ],
           );
 
@@ -79,11 +79,11 @@ void main() {
         "should return rejected 'Future' if an error occurs in the callback",
         () async {
           await expectLater(
-            pipe(toAsync(range(1, 10)), [
+            pipe(fxToAsync(fxRange(1, 10)), [
                   (FxAsyncIterable<int> a) =>
-                      mapAsync((int _) => throw Exception('err'), a),
+                      fxMapAsync((int _) => throw Exception('err'), a),
                   (FxAsyncIterable<int> a) =>
-                      reduceAsync((int acc, int b) => acc + b, a),
+                      fxReduceAsync((int acc, int b) => acc + b, a),
                 ])
                 as Future,
             throwsA(isA<Exception>()),
@@ -91,13 +91,13 @@ void main() {
 
           // Future.error
           await expectLater(
-            pipe(toAsync(range(1, 10)), [
-                  (FxAsyncIterable<int> a) => mapAsync(
+            pipe(fxToAsync(fxRange(1, 10)), [
+                  (FxAsyncIterable<int> a) => fxMapAsync(
                     (int _) => Future<int>.error(Exception('err')),
                     a,
                   ),
                   (FxAsyncIterable<int> a) =>
-                      reduceAsync((int acc, int b) => acc + b, a),
+                      fxReduceAsync((int acc, int b) => acc + b, a),
                 ])
                 as Future,
             throwsA(isA<Exception>()),
@@ -111,9 +111,9 @@ void main() {
         await pipe(
           ['a', 'b', 'c'],
           [
-            (List<String> v) => toAsync(v),
-            (FxAsyncIterable<String> v) => eachAsync((_) async {
-              await delay(Duration.zero, null);
+            (List<String> v) => fxToAsync(v),
+            (FxAsyncIterable<String> v) => fxEachAsync((_) async {
+              await fxDelay(Duration.zero, null);
               res++;
             }, v),
           ],
@@ -126,9 +126,9 @@ void main() {
     group('pipeLazy', () {
       test('should return a function piping its argument', () async {
         final f = pipeLazy([
-          (Iterable<int> n) => map((int a) => a + 5, n),
-          (Iterable<int> n) => filter((int a) => a % 2 == 0, n),
-          (Iterable<int> n) => toList(n),
+          (Iterable<int> n) => fxMap((int a) => a + 5, n),
+          (Iterable<int> n) => fxFilter((int a) => a % 2 == 0, n),
+          (Iterable<int> n) => fxToList(n),
         ]);
         expect(f([1, 2, 3, 4, 5]), equals([6, 8, 10]));
         expect(await f(Future.value([1, 2, 3, 4, 5])), equals([6, 8, 10]));

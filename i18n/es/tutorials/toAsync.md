@@ -24,8 +24,8 @@ nextLabel: async variants
   </p>
   <p>
     <code>FxAsyncIterable</code> está <strong>basado en pull</strong>: nada se
-    ejecuta hasta que un terminal (<code>toListAsync</code>,
-    <code>eachAsync</code>, el <code>.toList()</code> de la cadena
+    ejecuta hasta que un terminal (<code>fxToListAsync</code>,
+    <code>fxEachAsync</code>, el <code>.toList()</code> de la cadena
     <code>FxAsync</code>, …) llama a <code>next()</code> sobre él, un paso
     cada vez — exactamente igual que un <code>Iterable</code> normal, solo que
     asíncrono. Es un alejamiento deliberado del <code>Stream</code> de
@@ -41,7 +41,7 @@ nextLabel: async variants
     <code>Stream</code>.
   </p>
   <p>
-    Usa el <code>toAsync(iterable)</code> de nivel superior para un
+    Usa el <code>fxToAsync(iterable)</code> de nivel superior para un
     <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> en crudo, o el método de
     cadena <code>fx(iterable).toAsync()</code> para pasar una cadena
     <code>Fx</code> existente a su equivalente <code>FxAsync</code>. Ambos son
@@ -60,7 +60,7 @@ nextLabel: async variants
     se crea, no cuando se espera. Así que tres Futures construidos de forma
     ansiosa en un literal de lista ya se están ejecutando en paralelo antes de que
     <code>toAsync</code> los toque siquiera. Compáralo con
-    <code>mapAsync</code> (o el <code>.map</code> de la cadena), que crea un
+    <code>fxMapAsync</code> (o el <code>.map</code> de la cadena), que crea un
     Future nuevo por elemento solo cuando se <em>tira</em> de él — de forma
     perezosa, uno a uno, salvo que añadas <code>concurrent(n)</code>:
   </p>
@@ -93,5 +93,5 @@ nextLabel: async variants
     <a href="asyncVariants.html">convención de nombres <code>*Async</code></a> — mapAsync, filterAsync, … ·
     <a href="streams.html">puentes con Stream</a> — fromStream, fxStream, toStream ·
     <a href="concurrent.html"><code>concurrent</code></a> — el canal de retorno en acción ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — para construir demos asíncronas
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — para construir demos asíncronas
   </div>

@@ -53,7 +53,7 @@ nextLabel: nth
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="head.html"><code>head</code></a> — el extremo opuesto, en O(1) ·
-    <a href="nth.html"><code>nth</code></a> — obtener cualquier índice ·
+    <a href="nth.html"><code>fxNth</code></a> — obtener cualquier índice ·
     <a href="find.html"><code>find</code></a> — la primera coincidencia con un predicado ·
     <a href="reverse.html"><code>reverse</code></a> — invertir toda la secuencia
   </div>

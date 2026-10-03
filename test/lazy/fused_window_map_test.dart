@@ -10,7 +10,7 @@
 //
 //   * `windowed(...).map(f)` via the SDK's `Iterable.map` — never fuses, so it
 //     is the reference for what the layered pair used to do;
-//   * fxdart's `map(f, windowed(...))` over a `List` — the fused indexed path;
+//   * fxdart's `fxMap(f, windowed(...))` over a `List` — the fused indexed path;
 //   * the same over a generator — the fused pulled path, which still uses the
 //     ring buffer and so exercises the *other* window-building loop.
 import 'package:fxdart/fxdart.dart';
@@ -35,9 +35,9 @@ List<List<A>> windowsOf<A>(
   int size, {
   int step = 1,
   bool partial = false,
-}) => map(
+}) => fxMap(
   (List<A> w) => w.toList(),
-  windowed(size, src, step: step, partial: partial),
+  fxWindowed(size, src, step: step, partial: partial),
 ).toList();
 
 /// Asserts the layered pair, the fused indexed path and the fused pulled path
@@ -52,19 +52,22 @@ void expectAllSpellings(
   String render(List<int> w) => w.join('-');
 
   expect(
-    unfused(windowed(size, src, step: step, partial: partial), render).toList(),
+    unfused(
+      fxWindowed(size, src, step: step, partial: partial),
+      render,
+    ).toList(),
     expected,
     reason: 'layered pair (the reference)',
   );
   expect(
-    map(render, windowed(size, src, step: step, partial: partial)).toList(),
+    fxMap(render, fxWindowed(size, src, step: step, partial: partial)).toList(),
     expected,
     reason: 'fused, List source',
   );
   expect(
-    map(
+    fxMap(
       render,
-      windowed(size, pulled(src), step: step, partial: partial),
+      fxWindowed(size, pulled(src), step: step, partial: partial),
     ).toList(),
     expected,
     reason: 'fused, pulled source',
@@ -82,31 +85,31 @@ void main() {
       // White-box: nothing else here fails if the two stages stop fusing, and
       // the boundary is paid once per source element.
       expect(
-        map(
+        fxMap(
           (List<int> w) => w.length,
-          windowed(3, [1, 2, 3, 4]),
+          fxWindowed(3, [1, 2, 3, 4]),
         ).runtimeType.toString(),
         startsWith('_WindowMapIterable'),
       );
       // A List source resolves to the indexed iterator...
       expect(
-        map(
+        fxMap(
           (List<int> w) => w.length,
-          windowed(3, [1, 2, 3, 4]),
+          fxWindowed(3, [1, 2, 3, 4]),
         ).iterator.runtimeType.toString(),
         startsWith('_WindowRangeMapIterator'),
       );
       // ...and anything else keeps the ring buffer.
       expect(
-        map(
+        fxMap(
           (List<int> w) => w.length,
-          windowed(3, pulled([1, 2, 3, 4])),
+          fxWindowed(3, pulled([1, 2, 3, 4])),
         ).iterator.runtimeType.toString(),
         startsWith('_WindowMapIterator'),
       );
       // A stage that cannot absorb a map still gets the plain map stage.
       expect(
-        map((int a) => a, [1, 2, 3]).runtimeType.toString(),
+        fxMap((int a) => a, [1, 2, 3]).runtimeType.toString(),
         startsWith('_MapIterable'),
       );
     });
@@ -170,9 +173,9 @@ void main() {
       expectAllSpellings(<int>[], 3, partial: true, expected: <String>[]);
       expectAllSpellings(<int>[], 1, partial: true, expected: <String>[]);
       expect(
-        map(
+        fxMap(
           (List<int> w) => w.length,
-          windowed(2, <int>[]),
+          fxWindowed(2, <int>[]),
         ).iterator.moveNext(),
         isFalse,
       );
@@ -187,33 +190,31 @@ void main() {
       const src = [1, 2, 3, 4, 5, 6, 7];
 
       expect(
-        map(render, chunk(3, src)).toList(),
-        unfused(chunk(3, src), render).toList(),
+        fxMap(render, fxChunk(3, src)).toList(),
+        unfused(fxChunk(3, src), render).toList(),
       );
-      expect(map(render, chunk(3, src)).toList(), ['1-2-3', '4-5-6', '7']);
-      expect(map(render, chunk(3, pulled(src))).toList(), [
+      expect(fxMap(render, fxChunk(3, src)).toList(), ['1-2-3', '4-5-6', '7']);
+      expect(fxMap(render, fxChunk(3, pulled(src))).toList(), [
         '1-2-3',
         '4-5-6',
         '7',
       ]);
       expect(fx(src).chunk(3).map(render).toList(), ['1-2-3', '4-5-6', '7']);
       // chunk's non-positive-size escape hatch has no windows to fuse.
-      expect(map(render, chunk(0, src)).toList(), <String>[]);
+      expect(fxMap(render, fxChunk(0, src)).toList(), <String>[]);
     });
 
     test('windows over a take/drop range are offset, not restarted', () {
       const src = [1, 2, 3, 4, 5, 6, 7, 8];
-      final range = drop(2, take(7, src));
+      final range = fxDrop(2, fxTake(7, src));
       expect(
-        map((List<int> w) => w.join('-'), windowed(2, range)).toList(),
-        unfused(windowed(2, range), (List<int> w) => w.join('-')).toList(),
+        fxMap((List<int> w) => w.join('-'), fxWindowed(2, range)).toList(),
+        unfused(fxWindowed(2, range), (List<int> w) => w.join('-')).toList(),
       );
-      expect(map((List<int> w) => w.join('-'), windowed(2, range)).toList(), [
-        '3-4',
-        '4-5',
-        '5-6',
-        '6-7',
-      ]);
+      expect(
+        fxMap((List<int> w) => w.join('-'), fxWindowed(2, range)).toList(),
+        ['3-4', '4-5', '5-6', '6-7'],
+      );
     });
 
     test('runs the callback once per window consumed, in order', () {
@@ -222,10 +223,10 @@ void main() {
         pulled([1, 2, 3, 4]),
       ]) {
         final seen = <String>[];
-        final result = map((List<int> w) {
+        final result = fxMap((List<int> w) {
           seen.add(w.join('-'));
           return w.first;
-        }, windowed(2, src)).toList();
+        }, fxWindowed(2, src)).toList();
 
         expect(result, [1, 2, 3]);
         expect(seen, [
@@ -267,7 +268,7 @@ void main() {
 
     test('stays lazy over an endless List-backed range', () {
       final calls = <int>[];
-      final result = fx(range(1, 1000000))
+      final result = fx(fxRange(1, 1000000))
           .windowed(4)
           .map((w) {
             calls.add(w.first);
@@ -291,7 +292,7 @@ void main() {
 
     test('sees a List source that grew between iterations', () {
       final src = [1, 2, 3];
-      final chain = map((List<int> w) => w.join('-'), windowed(2, src));
+      final chain = fxMap((List<int> w) => w.join('-'), fxWindowed(2, src));
       expect(chain.toList(), ['1-2', '2-3']);
       src.add(4);
       expect(
@@ -305,10 +306,10 @@ void main() {
 
     test('the window handed to the callback is the window, not a view', () {
       final windows = <List<int>>[];
-      map((List<int> w) {
+      fxMap((List<int> w) {
         windows.add(w);
         return w.length;
-      }, windowed(2, [1, 2, 3])).toList();
+      }, fxWindowed(2, [1, 2, 3])).toList();
 
       expect(windows, [
         [1, 2],
@@ -327,29 +328,32 @@ void main() {
       // win. Reverting either to a pre-sized fill would fail here.
       //
       // All four paths must agree, which is the point: before 0.8.7 the two
-      // sync paths were fixed-length while `windowedAsync` was already
+      // sync paths were fixed-length while `fxWindowedAsync` was already
       // growable.
-      final unfusedWindow = windowed(2, [1, 2, 3]).first;
+      final unfusedWindow = fxWindowed(2, [1, 2, 3]).first;
       expect(unfusedWindow, [1, 2]);
       expect(() => unfusedWindow.add(9), returnsNormally);
 
-      final fusedWindow = map((List<int> w) => w, windowed(2, [1, 2, 3])).first;
+      final fusedWindow = fxMap(
+        (List<int> w) => w,
+        fxWindowed(2, [1, 2, 3]),
+      ).first;
       expect(fusedWindow, [1, 2]);
       expect(() => fusedWindow.add(9), returnsNormally);
 
       // The pulled path builds its window out of the ring buffer. Both of its
       // branches have to agree: `chunk` never wraps past the ring's end,
       // an overlapping `windowed` does.
-      final contiguous = map(
+      final contiguous = fxMap(
         (List<int> w) => w,
-        chunk(2, pulled([1, 2, 3, 4])),
+        fxChunk(2, pulled([1, 2, 3, 4])),
       ).first;
       expect(contiguous, [1, 2]);
       expect(() => contiguous.add(9), returnsNormally);
 
-      final wrapped = map(
+      final wrapped = fxMap(
         (List<int> w) => w,
-        windowed(3, pulled([1, 2, 3, 4, 5])),
+        fxWindowed(3, pulled([1, 2, 3, 4, 5])),
       ).toList()[2];
       expect(wrapped, [3, 4, 5], reason: 'this window wraps the ring');
       expect(() => wrapped.add(9), returnsNormally);
@@ -357,11 +361,11 @@ void main() {
 
     test('rejects a non-positive size or step before fusing', () {
       expect(
-        () => map((List<int> w) => w, windowed(0, [1, 2])),
+        () => fxMap((List<int> w) => w, fxWindowed(0, [1, 2])),
         throwsArgumentError,
       );
       expect(
-        () => map((List<int> w) => w, windowed(2, [1, 2], step: 0)),
+        () => fxMap((List<int> w) => w, fxWindowed(2, [1, 2], step: 0)),
         throwsArgumentError,
       );
     });
@@ -375,7 +379,7 @@ void main() {
           for (var step = 1; step <= 4; step++) {
             for (final partial in [false, true]) {
               final reference = unfused(
-                windowed(size, pulled(src), step: step, partial: partial),
+                fxWindowed(size, pulled(src), step: step, partial: partial),
                 (List<int> w) => w.toList(),
               ).toList();
               expect(

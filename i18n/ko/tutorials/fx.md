@@ -29,7 +29,7 @@ nextLabel: pipe
   </p>
   <p>
     이 지연 평가 덕분에 FxDart는 아주 크거나 무한한 시퀀스
-    (<code>range</code>, <code>cycle</code>, <code>repeat</code>) 위에서도
+    (<code>fxRange</code>, <code>cycle</code>, <code>repeat</code>) 위에서도
     안전하게 체인을 이어 갈 수 있습니다. 하류의 무언가가 — 보통은
     <code>take(n)</code>이 — 실제로 몇 개를 끌어당길지 정해 주기만 하면,
     상류 단계는 딱 그만큼만 실행됩니다.
@@ -37,7 +37,7 @@ nextLabel: pipe
   <p>
     <code>fx</code>는 체인의 <em>동기</em> 쪽 절반입니다. 비동기 짝으로는
     <code>FxAsyncIterable</code>(<code>toAsync</code>,
-    <code>fromStream</code>, 혹은 <code>*Async</code> 계열 함수에서 얻는 것)을
+    <code>fxFromStream</code>, 혹은 <code>*Async</code> 계열 함수에서 얻는 것)을
     감싸는 <code>fxAsync</code>, 그리고 Dart의 <code>Stream</code>을 바로
     감싸는 단축 함수 <code>fxStream</code>이 있습니다. 둘 다
     <code>FxAsync&lt;T&gt;</code> 체인을 반환하며, 이 체인의 메서드는
@@ -46,7 +46,7 @@ nextLabel: pipe
     동기에서 비동기로 넘어가려면 <code>.toAsync()</code>를 쓰면 됩니다.
   </p>
   <p>
-    그냥 <code>map(f, iterable)</code> 같은 최상위 함수를 호출하면 될 텐데
+    그냥 <code>fxMap(f, iterable)</code> 같은 최상위 함수를 호출하면 될 텐데
     왜 이런 게 필요할까요? Dart로는 FxTS의 TypeScript처럼 가변 인자
     <code>pipe</code>에 타입을 붙일 수 없기 때문입니다(다음 강의 참고).
     <code>fx()</code> 체이닝은 그 대신 FxDart가 완전한 타입과 자동 완성이
@@ -133,9 +133,15 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
   <h2>getter 표기 전체</h2>
   <p>
     규칙은 하나입니다. 진입점 이름에는 <code>fx</code>가 들어갑니다. 어느
-    라이브러리로 들어가는지를 밝혀 주고, 맨 이름 — <code>toAsync</code>,
-    <code>shuffle</code>, <code>debounce</code> — 은 프로젝트가 그 타입에
-    붙일 몫으로 남겨 둡니다.
+    라이브러리로 들어가는지를 밝혀 주고, 맨 이름 — <code>shuffle</code>,
+    <code>debounce</code> — 은 프로젝트가 그 타입에 붙일 몫으로 남겨 둡니다.
+    짧은 최상위 함수도 같은 이유로 같은 규칙을 따릅니다. <code>fxMap</code>,
+    <code>fxRange</code>, <code>fxGroupBy</code>는 <code>dart:math</code>의
+    <code>max</code>, <code>dart:io</code>의 <code>sleep</code>,
+    <code>package:path</code>의 <code>join</code>과 부딪히지 않습니다. 아무것과도
+    겹치지 않는 긴 이름(<code>mapWithIndex</code>,
+    <code>takeUntilInclusive</code>)은 FxTS 표기를 그대로 쓰고, 체인 메서드에는
+    접두어가 붙지 않습니다. 언제나 <code>fx(xs).map(f)</code>입니다.
   </p>
   <table>
     <thead><tr><th>수신 타입</th><th>getter</th><th>같은 것</th></tr></thead>
@@ -143,14 +149,14 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
       <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fx(xs)</code></td></tr>
       <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxAsync(it)</code></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fx</code></td><td><code>fxStream(s)</code></td></tr>
-      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>toAsync(xs)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code></td><td><code>.fxAsync</code></td><td><a href="toAsync.html"><code>fxToAsync(xs)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxEvents</code></td><td><a href="fxEvents.html"><code>fxEvents(s)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLive</code></td><td><a href="liveValue.html"><code>LiveValue.from(s)</code></a></td></tr>
       <tr><td><code>Stream&lt;T&gt;</code></td><td><code>.fxLiveSeeded</code></td><td><a href="liveValue.html"><code>LiveValue.seededFrom(v, s)</code></a></td></tr>
-      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffle(xs)</code></a></td></tr>
-      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>shuffleAsync(it)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>debounce(f, w)</code></a></td></tr>
-      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>throttle(f, w)</code></a></td></tr>
+      <tr><td><code>Iterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>fxShuffle(xs)</code></a></td></tr>
+      <tr><td><code>FxAsyncIterable&lt;T&gt;</code></td><td><code>.fxShuffle</code></td><td><a href="shuffle.html"><code>fxShuffleAsync(it)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxDebounce</code></td><td><a href="debounce.html"><code>fxDebounce(f, w)</code></a></td></tr>
+      <tr><td><code>void Function(T)</code></td><td><code>.fxThrottle</code></td><td><a href="throttle.html"><code>fxThrottle(f, w)</code></a></td></tr>
     </tbody>
   </table>
   <p>

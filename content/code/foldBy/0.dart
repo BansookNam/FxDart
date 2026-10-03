@@ -16,7 +16,7 @@ void main() {
   ];
 
   // Data-first form: key selector, seed, combining step, then the iterable.
-  final spent = foldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
+  final spent = fxFoldBy((Tx t) => t.category, 0.0, (sum, t) => sum + t.amount, txns);
   print(spent); // {Food: 65.5, Transport: 2.75, Fun: 15.0}
 
   // Chain form. Nothing is grouped on the way — each key holds only its

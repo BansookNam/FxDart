@@ -17,7 +17,7 @@ nextLabel: maxBy
   <h2>강의</h2>
   <p>
     <code>max</code>는 <code><a href="min.html">min</a></code>과 방향만 반대일 뿐
-    동작이 똑같습니다. 내부적으로는 <code>fold(-double.infinity, ..., iterable)</code>로,
+    동작이 똑같습니다. 내부적으로는 <code>fxFold(-double.infinity, ..., iterable)</code>로,
     지금까지 본 값 중 가장 큰 값을 계속 들고 갑니다.
   </p>
   <p>

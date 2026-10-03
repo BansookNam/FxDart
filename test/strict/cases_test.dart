@@ -6,9 +6,9 @@ void main() {
     test('should work in pipe', () {
       final res = fx([10, 20, 30])
           .map(
-            cases<int, int>([
-              ((n) => gt(15, n), (n) => n + 20),
-              ((n) => gt(25, n), (n) => n + 10),
+            fxCases<int, int>([
+              ((n) => fxGt(15, n), (n) => n + 20),
+              ((n) => fxGt(25, n), (n) => n + 10),
             ]),
           )
           .toList();
@@ -22,15 +22,15 @@ void main() {
                 {'a': 'A'},
               ])
               .map(
-                cases<Map<String, String>, String>([
+                fxCases<Map<String, String>, String>([
                   ((n) => n.containsKey('b'), (n) => n['b']!),
                 ], orElse: (n) => n['a']!),
               )
               .toList();
       expect(res, equals(['B', 'A']));
 
-      final upper = cases<Object, String>([
-        (isString, (s) => (s as String).toUpperCase()),
+      final upper = fxCases<Object, String>([
+        (fxIsString, (s) => (s as String).toUpperCase()),
       ], orElse: (_) => 'not string');
       expect(upper('hello'), equals('HELLO'));
       expect(upper(123), equals('not string'));
@@ -38,7 +38,9 @@ void main() {
 
     test('should match first predicate', () {
       final res = fx([5, -5])
-          .map(cases<int, Object>([((n) => lt(0, n), always('positive'))]))
+          .map(
+            fxCases<int, Object>([((n) => fxLt(0, n), fxAlways('positive'))]),
+          )
           .toList();
       expect(res, equals(['positive', -5]));
     });
@@ -46,7 +48,7 @@ void main() {
     test(
       'should throw when no case matches, no orElse, and value is not R',
       () {
-        final f = cases<int, String>([((n) => n < 0, (n) => 'negative')]);
+        final f = fxCases<int, String>([((n) => n < 0, (n) => 'negative')]);
         expect(() => f(1), throwsStateError);
       },
     );

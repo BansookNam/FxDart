@@ -64,6 +64,6 @@ nextLabel: fxEventsCreate
   <div class="callout">
     <strong>Related:</strong>
     <a href="streams.html">Stream bridges</a> — the pull side of the border, and <code>stream.fx</code> vs <code>stream.fxEvents</code> side by side ·
-    <a href="debounce.html"><code>debounce</code></a> &amp; <a href="throttle.html"><code>throttle</code></a> — both have <code>FxEvents</code> forms ·
+    <a href="debounce.html"><code>fxDebounce</code></a> &amp; <a href="throttle.html"><code>fxThrottle</code></a> — both have <code>FxEvents</code> forms ·
     <a href="liveValue.html"><code>LiveValue</code></a> — the current-value companion to this chain
   </div>

@@ -1,1 +1,1 @@
-Iterable&lt;(K, V)&gt; entries&lt;K, V&gt;(Map&lt;K, V&gt; map)
+Iterable&lt;(K, V)&gt; fxEntries&lt;K, V&gt;(Map&lt;K, V&gt; map)

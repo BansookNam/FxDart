@@ -2,15 +2,15 @@ import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
   var checked = 0;
-  final index = indexWhere((a) {
+  final index = fxIndexWhere((a) {
     checked++;
     return a == 5;
-  }, range(1000000));
+  }, fxRange(1000000));
   print(index);               // 5
   print('checked $checked');  // checked 6
 
   final asyncIndex = await fx(['x', 'y', 'z'])
       .toAsync()
-      .indexWhere((v) => delay(Duration(milliseconds: 30), v == 'z'));
+      .indexWhere((v) => fxDelay(Duration(milliseconds: 30), v == 'z'));
   print(asyncIndex); // 2
 }

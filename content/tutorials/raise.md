@@ -2,7 +2,7 @@
 slug: raise
 title: either builder &amp; the Raise scope — FxDart 101
 description: FxDart raise tutorial: the either and eitherAsync builders, and the Raise scope vocabulary — bind, ensure, ensureNotNull, recover, withError, raise.
-heading: <code>either</code> &amp; the <code>Raise</code> scope
+heading: <code>fxEither</code> &amp; the <code>Raise</code> scope
 section: 13
 crumb: either &amp; Raise
 prev: eitherCombinators.html
@@ -43,7 +43,7 @@ nextLabel: nullable
     <code>bind</code> throws a private, scope-tagged signal that the builder
     catches at its boundary. That is why early returns, loops and
     <code>if</code>s all just work inside the block, and why nested builders
-    never capture each other's errors. <code>eitherAsync</code> is the async
+    never capture each other's errors. <code>fxEitherAsync</code> is the async
     twin — same vocabulary, <code>await</code> allowed (raise only within the
     same awaited chain).
   </p>
@@ -61,8 +61,8 @@ nextLabel: nullable
   <p>
     Real parsing fails two ways at once: your rules <em>raise</em> typed
     errors, while the platform (<code>int.parse</code>, <code>jsonDecode</code>)
-    <em>throws</em>. <code>eitherCatching</code> is <code>either</code> +
-    <code>catching</code> as one builder — the block may raise or throw,
+    <em>throws</em>. <code>fxEitherCatching</code> is <code>fxEither</code> +
+    <code>fxCatching</code> as one builder — the block may raise or throw,
     and the second argument maps anything thrown into the same typed error.
     The raise signal itself is never handed to it. <code>recover</code>
     accepts the same optional <code>onThrow:</code> clause, completing
@@ -84,14 +84,14 @@ nextLabel: nullable
     use the <a href="eitherPipelines.html">eager Either terminals</a>; a
     deferred raise fails loudly with <code>RaiseLeakedError</code>. (2) Never
     bare-<code>catch</code> inside a raise block — use
-    <code>catching</code>/<code>catchingAsync</code>, which always let the
+    <code>fxCatching</code>/<code>fxCatchingAsync</code>, which always let the
     short-circuit signal through.
   </div>
 
   <div class="callout">
     <strong>Related:</strong>
     <a href="either.html"><code>Either</code></a> — the boundary type ·
-    <a href="nullable.html"><code>nullable</code></a> — the info-free twin that returns <code>T?</code> ·
+    <a href="nullable.html"><code>fxNullable</code></a> — the info-free twin that returns <code>T?</code> ·
     <a href="accumulate.html">accumulation</a> — collect every failure ·
     <a href="typedErrors.html">typed errors — full guide</a>
   </div>

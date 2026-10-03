@@ -6,7 +6,7 @@ void main() async {
   // foldByAsync / .toAsync().foldBy(...) awaits the key selector and the
   // combining step for each element, folding in source order.
   final byCustomer = await fx(orders).toAsync().foldBy(
-        (o) => delay(const Duration(milliseconds: 50), o.split(':')[0]),
+        (o) => fxDelay(const Duration(milliseconds: 50), o.split(':')[0]),
         0,
         (total, o) => total + int.parse(o.split(':')[1]),
       );

@@ -10,20 +10,20 @@ import 'package:test/test.dart';
 /// A source whose pulls are genuinely asynchronous, so the fused run takes
 /// its Future-resuming path rather than the synchronous fast path.
 FxAsyncIterable<int> asyncSource(List<int> values) =>
-    fromStream(Stream.fromIterable(values).asyncMap((v) async => v));
+    fxFromStream(Stream.fromIterable(values).asyncMap((v) async => v));
 
 void main() {
   group('async scan inside a fused run', () {
     test('a Future seed is emitted before anything is pulled', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3]),
+        fxToAsync([1, 2, 3]),
       ).scan((int acc, int a) => acc + a, Future.value(100)).toList();
 
       expect(result, [100, 101, 103, 106]);
     });
 
     test('a Future seed flows through the stages after the scan', () async {
-      final result = await fxAsync(toAsync([1, 2, 3]))
+      final result = await fxAsync(fxToAsync([1, 2, 3]))
           .scan((int acc, int a) => acc + a, Future.value(100))
           .map((a) => a * 2)
           .toList();
@@ -34,7 +34,7 @@ void main() {
     test(
       'a Future seed dropped by a later filter still starts the run',
       () async {
-        final result = await fxAsync(toAsync([1, 2, 3]))
+        final result = await fxAsync(fxToAsync([1, 2, 3]))
             .scan((int acc, int a) => acc + a, Future.value(100))
             .filter((a) => a.isOdd)
             .toList();
@@ -45,7 +45,7 @@ void main() {
 
     test('an asynchronous accumulator resumes the run', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3]),
+        fxToAsync([1, 2, 3]),
       ).scan((int acc, int a) async => acc + a, 0).toList();
 
       expect(result, [0, 1, 3, 6]);
@@ -56,7 +56,7 @@ void main() {
       () async {
         // filter makes the run non-one-to-one, so this exercises the dropping
         // loop's scan branch rather than the map-only one.
-        final result = await fxAsync(toAsync([1, 2, 3, 4]))
+        final result = await fxAsync(fxToAsync([1, 2, 3, 4]))
             .scan((int acc, int a) async => acc + a, 0)
             .filter((a) => a.isEven)
             .toList();
@@ -67,7 +67,7 @@ void main() {
 
     test('an asynchronous map resumes a run that can also drop', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3, 4]),
+        fxToAsync([1, 2, 3, 4]),
       ).filter((a) => a.isEven).map((a) async => a * 10).toList();
 
       expect(result, [20, 40]);
@@ -77,7 +77,7 @@ void main() {
   group('async takeWhile inside a fused run', () {
     test('ends the run when the predicate fails asynchronously', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3, 4, 1]),
+        fxToAsync([1, 2, 3, 4, 1]),
       ).takeWhile((a) async => a < 3).toList();
 
       expect(result, [1, 2]);
@@ -94,7 +94,7 @@ void main() {
     test('a failing takeWhile stops pulling the source', () async {
       var pulled = 0;
       final result = await fxAsync(
-        toAsync([1, 2, 3, 4, 5]),
+        fxToAsync([1, 2, 3, 4, 5]),
       ).peek((_) => pulled++).takeWhile((a) async => a < 3).toList();
 
       expect(result, [1, 2]);
@@ -110,7 +110,7 @@ void main() {
       }
 
       expect(
-        fxAsync(fromStream(boom())).map((a) => a).toList(),
+        fxAsync(fxFromStream(boom())).map((a) => a).toList(),
         throwsStateError,
       );
     });
@@ -144,7 +144,7 @@ void main() {
 
     test('a throwing seed fails the terminal', () async {
       expect(
-        fxAsync(toAsync([1, 2]))
+        fxAsync(fxToAsync([1, 2]))
             .scan(
               (int acc, int a) => acc + a,
               Future<int>.error(StateError('seed')),
@@ -171,7 +171,7 @@ void main() {
   group('the pull path (a run wrapped by take)', () {
     test('emits a Future seed, then the source', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3]),
+        fxToAsync([1, 2, 3]),
       ).scan((int acc, int a) => acc + a, Future.value(100)).take(3).toList();
 
       expect(result, [100, 101, 103]);
@@ -179,7 +179,7 @@ void main() {
 
     test('emits a synchronous seed, then the source', () async {
       final result = await fxAsync(
-        toAsync([1, 2, 3]),
+        fxToAsync([1, 2, 3]),
       ).scan((int acc, int a) => acc + a, 0).take(3).toList();
 
       expect(result, [0, 1, 3]);
@@ -188,7 +188,7 @@ void main() {
     test(
       'runs a synchronous accumulator in a run that can also drop',
       () async {
-        final result = await fxAsync(toAsync([1, 2, 3, 4]))
+        final result = await fxAsync(fxToAsync([1, 2, 3, 4]))
             .scan((int acc, int a) => acc + a, 0)
             .filter((a) => a.isEven)
             .take(5)
@@ -201,7 +201,7 @@ void main() {
     test('pulls the source when a later stage drops the seed', () async {
       // The seed is filtered out, so emitting it must fall through to the
       // first real pull rather than answering with nothing.
-      final result = await fxAsync(toAsync([1, 2, 3]))
+      final result = await fxAsync(fxToAsync([1, 2, 3]))
           .scan((int acc, int a) => acc + a, 0)
           .filter((a) => a > 0)
           .take(3)
@@ -211,7 +211,7 @@ void main() {
     });
 
     test('carries a Future seed through an asynchronous later stage', () async {
-      final result = await fxAsync(toAsync([1, 2]))
+      final result = await fxAsync(fxToAsync([1, 2]))
           .scan((int acc, int a) => acc + a, Future.value(100))
           .map((a) async => a * 2)
           .take(3)
@@ -277,7 +277,7 @@ void main() {
       'a synchronous throw from the upstream run fails the terminal',
       () async {
         expect(
-          fxAsync(toAsync([1, 2]))
+          fxAsync(fxToAsync([1, 2]))
               .scan((int acc, int a) => throw StateError('upstream'), 0)
               .scan((int acc, int a) => acc + a, 0)
               .toList(),
@@ -288,7 +288,7 @@ void main() {
 
     test('a synchronous throw from a stage fails the terminal', () async {
       expect(
-        fxAsync(toAsync([1, 2]))
+        fxAsync(fxToAsync([1, 2]))
             .scan((int acc, int a) => acc + a, 0)
             .scan((int acc, int a) => throw StateError('stage'), 0)
             .toList(),
@@ -300,7 +300,7 @@ void main() {
       'a synchronous throw while emitting the seed fails the terminal',
       () async {
         expect(
-          fxAsync(toAsync([1, 2]))
+          fxAsync(fxToAsync([1, 2]))
               .scan((int acc, int a) => acc + a, 0)
               .map((a) => throw StateError('seed stage'))
               .toList(),
@@ -315,9 +315,9 @@ void main() {
       'a Concurrent marker falls back and agrees element for element',
       () async {
         final fused = await fxAsync(
-          toAsync([1, 2, 3, 4, 5, 6]),
+          fxToAsync([1, 2, 3, 4, 5, 6]),
         ).filter((a) async => a.isEven).map((a) async => a * 10).toList();
-        final concurrent = await fxAsync(toAsync([1, 2, 3, 4, 5, 6]))
+        final concurrent = await fxAsync(fxToAsync([1, 2, 3, 4, 5, 6]))
             .filter((a) async => a.isEven)
             .map((a) async => a * 10)
             .concurrent(3)
@@ -329,7 +329,7 @@ void main() {
 
     test('each terminal sees exactly what toList sees', () async {
       FxAsync<int> chain() => fxAsync(
-        toAsync([1, 2, 3, 4]),
+        fxToAsync([1, 2, 3, 4]),
       ).scan((int acc, int a) async => acc + a, 0).filter((a) => a.isEven);
 
       final viaList = await chain().toList();

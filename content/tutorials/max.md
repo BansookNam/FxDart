@@ -17,7 +17,7 @@ nextLabel: maxBy
   <h2>Lecture</h2>
   <p>
     <code>max</code> works exactly like <code><a href="min.html">min</a></code>,
-    flipped: it's <code>fold(-double.infinity, ..., iterable)</code>, keeping
+    flipped: it's <code>fxFold(-double.infinity, ..., iterable)</code>, keeping
     the largest value seen so far.
   </p>
   <p>

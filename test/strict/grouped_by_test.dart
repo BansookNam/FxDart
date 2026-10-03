@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 // Record `==` compares `List` fields by identity, so groups are asserted
@@ -9,7 +9,7 @@ void main() {
       test(
         'should group into (key, items) records in first-seen key order',
         () {
-          final groups = groupedBy((String w) => w.length, [
+          final groups = fxGroupedBy((String w) => w.length, [
             'ab',
             'cd',
             'e',
@@ -23,8 +23,8 @@ void main() {
 
       test('should match groupBy exactly', () {
         final words = ['ab', 'cd', 'e', 'fg', 'hij'];
-        final asMap = groupBy((String w) => w.length, words);
-        final asGroups = groupedBy((String w) => w.length, words);
+        final asMap = fxGroupBy((String w) => w.length, words);
+        final asGroups = fxGroupedBy((String w) => w.length, words);
         expect(
           asGroups.map((g) => g.key).toList(),
           equals(asMap.keys.toList()),
@@ -35,7 +35,7 @@ void main() {
       });
 
       test('should return an empty list for an empty iterable', () {
-        expect(groupedBy((int n) => n, <int>[]), isEmpty);
+        expect(fxGroupedBy((int n) => n, <int>[]), isEmpty);
       });
 
       test('should be able to be used in the pipeline (no re-entry)', () {
@@ -57,9 +57,9 @@ void main() {
 
     group('async', () {
       test('should group into records in first-seen key order', () async {
-        final groups = await groupedByAsync(
+        final groups = await fxGroupedByAsync(
           (int n) async => n.isEven,
-          toAsync([1, 2, 3, 4]),
+          fxToAsync([1, 2, 3, 4]),
         );
         expect(groups.map((g) => g.key), equals([false, true]));
         expect(groups[0].items, equals([1, 3]));

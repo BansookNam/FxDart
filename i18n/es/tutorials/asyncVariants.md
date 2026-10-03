@@ -22,11 +22,11 @@ nextLabel: streams
     <code>Iterable</code>, y un gemelo <code>*Async</code> para
     <code>FxAsyncIterable</code> cuyo callback devuelve
     <code>FutureOr&lt;R&gt;</code> en lugar de <code>R</code>. Ya has visto
-    algunos: <code>map</code>/<code>mapAsync</code>,
-    <code>filter</code>/<code>filterAsync</code>,
-    <code>toList</code>/<code>toListAsync</code>,
-    <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
-    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code>:
+    algunos: <code>fxMap</code>/<code>fxMapAsync</code>,
+    <code>fxFilter</code>/<code>fxFilterAsync</code>,
+    <code>fxToList</code>/<code>fxToListAsync</code>,
+    <code>fxReduce</code>/<code>fxReduceAsync</code>, <code>fxFold</code>/<code>fxFoldAsync</code>,
+    <code>fxEach</code>/<code>fxEachAsync</code>, <code>fxFind</code>/<code>fxFindAsync</code>:
     el patrón se cumple prácticamente para todas las funciones de la librería.
   </p>
   <p>

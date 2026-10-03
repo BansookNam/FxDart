@@ -10,7 +10,7 @@ prevLabel: sampleOn
 next: withLatestFrom.html
 nextLabel: withLatestFrom
 ---
-  <p class="hero-sub">On every event from either side, emits <code>combine</code> of the two latest values — once both sides have spoken at least once.</p>
+  <p class="hero-sub">On every event from either side, emits <code>fxCombine</code> of the two latest values — once both sides have spoken at least once.</p>
 
   {{signature}}
 
@@ -21,7 +21,7 @@ nextLabel: withLatestFrom
     one derived state that must be right after every keystroke on either.
     <code>combineLatest(other, combine)</code> is that shape: it remembers
     the latest value of each side, and every event from <em>either</em>
-    stream re-runs <code>combine</code> on the fresh pair.
+    stream re-runs <code>fxCombine</code> on the fresh pair.
   </p>
   <p>
     The rules, precisely. Nothing emits until <strong>both</strong> sides

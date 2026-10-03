@@ -22,7 +22,7 @@ nextLabel: ifEmpty
     one is pulled, so the source is iterated exactly once and nothing is
     buffered; the accumulators are independent and need not share a type; and
     the readers must be folds rather than pipelines. Read that page first for
-    the reasoning and for where <a href="fork.html"><code>fork</code></a> is
+    the reasoning and for where <a href="fork.html"><code>fxFork</code></a> is
     the better tool.
   </p>
   <p>
@@ -43,6 +43,6 @@ nextLabel: ifEmpty
   <div class="callout">
     <strong>Related:</strong>
     <a href="tee.html"><code>tee</code></a> — the two-fold form, and the full explanation ·
-    <a href="fork.html"><code>fork</code></a> — independent readers, at the cost of a buffer ·
+    <a href="fork.html"><code>fxFork</code></a> — independent readers, at the cost of a buffer ·
     <a href="fold.html"><code>fold</code></a> — a single fold
   </div>

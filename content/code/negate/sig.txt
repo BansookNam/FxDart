@@ -1,1 +1,1 @@
-bool Function(T) negate&lt;T&gt;(bool Function(T) f)
+bool Function(T) fxNegate&lt;T&gt;(bool Function(T) f)

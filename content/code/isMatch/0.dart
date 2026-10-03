@@ -7,9 +7,9 @@ void main() {
     'address': {'city': 'seoul', 'zip': '100'}
   };
 
-  print(isMatch(user, {'name': 'kim'})); // true — extra keys ignored
-  print(isMatch(user, {
+  print(fxIsMatch(user, {'name': 'kim'})); // true — extra keys ignored
+  print(fxIsMatch(user, {
     'address': {'city': 'seoul'}
   })); // true — nested partial match
-  print(isMatch(user, {'name': 'lee'})); // false
+  print(fxIsMatch(user, {'name': 'lee'})); // false
 }

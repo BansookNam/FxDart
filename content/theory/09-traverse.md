@@ -113,19 +113,19 @@ Either<String, int> parsePort(String s) {
 
 void main() {
   final results = ['8080', 'x', '9000'].map(parsePort).toList();
-  final (bad, good) = separateEither(results);
+  final (bad, good) = fxSeparateEither(results);
   print('kept: $good');
   print('dropped: $bad');
 
   // …or take just one side.
-  print(rights(results));
-  print(lefts(results));
+  print(fxRights(results));
+  print(fxLefts(results));
 }
 ```
 
 Choosing between them is a product decision, not a technical one: an import
-tool wants `separateEither`, a config loader wants `flattenOrAccumulate`, an
-API handler wants `sequenceEither`.
+tool wants `fxSeparateEither`, a config loader wants `flattenOrAccumulate`, an
+API handler wants `fxSequenceEither`.
 
 ## The async twin
 
@@ -172,9 +172,9 @@ back-channel that makes the limit real rather than advisory.
 
 ## The cost of not having it generically
 
-Count the versions in the code above: `sequenceEither`,
-`flattenOrAccumulate`, `mapOrAccumulate`, `separateEither` — plus
-`sequenceEitherAsync`, `flattenOrAccumulateAsync`, and `mapOrAccumulateAsync`
+Count the versions in the code above: `fxSequenceEither`,
+`flattenOrAccumulate`, `mapOrAccumulate`, `fxSeparateEither` — plus
+`fxSequenceEitherAsync`, `flattenOrAccumulateAsync`, and `mapOrAccumulateAsync`
 for chains that are asynchronous. Seven functions where a language with
 higher-kinded types writes one.
 
@@ -192,7 +192,7 @@ f(x); if (r.isLeft) return r; out.add(...); }` more than twice, that is a
 traversal and you should say so.
 
 Skip it when the collection is one element (just use the `Either` directly),
-when you need partial success semantics (that is `separateEither`), or when the
+when you need partial success semantics (that is `fxSeparateEither`), or when the
 loop genuinely does something per-element that is not a pure map — a traversal
 that hides a side effect is worse than the loop it replaced.
 

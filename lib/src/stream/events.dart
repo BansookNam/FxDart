@@ -85,7 +85,7 @@ class FxEvents<T> {
 
   /// A stream that emits [error] and then closes.
   ///
-  /// fxdart events layer, after Rx's `throwError`.
+  /// fxdart events layer, after Rx's `fxThrowError`.
   FxEvents.error(Object error, [StackTrace? stackTrace])
     : _inner = Stream<T>.error(error, stackTrace);
 
@@ -1540,7 +1540,7 @@ class FxEvents<T> {
 
   /// Crosses into the pull model: the events become an [FxAsync] chain,
   /// pulled on demand from here on.
-  FxAsync<T> pull() => fxAsync(fromStream(_inner));
+  FxAsync<T> pull() => fxAsync(fxFromStream(_inner));
 }
 
 /// Sink handed to [FxEvents.create] so the producer can emit, fail, or

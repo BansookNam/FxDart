@@ -25,7 +25,7 @@ nextLabel: chunk
   <p>
     Watch the argument order in the data-first form — unlike most FxDart
     functions, the <code>iterable</code> sits in the <strong>middle</strong>:
-    <code>slice(start, iterable, [end])</code>, mirroring FxTS. The chain
+    <code>fxSlice(start, iterable, [end])</code>, mirroring FxTS. The chain
     form doesn't have this quirk, since the iterable is the receiver:
     <code>fx(iterable).slice(start, end)</code>. Under the hood
     <code>slice</code> is still just walking the source once and counting

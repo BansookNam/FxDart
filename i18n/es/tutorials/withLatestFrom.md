@@ -10,7 +10,7 @@ prevLabel: combineLatest
 next: switchMap.html
 nextLabel: switchMap
 ---
-  <p class="hero-sub">En cada evento de la <em>fuente</em>, emite <code>combine</code> de ese evento y el último valor del otro stream — el otro lado es contexto, no disparador.</p>
+  <p class="hero-sub">En cada evento de la <em>fuente</em>, emite <code>fxCombine</code> de ese evento y el último valor del otro stream — el otro lado es contexto, no disparador.</p>
 
   {{signature}}
 
@@ -21,7 +21,7 @@ nextLabel: switchMap
     tipo de cambio de <em>ahora mismo</em>. Hay dos streams implicados, pero
     no son iguales: uno conduce, el otro se consulta.
     <code>withLatestFrom(other, combine)</code> codifica esa asimetría —
-    cada evento de la fuente emite <code>combine(event, latestOfOther)</code>,
+    cada evento de la fuente emite <code>fxCombine(event, latestOfOther)</code>,
     mientras que los eventos en <code>other</code> actualizan su valor
     recordado y no emiten <strong>nada</strong>.
   </p>

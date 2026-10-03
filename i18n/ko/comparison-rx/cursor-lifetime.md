@@ -29,11 +29,11 @@ async: true
   <h2>차이가 나는 이유</h2>
   <p>
     대체로 다르지 않습니다 — 둘 다 같은 Rx 아이디어의 포팅이고,
-    FxDart도 그렇게 말합니다: <code>usingAsync</code>는
+    FxDart도 그렇게 말합니다: <code>fxUsingAsync</code>는
     Rx의 <code>using</code>을 뒤따라 나왔습니다. 모양은 같은 3부
     괄호입니다: 획득, 사용, 해제. <code>Rx.using</code>은 스트림이
     listen될 때 커서를 만들고 스트림이 종료될 때 disposer를
-    호출합니다; <code>usingAsync</code>는 첫 <em>풀</em>에서 획득하고
+    호출합니다; <code>fxUsingAsync</code>는 첫 <em>풀</em>에서 획득하고
     마지막 풀 이후 또는 오류가 전파되기 직전에 정확히 한 번
     해제합니다. 둘 다에서 리소스의 수명은 호출자의 스코프가 아니라
     시퀀스의 소비에 묶입니다 — 그것이 이 도구의 존재 이유입니다.

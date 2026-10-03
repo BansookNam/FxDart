@@ -20,8 +20,8 @@ nextLabel: uniq
     devuelve un <code>Iterable&lt;A&gt;</code> — cada <code>null</code>
     desaparece, y el verificador de tipos lo sabe: nada de lo que venga
     después necesita ya comprobar null. <code>nonNulls</code> es el nombre
-    idiomático en Dart; fxdart también acepta la grafía <code>compact</code>
-    de FxTS: son el mismo operador. El <code>compact</code> de FxTS descarta
+    idiomático en Dart; fxdart también acepta la grafía <code>fxCompact</code>
+    de FxTS: son el mismo operador. El <code>fxCompact</code> de FxTS descarta
     los seis valores falsy de JS (<code>undefined</code>, <code>null</code>,
     <code>0</code>, <code>''</code>, <code>NaN</code>, <code>false</code>);
     Dart no tiene un concepto único de «falsy», así que el port solo elimina
@@ -29,8 +29,8 @@ nextLabel: uniq
     fácil de razonar.
   </p>
   <p>
-    Aparece constantemente después de <a href="pluck.html"><code>pluck</code></a>
-    o de cualquier búsqueda que devuelva <code>T?</code>: <code>nonNulls(pluck(key, records))</code>
+    Aparece constantemente después de <a href="pluck.html"><code>fxPluck</code></a>
+    o de cualquier búsqueda que devuelva <code>T?</code>: <code>fxNonNulls(fxPluck(key, records))</code>
     te da una lista limpia y no nullable en un solo paso.
   </p>
   <p>
@@ -39,8 +39,8 @@ nextLabel: uniq
     (<code>fx(xs).nonNulls</code>) y, como devuelve un
     <code>Iterable&lt;A&gt;</code> normal, envuélvelo en <code>fx(...)</code>
     para seguir encadenando. No hay getter asíncrono, así que en un pipeline
-    asíncrono usa la función de nivel superior <code>nonNullsAsync(...)</code>
-    (o su alias de FxTS <code>compactAsync</code>) y envuélvela con
+    asíncrono usa la función de nivel superior <code>fxNonNullsAsync(...)</code>
+    (o su alias de FxTS <code>fxCompactAsync</code>) y envuélvela con
     <code>fxAsync(...)</code>.
   </p>
 
@@ -57,8 +57,8 @@ nextLabel: uniq
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="pluck.html"><code>pluck</code></a> — una fuente habitual de valores nullable ·
+    <a href="pluck.html"><code>fxPluck</code></a> — una fuente habitual de valores nullable ·
     <a href="reject.html"><code>reject</code></a> — descarta según un predicado cualquiera ·
-    <a href="../tutorials/compactObject.html"><code>compactObject</code></a> — el equivalente para Map ·
+    <a href="../tutorials/compactObject.html"><code>fxCompactObject</code></a> — el equivalente para Map ·
     <a href="uniq.html"><code>uniq</code></a> — elimina duplicados
   </div>

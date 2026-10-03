@@ -23,7 +23,7 @@ nextLabel: sampleOn
     Optional <code>onError</code> / <code>onDone</code> hooks cover the
     other two notifications. A throwing callback becomes an error
     event and the chain continues — the event whose peek failed is
-    not re-emitted. fxdart events layer, after Rx's <code>tap</code> /
+    not re-emitted. fxdart events layer, after Rx's <code>fxTap</code> /
     <code>doOn*</code>.
   </p>
   <p>
@@ -49,10 +49,10 @@ nextLabel: sampleOn
     go.
   </p>
   <p>
-    fxdart events layer, after Rx's <code>tap</code>,
+    fxdart events layer, after Rx's <code>fxTap</code>,
     <code>catchError</code> in its non-switching shape, and
     <code>finalize</code>. Pull-layer names win where they already
-    mean the same thing: <code>peek</code> not <code>tap</code>,
+    mean the same thing: <code>peek</code> not <code>fxTap</code>,
     <code>takeRight</code> not <code>takeLast</code>,
     <code>uniq</code> not <code>distinct</code>.
   </p>
@@ -71,5 +71,5 @@ nextLabel: sampleOn
     <strong>Related:</strong>
     <a href="peek.html"><code>peek</code></a> — the pull-layer original, observing values as they are pulled ·
     <a href="onErrorResume.html"><code>onErrorResume</code></a> — abandon-and-switch; <code>handleError</code> is the continue form ·
-    <a href="tap.html"><code>tap</code></a> — data-first side effect on a single value, not a stream
+    <a href="tap.html"><code>fxTap</code></a> — data-first side effect on a single value, not a stream
   </div>

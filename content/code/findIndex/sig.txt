@@ -1,5 +1,5 @@
-int indexWhere&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;int&gt; indexWhereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+int fxIndexWhere&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;int&gt; fxIndexWhereAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 int Fx.indexWhere(bool Function(T a) f)              // chain
 Future&lt;int&gt; FxAsync.indexWhere(FutureOr&lt;bool&gt; Function(T a) f)  // chain
-int findIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias
+int fxFindIndex&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias

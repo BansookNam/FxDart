@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final result = await resolveProps({
+  final result = await fxResolveProps({
     'a': Future.value(1),
     'b': 2,
     'c': Future.value(3),

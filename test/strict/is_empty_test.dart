@@ -25,7 +25,7 @@ void main() {
 
     test('should return `true` if the given value is an empty value', () {
       for (final (input, expected) in testParameters) {
-        expect(isEmpty(input), equals(expected), reason: 'input: $input');
+        expect(fxIsEmpty(input), equals(expected), reason: 'input: $input');
       }
     });
   });

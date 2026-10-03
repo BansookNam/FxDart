@@ -16,7 +16,7 @@ nextLabel: onErrorResume
 
   <h2>강의</h2>
   <p>
-    풀 레이어의 <code><a href="retry.html">retry</a></code>는 이터러블을
+    풀 레이어의 <code><a href="retry.html">fxRetry</a></code>는 이터러블을
     다시 만듭니다. 푸시 쪽에서 같은 생각은
     <strong>재구독</strong>이고, 모양은 두 가지입니다. 하나는 팩토리로
     스트림을 다시 만드는 것이고 —
@@ -69,6 +69,6 @@ nextLabel: onErrorResume
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="onErrorResume.html"><code>FxEvents.retry</code></a> — 다시 들을 수 없는 소스를 위한 팩토리 형태 ·
-    <a href="retry.html"><code>retry</code></a> — 백오프 훅과 원소 단위 범위를 가진 풀 레이어의 원본 ·
+    <a href="retry.html"><code>fxRetry</code></a> — 백오프 훅과 원소 단위 범위를 가진 풀 레이어의 원본 ·
     <a href="timeout.html"><code>timeout</code></a> — 얼마나 자주가 아니라 한 번의 풀이 얼마나 걸릴 수 있는지를 제한
   </div>

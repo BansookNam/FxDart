@@ -2,7 +2,7 @@
 slug: shuffle
 title: shuffle — FxDart 101
 description: Tutorial de shuffle en FxDart: barajado de Fisher-Yates con semilla opcional para un orden reproducible, en versión síncrona y asíncrona, con playground en vivo.
-heading: <code>shuffle</code>
+heading: <code>fxShuffle</code>
 section: 12
 crumb: shuffle
 next: createSeededRandom.html
@@ -14,7 +14,7 @@ nextLabel: createSeededRandom
 
   <h2>Lección</h2>
   <p>
-    <code>shuffle</code> aplica un barajado de Fisher-Yates a los elementos de
+    <code>fxShuffle</code> aplica un barajado de Fisher-Yates a los elementos de
     <code>iterable</code> y devuelve una <code>List&lt;T&gt;</code> totalmente
     nueva: la entrada nunca se muta. Si lo llamas sin semilla, usa
     <code>Random</code> de <code>dart:math</code>, así que cada llamada da un
@@ -32,9 +32,9 @@ nextLabel: createSeededRandom
     aleatorizada.
   </p>
   <p>
-    <code>shuffleAsync</code> es el gemelo <code>*Async</code>: primero
+    <code>fxShuffleAsync</code> es el gemelo <code>*Async</code>: primero
     materializa el <code>FxAsyncIterable</code> (internamente con
-    <code>toListAsync</code>) y luego baraja el resultado, así que un barajado
+    <code>fxToListAsync</code>) y luego baraja el resultado, así que un barajado
     asíncrono con semilla produce exactamente el mismo orden que su equivalente
     síncrono con la misma semilla.
   </p>
@@ -54,12 +54,12 @@ nextLabel: createSeededRandom
 
   <h2>La forma con método</h2>
   <p>
-    <code>xs.fxShuffle(seed)</code> es <code>shuffle(xs, seed)</code>, y sobre
+    <code>xs.fxShuffle(seed)</code> es <code>fxShuffle(xs, seed)</code>, y sobre
     un <code>FxAsyncIterable</code> ese mismo nombre es
-    <code>shuffleAsync</code>.
+    <code>fxShuffleAsync</code>.
   </p>
   <p>
-    No se llama <code>shuffle</code>, y no es una cuestión de estilo.
+    No se llama <code>fxShuffle</code>, y no es una cuestión de estilo.
     <code>List.shuffle</code> ya existe en <code>dart:core</code> y baraja
     <strong>en el sitio, devolviendo void</strong>. Un miembro de instancia
     siempre gana a una extensión, así que con un <code>List</code> como
@@ -75,8 +75,8 @@ final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — limitación de frecuencia para callbacks ·
-    <a href="debounce.html"><code>debounce</code></a> — limitación que espera a que haya calma ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — limitación de frecuencia para callbacks ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — limitación que espera a que haya calma ·
     <a href="toAsync.html"><code>toAsync</code></a> — eleva una lista para usarla con shuffleAsync ·
     <a href="sort.html"><code>sort</code></a> — el instinto contrario: orden determinista
   </div>

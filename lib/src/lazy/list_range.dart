@@ -85,11 +85,11 @@ abstract class FxFilterFusable<A> {
 abstract class FxMapFusable<A> {
   /// This iterable followed by `map(f)`, as a single stage.
   ///
-  /// Same elements, order, laziness, and callback count as `map(f, this)`.
+  /// Same elements, order, laziness, and callback count as `fxMap(f, this)`.
   Iterable<B> fxFuseMap<B>(B Function(A a) f);
 }
 
-/// An arithmetic `start..end` range with a fixed [step] — what `range()`
+/// An arithmetic `start..end` range with a fixed [step] — what `fxRange()`
 /// produces.
 ///
 /// Exposed for the same reason as [FxListRange]: an operator that knows its
@@ -104,7 +104,7 @@ class FxIntRange {
   final int step;
 }
 
-/// Implemented by `range()`'s iterable.
+/// Implemented by `fxRange()`'s iterable.
 abstract class FxIntRangeSource {
   /// This iterable as a counted range.
   FxIntRange get intRange;

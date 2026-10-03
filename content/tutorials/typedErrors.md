@@ -21,8 +21,8 @@ nextLabel: Either
     <strong>Deep dives.</strong> This page is the overview; every subject has
     a detailed tutorial with runnable demos:
     <a href="either.html"><code>Either</code></a> ·
-    <a href="raise.html"><code>either</code> &amp; the <code>Raise</code> scope</a> ·
-    <a href="nullable.html"><code>nullable</code></a> ·
+    <a href="raise.html"><code>fxEither</code> &amp; the <code>Raise</code> scope</a> ·
+    <a href="nullable.html"><code>fxNullable</code></a> ·
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> ·
     <a href="accumulate.html">accumulation</a> ·
     <a href="eitherPipelines.html"><code>Either</code> × pipelines</a>
@@ -62,7 +62,7 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
   <p>
     The two differences from Kotlin are Dart realities: the scope is an
     explicit parameter (<code>r</code>) because Dart has no lambda receivers,
-    and async has its own builder (<code>eitherAsync</code>) because Dart has
+    and async has its own builder (<code>fxEitherAsync</code>) because Dart has
     no <code>inline</code>. Internally this is <em>not</em> flatMap chaining:
     like Arrow, <code>r.bind</code> on a failure throws a private,
     scope-tagged signal that the builder catches at the boundary — which is
@@ -103,16 +103,16 @@ switch (parsePort('8080')) {
       <code>Never</code>.</li>
   </ul>
   <p>
-    <code>eitherAsync</code> is the async twin (raise only in the same awaited
-    chain); <code>nullable</code>/<code>nullableAsync</code> are the
+    <code>fxEitherAsync</code> is the async twin (raise only in the same awaited
+    chain); <code>fxNullable</code>/<code>fxNullableAsync</code> are the
     nullable-first twins that return <code>T?</code> instead of an
     <code>Either</code> — FxDart stays nullable-first, so there is no
     <code>Option</code> type.
   </p>
   <p>
-    <a href="raise.html">Deep dive: <code>either</code> &amp; the
+    <a href="raise.html">Deep dive: <code>fxEither</code> &amp; the
     <code>Raise</code> scope →</a> ·
-    <a href="nullable.html">Deep dive: <code>nullable</code> →</a>
+    <a href="nullable.html">Deep dive: <code>fxNullable</code> →</a>
   </p>
 
   <h2>Accumulate every failure, not just the first</h2>
@@ -169,7 +169,7 @@ final result = await fxStream(records)
   <p>
     The boundary is hard: <em>raised</em> errors are your domain's typed
     failures; <em>thrown</em> exceptions are defects, and they propagate out
-    of <code>either</code> untouched. To capture a throw into an
+    of <code>fxEither</code> untouched. To capture a throw into an
     <code>Either</code>, be explicit:
   </p>
   <pre class="code"><code>final parsed = Either.catching(() => jsonDecode(raw));       // Either&lt;Object, dynamic&gt;
@@ -184,7 +184,7 @@ final typed  = Either.catchingWith(ParseFailure.new, () => jsonDecode(raw));</co
     a raise block — materialize with <code>toList()</code> or use the eager
     terminals above; a deferred raise fails loudly with
     <code>RaiseLeakedError</code>. (2) Never bare-<code>catch</code> inside a
-    raise block — use <code>catching</code>/<code>catchingAsync</code>, which
+    raise block — use <code>fxCatching</code>/<code>fxCatchingAsync</code>, which
     always let the short-circuit signal through (<code>on Exception</code> is
     already safe: the signal is an <code>Error</code>).
   </div>

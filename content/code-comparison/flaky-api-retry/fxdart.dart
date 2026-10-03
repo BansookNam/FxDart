@@ -13,7 +13,7 @@ Future<String> pollJob(String id, int attempt) async {
 
 Future<void> main() async {
   final log = <String>[];
-  final winner = await fx(range(1, 11))
+  final winner = await fx(fxRange(1, 11))
       .toAsync()
       .map((attempt) async => (attempt, await pollJob(jobId, attempt)))
       .peek((r) => log.add('  poll ${r.$1}: ${r.$2}'))

@@ -26,7 +26,7 @@ nextLabel: zip3
     <a href="zip3.html"><code>zip3</code></a> for three.
   </p>
   <p>
-    <code>zipAsync</code> issues both sides' <code>next()</code> calls
+    <code>fxZipAsync</code> issues both sides' <code>next()</code> calls
     <em>before</em> awaiting either — so it pulls the two sources in
     parallel per pair rather than sequentially. Zipping two 100ms-per-item
     sources still only costs ~100ms per pair, not 200ms.
@@ -45,8 +45,8 @@ nextLabel: zip3
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="zipWith.html"><code>zipWith</code></a> — zip and combine in one step ·
+    <a href="zipWith.html"><code>fxZipWith</code></a> — zip and combine in one step ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — zip against a running index ·
-    <a href="transpose.html"><code>transpose</code></a> — zip an arbitrary number of rows ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — zip an arbitrary number of rows ·
     <a href="concat.html"><code>concat</code></a> — chain instead of pair
   </div>

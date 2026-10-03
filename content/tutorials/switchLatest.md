@@ -10,7 +10,7 @@ prevLabel: mergeMap
 next: mergeScan.html
 nextLabel: mergeScan
 ---
-  <p class="hero-sub">A stream of streams, flattened: keep the newest, run them all, play them in order, or ignore the extra — and start later sources immediately with <code>concatEager</code>.</p>
+  <p class="hero-sub">A stream of streams, flattened: keep the newest, run them all, play them in order, or ignore the extra — and start later sources immediately with <code>fxConcatEager</code>.</p>
 
   {{signature}}
 
@@ -45,16 +45,16 @@ nextLabel: mergeScan
     inners that arrive while one is still running.
   </p>
   <p>
-    <code>concatEager</code> is the sibling of
+    <code>fxConcatEager</code> is the sibling of
     <code><a href="waitAll.html">FxEvents.concat</a></code>. Both emit
     in source order, but concat waits to <em>subscribe</em> to the next
     source until the current one completes — a cold later source has
-    not even started. <code>concatEager</code> subscribes to every
+    not even started. <code>fxConcatEager</code> subscribes to every
     source immediately and buffers later events until their turn. That
     is how you start a request now and still play the responses in
     order. fxdart events layer, after Rx's <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code> and <code>concatEager</code>.
+    <code>exhaustAll</code> and <code>fxConcatEager</code>.
   </p>
 
   <h2>Demo 1 · switchLatest — newest inner wins</h2>
@@ -64,12 +64,12 @@ nextLabel: mergeScan
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: <code>concatEager</code> vs concat — later starts immediately.</p>
+  <p>Exercise: <code>fxConcatEager</code> vs concat — later starts immediately.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
     <a href="switchMap.html"><code>switchMap</code></a> — the mapped form of switchLatest ·
     <a href="mergeMap.html"><code>mergeMap</code></a> — mergeMap, concatMap, exhaustMap ·
-    <a href="waitAll.html"><code>FxEvents.concat</code></a> — subscribe-later sibling of <code>concatEager</code>
+    <a href="waitAll.html"><code>FxEvents.concat</code></a> — subscribe-later sibling of <code>fxConcatEager</code>
   </div>

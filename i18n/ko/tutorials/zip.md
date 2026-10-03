@@ -26,7 +26,7 @@ nextLabel: zip3
     <a href="zip3.html"><code>zip3</code></a>입니다.
   </p>
   <p>
-    <code>zipAsync</code>는 양쪽의 <code>next()</code> 호출을 어느 쪽도
+    <code>fxZipAsync</code>는 양쪽의 <code>next()</code> 호출을 어느 쪽도
     await하기 <em>전에</em> 먼저 걸어 둡니다 — 즉 쌍마다 두 소스를 순차가
     아니라 병렬로 끌어옵니다. 원소당 100ms가 걸리는 소스 두 개를 zip해도
     쌍당 200ms가 아니라 약 100ms만 듭니다.
@@ -45,8 +45,8 @@ nextLabel: zip3
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="zipWith.html"><code>zipWith</code></a> — 짝짓기와 결합을 한 번에 ·
+    <a href="zipWith.html"><code>fxZipWith</code></a> — 짝짓기와 결합을 한 번에 ·
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — 증가하는 인덱스와 짝짓기 ·
-    <a href="transpose.html"><code>transpose</code></a> — 임의 개수의 행을 zip ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — 임의 개수의 행을 zip ·
     <a href="concat.html"><code>concat</code></a> — 짝짓는 대신 이어 붙이기
   </div>

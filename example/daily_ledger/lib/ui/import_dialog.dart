@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fxdart/fxdart.dart' show Debounced, debounce;
+import 'package:fxdart/fxdart.dart' show Debounced, fxDebounce;
 
 import '../logic/errors.dart';
 import '../logic/export.dart' show csvColumns;
@@ -49,7 +49,7 @@ class _ImportDialogState extends State<_ImportDialog> {
 
   /// Reparsing a large paste on every keystroke is wasteful — the same
   /// fxdart `debounce` that guards the entries search guards the preview.
-  late final Debounced<String> _debouncedParse = debounce(
+  late final Debounced<String> _debouncedParse = fxDebounce(
     (_) => setState(() {}),
     const Duration(milliseconds: 250),
   );

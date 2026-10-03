@@ -17,9 +17,9 @@ void main() {
       for (final (input, result) in cases) {
         test('should return the smallest of given iterable $input', () {
           if (result.isNaN) {
-            expect(min(input).isNaN, isTrue);
+            expect(fxMin(input).isNaN, isTrue);
           } else {
-            expect(min(input), equals(result));
+            expect(fxMin(input), equals(result));
           }
         });
       }
@@ -30,7 +30,7 @@ void main() {
         test(
           'should return the smallest of given asyncIterable $input',
           () async {
-            final res = await minAsync(toAsync(input));
+            final res = await fxMinAsync(fxToAsync(input));
             if (result.isNaN) {
               expect(res.isNaN, isTrue);
             } else {

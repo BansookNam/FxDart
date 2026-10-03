@@ -21,7 +21,7 @@ void main() {
     group('async', () {
       test('should be returned as a tuple (index, value)', () async {
         final items = ['a', 'b', 'c', 'd'];
-        final res = await toListAsync(zipWithIndexAsync(toAsync(items)));
+        final res = await fxToListAsync(zipWithIndexAsync(fxToAsync(items)));
         expect(res, equals([(0, 'a'), (1, 'b'), (2, 'c'), (3, 'd')]));
       });
 
@@ -30,12 +30,12 @@ void main() {
         () async {
           final items = ['a', 'b', 'c', 'd'];
           final length = items.length;
-          final it = concurrentAsync(
+          final it = fxConcurrentAsync(
             4,
             zipWithIndexAsync(
-              toAsync(
+              fxToAsync(
                 items.asMap().entries.map(
-                  (e) => delay(
+                  (e) => fxDelay(
                     Duration(milliseconds: (length - e.key) * 50),
                     e.value,
                   ),

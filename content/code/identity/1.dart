@@ -3,7 +3,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   final transforms = <String, String Function(String)>{
     'upper': (s) => s.toUpperCase(),
-    'none': identity,
+    'none': fxIdentity,
   };
 
   print(transforms['upper']!('hi')); // HI

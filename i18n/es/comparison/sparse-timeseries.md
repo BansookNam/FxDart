@@ -28,7 +28,7 @@ async: false
   <h2>Por qué difieren</h2>
   <p>
     Rellenar huecos significa dirigir el pipeline desde el
-    <em>calendario</em>, no desde los datos: <code>range(1, 15)</code>
+    <em>calendario</em>, no desde los datos: <code>fxRange(1, 15)</code>
     genera todos los días, <code>groupBy</code> responde a «qué pasó ese
     día», y <code>sumBy</code> sobre un grupo posiblemente vacío da gratis el
     0.00 de los días tranquilos. La agrupación semanal es entonces

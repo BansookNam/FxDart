@@ -20,23 +20,23 @@ nextLabel: peek
     intermediate steps exposed: instead of collapsing an iterable down to
     one final value, it emits <em>every</em> running accumulation, including
     the seed itself as the first value. That first-value-is-the-seed detail
-    matters — <code>scan(f, 0, [1, 2, 3])</code> yields four values
+    matters — <code>fxScan(f, 0, [1, 2, 3])</code> yields four values
     (<code>0</code>, then three running sums), not three.
   </p>
   <p>
-    <code>scan1</code> is the unseeded variant, ported from FxTS's
+    <code>fxScan1</code> is the unseeded variant, ported from FxTS's
     <code>scan(f, iterable)</code> overload (no seed argument). It uses the
     first element of the iterable as the initial accumulator and yields it
     immediately, then keeps folding the rest — mirroring <code>reduce</code>'s
-    relationship to <code>fold</code>. On an empty iterable, <code>scan1</code>
+    relationship to <code>fold</code>. On an empty iterable, <code>fxScan1</code>
     has no first element to seed with, so it yields nothing at all. Note
-    there is no chain method for <code>scan1</code> (only <code>scan</code> is
+    there is no chain method for <code>fxScan1</code> (only <code>scan</code> is
     on <code>Fx</code>/<code>FxAsync</code>) — call it data-first:
-    <code>scan1(f, iterable)</code>.
+    <code>fxScan1(f, iterable)</code>.
   </p>
   <p>
     Both are lazy: nothing runs until you pull. On the async side,
-    <code>scanAsync</code>/<code>scan1Async</code> still fold one step at a
+    <code>fxScanAsync</code>/<code>fxScan1Async</code> still fold one step at a
     time in order (each step needs the previous result), so
     <code>.concurrent(n)</code> doesn't parallelize the fold itself — but it
     does let an upstream fetch stage run concurrently, as long as the

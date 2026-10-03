@@ -4,7 +4,7 @@ Future<void> main() async {
   // forEachAsync awaits f for every element, strictly in order — even though
   // each delay is a different length, they always print as 1, 2, 3.
   await fx([1, 2, 3]).toAsync().forEach((a) async {
-    await sleep(Duration(milliseconds: 50 * (4 - a)));
+    await fxSleep(Duration(milliseconds: 50 * (4 - a)));
     print('processed $a');
   });
 

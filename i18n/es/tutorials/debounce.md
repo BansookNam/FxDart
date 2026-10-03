@@ -2,7 +2,7 @@
 slug: debounce
 title: debounce — FxDart 101
 description: Tutorial de debounce en FxDart: retrasa la llamada a una función hasta que todo se calma, con flanco de subida y cancel(), y playground en vivo.
-heading: <code>debounce</code>
+heading: <code>fxDebounce</code>
 section: 12
 crumb: debounce
 prev: parallel.html
@@ -16,7 +16,7 @@ nextLabel: throttle
 
   <h2>Lección</h2>
   <p>
-    <code>debounce</code> envuelve un callback para que las llamadas
+    <code>fxDebounce</code> envuelve un callback para que las llamadas
     repetidas en rápida sucesión se colapsen en una sola. Cada llamada
     reinicia un temporizador de duración <code>wait</code>; la función
     <code>func</code> envuelta solo se dispara de verdad cuando pasa
@@ -57,7 +57,7 @@ nextLabel: throttle
   <p>
     El propio callback lleva lo mismo como método:
     <code>saveDraft.fxDebounce(wait)</code> es
-    <code>debounce(saveDraft, wait)</code>, argumentos con nombre incluidos.
+    <code>fxDebounce(saveDraft, wait)</code>, argumentos con nombre incluidos.
   </p>
   <pre><code>void saveDraft(String text) =&gt; _post(text);
 
@@ -72,7 +72,7 @@ save('hello');   // only this one reaches _post</code></pre>
     de <a href="fx.html"><code>fx</code></a>.
   </p>
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: envuelve <code>save</code> en <code>debounce</code> (100 ms de espera)
+  <p>Ejercicio: envuelve <code>save</code> en <code>fxDebounce</code> (100 ms de espera)
     para que solo sobreviva el valor final de la ráfaga de llamadas de abajo.</p>
   {{playground:2}}
 
@@ -90,8 +90,8 @@ save('hello');   // only this one reaches _post</code></pre>
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — se dispara a intervalos regulares en lugar de tras la calma ·
-    <a href="delay.html"><code>delay</code> &amp; <code>sleep</code></a> — para montar demos con temporización ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — se dispara a intervalos regulares en lugar de tras la calma ·
+    <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — para montar demos con temporización ·
     <a href="concurrent.html"><code>concurrent</code></a> — limitar el ritmo de pipelines asíncronos ·
-    <a href="shuffle.html"><code>shuffle</code></a> — aleatoriedad con semilla
+    <a href="shuffle.html"><code>fxShuffle</code></a> — aleatoriedad con semilla
   </div>

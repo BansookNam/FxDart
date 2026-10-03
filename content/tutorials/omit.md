@@ -2,7 +2,7 @@
 slug: omit
 title: omit — FxDart 101
 description: FxDart omit tutorial: return a copy of a Map without the given keys, leaving the original untouched.
-heading: <code>omit</code>
+heading: <code>fxOmit</code>
 section: 9
 crumb: omit
 prev: fromEntries.html
@@ -16,7 +16,7 @@ nextLabel: pick
 
   <h2>Lecture</h2>
   <p>
-    <code>omit</code> builds a brand-new <code>Map</code> containing every
+    <code>fxOmit</code> builds a brand-new <code>Map</code> containing every
     entry of the original <em>except</em> the keys you list — the source
     map is never mutated. Keys in <code>keysToOmit</code> that don't
     actually exist in the map are simply ignored; there's no error for
@@ -36,13 +36,13 @@ nextLabel: pick
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: use <code>omit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
+  <p>Exercise: use <code>fxOmit</code> to drop the <code>'debug'</code> key from <code>config</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="pick.html"><code>pick</code></a> — the inverse: keep only some keys ·
-    <a href="omitBy.html"><code>omitBy</code></a> — drop by predicate instead of key list ·
-    <a href="compactObject.html"><code>compactObject</code></a> — drop null-valued keys ·
-    <a href="fromEntries.html"><code>fromEntries</code></a> — build a Map from scratch
+    <a href="pick.html"><code>fxPick</code></a> — the inverse: keep only some keys ·
+    <a href="omitBy.html"><code>fxOmitBy</code></a> — drop by predicate instead of key list ·
+    <a href="compactObject.html"><code>fxCompactObject</code></a> — drop null-valued keys ·
+    <a href="fromEntries.html"><code>fxFromEntries</code></a> — build a Map from scratch
   </div>

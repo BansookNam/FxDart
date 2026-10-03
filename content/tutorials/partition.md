@@ -30,10 +30,10 @@ nextLabel: head
     <strong>record</strong>: <code>(List&lt;A&gt;, List&lt;A&gt;)</code>. Access
     the two lists with <code>.$1</code> (pass) and <code>.$2</code> (fail),
     or destructure them directly with pattern-matching syntax:
-    <code>final (pass, fail) = partition(f, iterable);</code>. This is the
+    <code>final (pass, fail) = fxPartition(f, iterable);</code>. This is the
     same tuple-to-record convention used by
     <code><a href="zip.html">zip</a></code> and
-    <code><a href="entries.html">entries</a></code> elsewhere in FxDart.
+    <code><a href="entries.html">fxEntries</a></code> elsewhere in FxDart.
   </p>
   <p>
     As with every terminal in this section, it pulls the whole lazy pipeline

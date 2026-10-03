@@ -37,11 +37,11 @@ nextLabel: scan
     el port a Dart es honesto y devuelve <code>Iterable&lt;dynamic&gt;</code>.
     Si conoces la forma de lo que estás aplanando y quieres un resultado
     tipado, tira de <a href="flatMap.html"><code>flatMap</code></a>
-    en su lugar: <code>flatMap((row) =&gt; row, matrix)</code> te da un
+    en su lugar: <code>fxFlatMap((row) =&gt; row, matrix)</code> te da un
     aplanado tipado para datos de exactamente un nivel y forma uniforme.
   </p>
   <p>
-    Igual que <code>flat</code> en FxTS, <code>flattenedAsync</code> solo baja
+    Igual que <code>flat</code> en FxTS, <code>fxFlattenedAsync</code> solo baja
     por el anidamiento que ya sea, de forma <em>síncrona</em>, un
     <code>Iterable</code> en el momento en que llega — no espera a un <code>Future</code>
     escondido dentro de una colección anidada. Combínalo con una etapa previa

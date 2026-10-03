@@ -22,11 +22,11 @@ nextLabel: streams
     형태를 제공합니다. <code>Iterable</code>용의 평범한 이름, 그리고
     콜백이 <code>R</code> 대신 <code>FutureOr&lt;R&gt;</code>를 반환하는
     <code>FxAsyncIterable</code>용 <code>*Async</code> 짝입니다. 이미 몇 가지는
-    만나 보셨습니다. <code>map</code>/<code>mapAsync</code>,
-    <code>filter</code>/<code>filterAsync</code>,
-    <code>toList</code>/<code>toListAsync</code>,
-    <code>reduce</code>/<code>reduceAsync</code>, <code>fold</code>/<code>foldAsync</code>,
-    <code>each</code>/<code>eachAsync</code>, <code>find</code>/<code>findAsync</code> —
+    만나 보셨습니다. <code>fxMap</code>/<code>fxMapAsync</code>,
+    <code>fxFilter</code>/<code>fxFilterAsync</code>,
+    <code>fxToList</code>/<code>fxToListAsync</code>,
+    <code>fxReduce</code>/<code>fxReduceAsync</code>, <code>fxFold</code>/<code>fxFoldAsync</code>,
+    <code>fxEach</code>/<code>fxEachAsync</code>, <code>fxFind</code>/<code>fxFindAsync</code> —
     라이브러리의 사실상 모든 함수가 이 규칙을 따릅니다.
   </p>
   <p>

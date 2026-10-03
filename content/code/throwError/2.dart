@@ -2,7 +2,9 @@ import 'package:fxdart/fxdart.dart';
 
 void main() {
   // TODO: build a throwing function for "not implemented" and trigger it
-  final notImplemented = throwError<String>((name) => UnimplementedError(name));
+  final notImplemented = fxThrowError<String>(
+    (name) => UnimplementedError(name),
+  );
 
   try {
     notImplemented('exportPdf');

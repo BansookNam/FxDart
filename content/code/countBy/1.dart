@@ -5,7 +5,7 @@ Future<void> main() async {
 
   final counts = await fx(visits)
       .toAsync()
-      .countBy((page) => delay(const Duration(milliseconds: 100), page));
+      .countBy((page) => fxDelay(const Duration(milliseconds: 100), page));
 
   print(counts); // {home: 3, docs: 2}
 }

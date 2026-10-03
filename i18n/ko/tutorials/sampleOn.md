@@ -35,7 +35,7 @@ nextLabel: combineLatest
     수명은 소스를 따릅니다: 소스가 닫히면 체인이 닫히고 트리거 구독은
     취소됩니다 — 끝없는 <code>Stream.periodic</code> 틱도 훌륭한 트리거가
     됩니다. 이웃과 비교해 보세요:
-    <code><a href="throttle.html">throttle</a></code>은 소스 자신의
+    <code><a href="throttle.html">fxThrottle</a></code>은 소스 자신의
     이벤트에서 잰 고정 윈도우로 속도를 제한하고, <code>sampleOn</code>은
     일정을 통째로 두 번째 스트림에 넘깁니다. fxdart 이벤트 계층이며,
     Rx의 <code>sample</code>을 따랐습니다.
@@ -53,7 +53,7 @@ nextLabel: combineLatest
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — 소스 자신의 타이밍으로 속도 제한 ·
-    <a href="debounce.html"><code>debounce</code></a> — 샘플링 대신 잠잠해지기를 기다림 ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — 소스 자신의 타이밍으로 속도 제한 ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — 샘플링 대신 잠잠해지기를 기다림 ·
     <a href="withLatestFrom.html"><code>withLatestFrom</code></a> — 같은 "최신 값" 아이디어지만 두 데이터 스트림을 결합
   </div>

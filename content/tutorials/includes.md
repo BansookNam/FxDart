@@ -22,10 +22,10 @@ nextLabel: isEmpty
     <code>fx(xs).contains(a)</code> just works. There is no top-level
     <code>contains</code> function, though — the name collides with
     <code>package:test</code>'s matcher — so the data-first form keeps its
-    FxTS spelling <code>includes(a, iterable)</code>, which is literally
+    FxTS spelling <code>fxIncludes(a, iterable)</code>, which is literally
     <code>iterable.contains(a)</code>. The async
-    version, <code>includesAsync</code>, is built on top of
-    <a href="some.html"><code>someAsync</code></a> (<code>b == a</code> as
+    version, <code>fxIncludesAsync</code>, is built on top of
+    <a href="some.html"><code>fxSomeAsync</code></a> (<code>b == a</code> as
     the predicate), which means it inherits the same short-circuiting: it
     stops pulling from the source the moment it finds a match.
   </p>
@@ -39,7 +39,7 @@ nextLabel: isEmpty
   {{playground:0}}
 
   <h2>Demo 2 · Async, and proof it short-circuits</h2>
-  <p>Only 2 of 5 elements are pulled before <code>includesAsync</code> stops:</p>
+  <p>Only 2 of 5 elements are pulled before <code>fxIncludesAsync</code> stops:</p>
   {{playground:1}}
 
   <h2>Try it yourself</h2>
@@ -48,7 +48,7 @@ nextLabel: isEmpty
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="some.html"><code>some</code></a> — what <code>includesAsync</code> is built from ·
+    <a href="some.html"><code>some</code></a> — what <code>fxIncludesAsync</code> is built from ·
     <a href="find.html"><code>find</code></a> — get the matching value, not just a bool ·
     <a href="findIndex.html"><code>findIndex</code></a> — get the position instead ·
     <a href="isEmpty.html"><code>isEmpty</code></a> — the other value-based check nearby

@@ -13,8 +13,8 @@ void main() {
 
   // Both branches fork the SAME `shared` object, so they share one buffered
   // iteration of the underlying generator:
-  final evens = fork(shared).where((a) => a.isEven).toList();
-  final doubled = fork(shared).map((a) => a * 2).toList();
+  final evens = fxFork(shared).where((a) => a.isEven).toList();
+  final doubled = fxFork(shared).map((a) => a * 2).toList();
 
   print(evens); // [2, 4]
   print(doubled); // [2, 4, 6, 8, 10]

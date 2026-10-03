@@ -1,21 +1,24 @@
-import 'package:fxdart/fxdart.dart' hide isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
   group('minBy', () {
     group('sync', () {
       test('should return the element with the smallest key', () {
-        expect(minBy((String s) => s.length, ['ccc', 'a', 'bb']), equals('a'));
-        expect(minBy((int n) => -n, [3, 1, 2]), equals(3));
+        expect(
+          fxMinBy((String s) => s.length, ['ccc', 'a', 'bb']),
+          equals('a'),
+        );
+        expect(fxMinBy((int n) => -n, [3, 1, 2]), equals(3));
       });
 
       test('should return null for an empty iterable', () {
-        expect(minBy((int n) => n, <int>[]), isNull);
+        expect(fxMinBy((int n) => n, <int>[]), isNull);
       });
 
       test('should keep the first element on ties', () {
         expect(
-          minBy((String s) => s.length, ['aa', 'bb', 'ccc']),
+          fxMinBy((String s) => s.length, ['aa', 'bb', 'ccc']),
           equals('aa'),
         );
       });
@@ -35,18 +38,21 @@ void main() {
       // minBy never selects one unless it is the only element — that part
       // reads the same either way. `-0.0` is the half that changed: it is
       // now strictly below `0.0` rather than tying with it.
-      expect(minBy((double d) => d, [1.0, double.nan, 3.0]), 1.0);
-      expect(minBy((double d) => d, [double.nan]), isNaN);
-      expect(minBy((double d) => d, [0.0, -0.0])!.isNegative, isTrue);
+      expect(fxMinBy((double d) => d, [1.0, double.nan, 3.0]), 1.0);
+      expect(fxMinBy((double d) => d, [double.nan]), isNaN);
+      expect(fxMinBy((double d) => d, [0.0, -0.0])!.isNegative, isTrue);
     });
 
     group('async', () {
       test('should return the element with the smallest key', () async {
-        expect(await minByAsync((int n) => n, toAsync([3, 7, 5])), equals(3));
+        expect(
+          await fxMinByAsync((int n) => n, fxToAsync([3, 7, 5])),
+          equals(3),
+        );
       });
 
       test('should return null for an empty iterable', () async {
-        expect(await minByAsync((int n) => n, toAsync(<int>[])), isNull);
+        expect(await fxMinByAsync((int n) => n, fxToAsync(<int>[])), isNull);
       });
 
       test('should be able to be used in the pipeline', () async {

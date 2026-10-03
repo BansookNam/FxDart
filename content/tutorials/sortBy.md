@@ -63,5 +63,5 @@ nextLabel: sortByDesc
     <strong>Related:</strong>
     <a href="sort.html"><code>sort</code></a> — the comparator-based form this builds on ·
     <a href="min.html"><code>min</code></a> · <a href="max.html"><code>max</code></a> — for a single extreme instead of a full ranking ·
-    <a href="pluck.html"><code>pluck</code></a> — extract the same key without sorting
+    <a href="pluck.html"><code>fxPluck</code></a> — extract the same key without sorting
   </div>

@@ -32,7 +32,7 @@ async: false
     replaying the loop in your head. The FxDart version states the
     structure instead: <code>sortBy</code> descending,
     <code>groupBy</code> score (one group per rank), walk the groups with
-    <code>entries</code> + <code>zipWithIndex</code> (group index = rank),
+    <code>fxEntries</code> + <code>zipWithIndex</code> (group index = rank),
     and <code>flatMap</code> each group back into player lines. "Equal
     scores share a rank" stops being emergent loop behavior and becomes
     the pipeline's shape.

@@ -2,7 +2,7 @@
 slug: combine
 title: combine — FxDart 101
 description: FxDart combine tutorial: one combinator for combineLatest-style, withLatestFrom-style, zipAll and withLatestFromAll — driven by CombineSpec — with a live playground.
-heading: <code>combine</code> &amp; <code>CombineSpec</code>
+heading: <code>fxCombine</code> &amp; <code>CombineSpec</code>
 section: 14
 crumb: combine
 prev: waitAll.html
@@ -20,7 +20,7 @@ nextLabel: stopOn
     <code><a href="withLatestFrom.html">withLatestFrom</a></code> and
     <code><a href="waitAll.html">zip</a></code> differ in who may fire
     an emit and whether every side must have spoken.
-    <code>combine</code> is the unified form: a list of
+    <code>fxCombine</code> is the unified form: a list of
     <code>CombineSpec</code>, each a <code>source</code> plus two
     flags. It is a top-level function, not
     <code>FxEvents.combine</code> — Dart cannot add statics to

@@ -10,11 +10,11 @@ void main() {
         'should return value that is reduced given elements successively',
         () {
           expect(
-            toList(scan((int a, int b) => a * b, 1, [1, 2, 3, 4])),
+            fxToList(fxScan((int a, int b) => a * b, 1, [1, 2, 3, 4])),
             equals([1, 1, 2, 6, 24]),
           );
           expect(
-            toList(scan((String a, String b) => a + b, 'a', ['b', 'c'])),
+            fxToList(fxScan((String a, String b) => a + b, 'a', ['b', 'c'])),
             equals(['a', 'ab', 'abc']),
           );
         },
@@ -22,17 +22,17 @@ void main() {
 
       test('should reduce given elements successively without seed', () {
         expect(
-          toList(scan1((int a, int b) => a * b, [1, 2, 3, 4])),
+          fxToList(fxScan1((int a, int b) => a * b, [1, 2, 3, 4])),
           equals([1, 2, 6, 24]),
         );
         expect(
-          toList(scan1((String a, String b) => a + b, ['a', 'b', 'c'])),
+          fxToList(fxScan1((String a, String b) => a + b, ['a', 'b', 'c'])),
           equals(['a', 'ab', 'abc']),
         );
       });
 
       test('should be able to be used in the pipeline', () {
-        final res = toList(scan1((int a, int b) => a * b, [1, 2, 3, 4]));
+        final res = fxToList(fxScan1((int a, int b) => a * b, [1, 2, 3, 4]));
         expect(res, equals([1, 2, 6, 24]));
       });
     });
@@ -42,17 +42,17 @@ void main() {
         'should return value that is reduced given elements successively',
         () async {
           expect(
-            await toListAsync(
-              scanAsync((int a, int b) => a * b, 1, toAsync([1, 2, 3, 4])),
+            await fxToListAsync(
+              fxScanAsync((int a, int b) => a * b, 1, fxToAsync([1, 2, 3, 4])),
             ),
             equals([1, 1, 2, 6, 24]),
           );
           expect(
-            await toListAsync(
-              scanAsync(
+            await fxToListAsync(
+              fxScanAsync(
                 (String a, String b) => a + b,
                 'a',
-                toAsync(['b', 'c']),
+                fxToAsync(['b', 'c']),
               ),
             ),
             equals(['a', 'ab', 'abc']),
@@ -64,21 +64,21 @@ void main() {
         'should reduce given elements successively when seed is a Future',
         () async {
           expect(
-            await toListAsync(
-              scanAsync(
+            await fxToListAsync(
+              fxScanAsync(
                 (int a, int b) => a * b,
                 Future.value(1),
-                toAsync([1, 2, 3, 4]),
+                fxToAsync([1, 2, 3, 4]),
               ),
             ),
             equals([1, 1, 2, 6, 24]),
           );
           expect(
-            await toListAsync(
-              scanAsync(
+            await fxToListAsync(
+              fxScanAsync(
                 (String a, String b) => a + b,
                 Future.value('a'),
-                toAsync(['b', 'c']),
+                fxToAsync(['b', 'c']),
               ),
             ),
             equals(['a', 'ab', 'abc']),
@@ -88,14 +88,17 @@ void main() {
 
       test('should reduce given elements successively without seed', () async {
         expect(
-          await toListAsync(
-            scan1Async((int a, int b) => a * b, toAsync([1, 2, 3, 4])),
+          await fxToListAsync(
+            fxScan1Async((int a, int b) => a * b, fxToAsync([1, 2, 3, 4])),
           ),
           equals([1, 2, 6, 24]),
         );
         expect(
-          await toListAsync(
-            scan1Async((String a, String b) => a + b, toAsync(['a', 'b', 'c'])),
+          await fxToListAsync(
+            fxScan1Async(
+              (String a, String b) => a + b,
+              fxToAsync(['a', 'b', 'c']),
+            ),
           ),
           equals(['a', 'ab', 'abc']),
         );
@@ -105,7 +108,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = scan1Async((int a, int b) => a, mock).iterator;
+          final it = fxScan1Async((int a, int b) => a, mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },
@@ -113,15 +116,15 @@ void main() {
 
       test('should be handled concurrently', () async {
         final sw = Stopwatch()..start();
-        final res = await toListAsync(
-          concurrentAsync(
+        final res = await fxToListAsync(
+          fxConcurrentAsync(
             3,
-            scanAsync(
+            fxScanAsync(
               (int a, int b) => a * b,
               1,
-              mapAsync(
-                (int a) => delay(const Duration(milliseconds: 100), a),
-                toAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
+              fxMapAsync(
+                (int a) => fxDelay(const Duration(milliseconds: 100), a),
+                fxToAsync([1, 2, 3, 4, 5, 6, 7, 8, 9]),
               ),
             ),
           ),
@@ -135,19 +138,19 @@ void main() {
       test(
         'should be able to handle an error when working concurrent',
         () async {
-          final future = toListAsync(
-            concurrentAsync(
+          final future = fxToListAsync(
+            fxConcurrentAsync(
               2,
-              scan1Async(
+              fxScan1Async(
                 (int a, int b) {
                   if (a * b == 24) {
                     throw StateError('err');
                   }
                   return a * b;
                 },
-                mapAsync(
-                  (int a) => delay(const Duration(milliseconds: 20), a),
-                  toAsync(range(1, 21)),
+                fxMapAsync(
+                  (int a) => fxDelay(const Duration(milliseconds: 20), a),
+                  fxToAsync(fxRange(1, 21)),
                 ),
               ),
             ),

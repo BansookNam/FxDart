@@ -2,7 +2,7 @@
 slug: nullable
 title: nullable — FxDart 101
 description: Tutorial de nullable en FxDart: los constructores nullable y nullableAsync — desenvoltura en línea recta de valores nullables, la alternativa nullable-first a un tipo Option.
-heading: <code>nullable</code>
+heading: <code>fxNullable</code>
 section: 13
 crumb: nullable
 prev: raise.html
@@ -22,9 +22,9 @@ nextLabel: NonEmptyList
   <p>
     Cuando la única información de fallo que necesitas es la
     <em>ausencia</em>, un <code>Either</code> es excesivo — Dart ya tiene un
-    canal dedicado a la ausencia: <code>T?</code>. <code>nullable</code> es el
+    canal dedicado a la ausencia: <code>T?</code>. <code>fxNullable</code> es el
     gemelo sin información del
-    <a href="raise.html">constructor <code>either</code></a>
+    <a href="raise.html">constructor <code>fxEither</code></a>
     (el port de <code>nullable&nbsp;{&nbsp;}</code> de Arrow): el
     <code>r.bind(value)</code> del ámbito desenvuelve un valor nullable y, si
     es <code>null</code>, todo el bloque devuelve <code>null</code>.
@@ -55,8 +55,8 @@ nextLabel: NonEmptyList
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="raise.html">constructor <code>either</code></a> — cuando el fallo necesita un motivo ·
+    <a href="raise.html">constructor <code>fxEither</code></a> — cuando el fallo necesita un motivo ·
     <a href="either.html"><code>Either</code></a> — <code>getOrNull()</code> hace de puente de vuelta a los nullables ·
-    <a href="compact.html"><code>nonNulls</code></a> — elimina los nulls de un pipeline ·
+    <a href="compact.html"><code>fxNonNulls</code></a> — elimina los nulls de un pipeline ·
     <a href="typedErrors.html">errores tipados — guía completa</a>
   </div>

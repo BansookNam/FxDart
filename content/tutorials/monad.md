@@ -116,7 +116,7 @@ val result = for {
   <div class="callout">
     <strong>And in FxDart?</strong> Dart has neither
     <code>for</code>-comprehensions nor <code>do</code>-notation — which is
-    exactly why FxDart's <a href="typedErrors.html"><code>either((r) {
+    exactly why FxDart's <a href="typedErrors.html"><code>fxEither((r) {
     ... })</code> block</a> exists. It plays the same role as a
     comprehension block (straight-line code instead of a
     <code>flatMap</code> pyramid), but through a <code>Raise</code> scope

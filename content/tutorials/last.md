@@ -53,7 +53,7 @@ nextLabel: nth
   <div class="callout">
     <strong>Related:</strong>
     <a href="head.html"><code>head</code></a> — the O(1) opposite end ·
-    <a href="nth.html"><code>nth</code></a> — pull any index ·
+    <a href="nth.html"><code>fxNth</code></a> — pull any index ·
     <a href="find.html"><code>find</code></a> — first match to a predicate ·
     <a href="reverse.html"><code>reverse</code></a> — flip the whole sequence
   </div>

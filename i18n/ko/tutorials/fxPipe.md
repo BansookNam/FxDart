@@ -39,7 +39,7 @@ fx(lines).map(f);</code></pre>
     .toList();</code></pre>
   <p>
     결과가 <code>parallel</code> 워커일 때 각 단계는 보낼 수 있어야
-    합니다. <code>juxt</code>는 반대
+    합니다. <code>fxJuxt</code>는 반대
     방향입니다: 함수 여러 개, 입력 하나, 결과 리스트.
   </p>
   <p>
@@ -79,7 +79,7 @@ fx(lines).map(f);</code></pre>
   <div class="callout">
     <strong>관련:</strong>
     <a href="pipe.html"><code>pipe</code></a> — 같은 생각, 타입 없음, 값 위 ·
-    <a href="juxt.html"><code>juxt</code></a> — 함수 여러 개, 입력 하나, 결과 리스트 ·
+    <a href="juxt.html"><code>fxJuxt</code></a> — 함수 여러 개, 입력 하나, 결과 리스트 ·
     <a href="map.html"><code>map</code></a> — 이 isolate에서의 같은 합성 ·
     <a href="parallel.html"><code>parallel</code></a> — 워커를 합성하면 홉을 아끼는 곳
   </div>

@@ -30,7 +30,7 @@ nextLabel: fold
   </p>
   <p>
     FxTS overloads <code>reduce</code> for both the seeded and unseeded case
-    by argument count — <code>reduce(f, iterable)</code> vs.
+    by argument count — <code>fxReduce(f, iterable)</code> vs.
     <code>reduce(f, seed, iterable)</code>. Dart has no arity-based
     overloading, so FxDart keeps <code>reduce</code> for the unseeded form
     and renames the seeded one to <code><a href="fold.html">fold</a></code> —
@@ -64,7 +64,7 @@ nextLabel: fold
   <div class="callout">
     <strong>Related:</strong>
     <a href="fold.html"><code>fold</code></a> — the seeded counterpart ·
-    <a href="reduceLazy.html"><code>reduceLazy</code></a> — a reusable, curried reducer ·
+    <a href="reduceLazy.html"><code>fxReduceLazy</code></a> — a reusable, curried reducer ·
     <a href="sum.html"><code>sum</code></a> — reduce specialized for numbers ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation upstream
   </div>

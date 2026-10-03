@@ -8,11 +8,11 @@ Future<void> main() async {
   final names = ['alice', 'bob', 'carol', 'dave'];
   final fetched = fx(names)
       .toAsync()
-      .map((n) => delay(Duration(milliseconds: 100), n))
+      .map((n) => fxDelay(Duration(milliseconds: 100), n))
       .concurrent(4);
 
   final selected =
-      await fxAsync(compressAsync([true, false, true, false], fetched))
+      await fxAsync(fxCompressAsync([true, false, true, false], fetched))
           .toList();
 
   print(selected); // [alice, carol]

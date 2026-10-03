@@ -1,10 +1,10 @@
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNotNull, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, isNotNull, fxIsNull;
 import 'package:test/test.dart';
 
 void main() {
   group('Accumulator.dependent', () {
     test('should run the block when no branch has failed', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           final a = acc.accumulating((_) => 2);
           final b = acc.dependent((_) => a.value + 1);
@@ -16,7 +16,7 @@ void main() {
 
     test('should skip the block entirely once a branch has failed', () {
       var ran = false;
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           acc.accumulating<int>((br) => br.raise('bad'));
           acc.dependent((_) {
@@ -32,7 +32,7 @@ void main() {
 
     test('should detonate with the accumulated errors when reading a '
         'skipped dependent value', () {
-      final result = either<Nel<String>, int>(
+      final result = fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           acc.accumulating<int>((br) => br.raise('first'));
           acc.accumulating<int>((br) => br.raise('second'));
@@ -46,7 +46,7 @@ void main() {
     test(
       'should accumulate errors raised inside a running dependent block',
       () {
-        final result = either<Nel<String>, int>(
+        final result = fxEither<Nel<String>, int>(
           (r) => r.accumulate((acc) {
             final a = acc.accumulating((_) => 1);
             acc.dependent<int>((br) => br.raise('dependent failed'));
@@ -58,7 +58,7 @@ void main() {
     );
 
     test('should report hasErrors after a failed dependent block', () {
-      either<Nel<String>, int>(
+      fxEither<Nel<String>, int>(
         (r) => r.accumulate((acc) {
           expect(acc.hasErrors, isFalse);
           acc.dependent<int>((br) => br.raise('e'));
@@ -72,7 +72,7 @@ void main() {
       // The round-11 daily_ledger shape: an amount rule that depends on the
       // parsed type — only evaluated when both independent branches parsed.
       Either<Nel<String>, (String, double)> parse(String type, String amount) =>
-          either<Nel<String>, (String, double)>(
+          fxEither<Nel<String>, (String, double)>(
             (r) => r.accumulate((acc) {
               final t = acc.accumulating(
                 (br) => br.ensureNotNull(

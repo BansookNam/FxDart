@@ -32,13 +32,26 @@ fxdart is a port of **FxTS** (TypeScript FP library). API names, semantics, and 
 
 - `lib/src/lazy/` — lazy operators over plain `Iterable` (`sync*`), signature `op(callback, iterable)`.
 - `lib/src/strict/` — eager functions (aggregate, access, object, predicates, `.curried` extensions).
-- `lib/src/async_iterable.dart` — `FxAsyncIterable`, a **pull-based** async protocol with a concurrency back-channel: `concurrent(n)` passes a marker backwards through `iterator.next(concurrent)` so upstream evaluates n items at once, in order. This back-channel is why the library does not build on push-based `Stream`s (bridges: `toAsync`, `fromStream`, `toStream()`).
+- `lib/src/async_iterable.dart` — `FxAsyncIterable`, a **pull-based** async protocol with a concurrency back-channel: `concurrent(n)` passes a marker backwards through `iterator.next(concurrent)` so upstream evaluates n items at once, in order. This back-channel is why the library does not build on push-based `Stream`s (bridges: `fxToAsync`, `fxFromStream`, `toStream()`).
 - `lib/src/fx.dart` — typed `Fx`/`FxAsync` chains that wrap the top-level operators (the Dart replacement for FxTS's curried `pipe`). `lib/src/pipe.dart` is the dynamic, untyped `pipe` kept for FxTS parity.
 - Public API is the explicit export list in `lib/fxdart.dart`.
+- **Top-level naming rule.** A top-level function whose name has one or two
+  camelCase words (ignoring a trailing `Async` and digits) is prefixed `fx`:
+  `fxMap`, `fxGroupBy`, `fxRange`, `fxMapAsync`. Three or more words keep the
+  FxTS name (`mapWithIndex`, `takeUntilInclusive`, `foldRightWithIndexAsync`).
+  An `Async` twin follows its sync name. Chain members on `Fx`/`FxAsync`/
+  `FxEvents` and extension members never take the prefix (`fx(xs).map(f)`).
+  Exceptions: `pipe`/`pipeLazy`, because `fxPipe` is the typed composer. Why:
+  bare names collided with `package:path` (`join`) and `package:test`
+  (`isEmpty`), and `max`/`min`/`sleep` silently shadowed `dart:math`/`dart:io`
+  — a package name beats a `dart:` name with no diagnostic. Inside an
+  extension whose member shares a top-level `fx*` name (`fxShuffle`,
+  `fxDebounce`, `fxThrottle`), call a private helper: a bare call there
+  resolves to the member itself.
 
-**Adding an operator touches all of:** top-level sync fn + `Async` variant in `lib/src/`, chain method on `Fx`/`FxAsync`, export in `lib/fxdart.dart`, test at `test/{lazy,strict,util}/<fn>_test.dart` (one file per function), and a tutorial in `content/tutorials/<fn>.md` + `content/code/<fn>/`.
+**Adding an operator touches all of:** top-level sync fn + `Async` variant in `lib/src/` (named per the top-level naming rule above), chain method on `Fx`/`FxAsync`, export in `lib/fxdart.dart`, test at `test/{lazy,strict,util}/<fn>_test.dart` (one file per function), and a tutorial in `content/tutorials/<fn>.md` + `content/code/<fn>/`.
 
-Async operator callbacks in `mapAsync`-style code must stay parallel-safe: overlapping `next()` calls must start overlapping upstream pulls — awaiting the upstream serially breaks `concurrent`.
+Async operator callbacks in `fxMapAsync`-style code must stay parallel-safe: overlapping `next()` calls must start overlapping upstream pulls — awaiting the upstream serially breaks `concurrent`.
 
 ## Docs site (content/ → docs/)
 

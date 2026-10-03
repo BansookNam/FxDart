@@ -1,5 +1,5 @@
-void forEach&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
-Future&lt;void&gt; forEachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+void fxForEach&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;void&gt; fxForEachAsync&lt;A&gt;(FutureOr&lt;void&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
 void Fx.forEach(void Function(T a) f)        // chain (inherited from Iterable)
 Future&lt;void&gt; FxAsync.forEach(FutureOr&lt;void&gt; Function(T a) f)  // chain
-void each&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias
+void fxEach&lt;A&gt;(void Function(A a) f, Iterable&lt;A&gt; iterable)  // FxTS alias

@@ -42,7 +42,7 @@ void main() {
       'running ${money(p.$2)}').toList();
   final spent = fx(plan).sumBy((p) => p.$1.reorderQty * p.$1.unitCost);
 
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Restock plan (budget ${money(budget)})',
     ...lines,
     'Ordering ${lines.length} of ${needed.length} needed items; '

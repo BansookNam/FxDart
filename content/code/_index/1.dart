@@ -5,7 +5,7 @@ Future<void> main() async {
 
   final users = await fx([1, 2, 3, 4, 5, 6])
       .toAsync()
-      .map((id) => delay(Duration(milliseconds: 300), 'user$id'))
+      .map((id) => fxDelay(Duration(milliseconds: 300), 'user$id'))
       .concurrent(3) // ← try 1 (sequential) or 6 (all at once)
       .toList();
 

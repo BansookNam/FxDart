@@ -26,12 +26,12 @@ nextLabel: each
   <p>
     뒤집어 말하면 <code>toList</code>는 무한하거나 크기가 정해지지 않은 소스에
     <em>직접</em> 호출해서는 안 되는 연산자이기도 합니다(끝이 없는
-    <code>range</code>, <code>cycle</code>, 개수가 아주 큰 <code>repeat</code>).
+    <code>fxRange</code>, <code>cycle</code>, 개수가 아주 큰 <code>repeat</code>).
     영원히 값을 끌어당기려 들기 때문입니다. 먼저 <code>take(n)</code>으로 범위를
     한정한 다음, 그 결과에 <code>toList</code>를 호출하세요.
   </p>
   <p>
-    비동기 버전인 <code>toListAsync</code>(또는 <code>FxAsync</code> 체인에서의
+    비동기 버전인 <code>fxToListAsync</code>(또는 <code>FxAsync</code> 체인에서의
     <code>.toList()</code>)는 원소를 끌어당길 때마다 await하며
     <code>Future&lt;List&lt;T&gt;&gt;</code>를 반환합니다. 상류에
     <code>.concurrent(n)</code>을 함께 쓰면 개별 await가 겹쳐 실행되지만,

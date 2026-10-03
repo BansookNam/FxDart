@@ -1,1 +1,1 @@
-Map&lt;K, V&gt; pick&lt;K, V&gt;(Iterable&lt;K&gt; keysToPick, Map&lt;K, V&gt; map)
+Map&lt;K, V&gt; fxPick&lt;K, V&gt;(Iterable&lt;K&gt; keysToPick, Map&lt;K, V&gt; map)

@@ -1,7 +1,7 @@
 import 'package:fxdart/fxdart.dart';
 
 Future<void> main() async {
-  final kept = await fxAsync(toAsync([1, 2, 0, 0]))
+  final kept = await fxAsync(fxToAsync([1, 2, 0, 0]))
       .dropWhileRight((a) => a == 0)
       .toList();
   print(kept); // [1, 2]

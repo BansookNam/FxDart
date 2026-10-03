@@ -9,7 +9,7 @@ void main() {
       test(
         'should return all elements in iterable2 contained in iterable1',
         () {
-          final iter = intersectionBy(
+          final iter = fxIntersectionBy(
             (Map<String, int> a) => a['x'],
             [
               {'x': 1},
@@ -22,15 +22,15 @@ void main() {
             ],
           );
           expect(
-            toList(iter),
+            fxToList(iter),
             equals([
               {'x': 1},
             ]),
           );
 
           expect(
-            toList(
-              intersectionBy(
+            fxToList(
+              fxIntersectionBy(
                 (String a) => a,
                 'abcd'.split(''),
                 'cdefgc'.split(''),
@@ -46,14 +46,14 @@ void main() {
       test(
         'should return all elements in iterable2 contained in iterable1',
         () async {
-          final res = await toListAsync(
-            intersectionByAsync(
+          final res = await fxToListAsync(
+            fxIntersectionByAsync(
               (Map<String, int> a) => a['x'],
-              toAsync([
+              fxToAsync([
                 {'x': 1},
                 {'x': 4},
               ]),
-              toAsync([
+              fxToAsync([
                 {'x': 1},
                 {'x': 2},
                 {'x': 3},
@@ -68,11 +68,11 @@ void main() {
           );
 
           expect(
-            await toListAsync(
-              intersectionByAsync(
+            await fxToListAsync(
+              fxIntersectionByAsync(
                 (String a) => a,
-                toAsync('abcd'.split('')),
-                toAsync('cdefgc'.split('')),
+                fxToAsync('abcd'.split('')),
+                fxToAsync('cdefgc'.split('')),
               ),
             ),
             equals(['c', 'd']),
@@ -81,11 +81,11 @@ void main() {
       );
 
       test('should support an async callback', () async {
-        final res = await toListAsync(
-          intersectionByAsync(
+        final res = await fxToListAsync(
+          fxIntersectionByAsync(
             (int a) async => a % 10,
-            toAsync([1, 2]),
-            toAsync([11, 13, 21]),
+            fxToAsync([1, 2]),
+            fxToAsync([11, 13, 21]),
           ),
         );
         expect(res, equals([11, 21]));
@@ -96,7 +96,7 @@ void main() {
         () async {
           final mock1 = ConcurrentMock<int>();
           final mock2 = ConcurrentMock<int>();
-          final it = intersectionByAsync((int a) => a, mock1, mock2).iterator;
+          final it = fxIntersectionByAsync((int a) => a, mock1, mock2).iterator;
           await it.next(Concurrent.of(2));
           // Only iterable2 is evaluated concurrently, as in FxTS.
           expect(mock2.received?.length, equals(2));

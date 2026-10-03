@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:fxdart/fxdart.dart' hide isEmpty, isNull;
+import 'package:fxdart/fxdart.dart' hide fxIsEmpty, fxIsNull;
 import 'package:test/test.dart';
 
 Future<List<Object>> collect(FxEvents<dynamic> events) {

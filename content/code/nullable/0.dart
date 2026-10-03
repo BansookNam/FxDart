@@ -1,6 +1,6 @@
 import 'package:fxdart/fxdart.dart';
 
-int? addStrings(String x, String y) => nullable((r) {
+int? addStrings(String x, String y) => fxNullable((r) {
   final a = r.bind(int.tryParse(x)); // unwraps, or the block returns null
   final b = r.bind(int.tryParse(y));
   return a + b;

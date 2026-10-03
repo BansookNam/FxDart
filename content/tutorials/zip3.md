@@ -36,8 +36,8 @@ nextLabel: zipWith
     (<code>fx(a).zip(b)</code>) and <code>zip3</code> does not — a chain has
     one receiver and <code>zip3</code> needs three peers. Call it as a
     top-level function and wrap the result in <code>fx()</code> to carry on,
-    as the demo's last line does. <code>zip3Async</code> is the async form,
-    and like <code>zipAsync</code> it issues all three <code>next()</code>
+    as the demo's last line does. <code>fxZip3Async</code> is the async form,
+    and like <code>fxZipAsync</code> it issues all three <code>next()</code>
     calls before awaiting any of them, so the sources are pulled in parallel
     per record rather than one after another.
   </p>
@@ -48,6 +48,6 @@ nextLabel: zipWith
   <div class="callout">
     <strong>Related:</strong>
     <a href="zip.html"><code>zip</code></a> — the two-iterable form, and the full explanation ·
-    <a href="zipWith.html"><code>zipWith</code></a> — combine instead of pairing ·
-    <a href="transpose.html"><code>transpose</code></a> — any number of iterables, at the cost of a shared element type
+    <a href="zipWith.html"><code>fxZipWith</code></a> — combine instead of pairing ·
+    <a href="transpose.html"><code>fxTranspose</code></a> — any number of iterables, at the cost of a shared element type
   </div>

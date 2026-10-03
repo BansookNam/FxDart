@@ -96,7 +96,7 @@ realmente vienen los bugs.
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Either<String, int> risky(String s) => either((r) {
+Either<String, int> risky(String s) => fxEither((r) {
       if (s.isEmpty) r.raise('empty');
       // Not modelled, and not caught by the signature:
       return int.parse(s); // throws on 'abc'
@@ -111,12 +111,12 @@ void main() {
   }
 
   // If you want throws folded into the failure channel, say so.
-  print(eitherCatching<String, int>(
+  print(fxEitherCatching<String, int>(
       (r) => int.parse('abc'), (e, _) => 'not a number'));
 }
 ```
 
-`eitherCatching` es la conversión explícita, y que sea explícita es el
+`fxEitherCatching` es la conversión explícita, y que sea explícita es el
 diseño: tragarse en silencio cada excepción convertiría bugs genuinos en
 fallos de dominio, y te enterarías en producción, un `Left('Bad state: no
 element')` a la vez.
@@ -139,7 +139,7 @@ class Config {
 
 // Inbound: a throwing API becomes a typed failure.
 Either<String, Config> loadConfig(Map<String, String> env) =>
-    eitherCatching(
+    fxEitherCatching(
       (r) {
         final raw = env['PORT'];
         r.ensureNotNull(raw, () => 'PORT is not set');
@@ -181,7 +181,7 @@ valores.
 > (`FormatException`, `IOException`). Eso encaja perfectamente con este
 > capítulo: `Error` nunca debería capturarse y convertirse en un `Left`,
 > porque hacerlo esconde un bug; `Exception` es un buen candidato para
-> `eitherCatching`. Cuando escribes una librería, seguir la convención es lo
+> `fxEitherCatching`. Cuando escribes una librería, seguir la convención es lo
 > que permite que quienes la usan hagan esta distinción siquiera.
 
 ## El término medio nulable
@@ -193,7 +193,7 @@ búsqueda en un mapa, una primera coincidencia, un campo opcional: sí. Un
 parseo, una validación, una autorización: no, porque quien llama querrá saber
 qué salió mal.
 
-El scope `nullable` de FxDart existe para que la cadena con forma de null
+El scope `fxNullable` de FxDart existe para que la cadena con forma de null
 reciba el mismo trato en línea recta:
 
 ```dart run
@@ -210,7 +210,7 @@ final users = <String, User>{
   'u2': User('Grace', null),
 };
 
-String? managerName(String id) => nullable((r) {
+String? managerName(String id) => fxNullable((r) {
       final user = r.bind(users[id]);
       final managerId = r.bind(user.managerId);
       final manager = r.bind(users[managerId]);
@@ -251,8 +251,8 @@ ruido.
    proveedor.
 2. `int.parse` lanza y `int.tryParse` devuelve null. ¿Qué canal habría dado
    `Either`, y qué habría tenido que inventar?
-3. ¿Por qué `eitherCatching` es una función separada en lugar del
-   comportamiento por defecto de `either`? Describe el bug que seguiría de
+3. ¿Por qué `fxEitherCatching` es una función separada en lugar del
+   comportamiento por defecto de `fxEither`? Describe el bug que seguiría de
    la otra elección.
 4. Una función devuelve `Either<E, A>` pero también lanza en algunas
    entradas. ¿Cómo lo descubrirías, y qué cambiarías — el código o la
@@ -280,6 +280,6 @@ ruido.
 4. Descúbrelo con tests sobre las entradas que fallan, o leyendo en busca
    de llamadas que puedan lanzar (`parse`, `!`, `first`, `[]` sobre una
    lista). Cambia el *código*: envuelve la llamada que lanza en
-   `eitherCatching` y modela el fallo, o deja que se propague
+   `fxEitherCatching` y modela el fallo, o deja que se propague
    deliberadamente si es un bug. Lo único que no hay que hacer es
    documentarlo en un comentario y dejar la firma mintiendo.

@@ -6,26 +6,26 @@ void main() {
   group('sortBy', () {
     group('sync', () {
       test("should sort the elements by 'f' (identity, empty)", () {
-        expect(sortBy(identity, <Object?>[]), equals(<Object?>[]));
+        expect(fxSortBy(fxIdentity, <Object?>[]), equals(<Object?>[]));
       });
 
       test("should sort the elements by 'f' (identity, numbers)", () {
         expect(
-          sortBy(identity, [3, 4, 1, 2, 5, 2]),
+          fxSortBy(fxIdentity, [3, 4, 1, 2, 5, 2]),
           equals([1, 2, 2, 3, 4, 5]),
         );
       });
 
       test("should sort the elements by 'f' (identity, string chars)", () {
         expect(
-          sortBy(identity, 'bcdae'.split('')),
+          fxSortBy(fxIdentity, 'bcdae'.split('')),
           equals(['a', 'b', 'c', 'd', 'e']),
         );
       });
 
       test('should sort all-double keys (unboxed path)', () {
         expect(
-          sortBy((double d) => d, [2.5, 0.5, 1.5]),
+          fxSortBy((double d) => d, [2.5, 0.5, 1.5]),
           equals([0.5, 1.5, 2.5]),
         );
       });
@@ -33,7 +33,7 @@ void main() {
       test('should sort generic Comparable keys (DateTime)', () {
         final dates = [DateTime(2026, 3, 1), DateTime(2026, 1, 2)];
         expect(
-          sortBy((DateTime d) => d, dates),
+          fxSortBy((DateTime d) => d, dates),
           equals([DateTime(2026, 1, 2), DateTime(2026, 3, 1)]),
         );
       });
@@ -43,21 +43,21 @@ void main() {
         // buffer is allocated, so the caller's list cannot be aliased.
         // The new `List.filled` workspaces only ever see that copy.
         final original = [3, 4, 1, 2, 5, 2];
-        final result = sortBy(identity, original);
+        final result = fxSortBy(fxIdentity, original);
         expect(identical(original, result), isFalse);
         expect(original, equals([3, 4, 1, 2, 5, 2]));
       });
 
       test('should not mutate the original list (double keys, merge path)', () {
         final original = [2.5, 0.5, 1.5, 4.0, 3.0];
-        final result = sortBy((double d) => d, original);
+        final result = fxSortBy((double d) => d, original);
         expect(identical(original, result), isFalse);
         expect(original, equals([2.5, 0.5, 1.5, 4.0, 3.0]));
         expect(result, equals([0.5, 1.5, 2.5, 3.0, 4.0]));
       });
 
       test("should sort the elements by 'f' (key extractor)", () {
-        final res = sortBy((Map<String, Object> a) => a['id'], [
+        final res = fxSortBy((Map<String, Object> a) => a['id'], [
           {'id': 4, 'name': 'foo'},
           {'id': 2, 'name': 'bar'},
           {'id': 3, 'name': 'lee'},
@@ -76,8 +76,8 @@ void main() {
         final res = pipe(
           [3, 4, 1, 2, 5, 2],
           [
-            (Iterable<int> a) => filter((int n) => n % 2 != 0, a),
-            (Iterable<int> a) => sortBy(identity, a),
+            (Iterable<int> a) => fxFilter((int n) => n % 2 != 0, a),
+            (Iterable<int> a) => fxSortBy(fxIdentity, a),
           ],
         );
         expect(res, equals([1, 3, 5]));
@@ -87,14 +87,14 @@ void main() {
     group('async', () {
       test("should sort the elements by 'f' (identity, empty)", () async {
         expect(
-          await sortByAsync(identity, toAsync(<Object?>[])),
+          await fxSortByAsync(fxIdentity, fxToAsync(<Object?>[])),
           equals(<Object?>[]),
         );
       });
 
       test("should sort the elements by 'f' (identity, numbers)", () async {
         expect(
-          await sortByAsync(identity, toAsync([3, 4, 1, 2, 5, 2])),
+          await fxSortByAsync(fxIdentity, fxToAsync([3, 4, 1, 2, 5, 2])),
           equals([1, 2, 2, 3, 4, 5]),
         );
       });
@@ -103,16 +103,16 @@ void main() {
         "should sort the elements by 'f' (identity, string chars)",
         () async {
           expect(
-            await sortByAsync(identity, toAsync('bcdae'.split(''))),
+            await fxSortByAsync(fxIdentity, fxToAsync('bcdae'.split(''))),
             equals(['a', 'b', 'c', 'd', 'e']),
           );
         },
       );
 
       test("should sort the elements by 'f' (key extractor)", () async {
-        final res = await sortByAsync(
+        final res = await fxSortByAsync(
           (Map<String, Object> a) => a['id'],
-          toAsync([
+          fxToAsync([
             {'id': 4, 'name': 'foo'},
             {'id': 2, 'name': 'bar'},
             {'id': 3, 'name': 'lee'},
@@ -132,9 +132,9 @@ void main() {
         final res = await pipe(
           [3, 4, 1, 2, 5, 2],
           [
-            (List<int> a) => toAsync(a),
-            (FxAsyncIterable<int> a) => filterAsync((int n) => n % 2 != 0, a),
-            (FxAsyncIterable<int> a) => sortByAsync(identity, a),
+            (List<int> a) => fxToAsync(a),
+            (FxAsyncIterable<int> a) => fxFilterAsync((int n) => n % 2 != 0, a),
+            (FxAsyncIterable<int> a) => fxSortByAsync(fxIdentity, a),
           ],
         );
         expect(res, equals([1, 3, 5]));

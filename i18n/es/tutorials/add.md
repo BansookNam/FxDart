@@ -2,7 +2,7 @@
 slug: add
 title: add — FxDart 101
 description: Tutorial de add en FxDart: el + genérico como valor de función, utilizable como reductor, con un playground en vivo.
-heading: <code>add</code>
+heading: <code>fxAdd</code>
 section: 10
 crumb: add
 prev: cases.html
@@ -16,11 +16,11 @@ nextLabel: gt · gte · lt · lte
 
   <h2>Lección</h2>
   <p>
-    <code>add(a, b)</code> es <code>+</code> empaquetado como valor de función.
+    <code>fxAdd(a, b)</code> es <code>+</code> empaquetado como valor de función.
     Como despacha a <code>+</code> de forma dinámica, funciona con cualquier cosa
     que soporte el operador — <code>num</code>, concatenación de
     <code>String</code>, incluso concatenación de <code>List</code> — igual que el
-    <code>add</code> de FxTS, que acepta tanto números como cadenas.
+    <code>fxAdd</code> de FxTS, que acepta tanto números como cadenas.
   </p>
   <p>
     Su verdadero valor aparece allí donde una API espera una función binaria
@@ -29,7 +29,7 @@ nextLabel: gt · gte · lt · lte
     función combinadora de <code>reduce</code>/<code>fold</code>. Eso sí, es una
     función binaria, así que para usarla como callback unario de
     <code>map</code> (sumar una cantidad fija a cada elemento) tienes que fijar
-    tú mismo uno de los lados: <code>(b) =&gt; add(n, b)</code>.
+    tú mismo uno de los lados: <code>(b) =&gt; fxAdd(n, b)</code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -39,7 +39,7 @@ nextLabel: gt · gte · lt · lte
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>fold</code> + <code>add</code> para concatenar todas
+  <p>Ejercicio: usa <code>fold</code> + <code>fxAdd</code> para concatenar todas
     las partes en una sola cadena.</p>
   {{playground:2}}
 
@@ -47,6 +47,6 @@ nextLabel: gt · gte · lt · lte
     <strong>Relacionado:</strong>
     <a href="reduce.html"><code>reduce</code></a> / <a href="fold.html"><code>fold</code></a> — el sitio habitual de add como combinador ·
     <a href="sum.html"><code>sum</code></a> — una suma ya hecha para Iterable&lt;num&gt; ·
-    <a href="comparisons.html"><code>gt · gte · lt · lte</code></a> — las contrapartes de comparación de add ·
-    <a href="apply.html"><code>apply</code></a> — llama a cualquier función con una lista dinámica de argumentos
+    <a href="comparisons.html"><code>fxGt · fxGte · fxLt · fxLte</code></a> — las contrapartes de comparación de add ·
+    <a href="apply.html"><code>fxApply</code></a> — llama a cualquier función con una lista dinámica de argumentos
   </div>

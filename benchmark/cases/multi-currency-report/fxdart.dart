@@ -34,8 +34,8 @@ Future<void> main() async {
       final biggest = fx(usd).maxBy((p) => p.$2)!;
       final total = fx(usd).sumBy((p) => p.$2);
 
-      return join('\n', [
-        'Trip expenses in USD (currencies: ${join(', ', currencies)})',
+      return fxJoin('\n', [
+        'Trip expenses in USD (currencies: ${fxJoin(', ', currencies)})',
         ...catLines,
         'Largest single expense: ${biggest.$1.category} ${money(biggest.$2)} '
             '(${biggest.$1.amount.toStringAsFixed(2)} ${biggest.$1.currency})',

@@ -4,7 +4,7 @@ import 'package:fxdart/fxdart.dart';
 /// needs a positive amount. Reading a sibling's .value is only safe once
 /// every earlier branch succeeded — dependent runs its block exactly then.
 EitherNel<String, String> classify(String type, String rawAmount) =>
-    either<Nel<String>, String>((r) => r.accumulate((acc) {
+    fxEither<Nel<String>, String>((r) => r.accumulate((acc) {
           final t = acc.accumulating((br) => br.ensureNotNull(
               {'expense', 'income'}.contains(type) ? type : null,
               () => 'unknown type: $type'));

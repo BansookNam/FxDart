@@ -5,31 +5,34 @@ void main() {
   group('uniqAdjacent', () {
     group('sync', () {
       test('should drop only adjacent duplicates', () {
-        expect(toList(uniqAdjacent([1, 1, 2, 2, 2, 1])), equals([1, 2, 1]));
-        expect(toList(uniqAdjacent(<int>[])), equals([]));
-        expect(toList(uniqAdjacent([7])), equals([7]));
+        expect(fxToList(fxUniqAdjacent([1, 1, 2, 2, 2, 1])), equals([1, 2, 1]));
+        expect(fxToList(fxUniqAdjacent(<int>[])), equals([]));
+        expect(fxToList(fxUniqAdjacent([7])), equals([7]));
       });
 
       test('should compare by the given key', () {
         expect(
-          toList(uniqAdjacentBy((int a) => a % 10, [1, 11, 21, 2, 1])),
+          fxToList(uniqAdjacentBy((int a) => a % 10, [1, 11, 21, 2, 1])),
           equals([1, 2, 1]),
         );
       });
 
       test('should differ from uniq on recurring values', () {
         final source = [1, 1, 2, 1, 1];
-        expect(toList(uniq(source)), equals([1, 2]));
-        expect(toList(uniqAdjacent(source)), equals([1, 2, 1]));
+        expect(fxToList(fxUniq(source)), equals([1, 2]));
+        expect(fxToList(fxUniqAdjacent(source)), equals([1, 2, 1]));
       });
 
       test('should stay lazy over an endless source', () {
-        expect(toList(take(2, uniqAdjacent(cycle([1, 1, 2])))), equals([1, 2]));
+        expect(
+          fxToList(fxTake(2, fxUniqAdjacent(fxCycle([1, 1, 2])))),
+          equals([1, 2]),
+        );
       });
 
       test('should support repeated iteration', () {
-        final res = uniqAdjacent([1, 1, 2]);
-        expect(toList(res), toList(res));
+        final res = fxUniqAdjacent([1, 1, 2]);
+        expect(fxToList(res), fxToList(res));
       });
 
       test('should be able to be used as a chaining method in the `fx`', () {
@@ -44,21 +47,23 @@ void main() {
     group('async', () {
       test('should drop like the sync form', () async {
         expect(
-          await toListAsync(uniqAdjacentAsync(toAsync([1, 1, 2, 2, 2, 1]))),
+          await fxToListAsync(
+            fxUniqAdjacentAsync(fxToAsync([1, 1, 2, 2, 2, 1])),
+          ),
           equals([1, 2, 1]),
         );
         expect(
-          await toListAsync(uniqAdjacentAsync(asyncEmpty<int>())),
+          await fxToListAsync(fxUniqAdjacentAsync(fxAsyncEmpty<int>())),
           equals([]),
         );
       });
 
       test('should support an async key callback', () async {
         expect(
-          await toListAsync(
+          await fxToListAsync(
             uniqAdjacentByAsync(
-              (int a) => delay(const Duration(milliseconds: 10), a % 10),
-              toAsync([1, 11, 21, 2, 1]),
+              (int a) => fxDelay(const Duration(milliseconds: 10), a % 10),
+              fxToAsync([1, 11, 21, 2, 1]),
             ),
           ),
           equals([1, 2, 1]),
@@ -67,8 +72,8 @@ void main() {
 
       test('should be deduped after concurrent', () async {
         final sw = Stopwatch()..start();
-        final res = await fxAsync(toAsync([1, 1, 2, 2, 3, 3]))
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+        final res = await fxAsync(fxToAsync([1, 1, 2, 2, 3, 3]))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .concurrent(3)
             .uniqAdjacent()
             .toList();
@@ -81,7 +86,7 @@ void main() {
 
       test('should propagate an upstream error', () async {
         await expectLater(
-          fxAsync(toAsync([1, 1, 2]))
+          fxAsync(fxToAsync([1, 1, 2]))
               .map((a) {
                 if (a == 2) return Future<int>.error(Exception('err'));
                 return Future.value(a);

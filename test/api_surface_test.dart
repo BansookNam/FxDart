@@ -47,7 +47,7 @@ void main() {
     test('terminals', () {
       expect(fx([1, 2, 3]).toList(), [1, 2, 3]);
       expect(fx([1, 2, 3]).head(), 1);
-      expect(fx(<int>[]).head(), isNull);
+      expect(fx(<int>[]).head(), fxIsNull);
       expect(fx([1, 2, 3]).size(), 3);
       // The regression this file was written for.
       expect(fx([1, 2, 3]).join(), '123');
@@ -130,8 +130,8 @@ void main() {
       expect(await src().count(), 3);
       expect(await src().firstOrNull(), 1);
       expect(await src().lastOrNull(), 3);
-      expect(await fx(<int>[]).toAsync().firstOrNull(), isNull);
-      expect(await fx(<int>[]).toAsync().lastOrNull(), isNull);
+      expect(await fx(<int>[]).toAsync().firstOrNull(), fxIsNull);
+      expect(await fx(<int>[]).toAsync().lastOrNull(), fxIsNull);
     });
 
     test('toStream() takes no arguments', () async {

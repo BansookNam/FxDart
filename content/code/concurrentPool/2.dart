@@ -10,7 +10,7 @@ Future<void> main() async {
 
   final it = fx([1, 2, 3])
       .toAsync()
-      .map((i) => delay(Duration(milliseconds: delays[i - 1]), 'item$i'))
+      .map((i) => fxDelay(Duration(milliseconds: delays[i - 1]), 'item$i'))
       .concurrentPool(poolSize)
       .iterator;
 

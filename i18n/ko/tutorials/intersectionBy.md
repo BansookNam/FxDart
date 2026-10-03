@@ -17,7 +17,7 @@ nextLabel: compress
   <h2>강의</h2>
   <p>
     <a href="differenceBy.html"><code>differenceBy</code></a>와 형태는 같고
-    조건만 반대입니다. <code>intersectionBy(f, iterable1, iterable2)</code>는
+    조건만 반대입니다. <code>fxIntersectionBy(f, iterable1, iterable2)</code>는
     <strong><code>iterable2</code></strong>를 훑으면서
     <code>f</code>로 만든 키가 <em>존재하는</em> 원소만 남깁니다. 비교
     대상은 <code>iterable1</code>의 <code>f</code>-키이고, 그 키를 기준으로
@@ -29,12 +29,12 @@ nextLabel: compress
     식별용 필드를 공유하는 온전한 레코드 두 목록에 딱 맞는 함수입니다.
     "추천" SKU 목록과 상품 카탈로그, 활성 사용자 ID 목록과 전체 사용자
     객체 목록 같은 경우가 그렇습니다. <code>intersection</code> 자체가
-    <code>intersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
+    <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
   </p>
   <p>
     체인 메서드는 없습니다. data-first 함수나 그 비동기 짝을 호출하세요.
     <code>.concurrent(n)</code>의 동시성 표시는
-    <code>intersectionAsync</code>와 똑같이
+    <code>fxIntersectionAsync</code>와 똑같이
     <code>iterable2</code>에 적용됩니다.
   </p>
 
@@ -54,5 +54,5 @@ nextLabel: compress
     <a href="intersection.html"><code>intersection</code></a> — 값 동등성으로 비교하는 버전 ·
     <a href="differenceBy.html"><code>differenceBy</code></a> — 반대로 공통 계산 키를 가진 원소를 제외하기 ·
     <a href="uniqBy.html"><code>uniqBy</code></a> — 키 기준으로 이터러블 하나에서 중복 제거 ·
-    <a href="compress.html"><code>compress</code></a> — 나란한 불리언 마스크로 필터링
+    <a href="compress.html"><code>fxCompress</code></a> — 나란한 불리언 마스크로 필터링
   </div>

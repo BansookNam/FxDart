@@ -2,7 +2,7 @@
 slug: retry
 title: retry — FxDart 101
 description: Tutorial de retry y mapRetry en FxDart: reejecuta efectos inestables con backoff, por elemento o por pipeline, seguro en paralelo — con playground en vivo.
-heading: <code>retry</code>
+heading: <code>fxRetry</code>
 section: 11
 crumb: retry
 prev: concurrentPool.html
@@ -32,7 +32,7 @@ nextLabel: timeout
     <code>mapRetry(attempts, f)</code> es la misma idea por elemento: un
     <code><a href="map.html">map</a></code> en el que cada llamada tiene
     su propio presupuesto de reintentos. Está construido sobre el
-    <code>mapAsync</code> seguro en paralelo, así que bajo
+    <code>fxMapAsync</code> seguro en paralelo, así que bajo
     <code><a href="concurrent.html">concurrent(n)</a></code> cada
     elemento en vuelo reintenta de forma <em>independiente</em> — un
     elemento lento e inestable se reejecuta mientras sus vecinos avanzan
@@ -44,11 +44,11 @@ nextLabel: timeout
   </p>
   <p>
     Extensión de fxdart (sin contraparte en FxTS), inspirada en
-    <code>retry</code>/<code>retryWhen</code> de Rx — rediseñada para el
+    <code>fxRetry</code>/<code>retryWhen</code> de Rx — rediseñada para el
     modelo pull, donde «resuscribirse» significa «construir el iterable
     otra vez». Para un manejo <em>tipado</em> del fallo cuando los
     reintentos se agotan, pásale el resultado a
-    <code><a href="eitherPipelines.html">eitherCatching</a></code>.
+    <code><a href="eitherPipelines.html">fxEitherCatching</a></code>.
   </p>
 
   <h2>Demo 1 · Un fetch inestable, con backoff</h2>

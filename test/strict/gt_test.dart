@@ -7,13 +7,13 @@ void main() {
       test(
         'given array then should return array with values the pivot is greater than',
         () {
-          final result = fx([4, 5, 6]).filter((x) => gt(5, x)).toList();
+          final result = fx([4, 5, 6]).filter((x) => fxGt(5, x)).toList();
           expect(result, equals([4]));
         },
       );
 
       test('given array then should return empty array', () {
-        final result = fx([5, 6, 7]).filter((x) => gt(5, x)).toList();
+        final result = fx([5, 6, 7]).filter((x) => fxGt(5, x)).toList();
         expect(result, equals(<int>[]));
       });
 
@@ -24,7 +24,7 @@ void main() {
           'c',
           'd',
           'e',
-        ]).filter((x) => gt('c', x)).toList();
+        ]).filter((x) => fxGt('c', x)).toList();
         expect(result, equals(['a', 'b']));
       });
 
@@ -34,7 +34,7 @@ void main() {
           'b',
           'c',
           'd',
-        ]).filter((x) => gt('a', x)).toList();
+        ]).filter((x) => fxGt('a', x)).toList();
         expect(result, equals(<String>[]));
       });
 
@@ -42,7 +42,7 @@ void main() {
         final result = fx([
           DateTime(2022, 5, 10),
           DateTime(2022, 4, 9),
-        ]).filter((x) => gt(DateTime(2022, 4, 10), x)).toList();
+        ]).filter((x) => fxGt(DateTime(2022, 4, 10), x)).toList();
         expect(result, equals([DateTime(2022, 4, 9)]));
       });
 
@@ -50,7 +50,7 @@ void main() {
         final result = fx([
           DateTime(2021, 5, 10),
           DateTime(2021, 4, 9),
-        ]).filter((x) => gt(DateTime(2020, 10, 12), x)).toList();
+        ]).filter((x) => fxGt(DateTime(2020, 10, 12), x)).toList();
         expect(result, equals(<DateTime>[]));
       });
     });
@@ -59,38 +59,38 @@ void main() {
       test(
         'should return true that the first number is greater than second',
         () {
-          expect(gt(5, 1), isTrue);
+          expect(fxGt(5, 1), isTrue);
         },
       );
       test(
         'should return false that the first number is not greater than second',
         () {
-          expect(gt(1, 5), isFalse);
+          expect(fxGt(1, 5), isFalse);
         },
       );
 
       test('should return true that the first char is greater than second', () {
-        expect(gt('b', 'a'), isTrue);
+        expect(fxGt('b', 'a'), isTrue);
       });
       test(
         'should return false that the first char is not greater than second',
         () {
-          expect(gt('b', 'c'), isFalse);
+          expect(fxGt('b', 'c'), isFalse);
         },
       );
 
       test('should return true that the first Date is greater than second', () {
-        expect(gt(DateTime.now(), DateTime(2021, 5, 11)), isTrue);
+        expect(fxGt(DateTime.now(), DateTime(2021, 5, 11)), isTrue);
       });
       test(
         'should return false that the first Date is not greater than second',
         () {
-          expect(gt(DateTime(2021, 5, 11), DateTime.now()), isFalse);
+          expect(fxGt(DateTime(2021, 5, 11), DateTime.now()), isFalse);
         },
       );
 
       test('should throw ArgumentError on mixed types', () {
-        expect(() => gt(1, 'a'), throwsArgumentError);
+        expect(() => fxGt(1, 'a'), throwsArgumentError);
       });
     });
   });

@@ -54,7 +54,7 @@ import 'package:fxdart/fxdart.dart';
 void main() {
   var evaluated = 0;
 
-  final result = fx(range(1, 1000000))
+  final result = fx(fxRange(1, 1000000))
       .map((n) {
         evaluated++;
         return n * n;
@@ -92,7 +92,7 @@ void main() {
 
   // `some` stops pulling at the first match.
   var checked = 0;
-  final found = fx(range(1, 1000)).some((n) {
+  final found = fx(fxRange(1, 1000)).some((n) {
     checked++;
     return n > 4;
   });
@@ -185,7 +185,7 @@ void main() {
 
 지침은 짧습니다. **한 번 소비하거나, 재료화하라.** 사슬을 소비자 둘이 쓴다면
 `toList()`를 부르고 그 리스트를 공유하거나, 소스를 다시 실행하지 않고 당김
-하나를 여럿으로 쪼개려고 존재하는 `fork`/`tee`를 쓰세요.
+하나를 여럿으로 쪼개려고 존재하는 `fxFork`/`tee`를 쓰세요.
 
 ## 이것이 값을 하는 순간
 
@@ -207,7 +207,7 @@ void main() {
    예측하세요. 몇 줄이 출력되고, 왜인가요?
 3. 콜백이 실수로 두 번 실행되는 사슬을 써 보세요. 그런 다음 두 가지 방법으로
    고치세요.
-4. `fx(range(1, 1000000)).map(expensive).first` — `expensive`는 몇 번
+4. `fx(fxRange(1, 1000000)).map(expensive).first` — `expensive`는 몇 번
    실행되나요? `.first`를 `.last`로 바꾸면요?
 
 ## 정답과 해설
@@ -221,7 +221,7 @@ void main() {
    멈춘 것입니다.
 3. 변수에 담아 두고 종결 연산자를 두 번 부르는 사슬이면 됩니다. 위 예제가
    그렇습니다. 첫째 해법: `final xs = chain.toList();` 하고 `xs`를 두 번 쓰기.
-   둘째 해법: `fork`/`tee`로 당김 하나를 소비자 둘로 쪼개어 소스는 여전히 한 번만
+   둘째 해법: `fxFork`/`tee`로 당김 하나를 소비자 둘로 쪼개어 소스는 여전히 한 번만
    읽히게 하기.
 4. `.first`면 한 번입니다 — 당김 한 번으로 충족되니까요. `.last`면 999,999번
    전부입니다. `last`는 끝까지 가야 하므로 건너뛸 것이 남지 않습니다. 같은 사슬,

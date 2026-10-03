@@ -16,8 +16,8 @@ void main() {
         test(
           "should filter elements that have a corresponding element in 'selectors' #$i",
           () {
-            final res = compress(selectors, iterable);
-            expect(toList(res), equals(result));
+            final res = fxCompress(selectors, iterable);
+            expect(fxToList(res), equals(result));
           },
         );
       }
@@ -26,8 +26,8 @@ void main() {
         final res = pipe(
           [1, 2, 3, 4, 5],
           [
-            (v) => compress([false, true, false, false, true], v),
-            (v) => toList(v),
+            (v) => fxCompress([false, true, false, false, true], v),
+            (v) => fxToList(v),
           ],
         );
 
@@ -41,21 +41,21 @@ void main() {
         test(
           "should filter elements that have a corresponding element in 'selectors' #$i",
           () async {
-            final res = compressAsync(selectors, toAsync(iterable));
-            expect(await toListAsync(res), equals(result));
+            final res = fxCompressAsync(selectors, fxToAsync(iterable));
+            expect(await fxToListAsync(res), equals(result));
           },
         );
       }
 
       test('should be able to be used in the pipeline', () async {
-        final res = await toListAsync(
-          compressAsync([
+        final res = await fxToListAsync(
+          fxCompressAsync([
             false,
             true,
             false,
             false,
             true,
-          ], toAsync([1, 2, 3, 4, 5])),
+          ], fxToAsync([1, 2, 3, 4, 5])),
         );
 
         expect(res, equals([2, 5]));

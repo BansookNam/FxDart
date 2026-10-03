@@ -2,7 +2,7 @@
 slug: omitBy
 title: omitBy — FxDart 101
 description: Tutorial de omitBy en FxDart: descarta las entradas de un Map que cumplan un predicado sobre (clave, valor).
-heading: <code>omitBy</code>
+heading: <code>fxOmitBy</code>
 section: 9
 crumb: omitBy
 prev: pick.html
@@ -16,12 +16,12 @@ nextLabel: pickBy
 
   <h2>Lección</h2>
   <p>
-    Mientras que <code>omit</code> recibe una lista fija de claves,
-    <code>omitBy</code> recibe un predicado y decide entrada por entrada. El
+    Mientras que <code>fxOmit</code> recibe una lista fija de claves,
+    <code>fxOmitBy</code> recibe un predicado y decide entrada por entrada. El
     predicado recibe la entrada completa como un record <code>(K, V)</code>,
     así que tienes a mano tanto la clave como el valor: se leen con
     <code>e.$1</code> (clave) y <code>e.$2</code> (valor). Es la misma
-    representación que <code>entries(map)</code> le da a un <code>Map</code>
+    representación que <code>fxEntries(map)</code> le da a un <code>Map</code>
     en el resto de la librería.
   </p>
   <p>
@@ -37,13 +37,13 @@ nextLabel: pickBy
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>omitBy</code> para descartar las entradas cuyo valor sea <code>false</code>.</p>
+  <p>Ejercicio: usa <code>fxOmitBy</code> para descartar las entradas cuyo valor sea <code>false</code>.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="pickBy.html"><code>pickBy</code></a> — el inverso: conservar según un predicado ·
-    <a href="omit.html"><code>omit</code></a> — descartar según una lista fija de claves ·
-    <a href="isMatch.html"><code>isMatch</code></a> — un predicado profundo ya hecho para entradas ·
-    <a href="evolve.html"><code>evolve</code></a> — transformar los valores en lugar de descartarlos
+    <a href="pickBy.html"><code>fxPickBy</code></a> — el inverso: conservar según un predicado ·
+    <a href="omit.html"><code>fxOmit</code></a> — descartar según una lista fija de claves ·
+    <a href="isMatch.html"><code>fxIsMatch</code></a> — un predicado profundo ya hecho para entradas ·
+    <a href="evolve.html"><code>fxEvolve</code></a> — transformar los valores en lugar de descartarlos
   </div>

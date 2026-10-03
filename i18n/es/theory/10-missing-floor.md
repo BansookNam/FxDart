@@ -152,9 +152,9 @@ void main() {
 
   // Four spellings of "swap the structures", because there is no
   // way to write one that works for every effect type.
-  print(sequenceEither(xs));
+  print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
-  print(separateEither(xs));
+  print(fxSeparateEither(xs));
   print(fx(xs).sequence());
   // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
@@ -162,7 +162,7 @@ void main() {
 ```
 
 Y la otra cara, para que el trato sea honesto: por ser concretas, son
-*rápidas* y sus tipos son exactos. `sequenceEither` devuelve `Either<L,
+*rápidas* y sus tipos son exactos. `fxSequenceEither` devuelve `Either<L,
 List<R>>` — no `Kind<F, List<R>>`, ni un envoltorio que tengas que desmontar.
 La inferencia de Dart funciona, el editor completa, los errores señalan tu
 código. Una versión genérica en la codificación `Kind` devolvería algo que

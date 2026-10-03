@@ -7,6 +7,6 @@ void main() {
     'nickname': null,
   };
 
-  print(compactObject(nested));
+  print(fxCompactObject(nested));
   // {id: 1, address: {city: seoul, zip: null}} — nested null NOT removed
 }

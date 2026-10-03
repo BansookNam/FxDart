@@ -113,7 +113,7 @@ description: FxDart 是从 FxTS 移植而来的 Dart 函数式编程库：惰性
         <li><strong>多了一层异步抽象</strong> —— <code>FxAsyncIterable</code> 之所以存在，是因为 <code>Stream</code> 无法表达并发的反向通道；桥接很容易，但终究是一个需要额外学习的概念。</li>
         <li><strong>学习曲线</strong> —— 用惰性管道思考，与写命令式循环并不相同。</li>
         <li><strong>并非总是最快</strong> —— 对于极小的热点循环，手写 <code>for</code> 可能胜过操作符组合；FxDart 的优化目标是清晰度与 I/O 密集型场景。</li>
-        <li><strong>部分 TS API 无法逐字移植</strong> —— 它们改用了更符合 Dart 习惯的写法：<code>curry</code> 变成了带类型的 <a href="tutorials/curried.html"><code>.curried</code></a> 扩展 getter，旧名称则作为已废弃的桩函数保留，便于迁移。</li>
+        <li><strong>部分 TS API 无法逐字移植</strong> —— 它们改用了更符合 Dart 习惯的写法：<code>fxCurry</code> 变成了带类型的 <a href="tutorials/curried.html"><code>.curried</code></a> 扩展 getter，旧名称则作为已废弃的桩函数保留，便于迁移。</li>
       </ul>
     </div>
   </div>

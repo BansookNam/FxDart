@@ -17,8 +17,8 @@ nextLabel: debounceOn
   <h2>Lección</h2>
   <p>
     Limitar el ritmo siempre te cuesta algo, y la única pregunta real es
-    <em>qué</em>. <code><a href="throttle.html">throttle</a></code> y
-    <code><a href="debounce.html">debounce</a></code> pagan en
+    <em>qué</em>. <code><a href="throttle.html">fxThrottle</a></code> y
+    <code><a href="debounce.html">fxDebounce</a></code> pagan en
     <strong>eventos</strong>: se quedan con uno por ventana y descartan el
     resto, lo cual es correcto cuando los eventos son muestras de algo
     continuo y uno viejo no vale nada. <code>spaceBy(gap)</code> paga en
@@ -65,7 +65,7 @@ nextLabel: debounceOn
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="throttle.html"><code>throttle</code></a> — la contraparte con pérdidas: un evento por ventana, de inmediato ·
-    <a href="debounce.html"><code>debounce</code></a> — espera a que acabe la ráfaga y toma su último valor ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — la contraparte con pérdidas: un evento por ventana, de inmediato ·
+    <a href="debounce.html"><code>fxDebounce</code></a> — espera a que acabe la ráfaga y toma su último valor ·
     <a href="chunkOn.html"><code>chunkEvery</code></a> — también conserva todos los eventos, pero agrupados en vez de separados
   </div>

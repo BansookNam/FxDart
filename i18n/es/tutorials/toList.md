@@ -27,13 +27,13 @@ nextLabel: each
   <p>
     Eso también significa que <code>toList</code> es justo el operador que
     <em>no</em> debes llamar directamente sobre una fuente infinita o no
-    acotada (<code>range</code> sin fin, <code>cycle</code>,
+    acotada (<code>fxRange</code> sin fin, <code>cycle</code>,
     <code>repeat</code> con un número enorme de repeticiones): intentará tirar de ella para
     siempre. Acótala primero con <code>take(n)</code> y luego llama a
     <code>toList</code> sobre el resultado acotado.
   </p>
   <p>
-    La versión asíncrona, <code>toListAsync</code> (o <code>.toList()</code>
+    La versión asíncrona, <code>fxToListAsync</code> (o <code>.toList()</code>
     sobre una cadena <code>FxAsync</code>), espera cada elemento conforme lo
     extrae y devuelve un <code>Future&lt;List&lt;T&gt;&gt;</code>. Combinada
     con <code>.concurrent(n)</code> aguas arriba, las esperas individuales

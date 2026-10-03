@@ -2,6 +2,6 @@
 fx(list).map(f).toList()          // hands the copy to the SDK's bulk fill
 fx(list).filter(p).toList()       // same
 fx(list).map(f).distinct()        // fuses into one stage, one loop
-foldBy(key, seed, f, list)        // no per-key List, unlike groupBy + fold
-countBy(key, list)                // foldBy with a counter, pre-named
-uniqStrict(list)                  // dedupe once when the result is reused
+fxFoldBy(key, seed, f, list)        // no per-key List, unlike groupBy + fold
+fxCountBy(key, list)                // foldBy with a counter, pre-named
+fxUniqStrict(list)                  // dedupe once when the result is reused

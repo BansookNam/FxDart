@@ -16,7 +16,7 @@ nextLabel: intersection
 
   <h2>Lección</h2>
   <p>
-    <code>differenceBy(f, iterable1, iterable2)</code> sigue exactamente la
+    <code>fxDifferenceBy(f, iterable1, iterable2)</code> sigue exactamente la
     misma regla de orden de argumentos que <a href="difference.html"><code>difference</code></a>:
     el resultado sale <strong>de <code>iterable2</code></strong>, y conserva
     solo los elementos cuya clave <code>f</code> <em>no</em> aparezca entre
@@ -36,11 +36,11 @@ nextLabel: intersection
   </p>
   <p>
     <code>difference</code> no es más que
-    <code>differenceBy((a) =&gt; a, iterable1, iterable2)</code>. No hay
+    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. No hay
     método de cadena para ninguna de las dos — llama directamente a la
     función data-first. En el lado asíncrono, el marcador de concurrencia se
     aplica a <code>iterable2</code>, igual que en
-    <code>differenceAsync</code>.
+    <code>fxDifferenceAsync</code>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -59,5 +59,5 @@ nextLabel: intersection
     <a href="difference.html"><code>difference</code></a> — la versión por igualdad de valor ·
     <a href="intersectionBy.html"><code>intersectionBy</code></a> — quedarse con los que comparten la clave calculada ·
     <a href="uniqBy.html"><code>uniqBy</code></a> — elimina duplicados de un solo iterable por clave ·
-    <a href="compress.html"><code>compress</code></a> — filtra con una máscara booleana paralela
+    <a href="compress.html"><code>fxCompress</code></a> — filtra con una máscara booleana paralela
   </div>

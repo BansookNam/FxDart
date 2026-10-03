@@ -12,7 +12,7 @@ Future<void> main() async {
     run: () {
       // compact narrows Iterable<double?> to Iterable<double>.
       final clean = fx(
-        compact(samples),
+        fxCompact(samples),
       ).map((v) => '${v.toStringAsFixed(1)} V').toList();
       final dropped = samples.length - clean.length;
       return '${clean.length}|${clean.first}|${clean.last}|dropped=$dropped';

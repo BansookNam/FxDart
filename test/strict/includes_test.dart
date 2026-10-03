@@ -5,15 +5,15 @@ void main() {
   group('includes', () {
     group('sync', () {
       test('should check if the specified value is equal.', () {
-        expect(includes('r', 'marpple'.split('')), isTrue);
-        expect(includes('b', 'marpple'.split('')), isFalse);
+        expect(fxIncludes('r', 'marpple'.split('')), isTrue);
+        expect(fxIncludes('b', 'marpple'.split('')), isFalse);
 
-        expect(includes(1, [1, 2, 3, 4]), isTrue);
-        expect(includes(5, [1, 2, 3, 4]), isFalse);
+        expect(fxIncludes(1, [1, 2, 3, 4]), isTrue);
+        expect(fxIncludes(5, [1, 2, 3, 4]), isFalse);
       });
 
       test('should be able to be used in the pipeline', () {
-        final res1 = includes(
+        final res1 = fxIncludes(
           14,
           fx([1, 2, 3, 4]).map((a) => a + 10).filter((a) => a % 2 == 0),
         );
@@ -23,19 +23,25 @@ void main() {
 
     group('async', () {
       test('should check if the specified value is equal.', () async {
-        expect(await includesAsync('r', toAsync('marpple'.split(''))), isTrue);
-        expect(await includesAsync('b', toAsync('marpple'.split(''))), isFalse);
+        expect(
+          await fxIncludesAsync('r', fxToAsync('marpple'.split(''))),
+          isTrue,
+        );
+        expect(
+          await fxIncludesAsync('b', fxToAsync('marpple'.split(''))),
+          isFalse,
+        );
 
-        expect(await includesAsync(1, toAsync([1, 2, 3, 4])), isTrue);
-        expect(await includesAsync(5, toAsync([1, 2, 3, 4])), isFalse);
+        expect(await fxIncludesAsync(1, fxToAsync([1, 2, 3, 4])), isTrue);
+        expect(await fxIncludesAsync(5, fxToAsync([1, 2, 3, 4])), isFalse);
       });
 
       test('should be able to be used in the pipeline', () async {
-        final res1 = await includesAsync(
+        final res1 = await fxIncludesAsync(
           14,
-          filterAsync(
+          fxFilterAsync(
             (int a) => a % 2 == 0,
-            mapAsync((int a) => a + 10, toAsync([1, 2, 3, 4])),
+            fxMapAsync((int a) => a + 10, fxToAsync([1, 2, 3, 4])),
           ),
         );
         expect(res1, isTrue);

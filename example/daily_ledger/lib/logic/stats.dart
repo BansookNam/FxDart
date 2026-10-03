@@ -15,7 +15,7 @@ bool _isSpending(Entry e) =>
 
 /// Four at-a-glance stats for the dashboard header.
 ///
-/// `juxt` is the star: one list of stat functions, applied to the same
+/// `fxJuxt` is the star: one list of stat functions, applied to the same
 /// month slice in a single call — adding a stat is adding a lambda.
 List<(String label, String value)> quickStats(
   List<Entry> entries,
@@ -23,7 +23,7 @@ List<(String label, String value)> quickStats(
 ) {
   final inMonth = fx(entries).filter((e) => sameMonth(e.date, month)).toList();
 
-  final stats = juxt<List<Entry>, (String, String)>([
+  final stats = fxJuxt<List<Entry>, (String, String)>([
     (es) {
       // `maxBy`: the element with the largest key, one O(n) walk — no sort.
       final top = fx(es).filter(_isSpending).maxBy((e) => e.amount ?? 0);
@@ -33,7 +33,7 @@ List<(String label, String value)> quickStats(
       );
     },
     (es) {
-      final busiest = maxBy(
+      final busiest = fxMaxBy(
         (kv) => kv.value,
         fx(es).countBy((e) => e.date.day).entries,
       );

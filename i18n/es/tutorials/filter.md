@@ -29,8 +29,8 @@ nextLabel: reject
     <code>take</code> — mira la Demo 1.
   </p>
   <p>
-    <code>whereAsync</code> tiene su propia implementación concurrente
-    (en vez de reutilizar la de <code>mapAsync</code>): cuando le añades
+    <code>fxWhereAsync</code> tiene su propia implementación concurrente
+    (en vez de reutilizar la de <code>fxMapAsync</code>): cuando le añades
     <code>.concurrent(n)</code>, se evalúan <code>n</code> predicados en
     paralelo, pero los elementos que pasan se emiten aguas abajo en su orden
     original — la concurrencia cambia el rendimiento, nunca el resultado.
@@ -49,7 +49,7 @@ nextLabel: reject
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="reject.html"><code>reject</code></a> — lo contrario de filter ·
-    <a href="compact.html"><code>compact</code></a> — descarta los null ·
+    <a href="compact.html"><code>fxCompact</code></a> — descarta los null ·
     <a href="map.html"><code>map</code></a> — transforma en vez de conservar/descartar ·
     <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>

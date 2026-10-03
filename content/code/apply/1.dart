@@ -12,7 +12,7 @@ void main() {
   ];
 
   for (final (name, args) in calls) {
-    print(apply(handlers[name]!, args));
+    print(fxApply(handlers[name]!, args));
   }
   // 3
   // HI

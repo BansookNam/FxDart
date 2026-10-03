@@ -9,29 +9,29 @@ void main() {
   group('isMatch', () {
     group('primitives', () {
       test('should return true for equal primitives', () {
-        expect(isMatch(1, 1), isTrue);
-        expect(isMatch('hello', 'hello'), isTrue);
-        expect(isMatch(true, true), isTrue);
+        expect(fxIsMatch(1, 1), isTrue);
+        expect(fxIsMatch('hello', 'hello'), isTrue);
+        expect(fxIsMatch(true, true), isTrue);
       });
 
       test('should return false for different primitives', () {
-        expect(isMatch(1, 2), isFalse);
-        expect(isMatch('hello', 'world'), isFalse);
+        expect(fxIsMatch(1, 2), isFalse);
+        expect(fxIsMatch('hello', 'world'), isFalse);
       });
     });
 
     group('partial object matching', () {
       test('should return true when map contains all source properties', () {
-        expect(isMatch({'a': 1, 'b': 2}, {'a': 1}), isTrue);
-        expect(isMatch({'a': 1, 'b': 2, 'c': 3}, {'a': 1, 'c': 3}), isTrue);
+        expect(fxIsMatch({'a': 1, 'b': 2}, {'a': 1}), isTrue);
+        expect(fxIsMatch({'a': 1, 'b': 2, 'c': 3}, {'a': 1, 'c': 3}), isTrue);
       });
 
       test('should return false when map is missing source properties', () {
-        expect(isMatch({'a': 1}, {'a': 1, 'b': 2}), isFalse);
+        expect(fxIsMatch({'a': 1}, {'a': 1, 'b': 2}), isFalse);
       });
 
       test('should return false when property values differ', () {
-        expect(isMatch({'a': 1}, {'a': 2}), isFalse);
+        expect(fxIsMatch({'a': 1}, {'a': 2}), isFalse);
       });
 
       test('should match nested maps partially', () {
@@ -39,7 +39,7 @@ void main() {
           'user': {'name': 'John', 'age': 30},
         };
         expect(
-          isMatch(object, {
+          fxIsMatch(object, {
             'user': {'name': 'John'},
           }),
           isTrue,
@@ -53,7 +53,7 @@ void main() {
           },
         };
         expect(
-          isMatch(object, {
+          fxIsMatch(object, {
             'a': {
               'b': {'c': true},
             },
@@ -61,7 +61,7 @@ void main() {
           isTrue,
         );
         expect(
-          isMatch(object, {
+          fxIsMatch(object, {
             'a': {
               'b': {'c': false},
             },
@@ -73,27 +73,27 @@ void main() {
 
     group('list matching', () {
       test('should compare lists by index for matching positions', () {
-        expect(isMatch([1, 2, 3], [1, 2, 3]), isTrue);
-        expect(isMatch([1, 2, 3], [1, 2, 4]), isFalse);
+        expect(fxIsMatch([1, 2, 3], [1, 2, 3]), isTrue);
+        expect(fxIsMatch([1, 2, 3], [1, 2, 4]), isFalse);
       });
 
       test('should partially match when source is a prefix of target', () {
-        expect(isMatch([1, 2, 3], [1, 2]), isTrue);
-        expect(isMatch([1, 2, 3], [1]), isTrue);
-        expect(isMatch([1, 2, 3], <int>[]), isTrue);
+        expect(fxIsMatch([1, 2, 3], [1, 2]), isTrue);
+        expect(fxIsMatch([1, 2, 3], [1]), isTrue);
+        expect(fxIsMatch([1, 2, 3], <int>[]), isTrue);
       });
 
       test('should return false when source is longer than target', () {
-        expect(isMatch([1, 2], [1, 2, 3]), isFalse);
+        expect(fxIsMatch([1, 2], [1, 2, 3]), isFalse);
       });
 
       test('should return false when prefix values differ', () {
-        expect(isMatch([1, 2, 3], [2, 3]), isFalse);
+        expect(fxIsMatch([1, 2, 3], [2, 3]), isFalse);
       });
 
       test('should match lists with maps partially (per-element)', () {
         expect(
-          isMatch(
+          fxIsMatch(
             [
               {'a': 1},
             ],
@@ -104,7 +104,7 @@ void main() {
           isTrue,
         );
         expect(
-          isMatch(
+          fxIsMatch(
             [
               {'a': 1, 'b': 2},
             ],
@@ -118,7 +118,7 @@ void main() {
 
       test('should match lists with maps partially (prefix)', () {
         expect(
-          isMatch(
+          fxIsMatch(
             [
               {'a': 1, 'b': 2},
               {'c': 3},
@@ -135,63 +135,72 @@ void main() {
     group('DateTime matching', () {
       test('should match equal DateTime objects', () {
         expect(
-          isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-01-01')),
+          fxIsMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-01-01')),
           isTrue,
         );
       });
 
       test('should return false for different DateTime objects', () {
         expect(
-          isMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-02-01')),
+          fxIsMatch(DateTime.parse('2024-01-01'), DateTime.parse('2024-02-01')),
           isFalse,
         );
       });
 
       test('should return false when comparing DateTime with non-DateTime', () {
-        expect(isMatch(DateTime.parse('2024-01-01'), <String, int>{}), isFalse);
-        expect(isMatch(<String, int>{}, DateTime.parse('2024-01-01')), isFalse);
+        expect(
+          fxIsMatch(DateTime.parse('2024-01-01'), <String, int>{}),
+          isFalse,
+        );
+        expect(
+          fxIsMatch(<String, int>{}, DateTime.parse('2024-01-01')),
+          isFalse,
+        );
       });
     });
 
     group('Map matching', () {
       test('should match equal maps', () {
-        expect(isMatch({'a': 1}, {'a': 1}), isTrue);
+        expect(fxIsMatch({'a': 1}, {'a': 1}), isTrue);
       });
 
       test('should partially match maps', () {
-        expect(isMatch({'a': 1, 'b': 2}, {'a': 1}), isTrue);
+        expect(fxIsMatch({'a': 1, 'b': 2}, {'a': 1}), isTrue);
       });
 
       test('should return false for non-matching map values', () {
-        expect(isMatch({'a': 1, 'b': 2}, {'a': 1, 'b': 3}), isFalse);
+        expect(fxIsMatch({'a': 1, 'b': 2}, {'a': 1, 'b': 3}), isFalse);
       });
 
       test('should return false when source map has keys not in target', () {
-        expect(isMatch({'a': 1}, {'a': 1, 'b': 2}), isFalse);
+        expect(fxIsMatch({'a': 1}, {'a': 1, 'b': 2}), isFalse);
       });
     });
 
     group('cross-type matching', () {
       test('should return false when comparing incompatible types', () {
-        expect(isMatch(DateTime.parse('2024-01-01'), <String, int>{}), isFalse);
-        expect(isMatch(<String, int>{}, [1]), isFalse);
-        expect(isMatch([1], <String, int>{}), isFalse);
+        expect(
+          fxIsMatch(DateTime.parse('2024-01-01'), <String, int>{}),
+          isFalse,
+        );
+        expect(fxIsMatch(<String, int>{}, [1]), isFalse);
+        expect(fxIsMatch([1], <String, int>{}), isFalse);
       });
     });
 
     group('null', () {
       test('should return false when target is null', () {
-        expect(isMatch(null, {'a': 1}), isFalse);
+        expect(fxIsMatch(null, {'a': 1}), isFalse);
       });
 
       test('should return false when source is null', () {
-        expect(isMatch({'a': 1}, null), isFalse);
+        expect(fxIsMatch({'a': 1}, null), isFalse);
       });
     });
 
     group('empty pattern', () {
       test('should return true for empty source map', () {
-        expect(isMatch({'a': 1}, <String, int>{}), isTrue);
+        expect(fxIsMatch({'a': 1}, <String, int>{}), isTrue);
       });
     });
   });

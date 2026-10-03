@@ -24,7 +24,7 @@ nextLabel: zip
     tiene la primera.
   </p>
   <p>
-    <code>concatAsync</code> es transparente, igual que las primas asíncronas de
+    <code>fxConcatAsync</code> es transparente, igual que las primas asíncronas de
     <code>take</code> y <code>concat</code>: no serializa ninguno de los dos
     lados internamente, así que un <code>concurrent(n)</code> aguas abajo
     sigue pudiendo solapar las peticiones contra el lado que esté activo

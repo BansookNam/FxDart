@@ -10,8 +10,8 @@ class AvoidBareCatchInRaise extends DartLintRule {
   static const _code = LintCode(
     name: 'avoid_bare_catch_in_raise',
     problemMessage:
-        'A bare catch inside either/nullable/foldRaise swallows the '
-        'raise signal. Use catching(...) / eitherCatching, or `on Exception` '
+        'A bare catch inside fxEither/fxNullable/fxFoldRaise swallows the '
+        'raise signal. Use fxCatching(...) / fxEitherCatching, or `on Exception` '
         '(the signal is an Error).',
   );
 

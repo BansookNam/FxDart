@@ -17,11 +17,11 @@ description: An associative combine plus an identity element — the smallest us
 
 A **semigroup** is a type with an associative binary operation:
 
-`combine(a, combine(b, c)) == combine(combine(a, b), c)`
+`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
 
 A **monoid** is a semigroup with an identity element:
 
-`combine(empty, a) == a == combine(a, empty)`
+`fxCombine(empty, a) == a == fxCombine(a, empty)`
 
 That is all. `int` with `+` and `0`; `int` with `*` and `1`; `String` with `+`
 and `''`; `List` with `+` and `[]`; `bool` with `&&` and `true`. You have used
@@ -166,7 +166,7 @@ the error channel.
 > as identity — so "sum, count, and max in one pass" is a single fold over a
 > product monoid, and an average is that fold plus a division. Functions into a
 > monoid form a monoid (`(f + g)(x) = f(x) + g(x)`), and endofunctions form a
-> monoid under composition with `identity` as the unit — which is the sentence
+> monoid under composition with `fxIdentity` as the unit — which is the sentence
 > hiding inside "a monad is a monoid in the category of endofunctors": `flatten`
 > is the combine, `of` is the identity, and the three monad laws of Chapter 1
 > are these two laws in disguise.

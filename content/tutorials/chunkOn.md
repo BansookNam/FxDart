@@ -62,6 +62,6 @@ nextLabel: windowOn
   <div class="callout">
     <strong>Related:</strong>
     <a href="chunk.html"><code>chunk</code></a> — the pull-layer original, batching by count over an Iterable ·
-    <a href="throttle.html"><code>throttle</code></a> — when you want one event per window rather than all of them ·
+    <a href="throttle.html"><code>fxThrottle</code></a> — when you want one event per window rather than all of them ·
     <a href="spaceBy.html"><code>spaceBy</code></a> — the other way to slow a burst: stretch it instead of grouping it
   </div>

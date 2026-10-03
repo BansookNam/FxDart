@@ -15,9 +15,9 @@ Future<void> main() async {
       // lazily, and released exactly once — after the last row, or right
       // before an error would propagate.
       final rows = await fxAsync(
-        usingAsync(
+        fxUsingAsync(
           () => cursor = LedgerCursor(),
-          (c) => toAsync(Iterable.generate(c.length, c.read)),
+          (c) => fxToAsync(Iterable.generate(c.length, c.read)),
           (c) => c.close(),
         ),
       ).toList();

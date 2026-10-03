@@ -7,8 +7,8 @@ void main() {
   print(result); // [1, 2, 3, 1, 2, 3, 1]
 
   // Data-first form is the same:
-  print(toList(take(5, cycle(['a', 'b'])))); // [a, b, a, b, a]
+  print(fxToList(fxTake(5, fxCycle(['a', 'b'])))); // [a, b, a, b, a]
 
   // An empty source cycles to nothing, rather than hanging:
-  print(toList(take(3, cycle(<int>[])))); // []
+  print(fxToList(fxTake(3, fxCycle(<int>[])))); // []
 }

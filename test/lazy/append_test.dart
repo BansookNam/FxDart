@@ -7,38 +7,43 @@ void main() {
   group('append', () {
     group('sync', () {
       test('should be contained the contents of the given element', () {
-        expect(toList(append('c', ['a', 'b'])), equals(['a', 'b', 'c']));
+        expect(fxToList(fxAppend('c', ['a', 'b'])), equals(['a', 'b', 'c']));
       });
 
       test(
         'should be contained the contents of the given element - string',
         () {
-          expect(toList(append('c', 'ab'.split(''))), equals(['a', 'b', 'c']));
+          expect(
+            fxToList(fxAppend('c', 'ab'.split(''))),
+            equals(['a', 'b', 'c']),
+          );
         },
       );
 
       test('should be able to be used in the pipeline', () {
-        final res = fx(range(1, 4)).append(4).append(5).append(6).toList();
+        final res = fx(fxRange(1, 4)).append(4).append(5).append(6).toList();
         expect(res, equals([1, 2, 3, 4, 5, 6]));
       });
 
       test('should be able to be used chaining method in the `fx`', () {
-        final res = fx(range(1, 4)).append(4).append(5).toList();
+        final res = fx(fxRange(1, 4)).append(4).append(5).toList();
         expect(res, equals([1, 2, 3, 4, 5]));
       });
     });
 
     group('async', () {
       test('should be contained the contents of the given element', () async {
-        final res = await toListAsync(appendAsync('c', toAsync(['a', 'b'])));
+        final res = await fxToListAsync(
+          fxAppendAsync('c', fxToAsync(['a', 'b'])),
+        );
         expect(res, equals(['a', 'b', 'c']));
       });
 
       test('should be able to append a Future element', () async {
-        final res = await toListAsync(
-          appendAsync(
-            delay(const Duration(milliseconds: 100), 4),
-            toAsync([1, 2, 3]),
+        final res = await fxToListAsync(
+          fxAppendAsync(
+            fxDelay(const Duration(milliseconds: 100), 4),
+            fxToAsync([1, 2, 3]),
           ),
         );
         expect(res, equals([1, 2, 3, 4]));
@@ -46,7 +51,7 @@ void main() {
 
       test('should be able to be used chaining method in the `fx`', () async {
         final res = await fx(
-          range(1, 4),
+          fxRange(1, 4),
         ).toAsync().append(4).append(5).toList();
         expect(res, equals([1, 2, 3, 4, 5]));
       });
@@ -55,24 +60,24 @@ void main() {
         Future<void> chained = Future.value();
         Future<int> chain(int v) {
           final next = chained.then(
-            (_) => delay(const Duration(milliseconds: 50), v),
+            (_) => fxDelay(const Duration(milliseconds: 50), v),
           );
           chained = next;
           return next;
         }
 
-        var it = toAsync(range(1, 4));
-        it = appendAsync(chain(4), it);
-        it = appendAsync(chain(5), it);
-        it = appendAsync(chain(6), it);
-        expect(await toListAsync(it), equals([1, 2, 3, 4, 5, 6]));
+        var it = fxToAsync(fxRange(1, 4));
+        it = fxAppendAsync(chain(4), it);
+        it = fxAppendAsync(chain(5), it);
+        it = fxAppendAsync(chain(6), it);
+        expect(await fxToListAsync(it), equals([1, 2, 3, 4, 5, 6]));
       });
 
       test('should be appended concurrently', () async {
         final sw = Stopwatch()..start();
         final res = await fx([1, 2, 3])
             .toAsync()
-            .map((a) => delay(const Duration(milliseconds: 100), a))
+            .map((a) => fxDelay(const Duration(milliseconds: 100), a))
             .append(4)
             .append(Future.value(5))
             .append(6)
@@ -87,7 +92,7 @@ void main() {
         'should be passed concurrent object when job works concurrently',
         () async {
           final mock = ConcurrentMock<int>();
-          final it = appendAsync(1, mock).iterator;
+          final it = fxAppendAsync(1, mock).iterator;
           await it.next(Concurrent.of(2));
           expect(mock.received?.length, equals(2));
         },

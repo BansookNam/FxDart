@@ -110,7 +110,7 @@ final (refunds, charges) = fx(txns).partition((t) => t.amount < 0);
 Recognize: `await for` with a manual buffer list that flushes at size N, or
 a custom `StreamTransformer` for windowing. This is a Stream *used as a
 list* — pull it. Time-shaped work (debounce, switchMap) is `fxEvents`.
-`fromStream` is the raw iterable; wrap with `fxStream` to chain.
+`fxFromStream` is the raw iterable; wrap with `fxStream` to chain.
 
 ```dart
 final alerts = fxStream(sensorEvents)

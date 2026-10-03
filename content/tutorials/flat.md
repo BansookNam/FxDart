@@ -35,11 +35,11 @@ nextLabel: scan
     the Dart port is honest about it and returns <code>Iterable&lt;dynamic&gt;</code>.
     If you know the shape of what you're flattening and want a typed
     result, reach for <a href="flatMap.html"><code>flatMap</code></a>
-    instead: <code>flatMap((row) =&gt; row, matrix)</code> gives you a typed
+    instead: <code>fxFlatMap((row) =&gt; row, matrix)</code> gives you a typed
     flatten for exactly-one-level-deep, uniformly-shaped data.
   </p>
   <p>
-    Like <code>flat</code> in FxTS, <code>flattenedAsync</code> only recurses
+    Like <code>flat</code> in FxTS, <code>fxFlattenedAsync</code> only recurses
     into nesting that is already a <em>synchronous</em> <code>Iterable</code>
     by the time it arrives — it does not await a <code>Future</code> buried
     inside a nested collection. Combine it with an upstream

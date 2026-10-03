@@ -5,10 +5,10 @@ void main() {
   group('toAsync', () {
     group('sync', () {
       test("should convert 'Iterable<A>' to 'FxAsyncIterable<A>'", () async {
-        final asyncIter = toAsync([1, 2, 3, 4, 5]);
+        final asyncIter = fxToAsync([1, 2, 3, 4, 5]);
 
         var acc = 0;
-        await eachAsync((int item) => acc += item, asyncIter);
+        await fxEachAsync((int item) => acc += item, asyncIter);
         expect(acc, equals(15));
       });
     });
@@ -17,7 +17,7 @@ void main() {
       test(
         "should convert 'Iterable<Future<A>>' to 'FxAsyncIterable<A>'",
         () async {
-          final asyncIter = toAsync([
+          final asyncIter = fxToAsync([
             Future.value(1),
             Future.value(2),
             Future.value(3),
@@ -26,7 +26,7 @@ void main() {
           ]);
 
           var acc = 0;
-          await eachAsync((int item) => acc += item, asyncIter);
+          await fxEachAsync((int item) => acc += item, asyncIter);
           expect(acc, equals(15));
         },
       );
@@ -34,7 +34,7 @@ void main() {
       test(
         "should be consumed 'FxAsyncIterable' as many times as called with 'next'",
         () async {
-          final it = toAsync([
+          final it = fxToAsync([
             Future.value(1),
             Future.value(2),
             Future.value(3),
@@ -52,9 +52,9 @@ void main() {
       );
 
       test('should be able to handle concurrently', () async {
-        final it = toAsync(() sync* {
+        final it = fxToAsync(() sync* {
           for (var i = 1; i <= 5; i++) {
-            yield delay(const Duration(milliseconds: 100), i);
+            yield fxDelay(const Duration(milliseconds: 100), i);
           }
         }()).iterator;
 

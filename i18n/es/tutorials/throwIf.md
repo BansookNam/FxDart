@@ -2,7 +2,7 @@
 slug: throwIf
 title: throwIf — FxDart 101
 description: Tutorial de throwIf en FxDart: lanza de forma condicional y, si no, deja pasar el valor, con playground en vivo.
-heading: <code>throwIf</code>
+heading: <code>fxThrowIf</code>
 section: 10
 crumb: throwIf
 prev: throwError.html
@@ -16,7 +16,7 @@ nextLabel: cases
 
   <h2>Lección</h2>
   <p>
-    <code>throwIf(predicate, toError, value)</code> es una cláusula de guarda
+    <code>fxThrowIf(predicate, toError, value)</code> es una cláusula de guarda
     que puedes soltar en mitad de una expresión: si
     <code>predicate(value)</code> es true, lanza
     <code>toError(value)</code>; si no, te devuelve <code>value</code> sin
@@ -25,7 +25,7 @@ nextLabel: cases
     ruidosamente en cuanto uno no sea válido.
   </p>
   <p>
-    Es básicamente <a href="when.html"><code>when</code></a> con una rama
+    Es básicamente <a href="when.html"><code>fxWhen</code></a> con una rama
     «then» que siempre lanza en lugar de devolver un valor — así que envuelve
     cualquier punto de llamada en <code>try</code>/<code>catch</code> para
     observar el fallo o recuperarte de él.
@@ -42,14 +42,14 @@ nextLabel: cases
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>throwIf</code> para protegerte del stock a cero
+  <p>Ejercicio: usa <code>fxThrowIf</code> para protegerte del stock a cero
     mientras sumas este inventario.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="throwError.html"><code>throwError</code></a> — una función que lanza por sí sola, sin condición ·
-    <a href="when.html"><code>when</code></a> — sustituye un valor en vez de lanzar ·
-    <a href="cases.html"><code>cases</code></a> — despacha entre varios predicados ·
-    <a href="add.html"><code>add</code></a> — usado arriba como reductor
+    <a href="throwError.html"><code>fxThrowError</code></a> — una función que lanza por sí sola, sin condición ·
+    <a href="when.html"><code>fxWhen</code></a> — sustituye un valor en vez de lanzar ·
+    <a href="cases.html"><code>fxCases</code></a> — despacha entre varios predicados ·
+    <a href="add.html"><code>fxAdd</code></a> — usado arriba como reductor
   </div>

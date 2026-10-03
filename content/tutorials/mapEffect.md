@@ -17,7 +17,7 @@ nextLabel: flatMap
   <h2>Lecture</h2>
   <p>
     Look at the source and you'll find <code>mapEffect</code> is literally
-    <code>B mapEffect(f, iterable) =&gt; map(f, iterable);</code> — same
+    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code> — same
     function, same laziness, same signature. It exists purely to document
     <em>intent</em> at the call site: reach for <code>mapEffect</code> when
     the callback's return value matters less than what it does along the way
@@ -40,8 +40,8 @@ nextLabel: flatMap
 
   <h2>Demo 2 · Async, with concurrency</h2>
   <p>
-    <code>mapEffectAsync</code> runs on the exact same engine as
-    <code>mapAsync</code>, so <code>.concurrent(n)</code> parallelizes it the
+    <code>fxMapEffectAsync</code> runs on the exact same engine as
+    <code>fxMapAsync</code>, so <code>.concurrent(n)</code> parallelizes it the
     same way — handy for "process and persist" pipelines:
   </p>
   {{playground:1}}

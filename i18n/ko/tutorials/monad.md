@@ -116,7 +116,7 @@ val result = for {
   <div class="callout">
     <strong>그렇다면 FxDart에서는?</strong> Dart에는 <code>for</code>
     컴프리헨션도 <code>do</code> 표기법도 없습니다 — 바로 그래서 FxDart의
-    <a href="typedErrors.html"><code>either((r) { ... })</code> 블록</a>이
+    <a href="typedErrors.html"><code>fxEither((r) { ... })</code> 블록</a>이
     존재합니다. 컴프리헨션 블록과 같은 역할(<code>flatMap</code> 피라미드
     대신 일직선 코드)을 하지만, 모나드 디슈거링이 아니라
     <code>Raise</code> 스코프를 통해 동작합니다 — 이 구분이 왜 중요한지는

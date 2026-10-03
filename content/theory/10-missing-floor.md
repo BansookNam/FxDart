@@ -144,9 +144,9 @@ void main() {
 
   // Four spellings of "swap the structures", because there is no
   // way to write one that works for every effect type.
-  print(sequenceEither(xs));
+  print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
-  print(separateEither(xs));
+  print(fxSeparateEither(xs));
   print(fx(xs).sequence());
   // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
@@ -154,7 +154,7 @@ void main() {
 ```
 
 And the flip side, so the trade is honest: because these are concrete, they are
-*fast* and their types are exact. `sequenceEither` returns
+*fast* and their types are exact. `fxSequenceEither` returns
 `Either<L, List<R>>` — not `Kind<F, List<R>>`, not a wrapper you have to
 unpick. Dart's inference works, the editor completes, the errors point at your
 code. A generic version in the `Kind` encoding would return something no reader

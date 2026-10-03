@@ -6,7 +6,7 @@ void main() {
   try {
     final validated = fx(ages)
         .map((a) =>
-            throwIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
+            fxThrowIf<int>((n) => n < 18, (n) => ArgumentError('too young: $n'), a))
         .toList();
     print(validated);
   } catch (e) {

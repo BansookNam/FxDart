@@ -18,20 +18,20 @@ Iterable<int> pulled(List<int> xs) sync* {
 void main() {
   group('pulled dedup paths', () {
     test('uniq iterated lazily matches uniq materialised', () {
-      final chain = uniq([3, 1, 3, 2, 1]);
+      final chain = fxUniq([3, 1, 3, 2, 1]);
       expect([for (final v in chain) v], [3, 1, 2]);
       expect([for (final v in chain) v], chain.toList());
     });
 
     test('uniqBy iterated lazily matches uniqBy materialised', () {
-      final chain = uniqBy((int a) => a % 3, [1, 4, 2, 5, 3]);
+      final chain = fxUniqBy((int a) => a % 3, [1, 4, 2, 5, 3]);
       expect([for (final v in chain) v], [1, 2, 3]);
       expect([for (final v in chain) v], chain.toList());
     });
 
     test('uniq over a pulled source stops when the consumer stops', () {
       final seen = <int>[];
-      final chain = uniq(
+      final chain = fxUniq(
         pulled([1, 1, 2, 3]).map((a) {
           seen.add(a);
           return a;
@@ -42,15 +42,15 @@ void main() {
     });
 
     test('filter+uniq over a pulled source, iterated lazily', () {
-      final chain = uniq(filter((int a) => a < 4, pulled([3, 1, 3, 5, 2, 1])));
+      final chain = fxUniq(fxFilter((int a) => a < 4, pulled([3, 1, 3, 5, 2, 1])));
       expect([for (final v in chain) v], [3, 1, 2]);
       expect([for (final v in chain) v], chain.toList());
     });
 
     test('filter+uniqBy over a pulled source, iterated lazily', () {
-      final chain = uniqBy(
+      final chain = fxUniqBy(
         (int a) => a % 3,
-        filter((int a) => a < 9, pulled([1, 4, 2, 9, 5, 3])),
+        fxFilter((int a) => a < 9, pulled([1, 4, 2, 9, 5, 3])),
       );
       expect([for (final v in chain) v], [1, 2, 3]);
       expect([for (final v in chain) v], chain.toList());
@@ -58,9 +58,9 @@ void main() {
 
     test('filter+uniq(By) is lazy under a take', () {
       final seen = <int>[];
-      final chain = uniqBy(
+      final chain = fxUniqBy(
         (int a) => a,
-        filter((int a) {
+        fxFilter((int a) {
           seen.add(a);
           return true;
         }, [1, 1, 2, 3, 4]),
@@ -70,9 +70,9 @@ void main() {
     });
 
     test('filter+uniqBy toList(growable: false) is fixed length', () {
-      final r = uniqBy(
+      final r = fxUniqBy(
         (int a) => a,
-        filter((int a) => a > 1, [1, 2, 2, 3]),
+        fxFilter((int a) => a > 1, [1, 2, 2, 3]),
       ).toList(growable: false);
       expect(r, [2, 3]);
       expect(() => r.add(9), throwsUnsupportedError);
@@ -81,20 +81,20 @@ void main() {
 
   group('pulled set-op paths', () {
     test('differenceBy iterated lazily matches it materialised', () {
-      final chain = differenceBy((int a) => a, [1, 2], [2, 3, 4, 3]);
+      final chain = fxDifferenceBy((int a) => a, [1, 2], [2, 3, 4, 3]);
       expect([for (final v in chain) v], [3, 4]);
       expect([for (final v in chain) v], chain.toList());
     });
 
     test('intersectionBy iterated lazily matches it materialised', () {
-      final chain = intersectionBy((int a) => a, [1, 2, 5], [2, 3, 5, 2]);
+      final chain = fxIntersectionBy((int a) => a, [1, 2, 5], [2, 3, 5, 2]);
       expect([for (final v in chain) v], [2, 5]);
       expect([for (final v in chain) v], chain.toList());
     });
 
     test('the key set is built on the first pull, not on construction', () {
       var scanned = 0;
-      final chain = difference(
+      final chain = fxDifference(
         pulled([1, 2]).map((a) {
           scanned++;
           return a;
@@ -107,18 +107,18 @@ void main() {
     });
 
     test('a pulled second source takes the non-indexed branch', () {
-      expect(differenceBy((int a) => a, [1, 2], pulled([2, 3, 4])).toList(), [
+      expect(fxDifferenceBy((int a) => a, [1, 2], pulled([2, 3, 4])).toList(), [
         3,
         4,
       ]);
       expect(
-        intersectionBy((int a) => a, [1, 2], pulled([2, 3, 1])).toList(),
+        fxIntersectionBy((int a) => a, [1, 2], pulled([2, 3, 1])).toList(),
         [2, 1],
       );
     });
 
     test('set-op toList(growable: false) is fixed length', () {
-      final r = differenceBy(
+      final r = fxDifferenceBy(
         (int a) => a,
         [1],
         [2, 3],
@@ -128,7 +128,7 @@ void main() {
     });
 
     test('a lazy set-op stops when the consumer stops', () {
-      final chain = differenceBy((int a) => a, [1], [2, 3, 4]);
+      final chain = fxDifferenceBy((int a) => a, [1], [2, 3, 4]);
       final it = chain.iterator;
       expect(it.moveNext(), isTrue);
       expect(it.current, 2);

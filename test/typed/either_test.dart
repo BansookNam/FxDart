@@ -1,4 +1,4 @@
-import 'package:fxdart/fxdart.dart' hide isNull, isEmpty;
+import 'package:fxdart/fxdart.dart' hide fxIsNull, fxIsEmpty;
 import 'package:test/test.dart';
 
 void main() {

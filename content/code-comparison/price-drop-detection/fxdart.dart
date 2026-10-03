@@ -41,7 +41,7 @@ void main() {
   final biggest = fx(drops).head()!;
   final savings = fx(drops).sumBy((d) => d.$2);
 
-  print(join('\n', [
+  print(fxJoin('\n', [
     'Price drops, June -> July',
     ...lines,
     'Biggest drop: ${biggest.$1.name} (-${money(biggest.$2)})',
