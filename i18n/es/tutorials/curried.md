@@ -42,7 +42,7 @@ nextLabel: toAsync
     (<code>Uncurry2(f).uncurried</code>) para aplanar menos niveles. La
     historia completa del diseño — incluido por qué el getter se llama
     <code>curried</code> y no <code>fxCurry</code> — está en
-    <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>.
+    <a href="https://github.com/BansookNam/FxDart/blob/main/content/WHY_CURRIED.md">WHY_CURRIED.md</a>.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

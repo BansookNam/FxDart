@@ -334,7 +334,7 @@ APIs **deliberately** deviate:
 | 📋 | `toArray` / `toArrayAsync` | `toList` / `toListAsync` (Dart has no array type) |
 | ⏳ | `AsyncIterable` / `for await` | `FxAsyncIterable` + `toStream()` / `fromStream()` bridges |
 | 🎛️ | variadic `zip`/`juxt`/`cases` | fixed arities (`zip`/`zip3`) or list/record parameters |
-| 🍛 | `curry(f)` | `.curried` / `.uncurried` extension getters — see [WHY_CURRIED.md](WHY_CURRIED.md) |
+| 🍛 | `curry(f)` | `.curried` / `.uncurried` extension getters — see [WHY_CURRIED.md](content/WHY_CURRIED.md) |
 
 ### 🍛 Why `.curried` instead of `curry`?
 
@@ -348,7 +348,7 @@ final addOne = add.curried(1); // int Function(int)
 fx([1, 2, 3]).map(addOne).toList(); // [2, 3, 4]
 ```
 
-📖 [**WHY_CURRIED.md**](WHY_CURRIED.md) tells the full design story: why the direct
+📖 [**WHY_CURRIED.md**](content/WHY_CURRIED.md) tells the full design story: why the direct
 port is impossible, how static extension resolution stands in for overloading,
 why the getter is named `curried`, and how the same port-the-meaning
 philosophy resolves the other unportable APIs.

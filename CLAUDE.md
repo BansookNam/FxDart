@@ -28,7 +28,7 @@ dart run benchmark/run_parallel_benchmarks.dart # ParallelComparison — one CPU
 
 ## Architecture
 
-fxdart is a port of **FxTS** (TypeScript FP library). API names, semantics, and laziness follow FxTS faithfully; where Dart makes a direct port impossible (no variadic generics, no arity reflection), a Dart-native replacement is designed instead — `WHY_CURRIED.md` documents this philosophy. Zero runtime dependencies; keep it that way.
+fxdart is a port of **FxTS** (TypeScript FP library). API names, semantics, and laziness follow FxTS faithfully; where Dart makes a direct port impossible (no variadic generics, no arity reflection), a Dart-native replacement is designed instead — `content/WHY_CURRIED.md` documents this philosophy. Zero runtime dependencies; keep it that way.
 
 - `lib/src/lazy/` — lazy operators over plain `Iterable` (`sync*`), signature `op(callback, iterable)`.
 - `lib/src/strict/` — eager functions (aggregate, access, object, predicates, `.curried` extensions).
