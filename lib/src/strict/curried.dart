@@ -4,7 +4,7 @@
 /// reflection and recursive conditional types, neither of which exists in
 /// Dart. Instead, one extension per arity is declared under the same getter
 /// name, and the compiler picks the right one from the function's *static*
-/// type. Full design rationale: `WHY_CURRIED.md` at the repository root.
+/// type. Full design rationale: `content/WHY_CURRIED.md` in the repository.
 ///
 /// ```dart
 /// int add(int a, int b) => a + b;

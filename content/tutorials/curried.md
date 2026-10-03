@@ -39,7 +39,7 @@ nextLabel: toAsync
     extension explicitly (<code>Uncurry2(f).uncurried</code>) to flatten
     fewer levels. The full design story — including why the getter is named
     <code>curried</code> and not <code>fxCurry</code> — is in
-    <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>.
+    <a href="https://github.com/BansookNam/FxDart/blob/main/content/WHY_CURRIED.md">WHY_CURRIED.md</a>.
   </p>
 
   <h2>Demo 1 · Basics</h2>

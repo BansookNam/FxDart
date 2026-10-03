@@ -40,7 +40,7 @@ nextLabel: toAsync
     적용하면 됩니다(<code>Uncurry2(f).uncurried</code>). 게터 이름이 왜
     <code>fxCurry</code>가 아니라 <code>curried</code>인지를 포함한 설계 전반의
     이야기는
-    <a href="https://github.com/BansookNam/FxDart/blob/main/WHY_CURRIED.md">WHY_CURRIED.md</a>에 있습니다.
+    <a href="https://github.com/BansookNam/FxDart/blob/main/content/WHY_CURRIED.md">WHY_CURRIED.md</a>에 있습니다.
   </p>
 
   <h2>데모 1 · 기본</h2>
