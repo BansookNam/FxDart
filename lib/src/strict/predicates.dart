@@ -17,7 +17,7 @@ bool fxIsNil(Object? a) => a == null;
 
 /// Exactly [fxIsNull]: TypeScript distinguishes `undefined` from `null`, Dart
 /// has only `null`. Kept so ported FxTS code still compiles.
-@Deprecated('Dart has no undefined; use isNull instead')
+@Deprecated('Dart has no undefined; use fxIsNull instead')
 bool fxIsUndefined(Object? a) => a == null;
 
 /// True when [a] is a [bool]. Port of FxTS `fxIsBoolean` (Dart type: `bool`).
@@ -46,7 +46,7 @@ bool fxIsList(Object? a) => a is List;
 
 /// True when [a] is a [List] — JavaScript's `Array` is Dart's [List], so
 /// this is an alias of [fxIsList] under the FxTS name.
-@Deprecated('Use isList instead')
+@Deprecated('Use fxIsList instead')
 bool fxIsArray(Object? a) => a is List;
 
 /// True when [a] is a [Map]. The closest analogue of FxTS `fxIsObject`
@@ -56,7 +56,7 @@ bool fxIsMap(Object? a) => a is Map;
 
 /// True when [a] is a [Map] — JavaScript's plain objects are Dart's [Map]s,
 /// so this is an alias of [fxIsMap] under the FxTS name.
-@Deprecated('Use isMap instead')
+@Deprecated('Use fxIsMap instead')
 bool fxIsObject(Object? a) => a is Map;
 
 /// Combinators on a unary predicate, so conditions passed to `filter`,

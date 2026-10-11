@@ -1,11 +1,11 @@
 int get parallelWorkers
-FxAsyncIterable&lt;R&gt; parallel&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
+FxAsyncIterable&lt;R&gt; fxParallel&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
 FxAsyncIterable&lt;R&gt; fxParallelAsync&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, FxAsyncIterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
-FxAsyncIterable&lt;R&gt; mapParallel&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
+FxAsyncIterable&lt;R&gt; fxMapParallel&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
 FxAsyncIterable&lt;R&gt; fxMapParallelAsync&lt;A, R&gt;(int workers, FutureOr&lt;R&gt; Function(A input) worker, FxAsyncIterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
 fxPipe2(decodePng, thumbnail)  // one hop, see fxPipe
 IsolatePool.spawn(int workers) / IsolatePool.using(int workers, body)
-FxAsyncIterable&lt;R&gt; parallelOn&lt;A, R&gt;(IsolatePool pool, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
+FxAsyncIterable&lt;R&gt; fxParallelOn&lt;A, R&gt;(IsolatePool pool, FutureOr&lt;R&gt; Function(A input) worker, Iterable&lt;A&gt; iterable, {int chunk = 1, bool chunked = false})
 FxAsync&lt;R&gt; Fx.parallel(int workers, FutureOr&lt;R&gt; Function(T input) worker, {int chunk = 1, bool chunked = false})
 FxAsync&lt;R&gt; Fx.parallelOn(IsolatePool pool, FutureOr&lt;R&gt; Function(T input) worker, {int chunk = 1, bool chunked = false})
 FxAsync&lt;R&gt; FxAsync.parallel(int workers, FutureOr&lt;R&gt; Function(T input) worker, {int chunk = 1, bool chunked = false})

@@ -40,8 +40,8 @@ noBenchmark: timing
     recoger» — sin variable cacheada a mano y sin oyente extra de caché.
   </p>
   <p>
-    Esta es la capa de eventos de fxdart absorbiendo el enfoque Rx
-    para el lado push: <code>LiveValue.live</code> devuelve una cadena
+    Aquí la capa de eventos de fxdart incorpora el enfoque de
+    Rx para el lado push: <code>LiveValue.live</code> devuelve una cadena
     <code>fxEvents</code> — un envoltorio fino sobre un
     <code>Stream</code> broadcast llano, así que no colisiona con nada,
     rxdart incluido — y <code>.pull()</code> cruza al pipeline pull

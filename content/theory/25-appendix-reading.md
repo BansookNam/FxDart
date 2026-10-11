@@ -15,7 +15,7 @@ here is required; every chapter of this book stands on its own.
 | Source | Good for | Difficulty |
 |---|---|---|
 | **FxDart 101 tutorials** | the API surface, one function at a time, with runnable demos | easy |
-| **Dart vs FxDart** (52 examples) | whether a pipeline is the right tool for a given task, with verdicts | easy |
+| **Dart vs FxDart** (53 examples) | whether a pipeline is the right tool for a given task, with verdicts | easy |
 | **RxDart vs FxDart** | Chapter 12's pull/push decision, applied to 50 real problems | easy |
 | **`WHY_CURRIED.md`** | the reasoning behind Chapter 4 — what a port owes its source | moderate |
 | **`ARROW_MIGRATION_BLOCKER.md`** | the HKT wall of Chapter 10, documented as it was hit | moderate |

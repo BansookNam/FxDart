@@ -38,13 +38,13 @@ nextLabel: Either × pipelines
       colección entera en modo fail-slow.</li>
     <li><code>r.bindNel(eitherNel)</code> — desenvuelve un
       <code>EitherNel</code>, elevando todos sus errores de golpe;
-      <code>someEither.toEitherNel()</code> permite introducir un valor
+      <code>someEither.toEitherNel()</code> permite incorporar un valor
       fail-fast.</li>
   </ul>
   <p>
     El contrato es el de Arrow: todas las ramas se ejecutan (los errores se
     concatenan en el orden de las ramas), una rama que <em>lanza</em> una
-    excepción en vez de elevar un error gana sobre la acumulación y, tras el
+    excepción en vez de elevar un error prevalece sobre la acumulación y, tras el
     primer error, los resultados correctos ya no se conservan: la iteración
     continúa solo para recoger los errores restantes.
   </p>

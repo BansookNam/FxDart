@@ -26,8 +26,8 @@ nextLabel: performance
   <p>
     선택 인자 <code>n</code> 덕분에 무한하거나 아주 큰 소스와도 잘 어울립니다.
     <code>consume(5)</code>는 정확히 5개의 값만 끌어당기고 멈추므로, 바탕이
-    되는 이터러블이 (상한 없는 <code>fxRange</code>, <code>cycle</code>, 개수가
-    엄청난 <code>repeat</code>처럼) 끝없이 이어지더라도 문제가 없습니다.
+    되는 이터러블이 (끝이 없는 <code>cycle</code>, 또는 개수가 엄청난
+    <code>fxRange</code>나 <code>repeat</code>처럼) 아주 오래 실행되더라도 문제가 없습니다.
     유한한 이터러블을 끝까지 비우려면 <code>n</code>을 생략하세요.
   </p>
   <p>
@@ -38,10 +38,10 @@ nextLabel: performance
     싶을 때 유용합니다.
   </p>
 
-  <h2>데모 1 · 무한 소스에 상한 두기</h2>
+  <h2>데모 1 · 거대한 소스에 상한 두기</h2>
   <p>
-    <code>fxRange(1000000)</code>은 전부 끌어당기면 사실상 끝나지 않지만,
-    <code>consume(5)</code>는 5개를 처리한 뒤 멈춥니다.
+    <code>fxRange(1000000)</code>은 유한하지만 전부 끌어당기면 백만 개의 값을
+    방문하게 됩니다 — <code>consume(5)</code>는 5개를 처리한 뒤 멈춥니다.
   </p>
   {{playground:0}}
 
@@ -49,7 +49,7 @@ nextLabel: performance
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 사실상 무한한 <code>repeat()</code>에서 앞의 3개 값만 consume 하고,
+  <p>연습: 아주 큰 <code>repeat()</code>에서 앞의 3개 값만 consume하고,
     끌어당길 때마다 로그를 남겨 보세요.</p>
   {{playground:2}}
 

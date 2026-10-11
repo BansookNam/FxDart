@@ -19,7 +19,7 @@ nextLabel: take
     <code>fxCompress</code> es una máscara posicional: el elemento <code>i</code> de
     <code>iterable</code> sobrevive solo si <code>selectors[i]</code> es
     <code>true</code>. Está construido directamente a partir de dos funciones que ya
-    conoces — <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    conoces — <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, fxZip(selectors, iterable)))</code> —
     combina la máscara con los datos, filtra los pares que dan true y desempaqueta. Eso
     también significa que hereda el comportamiento de <code>zip</code> ante longitudes
     distintas: la iteración se detiene en cuanto se agota el <em>más corto</em> de

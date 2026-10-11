@@ -23,7 +23,7 @@ nextLabel: uniqStrict
     acepta <code>uniqBy</code>, la grafía de FxTS: son el mismo operador. Es la
     herramienta para «una fila por cliente», «un evento por tipo» o para
     deduplicar por cualquier campo o valor calculado — el propio
-    <code>uniq</code> no es más que
+    <code>uniq</code> se comporta como
     <code>fxDistinctBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>

@@ -18,7 +18,7 @@ nextLabel: …WithIndex
   <p>
     <code>indexed</code> es un <code>zip</code> contra un contador
     implícito: cada elemento sale emparejado como <code>(index, value)</code>,
-    contando desde <code>0</code>. Es la respuesta del pipeline perezoso al
+    contando desde <code>0</code>. Es la alternativa perezosa al
     bucle manual <code>for (var i = 0; i &lt; list.length; i++)</code>: sin
     variable contador que gestionar, y se compone con el resto de la cadena.
     <code>indexed</code> es el nombre idiomático en Dart (refleja

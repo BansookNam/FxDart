@@ -41,11 +41,11 @@ nextLabel: combine
     A의 3번째는 아무리 오래 걸려도 언제나 B의 3번째를 만납니다.
     <strong>combineLatest는 시간으로 짝짓습니다</strong>: 어느 쪽
     이벤트든 상대가 지금 쥐고 있는 값과 함께 다시 나가므로, 한 소스가
-    여러 출력에 등장하고 다른 소스는 하나에도 못 낄 수 있습니다.
+    여러 출력에 등장하고 다른 소스는 하나에도 끼지 못할 수 있습니다.
     <code>combineLatestAll</code>이 그 N항 형태입니다.
   </p>
   <p>
-    나머지는 합치기가 아니라 차례 세우기입니다.
+    나머지는 합치기가 아니라 순서대로 잇기입니다.
     <code>FxEvents.concat</code>은 각 소스를 완료까지 재생한 뒤 다음을
     시작합니다 — <code>followedBy</code>가 그 두 소스 형태이고, Dart
     자신의 <code>Iterable.followedBy</code>에서 이름을 땄습니다.
@@ -64,7 +64,7 @@ nextLabel: combine
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 차례 세우기 — concat, followedBy, raceWith, mergeWith.</p>
+  <p>연습: 순서대로 잇기 — concat, followedBy, raceWith, mergeWith.</p>
   {{playground:2}}
 
   <div class="callout">

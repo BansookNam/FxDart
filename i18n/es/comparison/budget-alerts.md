@@ -1,11 +1,11 @@
 ---
 slug: budget-alerts
 title: Categorías que superan su presupuesto mensual — Dart vs FxDart
-description: Gasto total por categoría, quedarse con las que se pasan del presupuesto y ordenarlas por exceso — contabilidad con mapas mutables en Dart nativo frente a groupBy + filter + sortBy en FxDart.
+description: Gasto total por categoría, quedarse con las que se pasan del presupuesto y ordenarlas por exceso — contabilidad con mapas mutables en Dart nativo frente a foldBy + filter + sortBy en FxDart.
 heading: Categorías que superan su presupuesto mensual
 order: 28
 tier: 3
-functions: groupBy, map, filter, sortBy, join
+functions: foldBy, map, filter, sortBy, join
 domain: transactions
 verdict: fxdart
 async: false
@@ -30,11 +30,11 @@ async: false
   <p>
     La línea de formato es idéntica en ambas versiones —la diferencia está
     en todo lo que viene antes. Dart nativo hace la agrupación a mano en un
-    mapa mutable y luego cambia de modismo dos veces: un bucle
+    mapa mutable y luego cambia de modismo una y otra vez: un bucle
     <code>for</code> para sumar, un <code>where</code> para filtrar, un
     <code>sort</code> en cascada con un comparador hecho a mano para
     ordenar. La versión de FxDart es un solo vocabulario de principio a fin:
-    <code>groupBy</code>, <code>map</code> a los totales,
+    <code>foldBy</code> a los totales, <code>map</code> a las filas,
     <code>filter</code> contra el presupuesto, <code>sortBy</code> por el
     exceso, <code>join</code>. Cada regla de negocio —pasarse del
     presupuesto, la peor primero— es un paso con nombre que puedes señalar

@@ -34,13 +34,15 @@ nextLabel: matches
     규칙이 중첩되기 때문에 깊은 일치 검사는 거의 거저 얻습니다.
     <code>{'address': {'city': 'seoul'}}</code> 같은 패턴은, 훨씬 크고 깊게
     중첩된 <code>address</code> 값을 가진 사용자 map이라도 그 안 어딘가에
-    <code>city</code>가 <code>'seoul'</code>이기만 하면 일치합니다.
+    <code>address</code> 항목에 값이 <code>'seoul'</code>인
+    <code>city</code> 키가 있기만 하면 일치합니다 — 패턴의 키 경로가 그
+    위치의 대상과 맞아야 하며, 그 안 어딘가에 나타나는 것만으로는 안 됩니다.
   </p>
 
   <h2>데모 1 · Map 일치</h2>
   {{playground:0}}
 
-  <h2>데모 2 · 리스트 접두사 일치, 그리고 그것으로 필터링하기</h2>
+  <h2>데모 2 · 리스트 접두사 일치, 그리고 이 조건으로 필터링하기</h2>
   {{playground:1}}
 
   <h2>직접 해 보기</h2>

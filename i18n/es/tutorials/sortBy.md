@@ -44,7 +44,8 @@ nextLabel: sortByDesc
     es un terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
   <p>
-    Si necesitas orden descendente, o una ordenación por varias claves, vuelve
+    Para el orden descendente usa <a href="sortByDesc.html"><code>sortByDesc</code></a>.
+    Para una ordenación por varias claves, vuelve
     a <code>sort</code> con un comparador explícito — <code>sortBy</code>
     solo cubre el caso habitual de «ascendente por una clave extraída».
   </p>

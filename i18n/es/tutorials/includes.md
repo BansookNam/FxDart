@@ -20,8 +20,8 @@ nextLabel: isEmpty
     pertenencia, y en una cadena ya lo tienes: <code>Fx</code> hereda
     <code>.contains()</code> de <code>Iterable</code>, así que
     <code>fx(xs).contains(a)</code> funciona sin más. Eso sí, no existe una
-    función <code>contains</code> de nivel superior — el nombre choca con el
-    matcher de <code>package:test</code> —, de modo que la forma data-first
+    función <code>contains</code> de nivel superior (el nombre choca con el
+    matcher de <code>package:test</code>), de modo que la forma data-first
     conserva su grafía de FxTS, <code>fxIncludes(a, iterable)</code>, que es
     literalmente <code>iterable.contains(a)</code>. La
     versión asíncrona, <code>fxIncludesAsync</code>, está construida sobre

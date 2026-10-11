@@ -22,8 +22,8 @@ nextLabel: uniqStrict
     Dart다운 이름이고, fxdart는 FxTS식 표기인 <code>uniqBy</code>도 함께
     받습니다 — 같은 연산자입니다. "고객당 한 행", "타입당 이벤트 하나"
     같은 요구나 임의의 필드 또는 계산된 값으로 중복을 없앨 때 쓰는 도구이며,
-    <code>uniq</code> 자체도 결국
-    <code>fxDistinctBy((a) =&gt; a, iterable)</code>일 뿐입니다.
+    <code>uniq</code> 자체도
+    <code>fxDistinctBy((a) =&gt; a, iterable)</code>와 같게 동작합니다.
   </p>
   <p>
     <code>uniq</code>와 마찬가지로 지연 평가되고 순서를 보존합니다. 각 키에

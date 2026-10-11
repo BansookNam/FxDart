@@ -34,7 +34,9 @@ nextLabel: intersectionBy
     바로 쓰세요.
   </p>
   <p>
-    체인 메서드는 없으니 data-first 함수를 호출하세요. 비동기 쪽에서는
+    체인 메서드는 <code>.intersection(other)</code>이며, 여기서는 리시버가
+    <code>iterable2</code>(순회되는 쪽)이고 <code>other</code>가
+    <code>iterable1</code>(포함 여부 집합)입니다. 비동기 쪽에서는
     <code>.concurrent(n)</code>의 동시성 표시가
     <code>iterable2</code>에 적용됩니다. <code>iterable1</code>은 포함
     여부 집합을 만들기 위해 미리 전부 소비합니다.

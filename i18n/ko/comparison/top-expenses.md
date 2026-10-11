@@ -26,7 +26,7 @@ async: false
   <h2>차이가 나는 이유</h2>
   <p>
     거의 차이가 없습니다 — 페이지 위의 코드는 무승부입니다. 양쪽 모두
-    부호를 반전한 키로 정렬해 내림차순을 얻고 앞의 세 개를 취합니다.
+    부호를 반전한 키로 정렬해 내림차순을 얻고 앞의 세 개를 가져옵니다.
     <code>package:collection</code>의 <code>sortedBy</code>는 FxDart의
     <code>sortBy</code>만큼이나 직접적입니다(Dart 코어의
     <code>List.sort</code>만 단독으로 쓰면 제자리에서 변형되고 명시적인
@@ -69,7 +69,7 @@ async: false
     한계도 정직하게 말하면 이렇습니다: 키가 전부 <code>double</code>,
     <code>int</code>, <code>String</code> 중 하나로 균일하지 않으면
     <code>sortBy</code>는 제네릭 비교자로 되돌아가고 이 이점은
-    사라집니다. 100만 행에서 메모리는 비슷합니다(약 123 MB 대 130 MB)
+    사라집니다. 100만 행에서 메모리는 비슷합니다(약 네이티브 123 MB 대 FxDart 130 MB)
     — 양쪽 모두 행 복사본과 스크래치 버퍼를 붙들고 있습니다. 이 예제는
     금액이 모두 달라서, 안정성은 출력되는 세 줄에는 드러나지 않습니다.
   </p>

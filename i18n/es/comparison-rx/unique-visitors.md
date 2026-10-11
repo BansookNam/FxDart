@@ -28,7 +28,7 @@ async: false
   <h2>Por qué difieren</h2>
   <p>
     Este es uno de los mejores emparejamientos de RxDart con un operador
-    de FxDart. El <code>Stream.distinct</code> corriente solo compara
+    de FxDart. El <code>Stream.distinct</code> normal solo compara
     eventos <em>adyacentes</em> (el <code>uniqAdjacent</code> de FxDart es
     la misma idea), así que RxDart añade <code>distinctUnique</code>:
     deduplicación a lo largo de todo el stream, conservando la primera

@@ -24,7 +24,7 @@ nextLabel: concat
   </p>
   <p>
     <code>fxPrependAsync</code> acepta además un <code>Future</code> como
-    <code>a</code>; se espera primero, antes de que la primera petición llegue a
+    <code>a</code>; se espera primero, antes de que el primer pull llegue a
     la fuente subyacente.
   </p>
 

@@ -19,7 +19,7 @@ nextLabel: predicate combinators
     <code>fxNot</code> does exactly what <code>!a</code> does — it just does it
     as a first-class function, so it can be passed where a
     <code>bool Function(bool)</code> is expected instead of you writing
-    <code>(b) =&gt; !b</code> yourself. FxTS's <code>fxNot</code> works on
+    <code>(b) =&gt; !b</code> yourself. FxTS's <code>not</code> works on
     JavaScript "truthy" values of any type; Dart has no implicit truthiness,
     so the Dart port only accepts an actual <code>bool</code>.
   </p>

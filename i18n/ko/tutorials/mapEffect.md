@@ -17,8 +17,8 @@ nextLabel: flatMap
   <h2>강의</h2>
   <p>
     소스를 열어 보면 <code>mapEffect</code>는 말 그대로
-    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code>입니다 —
-    같은 함수, 같은 지연 평가, 같은 시그니처죠. 오직 호출 지점에서
+    <code>Iterable&lt;B&gt; fxMapEffect&lt;A, B&gt;(f, iterable) =&gt; fxMap(f, iterable);</code>입니다 —
+    같은 함수, 같은 지연 평가, 같은 시그니처입니다. 오직 호출 지점에서
     <em>의도</em>를 드러내기 위해 존재합니다. 콜백의 반환값보다 그 과정에서
     벌어지는 일(로그 기록, DB 저장, 카운터 증가)이 더 중요하다면
     <code>mapEffect</code>를, 반환값 자체가 목적이라면 <code>map</code>을

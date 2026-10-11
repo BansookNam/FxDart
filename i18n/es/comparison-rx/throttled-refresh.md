@@ -37,7 +37,7 @@ noBenchmark: timing
     de RxDart y el <code>fxEvents(...).throttle(300ms)</code> de fxdart
     implementan la misma ventana de borde inicial (el primer toque emite
     y abre la ventana, el resto de la ráfaga se traga; el borde final
-    está a una bandera de distancia en cualquiera de los dos lados), con
+    está a un parámetro de distancia en cualquiera de los dos lados), con
     la suscripción, la contabilidad de ventanas y la terminación todas
     dentro del operador.
   </p>

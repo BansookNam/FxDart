@@ -1,7 +1,7 @@
 ---
 slug: fxSubscriptions
 title: FxSubscriptions — FxDart 101
-description: FxDart FxSubscriptions 튜토리얼: 여러 스트림 구독을 한 자루에 담아 함께 취소·일시정지·재개하기 — dispose 한 줄 — 을 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart FxSubscriptions 튜토리얼: 여러 스트림 구독을 한 자루에 담아 한꺼번에 취소·일시정지·재개하고, dispose를 한 줄로 끝내는 방법을 라이브 플레이그라운드와 함께 익힙니다.
 heading: <code>FxSubscriptions</code>
 section: 14
 crumb: FxSubscriptions
@@ -33,14 +33,16 @@ nextLabel: materialize
     <code>pauseAll()</code>과 <code>resumeAll()</code>은 더 부드러운
     버전으로, 배선을 해체하지 않은 채 일만 멈춰야 할 때를 위한
     것입니다 — 화면이 백그라운드로 가거나 탭이 포커스를 잃을 때요.
-    일시정지된 구독은 버리지 않고 버퍼에 담으므로 그 틈에서 잃는 것이
-    없습니다.
+    단일 구독 스트림에 대한 일시정지된 구독은 이벤트를 버퍼에 담으므로
+    그 틈에서 잃는 것이 없습니다. 하지만 <em>브로드캐스트</em> 스트림은
+    일시정지된 리스너를 위해 버퍼링하지 않으므로, 일시정지 동안 발생한
+    이벤트는 버려집니다.
   </p>
   <p>
     자루는 취소를 기다리기 <em>전에</em> 비워지므로, 기다리는 동안 두
     번째 <code>cancelAll()</code>이 무언가를 두 번 취소할 수 없고, 같은
-    객체가 그 뒤로 새 세대의 구독을 담을 수 있습니다. fxdart 이벤트
-    레이어, Rx의 <code>CompositeSubscription</code>을 따랐습니다.
+    객체가 그 뒤로 새 세대의 구독을 담을 수 있습니다. 이는 fxdart 이벤트
+    레이어의 일부이며, Rx의 <code>CompositeSubscription</code>을 본떴습니다.
   </p>
   <p>
     <code><a href="stopOn.html">stopOn</a></code>과 자연스럽게 짝을
@@ -56,7 +58,7 @@ nextLabel: materialize
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: <code>addAll</code>, 그리고 취소 후 자루 재사용.</p>
+  <p>연습: <code>addAll</code>을 써 보고, 취소한 뒤 같은 자루를 다시 써 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

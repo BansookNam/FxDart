@@ -44,9 +44,9 @@ fx(lines).map(f);</code></pre>
   </p>
   <p>
     <code>fxPipe2</code>..<code>fxPipe5</code>는 같은 단계를 클로저
-    하나로 합칩니다. 뜨거운 <code>map</code>이나
+    하나로 합칩니다. 자주 도는 <code>map</code>이나
     <code>parallel</code> 워커가 <code>.then</code>마다 중첩
-    호출을 내지 않습니다. 인자는 5에서 끝입니다
+    호출을 내지 않습니다. 인자 수는 5개까지입니다
     (<code>zipOrAccumulate2..5</code>와 같습니다). 그 이상은
     <code>.then</code>을 이어 붙이거나 합친 함수를 직접 쓰세요.
   </p>
@@ -58,7 +58,7 @@ fx(lines).map(f);</code></pre>
   <h2>데모 1 · parse, normalise, score</h2>
   <p>
     단계 세 개, 함수 하나. VM에서는 이것을 <code>parallel</code>에
-    넘깁니다. 여기선 플레이그라운드에서 돕니다.
+    넘깁니다. 여기서는 플레이그라운드에서 실행됩니다.
   </p>
   {{playground:0}}
 

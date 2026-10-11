@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: FxDart의 타입 술어 모음 - isNull, isBool, isNum, isString, isDateTime, isList, isMap 등을 filter에 그대로 넘길 수 있는 tear-off 함수로 제공합니다.
+description: FxDart의 타입 술어 모음 - fxIsNull, fxIsBool, fxIsNum, fxIsString, isDateTime, fxIsList, fxIsMap 등을 filter에 그대로 넘길 수 있는 tear-off 함수로 제공합니다.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates
@@ -22,7 +22,7 @@ nextLabel: fromEntries
     일급 함수 값으로 tear-off 할 수 없는데, <code>filter</code>,
     <code>takeWhile</code>, <code>find</code> 같은 함수들은 모두
     <code>bool Function(A)</code>를 원하기 때문입니다.
-    <code>fxFilter(isString, mixedList)</code>가
+    <code>fxFilter(fxIsString, mixedList)</code>가
     <code>fxFilter((a) => a is String, mixedList)</code>보다 읽기 좋다는 것,
     이 페이지의 요점은 그게 전부입니다.
   </p>
@@ -53,7 +53,7 @@ nextLabel: fromEntries
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="filter.html"><code>filter</code></a> — 이 함수들이 주로 쓰이는 자리 ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — 타입이 아니라 값을 보는 검사 ·
+    <a href="isEmpty.html"><code>fxIsEmpty</code></a> — 타입이 아니라 값을 보는 검사 ·
     <a href="compact.html"><code>fxCompact</code></a> — 이터러블에서 null을 제거 ·
     <a href="matches.html"><code>fxMatches</code></a> — 타입이 아니라 형태를 보는 술어
   </div>

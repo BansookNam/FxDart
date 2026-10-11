@@ -26,8 +26,8 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    El aplanado uno-a-muchos es roca madre en ambos modelos, y para una
-    carga síncrona las dos formas son la misma palabra:
+    El aplanado uno-a-muchos es una operación básica en ambos modelos, y
+    para una carga síncrona las dos formas son la misma palabra:
     <code>Stream.expand</code> y el <code>flatMap</code> de FxDart toman
     ambos <em>elemento a iterable</em>, empalman las piezas en orden de
     origen y entregan el resultado a un <code>map</code> de formateo. Los

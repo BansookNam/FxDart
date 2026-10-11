@@ -41,7 +41,7 @@ nextLabel: attempt
   <p>
     <code>FxEvents.retry(factory, [count])</code> trabaja un nivel más arriba:
     no parchea los errores de un stream, <strong>reconstruye el stream</strong>.
-    Ante un error se tira el intento fallido y se vuelve a llamar a
+    Ante un error se descarta el intento fallido y se vuelve a llamar a
     <code>factory()</code> para una suscripción nueva: la forma correcta
     cuando el fallo es la conexión misma. El presupuesto cuenta
     <em>re</em>suscripciones, así que <code>count: 2</code> permite tres

@@ -101,8 +101,8 @@ tiene una forma de API precisa:
 
 Leer un `Accumulated.value` de una rama que falló detona a propósito: lanza
 toda la lista acumulada de una vez. Eso es lo que hace seguro el `return`
-final — para cuando combinas valores, o bien todas las ramas tuvieron éxito o
-nunca llegas ahí.
+final: cuando llegas a combinar los valores, o bien todas las ramas tuvieron
+éxito o nunca llegas ahí.
 
 ![Ramas independientes, luego reglas dependientes](diagrams/t17-1-accumulate.svg)
 
@@ -182,8 +182,10 @@ razón por la que existe esta maquinaria.
 
 1. **Una rama por preocupación independiente.** Una rama que valida dos campos
    no puede reportar sobre el segundo si el primero falló.
-2. **Haz raise más de una vez en una rama cuando tenga sentido.** Una rama
-   puede contribuir varios errores; `age` arriba hace raise hasta dos veces.
+2. **Una rama se detiene en su primer raise.** `raise` devuelve `Never`, así que
+   `age` arriba contribuye un error, no dos. Una rama contribuye varios solo
+   entregando una lista entera: `bindNel` sobre un `EitherNel`, o un
+   `mapOrAccumulate` anidado.
 3. **Nunca leas `.value` dentro de una rama independiente.** Para eso está
    `dependent`, y leerlo pronto detona todo el ámbito.
 4. **Ordena los errores como el usuario lee el formulario.** El orden de las
@@ -227,14 +229,17 @@ todas incluso cuando la primera ya falló.
    de filas?
 3. ¿Por qué el tipo de error es `Nel<String>` y no `List<String>`? Da el
    estado que `List` admite y `Nel` prohíbe.
-4. Una rama llama a una API. ¿Debería ser `accumulating` o `dependent`, y qué
-   cambia si dos ramas llaman a la misma API?
+4. Una regla de validación necesita el resultado de una llamada a una API.
+   ¿Dónde va el `await`, dado que `accumulating` y `dependent` toman bloques
+   síncronos, y qué cambia si dos reglas necesitan la misma llamada?
 
 ## Soluciones
 
 1. Se ejecutaría, leería `age.value` de una rama fallida, y detonaría —
-   lanzando los errores acumulados desde dentro de la rama en vez de al final
-   del ámbito. La salida sigue siendo un `Left` con el error de parseo, pero el
+   lanzando *todos* los errores acumulados hasta el momento (aquí
+   `Left([email: must contain @, age: not a number])`, ya que `email` también
+   falta) desde dentro de la rama en vez de al final del ámbito. La salida sigue
+   siendo un `Left` con los errores de parseo, pero el
    mecanismo es una salida temprana en vez de una acumulación limpia, y una
    regla que necesitara ejecutarse después se saltaría. `dependent` existe para
    hacer esto imposible por construcción.
@@ -243,15 +248,17 @@ todas incluso cuando la primera ya falló.
    en flujo y reportarías, poniendo un tope a los errores recogidos (los
    primeros N, más un contador) o escribiéndolos en un archivo de rechazados
    según ocurren. La acumulación está acotada por el recuento de fallos, y ese
-   es el número que hay que sanity-check antes de elegirla.
+   es el número que hay que verificar antes de elegirla.
 3. `List<String>` admite `Left([])` — «esto falló, y no hay motivos» — que es
-   el tipo exacto de estado sin sentido representable del que trata el
-   capítulo 3. `Nel` hace la garantía estructural: un fallo siempre lleva al
+   el tipo exacto de estado sin sentido que no debería poder representarse, del
+   que trata el capítulo 3. `Nel` hace la garantía estructural: un fallo siempre lleva al
    menos un motivo, así que ningún consumidor necesita una rama «¿sin
    errores?».
-4. `accumulating`, si la llamada es independiente — quieres que su fallo se
-   reporte junto a los demás. Si dos ramas llaman a la misma API, se ejecutan
-   secuencialmente dentro del ámbito y pagas dos veces; eleva la llamada por
-   encima del ámbito, pasa el resultado, y mantén las ramas puras. Eso también
-   hace la validación testeable sin red, que es el argumento del capítulo 2
-   llegando de nuevo desde otra dirección.
+4. Ninguno toma un bloque `async`: `accumulating` y `dependent` ejecutan
+   callbacks síncronos, así que la llamada no puede esperarse dentro de una rama.
+   Haz el `await` fuera del ámbito y pasa el resultado: la rama que lo comprueba
+   es `accumulating` si es independiente de los demás campos (quieres que su
+   fallo se reporte junto a los suyos) y `dependent` si lee valores hermanos. Si
+   dos ramas necesitan la misma API, llámala una vez por encima del ámbito en
+   lugar de dos. Eso también mantiene la validación pura y testeable sin red, que
+   es el argumento del capítulo 2 llegando de nuevo desde otra dirección.

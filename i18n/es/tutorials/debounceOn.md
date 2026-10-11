@@ -23,7 +23,7 @@ nextLabel: retryOn
     misma espera para cada valor. La familia <code>xOn</code> entrega
     ese reloj a un <strong>selector</strong>: cada valor produce un
     stream, y el primer evento de ese stream es el momento en que el
-    valor toca. Espera un blur en vez de 300ms; debounce consultas más
+    valor toca. Espera a una pérdida de foco en vez de 300ms; debounce consultas más
     largas durante más tiempo; libera un valor retenido cuando dispara
     un botón en vez de cuando lo hace un temporizador.
   </p>
@@ -50,7 +50,7 @@ nextLabel: retryOn
     la forma stream de throttle) conserva el primero de la ventana;
     <code>trailing</code> conserva el más reciente visto cuando el
     interior dispara, o cuando la fuente se cierra a mitad de ventana.
-    Capa de eventos de fxdart, según las formas con selector de
+    Capa de eventos de fxdart, siguiendo las formas con selector de
     <code>debounce</code>, <code>delayWhen</code> y
     <code>throttle</code> de Rx.
   </p>

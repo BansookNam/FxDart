@@ -5,6 +5,8 @@ description: FxDart throttle 튜토리얼: wait 구간마다 함수를 최대 �
 heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
+prev: debounce.html
+prevLabel: debounce
 next: shuffle.html
 nextLabel: shuffle
 ---
@@ -65,7 +67,7 @@ final handler = onScroll.fxThrottle(
     <a href="fx.html"><code>fx</code></a>의 getter 표기와 같은 규칙입니다.
   </p>
   <h2>직접 해 보기</h2>
-  <p>연습: <code>onClick</code>을 <code>fxThrottle</code>로 감싸(wait는 100ms)
+  <p>연습: <code>onClick</code>을 <code>fxThrottle</code>로 감싸고 wait는 100ms로 맞춰
     빠르게 이어진 클릭이 세 번이 아니라 최대 두 번 — 리딩과 트레일링 —
     만 기록되게 만들어 보세요.</p>
   {{playground:2}}
@@ -77,7 +79,7 @@ final handler = onScroll.fxThrottle(
     <code>fxEvents(s).throttle(window, trailing: …)</code>이 윈도마다
     이벤트 하나만 통과시킵니다. 기본값이 하나 다릅니다: 스트림 형태는
     <code>trailing: true</code>를 넘기지 않는 한 리딩 전용입니다(위의
-    콜백 래퍼는 양쪽 에지가 기본으로 켜져 있습니다). 이 체인이 속한 곳은
+    콜백 래퍼는 양쪽 에지가 기본으로 켜져 있습니다). 이 체인이 어디에 속하는지는
     <a href="fxEvents.html"><code>fxEvents</code></a> 문서를 참고하세요.
   </p>
   {{playground:3}}
@@ -87,5 +89,5 @@ final handler = onScroll.fxThrottle(
     <a href="debounce.html"><code>fxDebounce</code></a> — 고정된 주기가 아니라 잠잠해지기를 기다립니다 ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — 타이밍 데모를 만드는 재료 ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — 시드를 지정하는 난수 ·
-    <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한
+    <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인에서 진행 중인 작업 수 제한
   </div>

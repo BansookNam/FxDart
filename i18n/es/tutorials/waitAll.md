@@ -2,7 +2,7 @@
 slug: waitAll
 title: waitAll — FxDart 101
 description: Tutorial de waitAll en FxDart: un resultado en cuanto todos los streams se han cerrado, más zip, concat, combineLatestAll, mergeWith y raceWith — con playground en vivo.
-heading: <code>waitAll</code>, <code>zip</code> &amp; friends
+heading: <code>waitAll</code>, <code>zip</code> y compañía
 section: 14
 crumb: waitAll
 prev: race.html

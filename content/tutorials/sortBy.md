@@ -44,9 +44,10 @@ nextLabel: sortByDesc
     already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
   <p>
-    If you need descending order, or a multi-key sort, drop back down to
-    <code>sort</code> with an explicit comparator — <code>sortBy</code> only
-    covers the common "ascending by one extracted key" case.
+    For descending order use <a href="sortByDesc.html"><code>sortByDesc</code></a>.
+    For a multi-key sort, drop back down to <code>sort</code> with an
+    explicit comparator — <code>sortBy</code> only covers the common
+    "ascending by one extracted key" case.
   </p>
 
   <h2>Demo 1 · Basics</h2>

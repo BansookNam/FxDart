@@ -36,8 +36,8 @@ nextLabel: shareReplay
     con el reset por recuento de Rx. Cuando el último oyente se va
     <strong>antes de que la fuente haya completado</strong>, la suscripción
     de aguas arriba se cancela y el siguiente oyente empieza una suscripción
-    nueva. Después de que la fuente <strong>completa</strong>, a un oyente
-    tardío se le sigue entregando un stream cerrado.
+    nueva. Después de que la fuente <strong>completa</strong>, un oyente
+    tardío sigue recibiendo un stream cerrado.
     <code>share(reset: false)</code> es el comportamiento de 0.8.7: la
     última cancelación cierra para siempre. Una resuscripción necesita una
     fuente que permita un segundo listen —

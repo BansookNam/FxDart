@@ -1,7 +1,7 @@
 ---
 slug: groupsBy
 title: groupsBy — FxDart 101
-description: Tutorial de groupsBy en FxDart: GroupedEvents en vivo de clave y eventos a medida que cada clave se abre, con lastFor para cerrar un grupo — con playground en vivo.
+description: Tutorial de groupsBy en FxDart: GroupedEvents en vivo, con clave y eventos, a medida que se abre cada clave; lastFor cierra un grupo — con playground en vivo.
 heading: <code>groupsBy</code>
 section: 14
 crumb: groupsBy
@@ -38,12 +38,12 @@ nextLabel: spaceBy
     valor posterior con la misma clave abre uno nuevo — un timeout de inactividad por
     usuario, una señal de «sesión terminada» por sala. Sin
     <code>lastFor</code>, los grupos se quedan abiertos hasta que la fuente completa
-    (o falla, lo que hace fallar cada grupo en vivo y luego el exterior).
+    (o falla; el error se reenvía a cada grupo en vivo y luego al stream exterior).
   </p>
   <p>
     Cancelar el exterior completa los grupos en vivo en silencio, la misma regla de RxJS 9
-    que sigue la familia window. Capa de eventos de fxdart, según el
-    <code>groupBy</code> de Rx.
+    que sigue la familia window. Esto forma parte de la capa de eventos de fxdart,
+    modelada sobre <code>groupBy</code> de Rx.
   </p>
 
   <h2>Demo 1 · Grupos a medida que se abren</h2>

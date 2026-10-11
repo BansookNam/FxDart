@@ -8,15 +8,15 @@ crumb: toAsync
 next: asyncVariants.html
 nextLabel: async variants
 ---
-  <p class="hero-sub">Eleva un Iterable normal —de valores o de Futures— a un FxAsyncIterable, la puerta de entrada al pipeline asíncrono de FxDart.</p>
+  <p class="hero-sub">Eleva un Iterable normal (de valores o de Futures) a un FxAsyncIterable, la puerta de entrada al pipeline asíncrono de FxDart.</p>
 
   {{signature}}
 
   <h2>Lección</h2>
   <p>
     Todo pipeline asíncrono de FxDart empieza con <code>toAsync</code>. Toma
-    un <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> normal —una lista de
-    valores simples, una lista de Futures o una mezcla— y lo envuelve en un
+    un <code>Iterable&lt;FutureOr&lt;T&gt;&gt;</code> normal (una lista de
+    valores simples, una lista de Futures o una mezcla) y lo envuelve en un
     <code>FxAsyncIterable</code>, el tipo que entienden todos los operadores
     <code>*Async</code> y la cadena <code>FxAsync</code>. Cada vez que un
     elemento resulta ser un <code>Future</code>, se espera automáticamente

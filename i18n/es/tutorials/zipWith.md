@@ -27,8 +27,8 @@ nextLabel: zipWithIndex
   <p>
     Se detiene en la más corta de las dos entradas, igual que
     <code>zip</code>, y la forma asíncrona <code>fxZipWithAsync</code> hereda de
-    <code>fxZipAsync</code> el tirar en paralelo por par. No hay forma
-    encadenable en <code>Fx</code> para <code>fxZipWith</code>: llama
+    <code>fxZipAsync</code> el tirar en paralelo por par. <code>Fx</code> no ofrece
+    método encadenable para <code>fxZipWith</code>: llama
     directamente a la función de nivel superior (o constrúyela tú mismo como
     <code>.zip(other).map((r) => f(r.$1, r.$2))</code>).
   </p>

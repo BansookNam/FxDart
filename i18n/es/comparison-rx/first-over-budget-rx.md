@@ -39,7 +39,7 @@ async: false
   </p>
   <p>
     La diferencia instructiva es <em>dónde vive el contador</em>. Un
-    stream tiene un «entre»: <code>doOnData</code> pincha la tubería entre
+    stream tiene un «entre»: <code>doOnData</code> pincha el pipeline entre
     operadores, así que el predicado rx se mantiene puro mientras el tap
     observa el tráfico. Una cadena pull no tiene «entre» — el momento de
     la demanda es la propia llamada al predicado, así que el lado FxDart

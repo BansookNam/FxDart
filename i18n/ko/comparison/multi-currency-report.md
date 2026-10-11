@@ -27,9 +27,9 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    먼저 정규화하는 것 — 각 거래를 <code>(tx, usd)</code> 쌍으로
-    <code>map</code>하는 것 — 은 이후의 모든 질문이 하나의 리스트 위에서
-    돌아가게 해 줍니다: 내역에는 <code>foldBy</code> +
+    먼저 정규화합니다. 각 거래를 <code>(tx, usd)</code> 쌍으로
+    <code>map</code>하면 이후의 모든 질문이 하나의 리스트 위에서 돌아갑니다.
+    내역에는 <code>foldBy</code> +
     <code>sortBy</code>, 통화 목록에는 <code>uniq</code>, 요약 줄에는
     <code>maxBy</code>와 <code>sumBy</code>. 리포트의 각 줄은 자신의 집계
     방식을 이름으로 드러내는 짧은 파이프라인 하나입니다. 네이티브 버전은
@@ -37,7 +37,7 @@ async: false
     누적기이고, 정렬에는 비교자를 일일이 써 줘야 하며, 최댓값은
     <code>reduce</code> 비교자, 통화 목록에는
     <code>toSet().toList()..sort()</code> 조합이 필요합니다. 어려운 부분은
-    없습니다 — 다만 코드량이 더 많고, 그 코드가 의미를 덜 말해 줄 뿐입니다.
+    없습니다. 다만 코드가 더 많고, 그 코드가 의미를 덜 드러낼 뿐입니다.
   </p>
   <p>
     집계에 <code>groupBy</code> + <code>sumBy</code>가 아니라

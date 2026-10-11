@@ -38,7 +38,7 @@ async: false
     pero sin el vocabulario: los totales por categoría son un acumulador de
     mapa hecho a mano, la ordenación necesita un comparador escrito a mano, el
     máximo es un comparador de <code>reduce</code> y la lista de divisas
-    necesita el baile de <code>toSet().toList()..sort()</code>. Nada de esto
+    necesita el rodeo de <code>toSet().toList()..sort()</code>. Nada de esto
     es difícil —simplemente hay más de todo, y menos de todo dice lo que
     significa.
   </p>

@@ -10,7 +10,7 @@ prevLabel: not
 next: when.html
 nextLabel: when
 ---
-  <p class="hero-sub">람다를 중첩하는 대신 이름 붙은 술어로 조건을 짭니다 — <code>and</code>, <code>or</code>, <code>xor</code>, <code>negate</code>, <code>contramap</code>.</p>
+  <p class="hero-sub">람다를 중첩하는 대신 이름 붙은 술어로 조건을 조합합니다 — <code>and</code>, <code>or</code>, <code>xor</code>, <code>negate</code>, <code>contramap</code>.</p>
 
   {{signature}}
 

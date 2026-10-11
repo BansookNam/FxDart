@@ -86,10 +86,10 @@ nextLabel: pipe
     <code>.fxEvents</code>가 붙습니다. 만들어지는 체인은 완전히 같고, 차이는
     표현식을 어느 쪽부터 읽느냐뿐입니다.
   </p>
-  <pre><code>// 함수 표기: 괄호를 열려면 표현식 앞으로 되돌아가야 합니다
+  <pre><code>// the function: you go back to the front to open the paren
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
 
-// getter 표기: .toList()를 읽듯 왼쪽에서 오른쪽으로
+// the getter: left to right, the way .toList() reads
 orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
   <p>
     이쪽이 Dart의 관용 표기이고, 비용은 없습니다. <code>Fx</code>는 extension
@@ -117,10 +117,10 @@ orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
   <pre><code>await responses.fxAsync.map(parse).concurrent(4).toList();</code></pre>
   <p>
     <code>Stream</code>에는 두 getter가 모두 붙습니다. 양쪽 세계에 걸쳐 있는
-    유일한 소스이기 때문입니다. <code>.fx</code>는 <em>pull</em> 체인으로,
-    <code>fxStream</code>과 같습니다. <code>.fxEvents</code>는 <em>push</em>
+    유일한 소스이기 때문입니다. <code>.fx</code>는 <em>풀(pull)</em> 체인으로,
+    <code>fxStream</code>과 같습니다. <code>.fxEvents</code>는 <em>푸시(push)</em>
     체인으로, <a href="fxEvents.html"><code>fxEvents</code></a>와 같습니다 —
-    debounce, throttle, switch가 여기에 있습니다. push에서 pull로 건너올 때는
+    debounce, throttle, switch가 여기에 있습니다. 푸시에서 풀로 건너올 때는
     <code>.pull()</code>을 씁니다. 둘을 나란히 놓고 비교한 표는
     <a href="streams.html">Stream 다리</a>에 있습니다.
   </p>

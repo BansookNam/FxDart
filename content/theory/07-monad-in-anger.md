@@ -151,10 +151,9 @@ Line for line, this is the `fxEither` block above with `await` where `r.bind`
 was. `async` marks the scope; `await` unwraps one layer; the compiler rewrites
 the body into continuations, which is `flatMap` by another name. The evidence
 that it is monadic and not magic: `await` on a `Future<Future<T>>` gives you
-`Future<T>` — flattening, exactly as Chapter 1 required.
+a `T`, not a `Future<T>` — Dart flattens nested futures, exactly as Chapter 1 required.
 
-What Dart did *not* do is generalise it. `await` works on `Future` (and
-anything with a `then`, by structural luck), and there is no `await` for
+What Dart did *not* do is generalise it. `await` works on `Future`, and there is no `await` for
 `Either`, no `await` for `Iterable`, no way to write your own. Every language
 in the table above made the same choice at first and then generalised;
 Dart's `async` is where that generalisation stopped.

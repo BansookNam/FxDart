@@ -16,7 +16,7 @@ prevLabel: debounced search
   <p>
     아는 id 리스트를 fetch하는 것은 이벤트 스트림이 아닙니다. 데이터는
     손에 있고, 일은 I/O이며, 정책은 "동시에 최대 <em>n</em>개, 결과는
-    원래 순서"입니다. 그것이
+    원래 순서"입니다. 이 정책을 구현하는 것이
     <code><a href="mapConcurrent.html">mapConcurrent</a></code>입니다
     (또는
     <code>.toAsync().map(f).<a href="concurrent.html">concurrent</a>(n)</code>,
@@ -24,25 +24,25 @@ prevLabel: debounced search
     <code>Future.wait(ids.map(fetch))</code>는 전부를 한 번에 쏩니다.
     <em>n</em>개씩 묶으면 각 묶음의 가장 느린 것을 기다립니다. 손으로
     제대로 하면 워커 풀입니다 — 공유 커서, 미리 잡은 슬롯, 워커
-    Future. FxDart가 그 풀에 붙인 단어가
+    Future. FxDart가 그 풀을 가리키는 이름이
     <code>concurrent(n)</code>입니다.
   </p>
   <p>
     불안정한 호출은
     <em>요소마다</em>
     <code><a href="retry.html">mapRetry</a></code>로
-    재시도합니다. 터미널 전체를 감싸지 않습니다. 첫 번째만이 아니라 모든 문제를
+    재시도합니다. 종결 연산 전체를 감싸는 방식이 아닙니다. 첫 번째만이 아니라 모든 문제를
     보고해야 하는 검증은
     <code><a href="eitherPipelines.html">mapOrAccumulate</a></code>에
     <code>concurrency: n</code>을 준 것입니다.
-    각 요소는 제 스코프에서 돌아가서, 하나의 실패가 형제로 새지 않고,
-    실패는 입력 순서로 나옵니다.
+    각 요소는 자신의 Raise 스코프에서 실행되므로, 한 요소의 실패가 형제 요소로 새지 않고,
+    실패는 입력 순서대로 나옵니다.
   </p>
   <p>
-    워커 풀 일의
+    워커 풀 작업을 다룬
     <a href="../DartComparison/bounded-concurrency.html">Dart 비교</a>는
-    명료함에서 <strong>fxdart</strong>입니다. 네이티브 풀은 두 번 쓰고
-    나면 짧아 보이지 않습니다. 이 페이지는 그 일에, 비교 예제가 보여
+    명료함 면에서 <strong>fxdart</strong>의 손을 듭니다. 네이티브 풀은 두 번 쓰고
+    나면 보기보다 제대로 만들기 어렵습니다. 이 페이지는 그 일에, 비교 예제가 보여
     주지 않는 타입 있는 에러 절반을 더한 것입니다.
   </p>
 
@@ -63,7 +63,7 @@ prevLabel: debounced search
 
   <div class="callout">
     <strong>관련:</strong>
-    <a href="whichSurface.html">어느 표면</a> — 이것이 pull-async인 이유 ·
+    <a href="whichSurface.html">어느 표면</a> — 왜 pull-async인지 ·
     <a href="concurrent.html"><code>concurrent</code></a> ·
     <a href="mapConcurrent.html"><code>mapConcurrent</code></a> ·
     <a href="retry.html"><code>fxRetry</code> / <code>mapRetry</code></a> ·

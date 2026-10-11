@@ -23,9 +23,7 @@ nextLabel: groupBy
   <p>
     인자 순서에 주의하세요. 최상위의 data-first <code>join</code>은
     <strong>구분자를 먼저</strong> 받습니다: <code>join(', ', iterable)</code>.
-    이는 FxTS의 관례(어디서나 data-first)를 따른 것으로, 이터러블을 수신자로
-    받고 구분자를 유일한 인자로 받는 Dart 자체의
-    <code>Iterable.join(separator)</code> 메서드와는 정반대입니다.
+    이는 FxTS의 관례(어디서나 data-first)를 따른 것입니다. 반면 Dart 자체의 <code>Iterable.join(separator)</code> 메서드는 이터러블을 수신자로 받고 구분자를 인자 하나로 받으므로 정반대입니다.
   </p>
   <p>
     이 차이는 체인 형태에도 미묘하게 스며듭니다. <strong>동기</strong>

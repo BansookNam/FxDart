@@ -17,9 +17,8 @@ nextLabel: resolveProps
   <h2>강의</h2>
   <p>
     <code>fxCompactObject</code>는 <code>Map</code>을 위한
-    <a href="compact.html"><code>fxCompact</code></a>입니다 —
-    <code>null</code>을 <code>Iterable</code>에서 걷어 내던 그 함수의
-    Map 버전이라고 보면 됩니다. 폼 데이터나 일부만 채워진 레코드를
+    <a href="compact.html"><code>fxCompact</code></a>입니다.
+    <code>Iterable</code>에서 <code>null</code>을 걷어 내는 그 함수의 Map 버전이라고 보면 됩니다. 폼 데이터나 일부만 채워진 레코드를
     직렬화하기 전에 정리할 때 유용합니다 — 아무도 채우지 않은 필드는
     버리고 나머지는 그대로 둡니다.
   </p>

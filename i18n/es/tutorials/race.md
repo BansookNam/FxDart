@@ -17,7 +17,7 @@ nextLabel: waitAll
   <h2>Lección</h2>
   <p>
     Pregunta a la caché y a la red a la vez; quédate con quien responda
-    primero. Prueba tres mirrors de descarga; conserva el más rápido.
+    primero. Prueba tres espejos de descarga; conserva el más rápido.
     <code>FxEvents.race(candidates)</code> se suscribe a todos los
     candidatos a la vez, y el primer <em>evento</em> en cualquier parte lo
     decide: ese evento se entrega, y todo candidato perdedor se
@@ -32,12 +32,12 @@ nextLabel: waitAll
     <em>error</em> también puede ganar: un endpoint roto pero rápido vence
     a uno sano pero lento, que es exactamente el comportamiento honesto —
     preguntaste quién responde primero, y «falló» es una respuesta. Protege
-    los campos lentos y poco fiables con
+    los candidatos lentos y poco fiables con
     <code><a href="timeout.html">timeout</a></code>/<code><a href="retry.html">fxRetry</a></code>
-    en cada candidato antes de ponerlos a correr.
+    en cada candidato antes de lanzar la carrera.
   </p>
   <p>
-    Los candidatos que se cierran sin emitir nunca se retiran en silencio;
+    Los candidatos que se cierran sin haber emitido nada se retiran en silencio;
     si todos lo hacen — o la lista de candidatos está vacía — la carrera se
     cierra vacía. Fíjate en la dirección de la cancelación frente a su
     vecino: <code><a href="switchMap.html">switchMap</a></code> cancela el
@@ -53,7 +53,7 @@ nextLabel: waitAll
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: el más rápido de tres mirrors.</p>
+  <p>Ejercicio: el más rápido de tres espejos.</p>
   {{playground:2}}
 
   <div class="callout">

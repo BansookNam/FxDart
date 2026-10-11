@@ -39,7 +39,7 @@ async: true
     Seamos justos: una importación estrictamente secuencial es la única
     política de concurrencia que un simple bucle <code>for</code> maneja
     con elegancia, y la versión nativa se lee bien —<code>slices</code> de
-    <code>package:collection</code> hasta cubre el troceado en lotes—. El
+    <code>package:collection</code> incluso cubre el troceado en lotes—. El
     total acumulado, en cambio, ya es estado mutable hilado a mano
     (<code>running += amount</code> junto a <code>n++</code>), mientras que
     <code>scan</code> lo convierte en un paso declarado. Y la sencillez del

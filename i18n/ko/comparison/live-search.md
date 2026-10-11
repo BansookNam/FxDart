@@ -1,7 +1,7 @@
 ---
 slug: live-search
 title: 키 입력 스트림 위의 실시간 검색 — Dart vs FxDart
-description: 키 입력 스트림을 중복 제거된 백엔드 검색으로 바꿉니다 — fromStream + filter + uniq + take + map과 guard 절이 있는 await-for를 비교합니다.
+description: 키 입력 스트림을 중복 제거된 백엔드 검색으로 바꿉니다 — fxStream + filter + uniq + take + map과 guard 절이 있는 await-for를 비교합니다.
 heading: 키 입력 스트림 위의 실시간 검색
 order: 45
 tier: 4
@@ -45,7 +45,7 @@ async: true
     추가하려면 그것들을 다시 풀어헤쳐야 합니다. 파이프라인은 규칙마다
     이름 붙은 연산자 하나씩을, 적용되는 순서 그대로 씁니다. 그리고 같은
     체인이 실제 위젯의 텍스트 변경 스트림도 수정 없이 그대로 받아들일
-    것입니다. 한 가지 솔직히 짚어둘 점은: fxdart의
+    것입니다. 솔직히 짚고 넘어갈 점이 하나 있습니다. fxdart의
     <code>debounce</code>는 스트림 연산자가 아니라 함수 호출 유틸리티여서,
     이벤트가 잦은 스트림을 시간 기준으로 잠재우는 일은 여기서 보여준 네
     규칙과는 다른 도구라는 것입니다.

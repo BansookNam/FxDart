@@ -123,7 +123,7 @@ Dart esconde `flatMap` detrás de sintaxis que usas a diario. `await` *es*
 `flatMap` para `Future`: saca el valor de un future, ejecuta el resto de la
 función sobre él, y el resultado es un solo future — nunca un
 `Future<Future<T>>`. Un bucle `for`-in que va añadiendo a una lista es
-`flatMap` para `List`. El bloque `either { }` del capítulo 14 es `flatMap`
+`flatMap` para `List`. El bloque `fxEither((r) { … })` del capítulo 15 es `flatMap`
 para `Either`.
 
 Observa el mismo cálculo escrito de las dos maneras — primero como cadena
@@ -184,7 +184,7 @@ además tres leyes. Se leen como enunciados pedantes de lo obvio, que es
 justo lo que las hace valiosas: son las garantías que ya das por supuestas
 cuando refactorizas.
 
-1. **Identidad por la izquierda.** `of(a).flatMap(f)` = `f(a)`. Encajar un
+1. **Identidad por la izquierda.** `of(a).flatMap(f)` = `f(a)`. Envolver un
    valor y encadenar un paso inmediatamente es lo mismo que llamar al paso.
 2. **Identidad por la derecha.** `m.flatMap(of)` = `m`. Sacar el valor de una
    caja y volver a meterlo tal cual no cambia nada.
@@ -266,7 +266,7 @@ void main() {
 
 La asociatividad sobrevive aquí por casualidad — reagrupa la cadena y la
 cuenta no cambia — pero ambas leyes de identidad fallan, y eso ya es fatal.
-Extraer un paso trivial a su propio `flatMap`, o eliminarlo por inlining, es
+Extraer un paso trivial a su propio `flatMap`, o eliminarlo al incorporar su código en la función que lo llama, es
 un refactor que cualquier revisor dejaría pasar, y en este tipo cambia la
 respuesta.
 
@@ -315,7 +315,7 @@ nunca finge abstraer sobre ella.
 - **`Either<L, R>`** tiene `flatMap`, y `Either.right` es su `of`. Las leyes
   se cumplen; ejecutaste la comprobación dos páginas atrás.
 - **`fxEither((r) { … })`** es el sustituto ergonómico de la notación `do`. No
-  es azúcar sintáctico — `r.bind` cortocircuita elevando hacia un ámbito
+  es azúcar sintáctico — `r.bind` cortocircuita saltando hasta el ámbito que lo envuelve
   (capítulo 15), un truco de continuaciones delimitadas y no una reescritura
   monádica. El mismo código en línea recta, distinto mecanismo, y una
   distinción que importa cuando preguntas por qué no hay una instancia de

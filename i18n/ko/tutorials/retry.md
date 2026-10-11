@@ -20,7 +20,7 @@ nextLabel: timeout
     실패합니다. 손으로 짠 답은 <code>try</code>/<code>catch</code>와
     카운터, <code>Future.delayed</code>를 갖춘 <code>for</code> 루프 —
     프로젝트마다 복사되면서 매번 미묘하게 달라지는 코드입니다.
-    <code>retry(attempts, f)</code>는 그 루프를 한 번으로 정리한
+    <code>fxRetry(attempts, f)</code>는 그 루프를 한 번으로 정리한
     것입니다. <code>f</code>를 실행하고, 에러가 나면 다시 실행하되 총
     <code>attempts</code>번까지만 실행합니다. 예산이 다 떨어지면
     <em>마지막</em> 에러가 원래 스택 트레이스와 함께 다시 던져집니다.
@@ -37,14 +37,14 @@ nextLabel: timeout
     진행 중인 각 원소가 <em>독립적으로</em> 재시도합니다 — 느리고
     불안정한 항목 하나가 다시 실행되는 동안 이웃들은 그대로 지나가고,
     순서는 여전히 보존됩니다. 파이프라인 전체를 재시도하려면 대신
-    종단을 감싸세요:
-    <code>retry(3, ()&nbsp;=&gt;&nbsp;fxAsync(…).toList())</code> —
+    종결 연산자까지 감싸세요:
+    <code>fxRetry(3, ()&nbsp;=&gt;&nbsp;fxAsync(…).toList())</code> —
     부분 결과는 버려지고 파이프라인은 새 이터레이터에서 처음부터 다시
     실행됩니다.
   </p>
   <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
-    <code>fxRetry</code>/<code>retryWhen</code>을 따르되, "재구독"이
+    <code>retry</code>/<code>retryWhen</code>을 따르되, "재구독"이
     "이터러블을 다시 만든다"를 뜻하는 pull 모델에 맞춰 다시
     설계했습니다. 재시도가 소진된 뒤의 <em>타입이 있는</em> 실패 처리는
     결과를

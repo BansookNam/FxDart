@@ -28,7 +28,7 @@ nextLabel: switchLatest
     <code>mergeMap(f)</code> ejecuta todos los streams internos
     <strong>a la vez</strong> e intercala su salida por orden de llegada. Úsalo
     cuando todos los resultados importan y ninguno reemplaza a otro: subir
-    tres ficheros, abanicarse hacia tres servicios. Con
+    tres archivos, abanicarse hacia tres servicios. Con
     <code>concurrent: n</code> se ejecutan como mucho <em>n</em> a la vez y el
     resto espera en cola, que es como evitas que un abanico abra doscientos
     sockets.

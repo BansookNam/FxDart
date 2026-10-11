@@ -29,7 +29,7 @@ async: true
   <p>
     Un stream tiene dos canales — datos y error — y el canal de errores
     tiene semántica de stream completo: una sola validación lanzada
-    mataría el pipeline con cinco pedidos aún sin procesar. Así que el
+    mataría el pipeline con cuatro pedidos aún sin procesar. Así que el
     lado RxDart no puede simplemente <code>asyncMap(validate)</code>;
     envuelve <em>cada</em> validación en su propio stream interno
     (<code>Rx.fromCallable</code>), captura en ese canal de errores
@@ -42,7 +42,7 @@ async: true
     El lado FxDart nunca pone los fallos en un canal aparte. Un try/catch
     dentro de <code>map</code> convierte cada desenlace en un registro
     llano — <code>(id, error?)</code> — y a partir de ahí
-    <code>partition</code> es una división por predicado corriente. Esta
+    <code>partition</code> es una división común por predicado. Esta
     es la postura general del modelo pull ante los errores: son
     <em>valores</em> que fluyen por el mismo pipeline tipado que todo lo
     demás, así que mantener juntos éxitos y fallos no cuesta nada. Cuando

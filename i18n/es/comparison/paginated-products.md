@@ -30,7 +30,7 @@ async: false
     La paginación es exactamente la forma que el <code>Iterable</code> de
     Dart ya cubre: <code>skip</code> y <code>take</code> se leen igual de
     bien que el <code>drop</code> y el <code>take</code> de FxDart, y los
-    dos siguen siendo perezosos. La única arruga nativa es ordenar por una
+    dos siguen siendo perezosos. La única complicación nativa es ordenar por una
     clave — el núcleo de Dart necesita un comparador (el
     <code>sortedBy</code> de <code>package:collection</code> cierra
     incluso esa brecha). Elige FxDart aquí solo si el resto del código ya

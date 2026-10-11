@@ -28,7 +28,7 @@ nextLabel: countWhere
     씁니다.
   </p>
   <p>
-    기본은 <code>filter(...).foldBy(...)</code>로 쓰십시오. 이름 붙은 두
+    기본은 <code>filter(...).foldBy(...)</code>로 쓰세요. 이름 붙은 두
     단계가 두 질문을 겸하는 콜백 하나보다 잘 읽히고, 여기서는 그 두 질문이
     대개 무관합니다 — 날짜 범위와 카테고리는 같은 생각이 아닙니다. 이
     연산자가 존재하는 이유는 하나뿐이며, 그게 무엇인지 아는 편이 좋습니다.
@@ -70,7 +70,7 @@ nextLabel: countWhere
   {{playground:1}}
 
   <h2>직접 해보기</h2>
-  <p>연습: 고장 난 행을 빼고 센서별 최고 측정값 구하기.</p>
+  <p>연습: 고장 난 행을 제외하고 센서별 최고 측정값을 구해 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

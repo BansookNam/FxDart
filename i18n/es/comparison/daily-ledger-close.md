@@ -40,7 +40,7 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    Cincuenta ejemplos después, este es el patrón al que todos apuntaban:
+    Tras cincuenta ejemplos, este es el patrón al que todos apuntaban:
     Dart nativo necesita tres dialectos para una sola funcionalidad —los
     helpers de <code>package:collection</code> para agrupar,
     <code>fold</code> con valores iniciales explícitos para los totales, y

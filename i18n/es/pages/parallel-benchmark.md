@@ -37,7 +37,7 @@ heading: ¿Merece la pena <code>parallel</code>?
     <strong>Deja <code>chunk</code> fuera</strong> cuando el trabajo de
     una hoja es pesado. Abajo hay 20.000 contraseñas y 10 trabajadores.
     Rehashear una contraseña tarda unos 250µs — cincuenta caminos de
-    trabajo. Entonces el camino es ruido. Envía una contraseña por
+    trabajo. Entonces el camino apenas se nota. Envía una contraseña por
     viaje. Son 20.000 caminos, y está bien:
   </p>
   <pre><code>// 20,000 passwords, 10 workers. No chunk.
@@ -135,8 +135,8 @@ await fx(lines).parallel(10, fingerprint, chunk: 37500).toList();
     de la página no refresca estas cuatro filas.
   </p>
   <p>
-    La forma por defecto no mejora en absoluto — se va poniendo algo
-    <em>peor</em>, y su coste se queda en torno a 8µs por elemento sea cual
+    La forma por defecto no mejora en absoluto — se va poniendo
+    <em>peor</em> (de 768,8 a 873,5&nbsp;ms, un 14 % aproximadamente), y su coste se queda en torno a 8µs por elemento sea cual
     sea el tamaño del grupo. La forma con lotes escala 5,4× en ese mismo
     rango.
   </p>

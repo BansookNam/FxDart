@@ -10,7 +10,7 @@ prevLabel: dropWhileRight
 next: slice.html
 nextLabel: slice
 ---
-  <p class="hero-sub">Omite valores hasta que el predicado se cumple —el elemento coincidente también se descarta— y luego emite el resto.</p>
+  <p class="hero-sub">Omite valores hasta que el predicado se cumple (el elemento coincidente también se descarta) y luego emite el resto.</p>
 
   {{signature}}
 

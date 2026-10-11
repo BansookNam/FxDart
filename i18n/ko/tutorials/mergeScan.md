@@ -27,18 +27,18 @@ nextLabel: race
   </p>
   <p>
     <code>mergeScan(seed, acc)</code>은 각 이벤트를
-    <code>accumulator(state, value)</code>를 내부 스트림으로
-    열어 접습니다. 내부가 내보내는 모든 값이 새 상태가 되고
-    전달됩니다. <code>concurrent: n</code>을 주면 한 번에 최대
+    <code>accumulator(state, value)</code>로 내부 스트림을
+    열어 접습니다. 내부가 내보내는 모든 값이 새 상태가 되어
+    그대로 전달됩니다. <code>concurrent: n</code>을 주면 한 번에 최대
     <em>n</em>개만 돌고 나머지는 큐에서 기다립니다. 내부들은
     상태 변수 하나를 공유합니다 — 가장 최근 내부 방출이
-    이깁니다. <code>concurrent</code>가 null이면 무제한입니다.
+    이깁니다. <code>concurrent</code>가 null이면 무제한이라는 뜻입니다.
     결과는 소스가 닫히고 모든 내부가 끝났을 때 닫힙니다.
   </p>
   <p>
     <code>switchScan</code>은 취소하는 형제입니다: 새 소스 값이
-    이전 내부를 진행 도중에 <strong>취소</strong>하고, 가장 최근
-    내부 방출(있다면)이 다음 누산기 호출에 건네지는 상태입니다.
+    이전 내부를 진행 도중에 <strong>취소</strong>합니다. 가장 최근
+    내부 방출(있다면)이 다음 누산기 호출의 상태로 넘어갑니다.
     소스가 닫힌 뒤에도 현재 내부는 끝까지 갈 수 있습니다.
   </p>
   <p>
@@ -66,7 +66,7 @@ nextLabel: race
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="scan.html"><code>scan</code></a> — 시드가 <em>내보내집니다</em> ·
+    <a href="scan.html"><code>scan</code></a> — 시드도 <em>내보냅니다</em> ·
     <a href="switchMap.html"><code>switchMap</code></a> / <a href="mergeMap.html"><code>mergeMap</code></a> — 공유 상태 없는 평탄화 ·
     <a href="flatMap.html"><code>expand</code></a> — 풀 쪽의 한 단계 평탄화, 이 연산자가 가져갈 수 없었던 이름
   </div>

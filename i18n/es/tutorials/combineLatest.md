@@ -10,7 +10,7 @@ prevLabel: sampleOn
 next: withLatestFrom.html
 nextLabel: withLatestFrom
 ---
-  <p class="hero-sub">En cada evento de cualquiera de los dos lados, emite <code>fxCombine</code> de los dos valores más recientes — una vez que ambos lados han hablado al menos una vez.</p>
+  <p class="hero-sub">En cada evento de cualquiera de los dos lados, emite el resultado de <code>fxCombine</code> sobre los dos valores más recientes — una vez que ambos lados han hablado al menos una vez.</p>
 
   {{signature}}
 
@@ -48,7 +48,7 @@ nextLabel: withLatestFrom
   <h2>Demo 1 · Validación de formulario desde dos campos</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Un lado cerrado mantiene su última palabra</h2>
+  <h2>Demo 2 · Un lado cerrado conserva su último valor</h2>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>

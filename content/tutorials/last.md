@@ -23,12 +23,13 @@ nextLabel: nth
     <code>last</code> — they're the same operator. Unlike
     <code>head</code>, there's no shortcut: since a lazy iterable doesn't
     know where it ends without being asked, <code>lastOrNull</code> has to
-    consume every element, so it's <code>O(n)</code> even though the pipeline
-    upstream may be lazily built.
+    consume every element, so on a lazy pipeline it's <code>O(n)</code>
+    (a plain <code>List</code> is the exception: <code>fxLast</code> indexes
+    straight to the end in <code>O(1)</code>).
   </p>
   <p>
-    <strong>Watch out on the sync chain:</strong> <code>Fx</code> extends
-    <code>Iterable</code>, so <code>fx(iterable).lastOrNull</code> resolves to
+    <strong>Watch out on the sync chain:</strong> <code>Fx</code> implements
+    <code>Iterable</code> (it is an extension type over one), so <code>fx(iterable).lastOrNull</code> resolves to
     Dart's own inherited <code>Iterable.lastOrNull</code> <em>getter</em>
     (no parens) — which <em>is</em> null-safe and returns <code>null</code> on
     an empty iterable. The trap is the neighboring <code>.last</code> getter

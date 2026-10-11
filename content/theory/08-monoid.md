@@ -17,11 +17,11 @@ description: An associative combine plus an identity element — the smallest us
 
 A **semigroup** is a type with an associative binary operation:
 
-`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
+`combine(a, combine(b, c)) == combine(combine(a, b), c)`
 
 A **monoid** is a semigroup with an identity element:
 
-`fxCombine(empty, a) == a == fxCombine(a, empty)`
+`combine(empty, a) == a == combine(a, empty)`
 
 That is all. `int` with `+` and `0`; `int` with `*` and `1`; `String` with `+`
 and `''`; `List` with `+` and `[]`; `bool` with `&&` and `true`. You have used
@@ -151,7 +151,8 @@ void main() {
   print('length: ${all.length}');
 
   // Nel is an extension type over List, so it costs nothing at
-  // runtime — and `orNull` is the only way in from a plain list.
+  // runtime. From a plain list: `orNull` or `toNelOrNull()`;
+  // or build one with `NonEmptyList.of(head, tail)`.
   print(NonEmptyList.orNull(<String>[]));
 }
 ```
@@ -197,7 +198,7 @@ elements. Say "sum" there.
 
 ## Solutions
 
-1. Yes and yes. `max` is associative and commutative; its identity is negative
+1. A semigroup, yes; a monoid, only with a caveat. `max` is associative and commutative; its identity is negative
    infinity, which for `int` does not exist in Dart — so `max` is a *semigroup*
    on `int` and a monoid only on `double` (`double.negativeInfinity`) or on
    `int?` with `null` as the identity. That is the honest reason `reduce` is
@@ -218,5 +219,5 @@ elements. Say "sum" there.
    argument order, with `[]` as identity (waiting on nothing gives an empty
    list). Failures are *not* accumulated: by default the first error wins and
    the rest are dropped, which is the fail-fast behaviour Chapter 6 contrasted
-   with `zipOrAccumulate`. `eagerError: false` changes when it reports, not how
+   with `zipOrAccumulate`. `eagerError: true` changes when it reports, not how
    many it reports.

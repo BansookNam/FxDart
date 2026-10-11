@@ -54,11 +54,11 @@ nextLabel: accumulation
   <p>
     <code>Nel.orNull</code> recibe una <code>List</code>, así que cada
     pipeline acumulador terminaba en un baile de <code>.toList()</code>
-    antes de que sus errores pudieran volverse un panel. La extensión
+    antes de que sus errores pudieran llegar a un panel. La extensión
     <code>toNelOrNull()</code> (el <code>toNonEmptyListOrNull</code> de
     Arrow) acepta cualquier <code>Iterable</code> — incluida una cadena
     <code>fx</code> perezosa —, la copia y te da el <code>Nel?</code>
-    directamente: <code>null</code> para "sin errores", una lista
+    directamente: <code>null</code> para «sin errores», una lista
     garantizada no vacía en caso contrario.
   </p>
   {{playground:3}}

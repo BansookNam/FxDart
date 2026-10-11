@@ -25,9 +25,9 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    순수 Dart에는 "필드 합산"이라는 개념이 따로 없습니다 — <code>for</code>
-    루프 안에서 누산 변수를 직접 갱신하거나, 초기값과 결합 함수를 명시해서
-    <code>fold</code>를 써야 합니다. FxDart의 <code>sumBy</code>는 그 의도를
+    순수 Dart에는 "필드 합산"을 나타내는 이름이 없습니다.
+    <code>for</code> 루프 안에서 누산 변수를 직접 갱신하거나, 초기값과 결합
+    함수를 명시해 <code>fold</code>를 써야 합니다. FxDart의 <code>sumBy</code>는 그 의도를
     한 단어로 표현하고, <code>filter → sumBy</code> 체인은 데이터가 흐르는
     순서 그대로 읽힙니다. 두 단계짜리 작업에서는 차이가 작지만, 단계가
     늘어날수록 그 차이는 점점 벌어집니다.

@@ -226,7 +226,10 @@ feels nicer.
    several pages by then — the difference is unbounded and grows with latency.
 4. `asBroadcastStream` gives every listener the same events at the producer's
    pace: a slow listener either buffers or drops, and it cannot slow the
-   producer down. `fxFork`/`tee` split a *pull*, so the shared source advances
-   only when both consumers have asked — the slow consumer holds the fast one
-   back, which is backpressure working as designed, and is the right default
-   when correctness matters more than liveness.
+   producer down. `fxFork` branches a *pull* into cursors over one shared
+   iterator and an unbounded buffer: whichever cursor is ahead advances the
+   source, so the fast consumer is never held back, and the slow one costs
+   buffered memory for every element it has not read yet. That is not
+   backpressure — nothing slows the producer — it only keeps the source from
+   being walked twice. (`tee` is a different tool: a one-pass fold of two
+   reducers, not a split between consumers.)

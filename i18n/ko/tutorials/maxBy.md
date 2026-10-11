@@ -34,9 +34,9 @@ nextLabel: minBy
   <p>
     빈 입력은 <code>null</code>을 반환합니다.
     <code><a href="head.html">head</a></code>,
-    <code><a href="last.html">last</a></code>와 마찬가지죠 — 여기서는
+    <code><a href="last.html">last</a></code>와 마찬가지입니다 — 여기서는
     Dart의 널 허용 타입이 FxTS의
-    <code>undefined</code>를 대신합니다. 이것은 Dart 고유의 추가
+    <code>undefined</code>를 대신합니다. 이 함수는 Dart 고유의 추가
     기능이며(FxTS는 숫자용 <code>max</code>만 제공합니다), 이름은
     Kotlin의 <code>maxByOrNull</code> 형태를 따릅니다.
   </p>

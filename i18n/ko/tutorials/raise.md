@@ -61,7 +61,7 @@ nextLabel: nullable
 
   <h2>데모 4 · eitherCatching — 예외 경계를 미리 결합한 빌더</h2>
   <p>
-    실제 파싱은 두 갈래로 동시에 실패합니다. 우리가 정한 규칙은 타입 있는
+    실제 파싱은 두 가지 방식으로 실패합니다. 우리가 정한 규칙은 타입 있는
     오류를 <em>raise</em>하고, 플랫폼(<code>int.parse</code>,
     <code>jsonDecode</code>)은 <em>throw</em>합니다.
     <code>fxEitherCatching</code>은 <code>fxEither</code> +

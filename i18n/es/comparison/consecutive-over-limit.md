@@ -33,7 +33,7 @@ async: false
     accesos manuales —correcto, pero cada pieza es contabilidad que quien lo
     lea tiene que verificar. La versión de FxDart construye la ventana como
     <em>datos</em>: aplica <code>zip3</code> a la lista consigo misma
-    desplazada uno y dos lugares (<code>drop(1)</code>,
+    desplazada una y dos posiciones (<code>drop(1)</code>,
     <code>drop(2)</code>), y cada elemento pasa a ser una terna (lectura,
     siguiente, la siguiente de esa). Sin índices por ningún lado. Que
     <code>zip3</code> se detenga en la entrada más corta es exactamente la
@@ -44,7 +44,7 @@ async: false
   <p>
     Las entradas desplazadas no son copias. <code>drop(n)</code> sobre una
     <code>List</code> es un <em>rango</em> de esa lista, y <code>zip3</code>
-    lee los tres rangos por índice — así que la tubería recorre las lecturas
+    lee los tres rangos por índice — así que el pipeline recorre las lecturas
     una sola vez y reserva una terna por ventana, que es la razón de que su
     barra quede cerca del bucle y no a un múltiplo de él.
   </p>

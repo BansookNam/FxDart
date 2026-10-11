@@ -11,7 +11,7 @@ import 'map.dart';
 ///
 /// fxdart extension (not part of FxTS), after Rx's `retry`/`retryWhen`.
 /// To retry a whole pipeline, wrap its terminal:
-/// `retry(3, () => fxAsync(source()).map(parse).toList())`.
+/// `fxRetry(3, () => fxAsync(source()).map(parse).toList())`.
 ///
 /// ```dart
 /// final user = await fxRetry(3, () => api.fetchUser(id),

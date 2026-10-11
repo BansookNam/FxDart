@@ -46,7 +46,7 @@ async: false
   <p>
     Los datos de FxDart son finitos por construcción, así que agrupar no
     necesita streams-de-streams: <code>groupedBy</code> produce records
-    <code>(key, items)</code> corrientes en orden de primera aparición de
+    <code>(key, items)</code> simples, en orden de primera aparición de
     la clave y la cadena sigue adelante, con <code>sumBy</code> haciendo
     la aritmética por grupo. Nada se aplaza porque nada sigue llegando.
     Para feeds vivos e ilimitados el diseño de GroupedStream es la

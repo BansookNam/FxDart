@@ -144,9 +144,9 @@ async: false
   </p>
   <p>
     The bar chart above still reads <em>tie</em> at N=10,000 even though
-    FxDart is comfortably ahead there, because 365 µs against 191 µs is
-    174 µs — real, but under the harness's 0.6 ms floor. Nobody perceives
-    174 µs, so the badge refuses to claim a win.
+    FxDart is comfortably ahead there, because 351 µs against 199 µs is
+    152 µs — real, but under the harness's 0.6 ms floor. Nobody perceives
+    152 µs, so the badge refuses to claim a win.
   </p>
   <p>
     The fair summary, then: <strong><code>countBy</code> gives you a hand

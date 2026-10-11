@@ -70,7 +70,7 @@ async: false
     <code>double</code>, <code>int</code>, or <code>String</code>,
     <code>sortBy</code> falls back to a generic comparator and the
     advantage disappears. Memory at a million rows is close (about
-    123 MB vs 130 MB) — both keep the row copy plus a scratch buffer.
+    123 MB for native vs 130 MB for FxDart) — both keep the row copy plus a scratch buffer.
     The amounts here are all distinct, so stability does not show on
     the printed three lines.
   </p>

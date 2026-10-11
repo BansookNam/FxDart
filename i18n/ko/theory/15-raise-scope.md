@@ -57,8 +57,8 @@ void main() {
 모나드든"이라고 말하려면 고차 타입이 필요한데 — 10장이 설명했듯 Dart에는
 없습니다.
 
-FxDart의 스코프는 다시 쓰기가 아닙니다. 변환되는 것은 없고, 진짜 객체가 넘어가며,
-제어는 언어가 이미 가진 장치로 블록을 떠납니다. 거래는 이렇습니다.
+FxDart의 스코프는 다시 쓰기가 아닙니다. 변환되는 것은 없고, 실제 객체가 넘어가며,
+제어는 언어가 이미 가진 장치로 블록을 떠납니다. 트레이드오프는 이렇습니다.
 
 | | Desugaring (`do`, `for`) | 스코프 (`fxEither`, Arrow의 `Raise`) |
 |---|---|---|
@@ -76,17 +76,19 @@ FxDart의 스코프는 다시 쓰기가 아닙니다. 변환되는 것은 없고
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Future<Either<String, int>> lookup(String key) async {
+Future<Either<String, String>> lookup(String key) async {
   await Future.delayed(const Duration(milliseconds: 10));
-  return key == 'port'
-      ? Either.right(8080)
-      : Either.left('missing: $key');
+  return switch (key) {
+    'port' => Either.right('8080'),
+    'host' => Either.right('localhost'),
+    _ => Either.left('missing: $key'),
+  };
 }
 
 void main() async {
   final ok = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('port'));
-    final host = r.bind(await lookup('port'));
+    final host = r.bind(await lookup('host'));
     return 'http://$host:$port';
   });
   print(ok);
@@ -100,7 +102,7 @@ void main() async {
 ```
 
 `await`가 시간을 이어 붙이고 `r.bind`가 실패를 이어 붙이며, 둘은 서로를 모릅니다.
-그것이 보상의 전부입니다.
+이것이 얻는 이득의 전부입니다.
 
 ## 세 가지 스코프
 
@@ -172,7 +174,7 @@ void main() {
 ```
 
 라이브러리는 그것을 감지해 `RaiseLeakedError`를 던집니다. 길 잃은 제어 흐름
-점프가 무관한 코드로 새어 나가게 두는 대신에요. 실무에서 이 규칙이 물리는 자리는
+점프가 무관한 코드로 새어 나가게 두는 대신에요. 실무에서 이 규칙에 걸리는 곳은
 하나입니다. **나중에 실행되는 콜백 안에서 `r`을 쓰지 마세요** — await 하지 않은
 future, 타이머, 스트림 리스너. `fxEitherAsync` 안에서는 await 사슬 위에 머무르세요.
 같은 규칙을 비동기로 말한 것입니다.
@@ -191,9 +193,9 @@ future, 타이머, 스트림 리스너. `fxEitherAsync` 안에서는 await 사�
 가드 조건이 있을 때. `r.ensure(cond, () => err)`가 `if (!cond) return Left(...)`를
 대신하는데, `flatMap` 사슬은 그것을 중첩 한 겹 없이는 표현하지 못합니다.
 
-독립적인 검증에는(6장 — 누적을 원할 겁니다), 실패 가능 호출이 하나뿐일 때는
+독립적인 검증(6장 참고, 누적 방식이 필요합니다), 실패 가능 호출이 하나뿐인 경우
 (`Either`를 그냥 돌려주세요), 그리고 블록이 나중에 실행될 코드에 `r`을 넘기는
-곳에는 잘못된 도구입니다. 마지막 것은 누출 규칙이 금지합니다.
+경우에는 잘못된 도구입니다. 마지막 경우는 누출 규칙이 금지합니다.
 
 ## 연습문제
 
@@ -201,8 +203,9 @@ future, 타이머, 스트림 리스너. `fxEitherAsync` 안에서는 await 사�
    중간에 넣기가 어느 버전에서 더 쉬운가요?
 2. 블록이 raise가 아니라 진짜 예외를 던지면 `fxEither`는 무엇을 돌려주나요?
    해 보고, 왜 그것이 옳은 기본값인지 설명하세요.
-3. 스코프는 왜 재개할 수 없나요 — 즉 실패 후 블록을 이어 가는 `r.recover(...)`가
-   왜 없나요? 장치의 언어로 답하세요.
+3. 스코프는 왜 재개할 수 없나요 — 즉 실패 후 *같은* 블록을 이어 갈 수 있는 것이
+   왜 없나요? (`r.recover(...)`는 있지만, 중첩된 블록을 감싸 그 실패를 처리할
+   뿐 raise 한 블록을 재개하지는 않습니다.) 장치의 언어로 답하세요.
 4. `fxNullable`에는 오류 값이 아예 없습니다. 그 `E` 타입은 무엇이고, 그것은
    `Either<E, A>`와 `A?`의 관계에 대해 무엇을 말해 주나요?
 
@@ -217,14 +220,16 @@ future, 타이머, 스트림 리스너. `fxEitherAsync` 안에서는 await 사�
    서술하지 않는 무언가가 일어났다"는 뜻이므로 옳습니다. 그것을 조용히 `Left`로
    바꾸면 버그를 도메인 실패로 세탁하게 됩니다. 그 변환을 원할 때를 위해
    `fxEitherCatching`이 있고, 선택이 명시적이도록 별도 함수인 것입니다. 18장이 이
-   경계를 발전시킵니다.
+   경계를 다룹니다.
 3. 탈출이 던지기로 구현되기 때문입니다. `fxEither`가 실패를 보는 시점에는 블록의
    스택 프레임이 이미 풀려 있고 지역 변수도 사라졌습니다. 재개하려면 풀리기 전에
    연속을 붙잡아야 하는데, 그것이 `Raise`가 의도적으로 구현하지 않는 제한된
-   연속의 나머지 절반입니다. 그래서 복구는 *바깥에서*, 돌려받은 `Either`에 대해
-   일어납니다 — `result.fold(...)` 또는 `getOrElse`.
-4. 그 `E`는 사실상 `void`/`Null` 입니다 — 실을 것이 없습니다. `A?`는 실패 쪽이
+   연속의 나머지 절반입니다. 그래서 복구는 raise 한 블록의 *바깥에서* 일어납니다.
+   돌려받은 `Either`에 대해(`result.fold(...)` 또는 `getOrElse`), 또는 위험한
+   부분을 중첩된 `r.recover(block, onRaise)`로 실행해서 말이죠. 이것은 중첩
+   블록 전체를 값 하나로 대체할 뿐 블록을 재개하지는 않습니다.
+4. 그 `E`는 사실상 `void`/`Null` 입니다 — 담을 것이 없습니다. `A?`는 실패 쪽이
    아무 정보도 싣지 않는 `Either<Unit, A>`이므로, 모든 nullable 계산은 왜
-   실패했는지를 잊어버린 `Either`입니다. 그것이 18장이 살펴보는 거래입니다.
+   실패했는지를 잊어버린 `Either`입니다. 그것이 18장이 살펴보는 트레이드오프입니다.
    널 허용은 공짜지만 말이 없고, 타입 있는 오류는 타입 매개변수 하나를 치르고 무엇이
    잘못됐는지 말해 줍니다.

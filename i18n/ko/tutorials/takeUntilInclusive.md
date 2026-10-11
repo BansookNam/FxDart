@@ -27,7 +27,7 @@ nextLabel: drop
   </p>
   <p>
     FxTS에서는 원래 이름이 <code>takeUntil</code>이었습니다. FxDart는
-    FxTS와의 대응을 위해 <code>takeUntil</code>(그리고
+    FxTS와의 대응을 위해 <code>fxTakeUntil</code>(그리고
     <code>fxTakeUntilAsync</code>)을 <code>@Deprecated</code> 별칭으로
     남겨 두었지만, 새로 작성하는 코드는
     <code>takeUntilInclusive</code>를 바로 호출하세요.

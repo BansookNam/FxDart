@@ -21,14 +21,14 @@ nextLabel: fork
     forma de saber qué significa «el último» sin haberlo visto todo antes, así
     que <code>reverse</code> <strong>materializa</strong> la fuente entera en
     una lista antes de emitir un solo valor. Es un operador para fuentes
-    finitas y bufferizables: nunca terminará con una fuente infinita.
+    finitas que quepan en memoria: nunca terminará con una fuente infinita.
   </p>
   <p>
     <code>fxReverseAsync</code> sigue la misma regla: primero espera todos los
     elementos de aguas arriba y luego los reproduce del final al principio. Si
     solo necesitas la cola de una secuencia en lugar de una inversión de
-    verdad, prefiere <code>takeRight</code>: también materializa, pero al menos
-    para en cuanto tiene los valores que necesita para emitirlos en orden.
+    verdad, prefiere <code>takeRight</code>: solo almacena <code>n</code> elementos
+    en lugar de toda la fuente.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -43,7 +43,7 @@ nextLabel: fork
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="takeRight.html"><code>takeRight</code></a> — también materializa, pero solo necesita la cola ·
+    <a href="takeRight.html"><code>takeRight</code></a> — también lee toda la fuente, pero solo almacena la cola ·
     <a href="dropRight.html"><code>dropRight</code></a> ·
     <a href="sort.html"><code>sort</code></a> — también materializa en una lista nueva
   </div>

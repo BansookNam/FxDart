@@ -32,7 +32,7 @@ nextLabel: share
     <code>FxAsync</code>, donde <code>sequence()</code> y
     <code>flattenOrAccumulate()</code> ya existen. Estos operadores
     se quedan en la capa de eventos para que una UI pueda escuchar
-    éxitos y fallos como dos feeds.
+    éxitos y fallos como dos flujos.
   </p>
   <p>
     <code>separated()</code> hereda las reglas de vida de

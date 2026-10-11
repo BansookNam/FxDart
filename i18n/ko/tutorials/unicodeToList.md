@@ -1,7 +1,7 @@
 ---
 slug: unicodeToList
 title: unicodeToList — FxDart 101
-description: FxDart unicodeToList 튜토리얼: 이모지 같은 서로게이트 페어까지 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.
+description: FxDart unicodeToList 튜토리얼: 이모지 같은 서로게이트 페어까지 올바르게 처리하면서 문자열을 유니코드 코드 포인트 단위로 나눕니다.
 heading: <code>unicodeToList</code>
 section: 10
 crumb: unicodeToList
@@ -10,7 +10,7 @@ prevLabel: delay &amp; sleep
 next: curried.html
 nextLabel: curried &amp; uncurried
 ---
-  <p class="hero-sub">서로게이트 페어를 올바르게 처리하면서 문자열을 사람이 인식하는 문자 단위로 나눕니다.</p>
+  <p class="hero-sub">서로게이트 페어를 올바르게 처리하면서 문자열을 유니코드 코드 포인트 단위로 나눕니다.</p>
 
   {{signature}}
 
@@ -26,9 +26,11 @@ nextLabel: curried &amp; uncurried
   <p>
     <code>unicodeToList</code>는 문자열의 <code>.runes</code>, 즉 유니코드
     코드 포인트를 순회하면서 각각을 다시 한 글자짜리 <code>String</code>으로
-    되돌려 이 문제를 해결합니다. 결과는 사람이 문자열을 읽을 때 실제로 보는
-    문자들의 목록이며, UTF-16 유닛이 아니라 코드 포인트 단위로 나누는 FxTS의
-    <code>unicodeToList</code>와 동일하게 동작합니다.
+    되돌려 이 문제를 해결합니다. 결과는 코드 포인트의 목록이며, UTF-16 유닛이
+    아니라 코드 포인트 단위로 나누는 FxTS의 <code>unicodeToList</code>와
+    동일하게 동작합니다. 다만 코드 포인트가 늘 사람 눈에 한 글자로 보이는 것은
+    아닙니다. 자소 클러스터(grapheme cluster)는 다루지 않으므로 국기, ZWJ 이모지
+    시퀀스, 결합 문자는 여전히 여러 조각으로 나뉩니다.
   </p>
 
   <h2>데모 1 · 단순 split과 unicodeToList 비교</h2>
@@ -42,7 +44,7 @@ nextLabel: curried &amp; uncurried
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 이 문자열에 사람이 인식하는 문자가 몇 개인지 세어 보세요
+  <p>연습: 이 문자열에 코드 포인트가 몇 개인지 세어 보세요
     (이모지가 포함되어 있습니다).</p>
   {{playground:2}}
 

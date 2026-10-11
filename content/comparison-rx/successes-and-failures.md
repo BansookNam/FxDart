@@ -28,7 +28,7 @@ async: true
   <p>
     A stream has two channels — data and error — and the error channel has
     whole-stream semantics: one thrown validation would kill the pipeline
-    with five orders still unprocessed. So the RxDart side cannot simply
+    with four orders still unprocessed. So the RxDart side cannot simply
     <code>asyncMap(validate)</code>; it wraps <em>each</em> validation in
     its own inner stream (<code>Rx.fromCallable</code>), catches on that
     inner error channel with <code>onErrorReturnWith</code>, and re-encodes

@@ -16,8 +16,8 @@ nextLabel: toList
 
   <h2>Lección</h2>
   <p>
-    <code>fxPipe1</code> es el bloque de construcción de un solo paso que
-    <code>pipe</code> usa internamente: aplica <code>f</code> a
+    <code>fxPipe1</code> es la forma de un solo paso de <code>pipe</code>:
+    aplica <code>f</code> a
     <code>a</code>, pero si <code>a</code> es un <code>Future</code>, lo
     espera primero. Si <code>a</code> es un valor normal, <code>f</code> se
     ejecuta al momento y <code>fxPipe1</code> devuelve lo que devuelva
@@ -59,7 +59,7 @@ nextLabel: toList
 
   <div class="callout">
     <strong>Relacionado:</strong>
-    <a href="pipe.html"><code>pipe</code></a> — pipeline de varios pasos construido sobre pipe1 ·
+    <a href="pipe.html"><code>pipe</code></a> — pipeline de varios pasos, la misma idea para una lista de pasos ·
     <a href="fx.html"><code>fx</code></a> — la alternativa tipada en forma de cadena ·
     <a href="delay.html"><code>fxDelay &amp; fxSleep</code></a> — las utilidades asíncronas usadas arriba
   </div>

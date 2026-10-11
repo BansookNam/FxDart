@@ -22,8 +22,9 @@ nextLabel: find
     materializing the whole thing just to index into a <code>List</code>.
     <code>elementAtOrNull</code> is the Dart-idiomatic name (it mirrors
     <code>Iterable.elementAtOrNull</code>); fxdart also accepts the FxTS
-    spelling <code>fxNth</code> — they're the same operator. A negative index,
-    or one past the end, simply yields <code>null</code>; unlike some
+    spelling <code>fxNth</code> — they're the same operator. With the top-level function, a negative index
+    or one past the end simply yields <code>null</code> (the chain method
+    below is the SDK's and differs for negative indexes); unlike some
     languages' array indexing, there's no wraparound-from-the-end behavior
     here — the index has to be a valid, non-negative position.
   </p>
@@ -31,7 +32,8 @@ nextLabel: find
     On the sync chain, <code>fx(iterable).elementAtOrNull(index)</code> is the
     inherited <code>Iterable</code> method — call it directly on any
     <code>Fx</code> chain, since <code>Fx</code> <em>is</em> an
-    <code>Iterable</code>. For an <code>FxAsyncIterable</code>, use the
+    <code>Iterable</code>. Being the SDK method, it returns <code>null</code>
+    past the end but throws a <code>RangeError</code> for a negative index. For an <code>FxAsyncIterable</code>, use the
     top-level <code>elementAtOrNullAsync(index, iterable)</code>.
   </p>
 

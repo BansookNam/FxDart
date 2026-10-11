@@ -32,7 +32,7 @@ nextLabel: entries
     un resultado vacío.
   </p>
   <p>
-    Es una pieza natural para el reparto round-robin (recorrer en ciclo una
+    Es una pieza natural para el reparto por turnos (round-robin; recorrer en ciclo una
     lista corta de trabajadores/colores/huecos mientras haces map sobre una más
     larga) o para repetir una secuencia asíncrona corta y modelar así un bucle
     de sondeo. La forma asíncrona, <code>fxCycleAsync</code> (o <code>.cycle()</code>

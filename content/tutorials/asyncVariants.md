@@ -14,10 +14,10 @@ nextLabel: streams
 
   <h2>Lecture</h2>
   <p>
-    Because Dart has no untyped currying, FxDart can't overload one
-    <code>map</code> to work on both <code>Iterable</code> and
-    <code>FxAsyncIterable</code> in data-first position — the parameter types
-    would collide. So every lazy and aggregate operator ships in two
+    Because Dart has no function overloading — one top-level name can have
+    only one signature — FxDart can't make a single <code>map</code> work on
+    both <code>Iterable</code> and <code>FxAsyncIterable</code> in data-first
+    position, the way FxTS's overloaded types do. So every lazy and aggregate operator ships in two
     top-level forms: the plain one for <code>Iterable</code>, and an
     <code>*Async</code> twin for <code>FxAsyncIterable</code> whose callback
     returns <code>FutureOr&lt;R&gt;</code> instead of <code>R</code>. You've

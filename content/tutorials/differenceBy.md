@@ -24,8 +24,8 @@ nextLabel: intersection
     the result collapsed). The <code>f</code> function is applied to
     <em>both</em> iterables, so — unlike <code>differenceBy</code> in some
     languages — both arguments must share the same element type
-    <code>A</code>; only the derived key type <code>B</code> is what's being
-    compared.
+    <code>A</code>; only the derived key <em>values</em> (of type <code>B</code>) are
+    what's being compared.
   </p>
   <p>
     This is the shape you reach for when the "exclusion list" and the
@@ -36,8 +36,10 @@ nextLabel: intersection
   </p>
   <p>
     <code>difference</code> itself is just
-    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. There's no
-    chain method for either — call the data-first function directly. On the
+    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. Both also
+    exist as chain methods (<code>.differenceBy(f, other)</code>), where the
+    receiver is <code>iterable2</code> and <code>other</code> is
+    <code>iterable1</code>. On the
     async side, the concurrency marker applies to <code>iterable2</code>,
     same as <code>fxDifferenceAsync</code>.
   </p>

@@ -31,8 +31,9 @@ nextLabel: includes
     de retorno <code>int?</code>.
   </p>
   <p>
-    Por dentro empareja cada elemento con su índice (mediante <code>zipWithIndex</code>)
-    y se detiene en el primero que pasa <code>f</code>.
+    La versión síncrona es un bucle con contador que se detiene en el primer
+    elemento que pasa <code>f</code>; la asíncrona empareja cada elemento con su índice
+    (mediante <code>zipWithIndex</code>) y se detiene en el primero que pasa.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -50,5 +51,5 @@ nextLabel: includes
     <a href="find.html"><code>find</code></a> — la misma búsqueda, pero devuelve el valor ·
     <a href="includes.html"><code>fxIncludes</code></a> — solo «¿está o no?» ·
     <a href="nth.html"><code>fxNth</code></a> — el inverso: entra un índice, sale un valor ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — lo que lo hace funcionar por dentro
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — lo que hace funcionar por dentro a la versión asíncrona
   </div>

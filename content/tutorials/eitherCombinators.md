@@ -17,8 +17,8 @@ nextLabel: either &amp; Raise
   <h2>Lecture</h2>
   <p>
     <a href="either.html"><code>Either</code></a> on its own gives you
-    <code>map</code>, <code>flatMap</code> and <code>fold</code>. These four
-    methods cover the shapes that kept turning into a <code>flatMap</code>
+    <code>map</code>, <code>flatMap</code> and <code>fold</code>. The four below — <code>map2</code> (through <code>map5</code>),
+    <code>alt</code>, <code>orElse</code> and <code>filterOrElse</code> — cover the shapes that kept turning into a <code>flatMap</code>
     with an <code>if</code> inside it.
   </p>
 
@@ -74,7 +74,7 @@ nextLabel: either &amp; Raise
   <p>
     It is the <code>Either</code>-value form of
     <a href="raise.html"><code>Raise.ensure</code></a>, which does the same
-    job inside an <code>either { }</code> builder. Inside a builder, prefer
+    job inside an <code>fxEither</code> builder. Inside a builder, prefer
     <code>ensure</code>; on a value you already hold, this.
   </p>
 

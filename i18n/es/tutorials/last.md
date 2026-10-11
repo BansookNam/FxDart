@@ -22,14 +22,14 @@ nextLabel: nth
     fxdart también acepta la grafía de FxTS <code>last</code> — son el mismo
     operador. A diferencia de <code>head</code>, aquí no hay atajo: como un
     iterable perezoso no sabe dónde termina sin que se lo pregunten,
-    <code>lastOrNull</code> tiene que consumir todos los elementos, así que es
-    <code>O(n)</code> aunque el pipeline aguas arriba se haya construido de
-    forma perezosa.
+    <code>lastOrNull</code> tiene que consumir todos los elementos, así que en un
+    pipeline perezoso es <code>O(n)</code> (un <code>List</code> normal es la
+    excepción: <code>fxLast</code> indexa directamente al final en <code>O(1)</code>).
   </p>
   <p>
-    <strong>Ojo en la cadena síncrona:</strong> <code>Fx</code> extiende
-    <code>Iterable</code>, así que <code>fx(iterable).lastOrNull</code> resuelve
-    al <em>getter</em> <code>Iterable.lastOrNull</code> heredado de Dart (sin
+    <strong>Ojo en la cadena síncrona:</strong> <code>Fx</code> implementa
+    <code>Iterable</code> (es un extension type sobre uno), así que <code>fx(iterable).lastOrNull</code> resuelve
+    al <code>Iterable.lastOrNull</code> heredado de Dart, un <em>getter</em> (sin
     paréntesis), que <em>sí</em> es seguro frente a nulos y devuelve
     <code>null</code> con un iterable vacío. La trampa es el getter vecino
     <code>.last</code> (sin «OrNull»): <code>fx(&lt;int&gt;[]).last</code> lanza

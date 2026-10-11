@@ -29,7 +29,7 @@ nextLabel: chunk
     체인 형태에서는 이터러블이 수신자이므로 이런 특이점이 없습니다:
     <code>fx(iterable).slice(start, end)</code>. 내부적으로
     <code>slice</code>는 소스를 한 번 훑으며 인덱스를 세는 것뿐이라
-    지연 평가가 유지되고, <code>end</code>만 넘겨 준다면 무한 소스에서도
+    지연 평가가 유지되고, <code>end</code>를 넘겨 준다면 무한 소스에서도
     문제없이 동작합니다.
   </p>
 

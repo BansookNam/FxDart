@@ -41,7 +41,7 @@ void main() {
   print(shout2('  hello  '));
   print(['  a ', ' b'].map(shout2).toList());
 
-  // pipe1 is the same idea with the value supplied first.
+  // fxPipe1 is the same idea with the value supplied first.
   print(fxPipe1('  hi ', shout2));
 }
 ```
@@ -100,12 +100,11 @@ Dart에는 오버로드도 가변 제네릭도 없습니다. 단계 개수를 �
 ```dart
 // FxDart ships this for FxTS parity — and every stage boundary
 // is an unchecked cast.
-final result = pipe(
-  [1, 2, 3, 4],
+final result = pipe([1, 2, 3, 4], [
   (dynamic xs) =>
       fxMap((dynamic n) => (n as int) * 2, xs as Iterable),
   (dynamic xs) => fxToList(xs as Iterable<int>),
-);
+]);
 ```
 
 모든 단계 경계가 검사되지 않는 캐스트입니다. 컴파일러가 잡아 주길 바랐던 타입

@@ -56,8 +56,8 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
       양방향으로 이어집니다).</li>
     <li><strong>선언적 동시성</strong> — <code>concurrent(n)</code>은
       <em>상류</em> 파이프라인에 한 번에 <code>n</code>개씩 평가하도록 요청하면서도
-      결과의 순서는 그대로 유지합니다. FxTS를 대표하는 기능이며,
-      Dart에 충실하게 포팅했습니다.</li>
+      결과의 순서는 그대로 유지합니다. FxTS의 대표 기능이며,
+      Dart에도 충실하게 옮겼습니다.</li>
   </ul>
   <p>
     시간에 따른 이벤트, 그리고 값으로서의 실패는 나머지 두 표면에 있습니다.
@@ -68,7 +68,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
   <h2>왜 필요한가?</h2>
   <p>
     Dart에는 이미 <code>Iterable</code>과 <code>Stream</code>이 있습니다. FxDart는
-    그것들이 한계에 부딪히는 지점에서 제 몫을 합니다.
+    이 둘이 한계에 부딪히는 지점에서 제 몫을 합니다.
   </p>
   <table>
     <tr><th>문제</th><th>순수 Dart</th><th>FxDart</th></tr>
@@ -90,7 +90,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
     <tr>
       <td>읽기 쉬운 다단계 변환</td>
       <td>중첩 호출 또는 중간 변수</td>
-      <td>완전한 타입이 유지되는 좌에서 우로 흐르는 <code>fx()</code> 체인</td>
+      <td>타입이 끝까지 유지되며 왼쪽에서 오른쪽으로 흐르는 <code>fx()</code> 체인</td>
     </tr>
   </table>
 
@@ -103,7 +103,7 @@ description: FxDart는 FxTS를 포팅한 Dart 함수형 프로그래밍 라이�
         <li><strong>순서를 보존하는 동시성</strong>을 연산자 하나로: <code>concurrent(n)</code>, 완료 순서가 필요하면 <code>concurrentPool(n)</code>.</li>
         <li><strong>완전한 타입 체인</strong> — <code>fx()</code>는 처음부터 끝까지 타입 추론을 유지합니다. 동기 연산자는 네이티브 <code>Iterable</code>을 다루는 평범한 함수이므로 일반 Dart 코드와 그대로 어울립니다.</li>
         <li><strong>작고 목적이 분명한 함수</strong> — 변환 / 필터 / 슬라이스 / 결합 / 집계 / 객체 / 유틸을 아우르는 약 120개의 연산자.</li>
-        <li><strong>검증된 동작</strong> — FxTS의 동작을 850개가 넘는 테스트와 함께 그대로 옮겼습니다.</li>
+        <li><strong>검증된 동작</strong> — FxTS의 동작과 850개가 넘는 테스트와 함께 그대로 옮겼습니다.</li>
         <li><strong>의존성 없음</strong> — 순수 Dart.</li>
       </ul>
     </div>

@@ -19,7 +19,8 @@ nextLabel: repeat
     <code>fxRange</code> generates integers on demand, using a <code>sync*</code>
     generator — nothing is allocated up front. Called with one argument,
     <code>fxRange(4)</code> counts <code>0, 1, 2, 3</code> (i.e. <code>0</code>
-    up to, but not including, <code>start</code>). Called with two,
+    up to, but not including, that single argument — it is the end, though the
+    parameter is named <code>start</code>). Called with two,
     <code>fxRange(1, 4)</code> counts <code>1, 2, 3</code>. A third argument
     sets the step — including a <em>negative</em> step to count downward,
     e.g. <code>fxRange(4, 1, -1)</code> gives <code>4, 3, 2</code>.
@@ -33,8 +34,8 @@ nextLabel: repeat
     a real collection first.
   </p>
   <p>
-    Unlike FxTS's <code>fxRange</code>, which is a finite generator over
-    numbers, this port keeps the same finite contract — there's no
+    Like FxTS's <code>range</code>, which is a finite generator over
+    numbers, <code>fxRange</code> is always finite — there's no
     unbounded/infinite form here (that's <code>cycle</code>'s job). If you
     want an endless counter, pair <code>fxRange</code> with <code>cycle</code>
     and <code>take</code>.

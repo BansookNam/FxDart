@@ -44,7 +44,7 @@ nextLabel: concurrent or parallel
     <code><a href="take.html">take</a></code> (a bounded pipeline
     completes, and completion releases) or manage the resource with
     <code>try</code>/<code>finally</code> when early exit is the plan.
-    fxdart extension (no FxTS counterpart), after Rx's <code>fxUsing</code>.
+    fxdart extension (no FxTS counterpart), after Rx's <code>using</code>.
   </p>
 
   <h2>Demo 1 · The bracket around a lazy read</h2>

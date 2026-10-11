@@ -39,9 +39,9 @@ nextLabel: add
   </p>
   <p>
     Si no coincide nada y no se pasa <code>orElse</code>, <code>fxCases</code>
-    recurre a devolver el propio <code>value</code>, lo cual solo compila en el
-    punto de llamada si <code>T</code> resulta satisfacer también <code>R</code>;
-    en caso contrario lanza un <code>StateError</code> en tiempo de ejecución.
+    devuelve el propio <code>value</code> si ya es un <code>R</code>;
+    en caso contrario lanza un <code>StateError</code>. Es una comprobación en
+    tiempo de ejecución, no en tiempo de compilación.
     En la práctica, pasa siempre <code>orElse</code> salvo que tengas la certeza
     de que tus predicados son exhaustivos.
   </p>
@@ -60,7 +60,7 @@ nextLabel: add
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — un solo predicado, mismo tipo de resultado ·
-    <a href="throwError.html"><code>fxThrowError</code></a> — un orElse habitual cuando no encontrar coincidencia debe ser fatal ·
+    <a href="throwError.html"><code>fxThrowError</code></a> — un orElse habitual cuando la falta de coincidencia debe ser fatal ·
     <a href="always.html"><code>fxAlways</code></a> — un orElse constante ·
     <a href="matches.html"><code>fxMatches</code></a> — un predicado que puedes conectar a un caso
   </div>

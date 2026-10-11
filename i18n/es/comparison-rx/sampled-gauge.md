@@ -41,8 +41,8 @@ noBenchmark: timing
   </p>
   <p>
     Los pipelines pull siguen sin tener reloj ni «valor actual» — esa
-    negativa se mantiene. En su lugar, fxdart absorbe el
-    enfoque Rx en una capa de eventos dedicada: <code>fxEvents</code> es
+    negativa se mantiene. En su lugar, fxdart incorpora el
+    enfoque de Rx en una capa de eventos dedicada: <code>fxEvents</code> es
     una cadena envoltorio fina sobre <code>Stream</code>s llanos (nunca
     una extensión, así que no colisiona con nada) que posee los verbos
     nativos del push que el lado pull no quiso tener. El catálogo de

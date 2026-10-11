@@ -28,7 +28,8 @@ Design bugs are almost always the same bug: **the type has more values than the
 domain does.** Here is the classic form.
 
 ```dart run
-// Four fields; 2 × 2 × 2 × 2 = 16 representable combinations…
+// Four fields; counting each String? as just set or unset,
+// 2 × 2 × 2 × 2 = 16 representable combinations…
 class Request {
   Request(
       {this.loading = false,

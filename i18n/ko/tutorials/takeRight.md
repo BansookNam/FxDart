@@ -20,14 +20,15 @@ nextLabel: takeWhile
     앞의 <code>length</code>개가 아니라 뒤쪽 값을 돌려줍니다. 다만 한 가지
     함정이 있습니다 — "뒤쪽" 값이 무엇인지 알려면 <code>takeLast</code>는
     먼저 모든 원소를 봐야 합니다. 값을 하나라도 내보내기 전에 소스 전체를
-    리스트로 <strong>구체화</strong>하기 때문에, 대부분의 FxDart 연산자와
-    달리 무한 시퀀스에서는 동작하지 않습니다. <code>takeLast</code>가
+    <strong>소비</strong>해야 하며(<code>List</code>는 직접 인덱싱하고, 그 외의
+    소스는 마지막 <code>length</code>개 원소만 담는 링 버퍼로 읽습니다),
+    대부분의 FxDart 연산자와 달리 무한 시퀀스에서는 동작하지 않습니다. <code>takeLast</code>가
     Dart다운 이름이고, fxdart는 FxTS식 표기인 <code>takeRight</code>도
     함께 받습니다 — 같은 연산자입니다.
   </p>
   <p>
     비동기 버전에도 같은 제약이 있습니다. <code>fxTakeLastAsync</code>는
-    꼬리 부분을 돌려주기 전에 상류 전체를 (모든 원소를 await 하며)
+    꼬리 부분을 돌려주기 전에 상류 전체를 (모든 원소를 await하며)
     소진합니다. 소스가 유한하고 버퍼링해도 될 만큼 작다는 것을 알 때에만
     쓰세요.
   </p>
@@ -46,6 +47,6 @@ nextLabel: takeWhile
     <strong>관련 항목:</strong>
     <a href="take.html"><code>take</code></a> — 뒤의 n개 대신 앞의 n개 ·
     <a href="dropRight.html"><code>dropRight</code></a> — 뒤의 n개를 버리기 ·
-    <a href="reverse.html"><code>reverse</code></a> — 이쪽도 소스를 구체화합니다 ·
+    <a href="reverse.html"><code>reverse</code></a> — 소스 전체를 구체화합니다 ·
     <a href="slice.html"><code>slice</code></a> — 임의의 인덱스 구간
   </div>

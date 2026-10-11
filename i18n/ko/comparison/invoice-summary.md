@@ -31,9 +31,9 @@ async: false
     다룹니다. 순수 Dart는 이를 서로 무관한 두 가지 관용구로 씁니다:
     카테고리별 합계를 위해 가변 맵을 갱신해 나가는 <code>for</code>
     루프와, 총합을 위해 초기값을 명시한 <code>fold</code>입니다.
-    FxDart는 "필드의 합"을 두 번 다 같은 방식으로 말합니다 —
-    <code>sumBy</code> — 한 번은 <code>groupBy</code> 그룹마다, 한
-    번은 전체 항목에 대해, 그리고 <code>sortBy</code>가 행의 순서를
+    FxDart는 "필드의 합"을 두 번 모두 같은 방식으로 말합니다.
+    바로 <code>sumBy</code>입니다. 한 번은 <code>groupBy</code> 그룹마다,
+    한 번은 전체 항목에 대해 씁니다. <code>sortBy</code>가 행의 순서를
     매깁니다. 청구서에 할인 규칙이 추가되면, FxDart는 파이프라인당
     한 곳의 어휘만 바뀌지만, 네이티브 버전은 루프 본문<em>과</em>
     fold를 모두 바꿔야 합니다.

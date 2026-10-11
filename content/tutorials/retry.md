@@ -20,7 +20,7 @@ nextLabel: timeout
     hand-rolled answer is a <code>for</code> loop with a
     <code>try</code>/<code>catch</code>, a counter, and a
     <code>Future.delayed</code> — copied into every project, subtly
-    different each time. <code>retry(attempts, f)</code> is that loop,
+    different each time. <code>fxRetry(attempts, f)</code> is that loop,
     once: run <code>f</code>, and on error run it again, up to
     <code>attempts</code> total runs; when the budget is spent the
     <em>last</em> error rethrows with its original stack trace. The
@@ -36,13 +36,13 @@ nextLabel: timeout
     each in-flight element retries <em>independently</em> — one slow,
     flaky item re-runs while its neighbors sail through, and order is
     still preserved. To retry a whole pipeline instead, wrap its
-    terminal: <code>retry(3, ()&nbsp;=&gt;&nbsp;fxAsync(…).toList())</code> —
+    terminal: <code>fxRetry(3, ()&nbsp;=&gt;&nbsp;fxAsync(…).toList())</code> —
     the partial result is discarded and the pipeline re-runs from a fresh
     iterator.
   </p>
   <p>
     fxdart extension (no FxTS counterpart), after Rx's
-    <code>fxRetry</code>/<code>retryWhen</code> — re-designed for the pull
+    <code>retry</code>/<code>retryWhen</code> — re-designed for the pull
     model, where "resubscribe" means "build the iterable again". For
     <em>typed</em> failure handling after the retries run out, hand the
     result to <code><a href="eitherPipelines.html">fxEitherCatching</a></code>.

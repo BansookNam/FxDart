@@ -38,7 +38,7 @@ crumb: naming
     라이브러리들(<code>Monad2</code>, <code>HKT</code>,
     <code>Do</code> 표기법)은 타입 있는 에러의 혜택을 가장 크게 볼 바로 그
     개발자들을 겁먹게 합니다. "Monad"라는 제목의 페이지는 자기 독자를
-    쫓아내는 동시에 — 이 API가 유일하게 아닌 바로 그것을 설명하게 됩니다.
+    쫓아내는 동시에 — 이 API가 아닌 바로 그것을 설명하게 됩니다.
   </p>
 
   <h2>왜 "타입 있는 에러"인가요?</h2>
@@ -61,12 +61,14 @@ crumb: naming
   <p>
     <code>raise</code>는 정확하면서도 "멋진" 이름입니다 — 이 DSL의 실제
     이름이고, 여기의 튜토리얼 URL은 함수 이름을 따릅니다
-    (<code>concurrent.html</code>, <code>fx.html</code>). 하지만 일부러 아껴
-    두었습니다. 나중에 섹션&nbsp;13에 함수별 튜토리얼 페이지
-    (<code>either.html</code>, <code>bind.html</code>, …)가 생기면, 개요
-    페이지가 <code>raise.html</code>을 차지하고 있을 경우 미래의
-    <code>raise</code> 함수 튜토리얼과 충돌합니다.
-    <code>typedErrors.html</code>은 섹션 개요 페이지로서 영원히 안전합니다.
+    (<code>concurrent.html</code>, <code>fx.html</code>). 그래서 이 이름은
+    함수별 페이지가 맡습니다. <a href="raise.html"><code>raise.html</code></a>은
+    <code>Raise</code> 스코프를, <a href="either.html"><code>either.html</code></a>은
+    <code>Either</code>를 다룹니다. 함수 이름이 하지 못하는 일은, 아직 이 개념을 접하지
+    못한 사람에게 전체 아이디어를 소개하는 것입니다. 그래서
+    <code>typedErrors.html</code>이 섹션의 개요 페이지로 남습니다. 이 페이지는
+    기능을 그것이 주는 것으로 이름 붙이고, 함수별 페이지는 여기에서 갈라져
+    나옵니다.
   </p>
 
   <h2>"Railway"는 어떤가요?</h2>

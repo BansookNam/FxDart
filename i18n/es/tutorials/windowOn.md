@@ -45,7 +45,7 @@ nextLabel: groupsBy
     <code>window*</code> no.
   </p>
   <p>
-    <code>chunkToggle(openings, closeOf)</code> es la contraparte de la familia lista
+    <code>chunkToggle(openings, closeOf)</code> es la contraparte en listas
     de <code>windowToggle</code>: cada apertura arranca un
     búfer, el primer evento de <code>closeOf</code> de esa apertura
     lo emite, los búferes vacíos se saltan como

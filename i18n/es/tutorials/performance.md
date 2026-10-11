@@ -85,7 +85,7 @@ nextLabel: range
     Nada de esto es un argumento contra las cadenas perezosas. Un
     <code>take</code> o un <code>head</code> después de un filtro detienen el
     origen en cuanto tienen suficiente — el trabajo sencillamente no llega a
-    ocurrir — y ese es un tipo de ahorro que ninguna pipeline ansiosa puede
+    ocurrir — y ese es un tipo de ahorro que ningún pipeline ansioso puede
     igualar. La pereza cuesta un poco por elemento y puede ahorrarlo todo.
   </p>
 
@@ -95,7 +95,7 @@ nextLabel: range
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a>,
     <a href="pairwise.html"><code>pairwise</code></a>, o un <code>map</code> a
     una tupla — asigna uno por elemento, y un record no se puede reutilizar. Si
-    la etapa siguiente descarta la mayoría, plantéate si la pipeline puede
+    la etapa siguiente descarta la mayoría, plantéate si el pipeline puede
     llevar índices o un solo valor;
     <a href="withIndex.html"><code>mapWithIndex</code></a> existe precisamente
     para que <code>zipWithIndex().map(...)</code> no tenga que asignar un par

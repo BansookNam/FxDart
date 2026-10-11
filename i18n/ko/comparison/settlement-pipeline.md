@@ -38,7 +38,7 @@ async: true
   <h2>차이가 나는 이유</h2>
   <p>
     이 작업의 각 절반은 더 작은 예제에서 이미 등장했습니다; 여기서
-    중요한 것은 그 둘이 만났을 때 무슨 일이 벌어지는가입니다. 네이티브
+    중요한 것은 그 둘이 만났을 때 무슨 일이 벌어지는지입니다. 네이티브
     Dart는 <code>package:collection</code>(<code>groupListsBy</code>,
     <code>sortedBy</code>)으로 준비 단계를 충분히 잘 처리합니다 —
     다만 그룹별 합계를 내는 것은 명시적 시드를 가진 <code>fold</code>

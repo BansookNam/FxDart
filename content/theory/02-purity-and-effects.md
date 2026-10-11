@@ -209,7 +209,7 @@ case at length.
    stated relative to an observation — the same subtlety appears in Chapter 1's
    exercise about `Future` equality.
 2. Something like `class Rate { const Rate(this.pct); final int pct;
-   int fxApply(int n) => n * pct ~/ 100; }`. It is referentially transparent
+   int apply(int n) => n * pct ~/ 100; }`. It is referentially transparent
    because `pct` cannot change; the instance is part of the input, just spelled
    as a receiver rather than an argument. Drop `final` and the same call can
    return two answers, so substitution fails.

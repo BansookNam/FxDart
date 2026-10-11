@@ -10,7 +10,7 @@ description: El primer piso de la torre — map, sus dos leyes, y por qué «est
 > **En este capítulo**
 > - el functor: una operación, `map`, con dos leyes
 > - qué prohíben las leyes, mostrado con un tipo que las rompe
-> - por qué la ley de composición es la que autoriza la fusión de etapas en una tubería
+> - por qué la ley de composición es la que autoriza la fusión de etapas en un pipeline
 > - functores que no son contenedores, incluido el que se esconde en `Function`
 
 ## Una operación
@@ -37,7 +37,7 @@ void main() {
 ```
 
 Fíjate en la tercera línea. Mapear un `Left` no hace nada, y eso no es un caso
-especial atornillado — es forzoso. `map` no puede cambiar la estructura, y en
+especial añadido a última hora — es forzoso. `map` no puede cambiar la estructura, y en
 `Either` la elección de lado *es* la estructura. Un `map` que convirtiera un
 `Left` en un `Right` sería otra función llevando ese nombre.
 
@@ -73,7 +73,7 @@ void main() {
 
 ![Las dos leyes del functor](diagrams/t5-1-functor-laws.svg)
 
-*Figura 5-1. La identidad dice que el bucle no hace nada. La composición dice que las dos rutas por el cuadrado aterrizan en el mismo valor — que es por lo que una tubería puede recortarse en cualquier punto entre etapas.*
+*Figura 5-1. La identidad dice que el bucle no hace nada. La composición dice que las dos rutas por el cuadrado aterrizan en el mismo valor — que es por lo que un pipeline puede reagruparse en cualquier punto entre etapas.*
 
 ## Qué prohíben las leyes
 
@@ -128,7 +128,7 @@ Lee la ley de composición de derecha a izquierda y deja de ser filosofía:
 recorrido. Una librería puede por tanto reescribir el primero como el segundo
 cuando le apetezca, y tú nunca te enteras.
 
-Eso no es hipotético en FxDart. Las tuberías perezosas fusionan etapas para
+Eso no es hipotético en FxDart. Los pipelines perezosas fusionan etapas para
 que un valor recorra la cadena entera una vez en lugar de materializarse entre
 pasos, y la licencia para esa reescritura es la ley del functor:
 
@@ -208,7 +208,8 @@ leer el código antes de refactorizar a su alrededor.
 1. Demuestra — informalmente, por casos — que `Either.map` cumple la ley de
    identidad. ¿Cuántos casos hay, y por qué ese número es la demostración
    entera?
-2. `Set` tiene un `map`. ¿Cumple la ley de composición cuando `f` lleva dos
+2. `Set` tiene un `map` (en Dart devuelve un `Iterable` perezoso, así que termina con
+   `.toSet()`). ¿Cumple la ley de composición cuando `f` lleva dos
    elementos distintos al mismo valor? Prueba `{1, 2}` con `f = (x) => 0` y
    `g = (x) => x + 1`.
 3. Si un tipo tiene `map` cumpliendo ambas leyes, ¿es `map` único? Es decir,
@@ -225,13 +226,12 @@ leer el código antes de refactorizar a su alrededor.
    suma con exactamente dos constructores, así que cubrir ambos *es* cubrir
    todos los valores — la misma exhaustividad que el capítulo 3 obtuvo de
    `sealed`.
-2. La cumple. `{1, 2}.map(f)` es `{0}` y mapear `g` da `{1}`; la fusión
+2. La cumple. `{1, 2}.map(f).toSet()` es `{0}` y mapear `g` da `{1}`; la fusión
    `g ∘ f` da `{1}` también. La deduplicación ocurre a la salida en ambas
    rutas. Lo que `Set` rompe no es la composición sino la intuición de que un
    functor preserva el *tamaño* — nada en las leyes promete eso.
-3. Para `List`, no: un `map` que además invirtiera la lista cumple la
-   identidad (¿invirtiendo dos veces? no — invertir una vez rompe la
-   identidad, porque `xs.map(id)` sería `xs.reversed`). La respuesta
+3. Para `List`, no: un `map` que además invirtiera la lista incumple la
+   ley de identidad, porque `xs.map(id)` sería `xs.reversed`, no `xs`. La respuesta
    interesante es que las leyes fijan `map` para cualquier tipo cuya forma
    quede determinada por las posiciones de su contenido, lo cual cubre tanto
    a `List` como a `Either`. En la práctica, para estos tipos el `map` legal es

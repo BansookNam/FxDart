@@ -45,9 +45,12 @@ nextLabel: parallel
     <code>x + 1</code> spends more time in that hop than in the
     addition — four workers then make it <em>slower</em> than one,
     because you pay four times the postage for no CPU to reclaim.
-    Measured: a thousand <code>x + 1</code>s on four workers took
-    about twice as long as on one; a tight 20000-iteration loop
-    on four workers was about twice as <em>fast</em> as on one. If the
+    Measured (see the
+    <a href="../parallel-benchmark.html">parallel benchmark</a>): on the
+    cheap-per-element <code>log-fingerprint</code> case, plain
+    <code>.parallel()</code> took about 2.5× as long as the single-isolate
+    loop (13.7 s against 5.4 s), while the heavy-per-element
+    <code>password-rehash</code> case ran about 6× faster. If the
     work is not heavier than the hop, stay on this isolate.
   </p>
   <pre><code>// I/O — overlap Futures here

@@ -5,6 +5,8 @@ description: Tutorial de throttle en FxDart: invoca una función como máximo un
 heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
+prev: debounce.html
+prevLabel: debounce
 next: shuffle.html
 nextLabel: shuffle
 ---
@@ -28,9 +30,9 @@ nextLabel: shuffle
   <p>
     Tanto <code>leading</code> como <code>trailing</code> valen
     <code>true</code> por defecto: la primera llamada de una ventana se
-    dispara de inmediato (flanco de subida) y, si llegan más llamadas antes de
+    dispara de inmediato (flanco inicial) y, si llegan más llamadas antes de
     que la ventana se cierre, la <em>última</em> se dispara al terminar la
-    ventana (flanco de bajada, con el argumento más reciente). Desactiva
+    ventana (flanco final, con el argumento más reciente). Desactiva
     cualquiera de los dos para obtener un comportamiento solo-leading o
     solo-trailing. Igual que <code>debounce</code>, el
     <code>Throttled&lt;T&gt;</code> devuelto es una clase invocable con un
@@ -92,5 +94,5 @@ final handler = onScroll.fxThrottle(
     <a href="debounce.html"><code>fxDebounce</code></a> — espera a que haya calma en vez de seguir un ritmo fijo ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — para construir demos con tiempos ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — aleatoriedad con semilla ·
-    <a href="concurrent.html"><code>concurrent</code></a> — limitación de tasa para pipelines asíncronos
+    <a href="concurrent.html"><code>concurrent</code></a> — acotar el trabajo en curso en pipelines asíncronos
   </div>

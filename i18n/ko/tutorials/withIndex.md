@@ -45,9 +45,9 @@ nextLabel: transpose
     돌리면 0부터 다시 시작합니다.
   </p>
   <p>
-    <code>foldWithIndex</code>에는 Dart 쪽 주름이 하나 있습니다. 누산기
+    <code>foldWithIndex</code>에는 Dart 쪽에서 걸리는 점이 하나 있습니다. 누산기
     람다에 타입을 적지 않으면 <code>Acc</code>가 <code>Object?</code>로
-    추론되어 산술이 컴파일되지 않습니다. 여기서 새로 생긴 문제는 아니고 —
+    추론되어 산술이 컴파일되지 않습니다. 이 연산자에만 있는 문제가 아니고 —
     Dart의 <code>Iterable.fold</code>도 똑같습니다 — 해법도 같습니다.
     <code>foldWithIndex&lt;int&gt;(…)</code>라고 적으면 됩니다.
   </p>

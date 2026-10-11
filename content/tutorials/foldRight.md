@@ -46,10 +46,12 @@ nextLabel: reduceLazy
     than one that counts down.
   </p>
   <p>
-    Both are strict where <code>fold</code> is not. Walking backwards means
-    knowing where the end is, so a source that isn't a <code>List</code> is
-    materialized first and <code>fxFoldRightAsync</code> drains the stream
-    before it starts — never point it at an infinite source.
+    <code>fold</code> is eager too, but it streams: it keeps one accumulator and
+    never holds the source. Both right folds are different. Walking backwards
+    means knowing where the end is, so a source that isn't a <code>List</code>
+    is materialized first (and <code>fxFoldRightAsync</code> drains the stream
+    before it starts), and they cannot short-circuit — never point them at an
+    infinite source.
   </p>
 
   <h2>Demo 1 · Direction changes the answer</h2>

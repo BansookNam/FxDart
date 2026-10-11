@@ -18,9 +18,10 @@ nextLabel: takeRight
   <p>
     <code>take</code>는 지연 파이프라인을 유한하게 유지하는 장치입니다.
     <code>length</code>개를 내보낸 순간 소스에서 값을 끌어오는 것을
-    멈추므로, 상류는 그 이상의 요청을 받지 않습니다. <code>fxRange</code>,
-    <code>repeat</code>, <code>cycle</code> 같은 FxDart 소스는 무한할 수
-    있기 때문에, 파이프라인을 애초에 안전하게 실행할 수 있게 해 주는 것이
+    멈추므로, 상류는 그 이상의 요청을 받지 않습니다.
+    <code>cycle</code> 같은 FxDart 소스는 무한할 수 있기 때문에
+    (<code>fxRange</code>와 <code>repeat</code>는 유한하지만 아주 클 수
+    있습니다), 파이프라인을 애초에 안전하게 실행할 수 있게 해 주는 것이
     <code>take</code>뿐인 경우도 많습니다.
   </p>
   <p>
@@ -53,6 +54,6 @@ nextLabel: takeRight
     <strong>관련 항목:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — 앞의 n개 대신 뒤의 n개 ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — 술어로 가져오기 ·
-    <a href="range.html"><code>fxRange</code></a> · <a href="cycle.html"><code>cycle</code></a> — 무한 소스 ·
+    <a href="range.html"><code>fxRange</code></a> — 유한 소스 · <a href="cycle.html"><code>cycle</code></a> — 무한 소스 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 병렬 평가
   </div>

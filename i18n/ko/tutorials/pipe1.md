@@ -16,8 +16,8 @@ nextLabel: toList
 
   <h2>강의</h2>
   <p>
-    <code>fxPipe1</code>은 <code>pipe</code>가 내부적으로 사용하는 한 단계짜리
-    빌딩 블록입니다. <code>a</code>에 <code>f</code>를 적용하되,
+    <code>fxPipe1</code>은 <code>pipe</code>의 한 단계짜리
+    형태입니다. <code>a</code>에 <code>f</code>를 적용하되,
     <code>a</code>가 <code>Future</code>라면 먼저 await합니다.
     <code>a</code>가 평범한 값이면 <code>f</code>가 즉시 실행되고
     <code>fxPipe1</code>은 <code>f</code>가 반환한 값을 그대로 —
@@ -57,7 +57,7 @@ nextLabel: toList
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="pipe.html"><code>pipe</code></a> — pipe1로 만들어진 다단계 파이프라인 ·
+    <a href="pipe.html"><code>pipe</code></a> — 다단계 파이프라인, 단계 목록에 적용한 같은 아이디어 ·
     <a href="fx.html"><code>fx</code></a> — 타입이 유지되는 체인 대안 ·
     <a href="delay.html"><code>fxDelay &amp; fxSleep</code></a> — 위에서 쓴 비동기 헬퍼
   </div>

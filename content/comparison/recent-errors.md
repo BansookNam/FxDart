@@ -40,8 +40,8 @@ async: false
 
   <h2>Two FxDart spellings</h2>
   <p>
-    The benchmark on this page carries a <strong>third bar</strong>, which no
-    other comparison does. The chain above is the one to write: three
+    The benchmark on this page carries a <strong>third bar</strong>, which only
+    one other page does. The chain above is the one to write: three
     independent rules, read top to bottom, and lazy — it stops scanning at the
     third distinct error, exactly like the hand-written <code>break</code>.
     What it cannot do is inline its own callbacks. A lazy stage keeps its

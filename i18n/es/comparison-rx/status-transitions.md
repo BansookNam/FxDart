@@ -28,7 +28,7 @@ async: false
   <h2>Por qué difieren</h2>
   <p>
     La deduplicación adyacente — «avísame cuando el valor
-    <em>cambie</em>» — es un valor de estado recordado en cualquiera de
+    <em>cambie</em>» — es una forma de estado recordado en cualquiera de
     los dos modelos, y los dos lados son gemelos línea a línea. La única
     trampa es el nombrado, y corta en direcciones opuestas. En el lado
     stream, el <code>Stream.distinct</code> corriente es <em>ya</em> solo

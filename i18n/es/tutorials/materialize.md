@@ -17,7 +17,7 @@ nextLabel: debounced search
   <h2>Lección</h2>
   <p>
     Los tres terminales de un <code>Stream</code> de Dart — un valor, un
-    error, un cierre — normalmente abandonan la tubería.
+    error, un cierre — normalmente abandonan el pipeline.
     <code>materialize</code> convierte cada uno en un valor
     <code>StreamEvent</code> que puede viajar
     <em>a través</em> de la cadena: un evento de datos se convierte en
@@ -34,7 +34,7 @@ nextLabel: debounced search
     el resultado, y todo lo que venga después de <code>Done</code> se
     ignora. Ida y vuelta:
     <code>materialize().dematerialize()</code> es el stream original de
-    valores. Capa de eventos de fxdart, siguiendo a
+    valores. Capa de eventos de fxdart, inspirada en
     <code>materialize</code> /
     <code>dematerialize</code> de Rx.
   </p>
@@ -48,7 +48,7 @@ nextLabel: debounced search
     un test pueda pasar un reloj falso —
     <code>now: () =&gt; DateTime.utc(2020)</code> —
     en vez de <code>DateTime.now</code>. Los errores y el cierre pasan
-    sin cambios. Siguiendo a <code>timestamp</code> y
+    sin cambios. Inspirado en <code>timestamp</code> y
     <code>timeInterval</code> de Rx.
   </p>
   <p>
@@ -69,11 +69,11 @@ nextLabel: debounced search
     devuelve <code>Future&lt;bool&gt;</code>, false ante el primer valor
     o desajuste de longitud, y un error de cualquiera de los lados hace
     fallar el future. La misma pregunta existe en pull:
-    <code>sequenceEqual</code> /
+    <code>fxSequenceEqual</code> /
     <code>Fx.sequenceEqual</code> para iterables,
     <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code> para
-    <code>FxAsyncIterable</code>s. Siguiendo a
+    <code>FxAsyncIterable</code>s. Inspirado en
     <code>sequenceEqual</code> de Rx.
   </p>
 

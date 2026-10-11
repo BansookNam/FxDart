@@ -40,6 +40,6 @@ async: true
     real production boilerplate (and easy to get subtly wrong: off-by-one on
     the shared cursor, forgetting to pre-size the results list, losing
     ordering). In the FxDart version the concurrency policy is a single
-    chain step, so changing the limit — or removing it — touches one number
+    chain step, so changing the limit edits one number and dropping it removes one step,
     instead of the function's whole shape.
   </p>

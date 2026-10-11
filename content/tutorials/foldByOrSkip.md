@@ -19,7 +19,7 @@ nextLabel: countWhere
     <code>foldByOrSkip(key, seed, f, xs)</code> is
     <code><a href="filter.html">filter</a></code> +
     <code><a href="foldBy.html">foldBy</a></code> written as a single strict
-    call. Everything <code>foldBy</code> guarantees still holds: [seed] starts
+    call. Everything <code>foldBy</code> guarantees still holds: the seed starts
     every key rather than running across them, keys come out in first-seen
     order, and the map is probed once per element. The one twist is the key
     function — returning <code>null</code> means "skip this element", the same

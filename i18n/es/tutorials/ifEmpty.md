@@ -33,7 +33,7 @@ nextLabel: reduce
     que llegue hasta este punto, no la fuente original.
   </p>
   <p>
-    Extensión de fxdart (sin contraparte en FxTS), inspirada en
+    Esta es una extensión de fxdart (sin contraparte en FxTS), modelada sobre
     <code>switchIfEmpty</code> / <code>defaultIfEmpty</code> de Rx. Las
     formas async aceptan una cadena de respaldo asíncrona y un valor por
     defecto en <code>Future</code>, y componen con

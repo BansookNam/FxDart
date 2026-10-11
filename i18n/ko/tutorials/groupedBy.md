@@ -19,7 +19,7 @@ nextLabel: indexBy
     <code><a href="groupBy.html">groupBy</a></code>는 터미널입니다.
     <code>Map</code>을 건네주는 순간 체인이 끝나고, "그룹별 합계를 내서
     정렬하고 상위 3개"를 원하는 순간 <code>kv.key</code> /
-    <code>kv.value</code> 격식을 갖춰 <code>fx(map.entries)</code>로
+    <code>kv.value</code>를 일일이 꺼내 가며 <code>fx(map.entries)</code>로
     파이프라인에 재진입하게 됩니다. <code>groupedBy</code>는 같은 그룹핑을
     <strong>체이닝 가능한 뷰</strong>로 제공합니다. 각 그룹은 이름 있는
     레코드 <code>(key:&nbsp;…, items:&nbsp;…)</code>이므로 그룹별 집계,

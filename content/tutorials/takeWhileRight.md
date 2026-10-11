@@ -39,7 +39,8 @@ nextLabel: takeUntilInclusive
     Nothing can be emitted before the source ends: until the last element has
     arrived, no element is known to belong to the suffix. Over a
     <code>List</code> the trailing run is found by walking backwards from the
-    end, so the predicate only ever sees that run; over any other source
+    end, so the predicate only sees that run plus the one element just before it
+    that ends the run; over any other source
     every element is tested in order and the current run is buffered. Keep
     the predicate pure and the difference will not reach you.
   </p>

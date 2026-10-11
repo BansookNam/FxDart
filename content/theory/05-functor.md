@@ -204,7 +204,8 @@ read the source before you refactor around it.
 
 1. Prove — informally, by cases — that `Either.map` satisfies the identity law.
    How many cases are there, and why is that number the whole proof?
-2. `Set` has a `map`. Does it satisfy the composition law when `f` maps two
+2. `Set` has a `map` (in Dart it returns a lazy `Iterable`, so finish with
+   `.toSet()`). Does it satisfy the composition law when `f` maps two
    distinct elements to the same value? Try `{1, 2}` with `f = (x) => 0` and
    `g = (x) => x + 1`.
 3. If a type has `map` obeying both laws, is `map` unique? That is, could there
@@ -219,13 +220,12 @@ read the source before you refactor around it.
    `Right(a).map(id)` returns `Right(id(a))` = `Right(a)`. `Either` is a sum
    with exactly two constructors, so covering both *is* covering every value —
    the same exhaustiveness that Chapter 3 got from `sealed`.
-2. It does. `{1, 2}.map(f)` is `{0}` and mapping `g` gives `{1}`; the fused
+2. It does. `{1, 2}.map(f).toSet()` is `{0}` and mapping `g` gives `{1}`; the fused
    `g ∘ f` gives `{1}` too. Deduplication happens on the way out in both
    routes. What `Set` breaks is not composition but the intuition that a
    functor preserves *size* — nothing in the laws promises that.
-3. For `List`, no: a `map` that also reversed the list satisfies identity
-   (reversing twice? no — reversing once breaks identity, since
-   `xs.map(id)` would be `xs.reversed`). The interesting answer is that the
+3. For `List`, no: a `map` that also reversed the list fails the identity
+   law, since `xs.map(id)` would be `xs.reversed`, not `xs`. The interesting answer is that the
    laws pin `map` down for any type whose shape is determined by its contents'
    positions, which covers `List` and `Either` both. In practice, for these
    types the lawful `map` is unique, and that uniqueness is why the name can be

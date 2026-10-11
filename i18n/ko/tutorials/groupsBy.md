@@ -1,7 +1,7 @@
 ---
 slug: groupsBy
 title: groupsBy — FxDart 101
-description: FxDart groupsBy 튜토리얼: 키가 열릴 때마다 살아 있는 GroupedEvents — 키와 이벤트 스트림 — lastFor로 그룹을 닫기까지 — 를 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart groupsBy 튜토리얼: 키가 처음 열릴 때마다 키와 이벤트 스트림을 담은 살아 있는 GroupedEvents를 내보내고, lastFor로 그룹을 닫는 방법을 라이브 플레이그라운드와 함께 익힙니다.
 heading: <code>groupsBy</code>
 section: 14
 crumb: groupsBy
@@ -16,7 +16,7 @@ nextLabel: spaceBy
 
   <h2>강의</h2>
   <p>
-    풀 레이어의 <code><a href="groupBy.html">groupBy</a></code>는
+    풀(pull) 레이어의 <code><a href="groupBy.html">groupBy</a></code>는
     터미널입니다: 전부를 당기고 <code>Map</code>을 건넵니다.
     <code>groupsBy</code>는 살아 있는 버전입니다. 각 키의 첫 값이
     <code>GroupedEvents</code>를 내보냅니다 — 그 <code>key</code>와
@@ -27,7 +27,7 @@ nextLabel: spaceBy
   <p>
     그것은 중첩된 <code>FxEvents</code> 아이디어로
     <code><a href="windowOn.html">window*</a></code>와 같고, 시간이
-    아니라 값으로 키를 답니다. 위젯은 그룹이 나타나는 순간 그 내부에
+    아니라 값을 기준으로 나눕니다. 위젯은 그룹이 나타나는 순간 그 내부에
     구독해 이후 값이 도착하는 대로 볼 수 있고, 묶음을 기다릴 필요가
     없습니다.
   </p>
@@ -36,13 +36,13 @@ nextLabel: spaceBy
     이벤트(또는 완료)가 <strong>그 그룹을 완료</strong>합니다. 같은
     키의 이후 값은 새 그룹을 엽니다 — 사용자마다의 유휴 타임아웃,
     방마다의 "세션 종료" 신호. <code>lastFor</code>가 없으면 그룹은
-    소스가 완료될 때까지 (또는 에러가 날 때까지 — 살아 있는 그룹마다
-    에러를 낸 뒤 바깥에) 열려 있습니다.
+    소스가 완료될 때까지 (또는 에러가 날 때까지; 에러는 살아 있는 모든 그룹에
+    전달된 뒤 바깥 스트림으로 전달됩니다) 열려 있습니다.
   </p>
   <p>
     바깥을 취소하면 살아 있는 그룹은 조용히 완료됩니다. window 가족이
-    따르는 것과 같은 RxJS 9 규칙입니다. fxdart 이벤트 레이어, Rx의
-    <code>groupBy</code>를 따랐습니다.
+    따르는 것과 같은 RxJS 9 규칙입니다. 이는 fxdart 이벤트 레이어의
+    일부이며, Rx의 <code>groupBy</code>를 본떴습니다.
   </p>
 
   <h2>데모 1 · 열리는 대로의 그룹</h2>
@@ -52,7 +52,7 @@ nextLabel: spaceBy
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: SKU를 부서 접두사로 묶기.</p>
+  <p>연습: SKU를 부서 접두사별로 묶어 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

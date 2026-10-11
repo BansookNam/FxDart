@@ -10,7 +10,7 @@ prevLabel: repeat
 next: entries.html
 nextLabel: entries
 ---
-  <p class="hero-sub">시퀀스를 내보낸 뒤 그것을 계속 반복합니다 — 무한히. 항상 take처럼 개수를 제한하는 연산과 함께 쓰세요.</p>
+  <p class="hero-sub">시퀀스를 한 번 내보낸 뒤 계속 반복합니다 — 무한히. 항상 take처럼 개수를 제한하는 연산과 함께 쓰세요.</p>
 
   {{signature}}
 

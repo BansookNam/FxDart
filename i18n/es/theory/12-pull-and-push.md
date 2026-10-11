@@ -236,8 +236,10 @@ forma, no cuando el vocabulario suena mejor.
    tiene límite y crece con la latencia.
 4. `asBroadcastStream` da a cada listener los mismos eventos al ritmo del
    productor: un listener lento o hace búfer o descarta, y no puede frenar al
-   productor. `fxFork`/`tee` dividen un *pull*, así que la fuente compartida
-   avanza solo cuando ambos consumidores han preguntado — el consumidor lento
-   retiene al rápido, que es el backpressure funcionando como está diseñado,
-   y es la opción por defecto correcta cuando la corrección importa más que
-   la vivacidad.
+   productor. `fxFork` ramifica un *pull* en cursores sobre un iterador compartido y un
+   búfer sin límite: el cursor que va por delante hace avanzar la fuente, así
+   que el consumidor rápido nunca se ve frenado, y el lento cuesta memoria de
+   búfer por cada elemento que aún no ha leído. Eso no es backpressure — nada
+   frena al productor —, solo evita recorrer la fuente dos veces. (`tee` es
+   otra herramienta: un fold en una pasada de dos reductores, no una división
+   entre consumidores.)

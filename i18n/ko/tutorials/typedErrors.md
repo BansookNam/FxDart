@@ -43,7 +43,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
 }</code></pre>
   <p>FxDart는 Dart에서 같은 모양을 제공합니다:</p>
   <pre class="code"><code>// FxDart
-Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
+Either&lt;Failure, SuccessData&gt; getResult() => fxEither((r) {
   final user  = r.bind(findUser(userId));
   final order = r.bind(findOrder(user.id));
   final total = r.bind(calculateTotal(order));
@@ -53,7 +53,7 @@ Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
     둘 다, 이렇게 쓸 수밖에 없었던 중첩 <code>flatMap</code> 피라미드를
     대체합니다:
   </p>
-  <pre class="code"><code>// 이것을 대체합니다
+  <pre class="code"><code>// What it replaces
 Either&lt;Failure, SuccessData&gt; getResult() =>
     findUser(userId).flatMap((user) =>
         findOrder(user.id).flatMap((order) =>
@@ -78,15 +78,15 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     모든 것이 빌더가 건네주는 <code>r</code>에 달려 있습니다 —
     <code>r.</code>을 입력하면 전부 발견할 수 있습니다:
   </p>
-  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => either((r) {
-  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw"는 숫자가 아닙니다');
-  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n은 범위를 벗어났습니다');
+  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => fxEither((r) {
+  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
+  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n is out of range');
   return n;
 });
 
 switch (parsePort('8080')) {
-  case Right(:final value): print('$value 포트에서 대기 중');
-  case Left(:final value):  print('잘못된 설정: $value');
+  case Right(:final value): print('listening on $value');
+  case Left(:final value):  print('bad config: $value');
 }</code></pre>
   <ul>
     <li><code>r.bind(either)</code> / <code>r.bindAll(eithers)</code> —
@@ -120,10 +120,10 @@ switch (parsePort('8080')) {
     검증에는 첫 번째 에러가 아니라 <em>모든</em> 에러가 필요합니다. 별도의
     <code>Validated</code> 타입을 대체하는 Arrow의 방식입니다:
   </p>
-  <pre class="code"><code>final user = either&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
+  <pre class="code"><code>final user = fxEither&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
   final name = acc.accumulating((r) => validateName(r, input));
   final age  = acc.accumulating((r) => validateAge(r, input));
-  return User(name.value, age.value); // 모든 에러가 한 번에 보고됩니다
+  return User(name.value, age.value); // all errors reported together
 }));</code></pre>
   <p>
     <code>r.accumulate</code>는 모든 분기를 실행하고 실패 전부를
@@ -145,10 +145,10 @@ switch (parsePort('8080')) {
     Arrow에도, 다른 Dart FP 라이브러리에도 없는 부분입니다. 타입 있는 에러가
     FxDart의 지연·동시성 파이프라인과 융합됩니다.
   </p>
-  <pre class="code"><code>// 레코드 500건을 한 번에 8건씩 검증하고, 모든 실패를 순서대로 보존합니다.
+  <pre class="code"><code>// Validate 500 records, 8 at a time, and keep EVERY failure — in order.
 final result = await fxStream(records)
     .mapOrAccumulate&lt;String, User&gt;((r, rec) async {
-  final parsed = r.ensureNotNull(tryParse(rec), () => '잘못된 레코드: $rec');
+  final parsed = r.ensureNotNull(tryParse(rec), () => 'bad record: $rec');
   return await enrich(parsed);
 }, concurrency: 8);</code></pre>
   <p>

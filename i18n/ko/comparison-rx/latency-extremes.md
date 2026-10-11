@@ -25,14 +25,14 @@ async: true
 
   <h2>차이가 나는 이유</h2>
   <p>
-    축약은 push와 pull이 수렴하는 곳입니다: 극값을 알려면 시퀀스 전체를
+    축약은 푸시(push)와 풀(pull)이 수렴하는 곳입니다: 극값을 알려면 시퀀스 전체를
     봐야 하므로, <code>min</code>과 <code>max</code>는 둘 다 종결
     연산이고 둘 다 <code>Future</code>를 반환합니다. RxDart의 버전은
     <code>Comparable</code>이 아닌 요소를 위한 선택적 비교자도 받습니다;
     FxDart는 <code>min</code>과 <code>max</code>를 숫자 종결 연산으로
     유지하고 키 기반 경우는 <code>minBy</code>/<code>maxBy</code>로
     커버합니다. 평범한 정수 위에서 두 호출은 단어 하나까지 동일합니다 —
-    FxDart 쪽은 먼저 <code>toAsync</code>로 pull들을 비동기 체인으로
+    FxDart 쪽은 먼저 <code>toAsync</code>로 풀들을 비동기 체인으로
     끌어올릴 뿐입니다.
   </p>
   <p>

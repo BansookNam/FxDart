@@ -1,7 +1,7 @@
 ---
 slug: unicodeToList
 title: unicodeToList — FxDart 101
-description: Tutorial de unicodeToList en FxDart: divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados como los emoji.
+description: Tutorial de unicodeToList en FxDart: divide una cadena en puntos de código Unicode, tratando correctamente los pares subrogados como los emoji.
 heading: <code>unicodeToList</code>
 section: 10
 crumb: unicodeToList
@@ -10,7 +10,7 @@ prevLabel: delay &amp; sleep
 next: curried.html
 nextLabel: curried &amp; uncurried
 ---
-  <p class="hero-sub">Divide una cadena en los caracteres que percibe el usuario, tratando correctamente los pares subrogados.</p>
+  <p class="hero-sub">Divide una cadena en puntos de código Unicode, tratando correctamente los pares subrogados.</p>
 
   {{signature}}
 
@@ -28,9 +28,11 @@ nextLabel: curried &amp; uncurried
     <code>unicodeToList</code> lo resuelve iterando los <code>.runes</code> de la
     cadena — los puntos de código Unicode — y convirtiendo cada uno de vuelta en
     su propio <code>String</code> de un solo carácter. El resultado es la lista de
-    caracteres que una persona ve realmente al leer la cadena, igual que el
-    <code>unicodeToList</code> de FxTS, que divide por punto de código y no por
-    unidad UTF-16.
+    puntos de código, igual que el <code>unicodeToList</code> de FxTS, que divide
+    por punto de código y no por unidad UTF-16. Los puntos de código no siempre
+    son lo que una persona ve como un solo carácter: las banderas, las secuencias
+    de emoji con ZWJ y las marcas combinantes se siguen dividiendo en varias
+    piezas, porque no se manejan los grapheme clusters.
   </p>
 
   <h2>Demo 1 · División ingenua frente a unicodeToList</h2>
@@ -38,13 +40,13 @@ nextLabel: curried &amp; uncurried
 
   <h2>Demo 2 · Invertir y contar correctamente</h2>
   <p>
-    Partiendo de <code>unicodeToList</code>: una inversión con división ingenua
+    Basándose en <code>unicodeToList</code>, una inversión con división ingenua
     destrozaría el emoji; esta no:
   </p>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: cuenta cuántos caracteres percibidos por el usuario hay en esta
+  <p>Ejercicio: cuenta cuántos puntos de código hay en esta
     cadena (contiene un emoji).</p>
   {{playground:2}}
 

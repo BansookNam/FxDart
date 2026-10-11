@@ -30,7 +30,7 @@ nextLabel: fxPipe
 
   <h2>데모 1 · 기본</h2>
   <p>dartdoc에 나오는 전형적인 예제입니다. 리스트의 최솟값과 최댓값을
-    한 번에 계산합니다:</p>
+    한 번의 호출로 계산합니다:</p>
   {{playground:0}}
 
   <h2>데모 2 · 여러 필드 투영하기</h2>
@@ -39,7 +39,7 @@ nextLabel: fxPipe
 
   <h2>직접 해 보기</h2>
   <p>연습: <code>fxJuxt</code>로 이 리스트의 <code>sum</code>과
-    <code>average</code>를 한 번에 계산해 보세요.</p>
+    <code>average</code>를 한 번의 호출로 계산해 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

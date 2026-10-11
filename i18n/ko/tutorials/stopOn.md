@@ -21,7 +21,7 @@ nextLabel: chunkOn
     <code>Stream.periodic</code> — 는 무언가가 <em>취소</em>할 때까지
     계속 생산합니다. 그걸 잊는 것이 전형적인 누수입니다: 화면은
     폐기되었고, 위젯은 사라졌는데, 구독은 여전히 깨어 있고, 여전히
-    할당하고, 여전히 시체를 향해 <code>setState</code>를 호출합니다.
+    할당하고, 이미 사라진 위젯에 대해 <code>setState</code>를 호출합니다.
   </p>
   <p>
     <code>stopOn(trigger)</code>은 종료를 "기억해서 취소해야 하는

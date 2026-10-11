@@ -30,7 +30,7 @@ nextLabel: sumBy
     <code><a href="min.html">min</a></code>,
     <code><a href="max.html">max</a></code>,
     <code><a href="average.html">average</a></code>와는 다른 점인데,
-    이들은 각자 (의외의!) 빈 입력 동작이 따로 있으니 알아 둘 필요가
+    이들은 빈 입력에 대해 각자 의외의 동작을 하므로 알아 둘 필요가
     있습니다.
   </p>
   <p>

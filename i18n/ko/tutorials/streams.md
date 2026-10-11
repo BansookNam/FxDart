@@ -1,14 +1,14 @@
 ---
 slug: streams
 title: Stream 브리지 — FxDart 101
-description: FxDart의 Stream 브리지 — fromStream, fromStreamLatest, fromStreamChunked, fromStreamNext, fxStream, toStream()으로 Dart Stream을 FxAsyncIterable로 당기는 네 가지 방법. 라이브 플레이그라운드 포함.
+description: FxDart의 Stream 브리지 — fxFromStream, fromStreamLatest, fromStreamChunked, fromStreamNext, fxStream, toStream()으로 Dart Stream을 FxAsyncIterable로 당기는 네 가지 방법. 라이브 플레이그라운드 포함.
 heading: Stream 브리지
 section: 11
 crumb: Stream bridges
 next: concurrent.html
 nextLabel: concurrent
 ---
-  <p class="hero-sub">fromStream, fxStream, .toStream() — Dart의 Stream과 FxDart의 FxAsyncIterable 사이를 자유롭게 오갑니다.</p>
+  <p class="hero-sub">fxFromStream, fxStream, .toStream() — Dart의 Stream과 FxDart의 FxAsyncIterable 사이를 자유롭게 오갑니다.</p>
 
   {{signature}}
 
@@ -42,13 +42,13 @@ nextLabel: concurrent
     바쁜 동안에도 스트림은 계속 내보낼 수 있기 때문입니다. RxJS 9는 넷을
     <code>iterateEach</code>, <code>iterateLatest</code>,
     <code>iterateBuffered</code>, <code>iterateNext</code>로 부릅니다.
-    FxDart는 이를 <code>fromStream*</code>(날것 iterable)과
+    FxDart는 이를 <code>fxFromStream</code>과 <code>fromStream*</code>(날것 iterable)과
     <code>FxEvents.pull*</code>(체인)에 대응시킵니다:
   </p>
   <table>
     <thead><tr><th>RxJS 9</th><th>FxDart</th><th>바쁜 동안</th></tr></thead>
     <tbody>
-      <tr><td><code>iterateEach</code></td><td><code>fromStream</code> / <code>.pull()</code></td><td>무손실 FIFO — 소스를 일시정지하고 모든 값을 큐에 담음</td></tr>
+      <tr><td><code>iterateEach</code></td><td><code>fxFromStream</code> / <code>.pull()</code></td><td>무손실 FIFO — 소스를 일시정지하고 모든 값을 큐에 담음</td></tr>
       <tr><td><code>iterateLatest</code></td><td><code>fromStreamLatest</code> / <code>.pullLatest()</code></td><td>낡은 값 버리기 — 읽히지 않은 최신 값만 유지</td></tr>
       <tr><td><code>iterateBuffered</code></td><td><code>fromStreamChunked</code> / <code>.pullChunked()</code></td><td>배치 — 도착분을 리스트 하나로 내보냄</td></tr>
       <tr><td><code>iterateNext</code></td><td><code>fromStreamNext</code> / <code>.pullNext()</code></td><td>수요 게이트로 버리기 — 기다리는 pull이 없을 때 온 것은 무시</td></tr>
@@ -61,7 +61,7 @@ nextLabel: concurrent
     때는 next를 고르세요.
   </p>
 
-  <h2>데모 1 · fromStream과 fxStream</h2>
+  <h2>데모 1 · fxFromStream과 fxStream</h2>
   <p>둘 다 <code>Stream.fromIterable</code>을 감싸므로, 기존 스트림을
     FxDart 연산자에 그대로 흘려보낼 수 있습니다.</p>
   {{playground:0}}

@@ -32,7 +32,7 @@ nextLabel: isEmpty
   </p>
   <p>
     동등성은 Dart의 <code>==</code>로 확인하므로, 직접 만든 클래스에
-    <code>operator ==</code>를 재정의해 두었다면 그것을 따릅니다.
+    <code>operator ==</code>를 재정의해 두었다면 그 정의를 따릅니다.
     원시 타입에만 쓸 수 있는 것이 아닙니다.
   </p>
 
@@ -40,7 +40,7 @@ nextLabel: isEmpty
   {{playground:0}}
 
   <h2>데모 2 · 비동기, 그리고 단락 확인</h2>
-  <p><code>includesAsync</code>가 멈추기 전까지 원소 5개 중 2개만 소비됩니다:</p>
+  <p><code>fxIncludesAsync</code>가 멈추기 전까지 원소 5개 중 2개만 소비됩니다:</p>
   {{playground:1}}
 
   <h2>직접 해 보기</h2>

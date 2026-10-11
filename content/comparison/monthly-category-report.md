@@ -1,11 +1,11 @@
 ---
 slug: monthly-category-report
 title: Monthly category report, sorted by spend — Dart vs FxDart
-description: Filter a ledger to one month, total each category, and rank them — loop plus mutable map in plain Dart vs filter + groupBy + sortBy in FxDart.
+description: Filter a ledger to one month, total each category, and rank them — loop plus mutable map in plain Dart vs filter + foldBy + sortBy in FxDart.
 heading: Monthly category report, sorted by spend
 order: 29
 tier: 3
-functions: filter, groupBy, map, sortBy, join, foldByOrSkip
+functions: filter, foldBy, map, sortBy, join, foldByOrSkip
 domain: transactions
 verdict: fxdart
 async: false
@@ -29,10 +29,10 @@ async: false
     Native Dart has no <code>groupBy</code>, so the loop does the grouping
     and the totalling at once inside a mutable map — compact, but the four
     requirements (July only, per category, totalled, ranked) are tangled
-    into one body. The FxDart chain keeps them as four visible steps:
-    <code>filter</code> the month, <code>groupBy</code> category,
-    <code>map</code> each group to its total, <code>sortBy</code> descending
-    — and <code>join</code> formats the report. Adding a requirement
+    into one body. The FxDart chain keeps them as visible steps:
+    <code>filter</code> the month, <code>foldBy</code> category into a
+    total, <code>map</code> the entries to rows, <code>sortBy</code>
+    descending — and <code>join</code> formats the report. Adding a requirement
     (say, a minimum total) is one more chain step; in the loop it is
     another branch inside an already-busy body.
   </p>

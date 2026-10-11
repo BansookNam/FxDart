@@ -39,10 +39,11 @@ nextLabel: takeUntilInclusive
     No puede emitirse nada antes de que la fuente termine: hasta que no llega
     el último elemento, no se sabe de ningún elemento que pertenezca al
     sufijo. Sobre una <code>List</code> la racha final se busca caminando
-    hacia atrás desde el final, así que el predicado solo ve esa racha; sobre
+    hacia atrás desde el final, así que el predicado solo ve esa racha más el elemento justo anterior que
+    la termina; sobre
     cualquier otra fuente se prueba cada elemento en orden y la racha actual
     se almacena en memoria. Mantén el predicado puro y la diferencia no te
-    alcanzará.
+    afectará.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>

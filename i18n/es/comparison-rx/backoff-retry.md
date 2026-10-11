@@ -29,7 +29,7 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    El backoff es donde se rompe la simetría de una-sola-llamada del retry
+    El backoff es donde se rompe la simetría de una sola llamada del retry
     simple. El <code>retryWhen</code> de RxDart es un protocolo de
     meta-streams: por cada error, tu fábrica debe devolver un <em>stream
     notificador</em> — emite un valor para disparar el reintento, emite un

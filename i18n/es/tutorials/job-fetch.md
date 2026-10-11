@@ -8,7 +8,7 @@ crumb: bounded concurrent fetch
 prev: job-search.html
 prevLabel: debounced search
 ---
-  <p class="hero-sub">Un límite, el orden conservado, cada fallo conservado. Este es el trabajo para el que <code>Future.wait</code> no tiene un primitivo.</p>
+  <p class="hero-sub">Un límite, el orden conservado, cada fallo conservado. Este es el trabajo para el que <code>Future.wait</code> no ofrece una primitiva.</p>
 
   {{signature}}
 
@@ -34,15 +34,15 @@ prevLabel: debounced search
     solo el primero — es
     <code><a href="eitherPipelines.html">mapOrAccumulate</a></code> con
     <code>concurrency: n</code>. Cada elemento corre en su propio ámbito
-    raise, así que un fallo en uno no puede filtrarse a un hermano, y los
+    Raise, así que un fallo en uno no puede filtrarse a un hermano, y los
     fallos salen en el orden de entrada.
   </p>
   <p>
     La
     <a href="../DartComparison/bounded-concurrency.html">comparación con Dart</a>
-    del trabajo de pool de workers da el veredicto a <strong>fxdart</strong> en claridad;
-    el pool nativo es más corto de lo que parece una vez que lo has escrito
-    dos veces. Esta página es ese trabajo más la mitad de errores tipados, que los
+    de este trabajo de pool de workers otorga a <strong>fxdart</strong> la ventaja en claridad;
+    el pool nativo resulta más difícil de acertar de lo que parece una vez que lo has
+    escrito dos veces. Esta página es ese trabajo más la parte de errores tipados, que los
     ejemplos de la comparación no muestran.
   </p>
 

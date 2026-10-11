@@ -97,8 +97,8 @@ val result = for {
   order &lt;- findOrder(user.id) // take order out of the box (really flatMap/map)
 } yield s"${user.name}'s order: ${order.item}"</code></pre>
   <p>
-    The compiler automatically rewrites the <code>for</code> block below into
-    the <code>flatMap</code>/<code>map</code> chain above. In other words,
+    The compiler automatically rewrites the <code>for</code> block above into
+    the <code>flatMap</code>/<code>map</code> chain shown before it. In other words,
     every time you extract a variable with the <code>&lt;-</code> symbol
     inside a comprehension block, you are actually performing the
     mathematical operation of opening the monad's box and chaining it.

@@ -39,12 +39,12 @@ noBenchmark: timing
     리스너도 없습니다.
   </p>
   <p>
-    이것이 fxdart의 이벤트 레이어가 push 쪽을 위해 Rx의 접근을
+    이것이 fxdart의 이벤트 레이어가 푸시(push) 쪽을 위해 Rx의 접근을
     흡수한 모습입니다: <code>LiveValue.live</code>는
     <code>fxEvents</code> 체인을 돌려주는데 — 평범한 브로드캐스트
     <code>Stream</code> 위의 얇은 래퍼라 rxdart를 포함해 어떤 것과도
     충돌하지 않습니다 — 값별 처리가 자라면 <code>.pull()</code>이 타입
-    있는 pull 파이프라인으로 건너갑니다. RxDart의 subject 계열과
+    있는 풀 파이프라인으로 건너갑니다. RxDart의 subject 계열과
     연산자 카탈로그는 여전히 훨씬 큽니다; 최신-값-그다음-라이브
     자체에 관해서는 두 패널이 동등합니다: 무승부입니다.
   </p>

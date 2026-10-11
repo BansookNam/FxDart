@@ -25,7 +25,7 @@ nextLabel: sortByDesc
   </p>
   <p>
     내부는 <em>결코</em> <code>sort((a, b) =&gt; compare(f(a), f(b)))</code>가
-    아니며, 그 차이는 여러분의 콜백에서 그대로 드러납니다. 그
+    아니며, 그 차이는 키 추출 함수가 호출되는 횟수에서 드러납니다. 그
     형태라면 비교할 때마다 <code>f</code>를 두 번씩, 대략
     <code>2·n·log n</code>번 호출하게 됩니다. <code>sortBy</code>는 각 키를
     <strong>정확히 한 번</strong>만 추출한 뒤 그 키로 정렬하므로, 비싼 키
@@ -44,7 +44,8 @@ nextLabel: sortByDesc
     <code>Future&lt;List&lt;T&gt;&gt;</code>를 반환하는 종결 연산자입니다.
   </p>
   <p>
-    내림차순이나 다중 키 정렬이 필요하다면 비교자를 명시하는
+    내림차순은 <a href="sortByDesc.html"><code>sortByDesc</code></a>를 쓰세요.
+    다중 키 정렬이 필요하다면 비교자를 명시하는
     <code>sort</code>로 내려가세요. <code>sortBy</code>는 "추출한 키
     하나로 오름차순"이라는 흔한 경우만 다룹니다.
   </p>

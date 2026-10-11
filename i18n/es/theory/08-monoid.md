@@ -17,11 +17,11 @@ description: Una combinación asociativa más un elemento identidad — el álge
 
 Un **semigrupo** es un tipo con una operación binaria asociativa:
 
-`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
+`combine(a, combine(b, c)) == combine(combine(a, b), c)`
 
 Un **monoide** es un semigrupo con un elemento identidad:
 
-`fxCombine(empty, a) == a == fxCombine(a, empty)`
+`combine(empty, a) == a == combine(a, empty)`
 
 Eso es todo. `int` con `+` y `0`; `int` con `*` y `1`; `String` con `+` y `''`;
 `List` con `+` y `[]`; `bool` con `&&` y `true`. Has usado todos ellos hoy.
@@ -68,7 +68,7 @@ void main() {
 
 `reduce` solo requiere un semigrupo y por tanto es parcial. `fold` requiere un
 monoide — tú aportas `empty` como semilla — y es total. La excepción con la
-que has chocado cien veces es un elemento identidad ausente, apareciendo en
+que has chocado cien veces es un elemento identidad ausente que aflora en
 tiempo de ejecución.
 
 **La asociatividad te da libertad de agrupación**, y eso vale más de lo que
@@ -120,7 +120,7 @@ La asociatividad dice que la agrupación no importa. La **conmutatividad** —
 monoides útiles no la tienen. La concatenación de cadenas, el append de listas
 y la composición de funciones son todos asociativos y ninguno es conmutativo.
 
-La distinción tiene dientes en el capítulo asíncrono de FxDart: `concurrent(n)`
+La distinción tiene consecuencias prácticas en el capítulo asíncrono de FxDart: `concurrent(n)`
 evalúa los elementos fuera de orden pero los emite **en el orden de la
 fuente**, precisamente para que un fold posterior solo necesite asociatividad y
 no conmutatividad. Una librería que entregara los resultados en orden de
@@ -128,8 +128,8 @@ finalización estaría exigiendo en silencio la ley más fuerte a tu código.
 
 ## `NonEmptyList`, y por qué los errores son un semigrupo
 
-El capítulo 6 acumulaba errores de validación. Pregunta en qué tipo se acumulan
-*hacia* y el álgebra responde antes que tú: necesitas algo que puedas combinar
+El capítulo 6 acumulaba errores de validación. Pregúntate en qué tipo se acumulan
+y el álgebra responde antes que tú: necesitas algo que puedas combinar
 asociativamente (dos ramas fallidas se concatenan), y el resultado de combinar
 fallos nunca está vacío — así que la identidad no es meramente innecesaria,
 sería una mentira.
@@ -151,7 +151,8 @@ void main() {
   print('length: ${all.length}');
 
   // Nel is an extension type over List, so it costs nothing at
-  // runtime — and `orNull` is the only way in from a plain list.
+  // runtime. From a plain list: `orNull` or `toNelOrNull()`;
+  // or build one with `NonEmptyList.of(head, tail)`.
   print(NonEmptyList.orNull(<String>[]));
 }
 ```
@@ -175,15 +176,15 @@ del capítulo 3, aplicado al canal de errores.
 ## Cuándo se gana el sueldo
 
 Cada vez que escribes un `fold` estás eligiendo un monoide, y nombrarlo en voz
-alta te dice si el código está bien: ¿tiene identidad (qué debería devolver el
-caso vacío?), y es asociativo (se puede repartir el trabajo?).
+alta te dice si el código está bien: ¿tiene identidad (¿qué debería devolver el
+caso vacío?) y es asociativo (¿se puede repartir el trabajo?)?
 
-Paga más fuerte a escala — procesamiento por trozos, agregación paralela,
+Su valor es mayor a escala — procesamiento por trozos, agregación paralela,
 totales incrementales en una base de datos — y en el diseño de API, donde
 «dame una semilla y una combinación» es la interfaz que deja a una librería
 agrupar tu trabajo sin preguntar.
 
-No paga como vocabulario en un código que hace un `reduce` sobre diez
+No merece la pena como vocabulario en un código que hace un `reduce` sobre diez
 elementos. Ahí di «suma».
 
 ## Ejercicios
@@ -200,7 +201,7 @@ elementos. Ahí di «suma».
 
 ## Soluciones
 
-1. Sí y sí. `max` es asociativo y conmutativo; su identidad es menos infinito,
+1. Un semigrupo, sí; un monoide, solo con una salvedad. `max` es asociativo y conmutativo; su identidad es el infinito negativo,
    que para `int` no existe en Dart — así que `max` es un *semigrupo* sobre
    `int` y un monoide solo sobre `double` (`double.negativeInfinity`) o sobre
    `int?` con `null` como identidad. Esa es la razón honesta de que `reduce`
@@ -214,12 +215,12 @@ elementos. Ahí di «suma».
    semilla `int` difiere del tipo del elemento `String`. `fold` en Dart es el
    *catamorfismo* más general `(B, A) → B`, y solo cuando `B == A` surge la
    pregunta del monoide. No es un problema porque el fold secuencial nunca
-   reagrupa; se convierte en un problema en el momento en que quieres trocearlo,
-   punto en el cual debes factorizar la operación en un monoide genuino
+   reagrupa; se convierte en un problema en cuanto quieres trocearlo,
+   y entonces debes factorizar la operación en un monoide genuino
    (`String → int`, y luego sumar).
 4. `Future.wait` usa el monoide de listas sobre los resultados — concatenándolos
    en el orden de los argumentos, con `[]` como identidad (esperar a nada da
    una lista vacía). Los fallos *no* se acumulan: por defecto gana el primer
    error y los demás se descartan, que es el comportamiento de fallo rápido que
-   el capítulo 6 contrastaba con `zipOrAccumulate`. `eagerError: false` cambia
+   el capítulo 6 contrastaba con `zipOrAccumulate`. `eagerError: true` cambia
    cuándo informa, no de cuántos informa.

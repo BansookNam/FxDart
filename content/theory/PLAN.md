@@ -258,8 +258,9 @@ Known gaps, in the order they will start to matter:
   Section-level anchors are not routed yet (headings do carry `id="chN-slug"`,
   but the slug is empty for non-Latin headings, so it cannot be shared across
   translations).
-- **More locales.** en and ko are complete books; zh-Hans/ja/es/pt-BR/ru have
-  translated chrome and render the English text with a notice in the HUD.
+- **More locales.** en, ko and es have translated chapters (`i18n/<code>/theory/`);
+  zh-Hans/ja/pt-BR/ru have translated chrome and render the English text with a
+  notice in the HUD.
 - **Cross-links.** Chapters reference each other by number in prose; only
   `#chN` deep links are wired. Turning those references into links, and linking
   the relevant tutorials into the book (and back), is a mechanical pass worth

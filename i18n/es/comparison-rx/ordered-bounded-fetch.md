@@ -44,8 +44,8 @@ async: true
     lugar. En un pipeline pull, la concurrencia es una propiedad de la
     <em>demanda</em>, no de la entrega: el operador lanza cuatro pulls
     solapados pero entrega los resultados aguas abajo en el orden en que
-    se pidieron, reteniendo una llegada rápida y tardía hasta que sus
-    predecesoras más lentas hayan salido. Acotado-y-ordenado es la forma
+    se pidieron, reteniendo un resultado que ya ha llegado hasta que
+    salgan los anteriores más lentos. Acotado-y-ordenado es la forma
     que la mayoría del trabajo por lotes realmente quiere — resultados
     alineados con las entradas, límites de tasa respetados — y aquí es el
     comportamiento por defecto en lugar de una reconstrucción. Cuando el

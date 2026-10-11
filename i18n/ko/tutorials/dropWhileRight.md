@@ -29,12 +29,13 @@ nextLabel: dropUntil
     테니까요.
   </p>
   <p>
-    <a href="takeWhileRight.html"><code>takeWhileRight</code></a>와 달리 이쪽은
+    <a href="takeWhileRight.html"><code>takeWhileRight</code></a>와 달리 동기 버전은
     흘려보냅니다. 조건에 맞는 구간은 접미사일 가능성이 있으므로 내보내지 않고
     붙들어 두었다가, 술어에서 <em>떨어지는</em> 첫 원소가 나타나 그 구간이
     접미사가 아니었음을 증명하는 순간 한꺼번에 풀어놓습니다. 그래서 메모리
     비용은 소스 길이가 아니라 가장 긴 구간의 길이이고, 소스가 열려 있는 동안
-    값이 계속 흐릅니다.
+    값이 계속 흐릅니다. 비동기 짝인 <code>dropWhileRightAsync</code>는 그렇지
+    않습니다. 상류 전체를 먼저 리스트로 비운 다음 다듬습니다.
   </p>
   <p>
     <code>List</code>라면 끝에서부터 거꾸로 훑어 구간을 찾으므로 술어는 그
@@ -45,7 +46,7 @@ nextLabel: dropUntil
   <h2>데모 1 · 기본</h2>
   {{playground:0}}
 
-  <h2>데모 2 · 비동기, 그리고 분할</h2>
+  <h2>데모 2 · 비동기, 그리고 takeWhileRight와의 분할</h2>
   {{playground:1}}
 
   <h2>직접 해 보기</h2>

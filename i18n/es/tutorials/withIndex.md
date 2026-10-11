@@ -1,8 +1,8 @@
 ---
 slug: withIndex
-title: mapWithIndex &amp; friends — FxDart 101
+title: mapWithIndex y compañía — FxDart 101
 description: Tutorial de mapWithIndex, filterWithIndex, flatMapWithIndex y foldWithIndex en FxDart: recibe la posición del elemento como segundo argumento, con playground en vivo.
-heading: <code>mapWithIndex</code> &amp; friends
+heading: <code>mapWithIndex</code> y compañía
 section: 6
 crumb: …WithIndex
 prev: zipWithIndex.html
@@ -31,7 +31,7 @@ nextLabel: transpose
     posición del elemento en la fuente original: un
     <a href="filter.html"><code>filter</code></a> por encima de
     <code>mapWithIndex</code> renumera lo que lo atraviesa, empezando otra vez
-    en 0. El que hay que leer dos veces es <code>filterWithIndex</code>: su
+    en 0. El que conviene leer con más calma es <code>filterWithIndex</code>: su
     cuenta avanza también con los elementos que <em>descarta</em>, porque
     siguen siendo entrada. <code>flatMapWithIndex</code> cuenta elementos de
     la fuente, no emitidos, así que un iterable interno de cinco valores
@@ -39,14 +39,14 @@ nextLabel: transpose
   </p>
   <p>
     Todos tienen su forma <code>…Async</code>, y la numeración sobrevive a
-    <a href="concurrent.html"><code>concurrent</code></a>: solapa los tirones
+    <a href="concurrent.html"><code>concurrent</code></a>: solapa los pulls
     aguas arriba pero los resuelve igualmente en orden, así que el elemento
     <em>n</em> recibe el índice <em>n</em> fueran cuales fueran las latencias.
     El contador vive además por <em>iteración</em>, así que volver a recorrer
     una cadena empieza otra vez en 0.
   </p>
   <p>
-    Una arruga de Dart en <code>foldWithIndex</code>: si el lambda del
+    Una peculiaridad de Dart en <code>foldWithIndex</code>: si el lambda del
     acumulador no lleva tipos, <code>Acc</code> se infiere como
     <code>Object?</code> y la aritmética deja de compilar. No es nada nuevo de
     aquí — el propio <code>Iterable.fold</code> de Dart se comporta igual — y

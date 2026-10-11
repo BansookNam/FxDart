@@ -40,8 +40,8 @@ async: true
   <p>
     El lado de streams llega al mismo sitio, pero solo tomando prestada
     mecánica pull: un cursor <code>async*</code> sin fin — Dart llano en
-    lugar de un operador Rx — <em>pausado</em> hacia un comportamiento
-    dirigido por demanda por el backpressure de <code>asyncMap</code>, y
+    lugar de un operador Rx — <em>pausado</em> para que se comporte según la
+    demanda, mediante el backpressure de <code>asyncMap</code>, y
     un <code>takeWhile</code> cuya cancelación detiene el rastreo en la
     página vacía. Funciona, e imprime el mismo
     <code>pages fetched: 4</code> — porque pausar, reanudar y cancelar

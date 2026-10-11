@@ -28,8 +28,9 @@ nextLabel: concurrentPool
   <p>
     Because it <em>is</em> the composition — not a reimplementation — every
     guarantee carries over: results arrive in <strong>source order</strong>
-    (use <code><a href="concurrentPool.html">concurrentPool</a></code>
-    behavior via the long form when you want completion order), at most
+    (when you want completion order instead, use the long form with
+    <code><a href="concurrentPool.html">concurrentPool</a></code>
+    in place of <code>concurrent</code>), at most
     <code>concurrency</code> callbacks are in flight, and downstream
     operators keep pulling lazily. On an already-async chain it composes
     <code>map(f).concurrent(n)</code>, skipping the bridge.

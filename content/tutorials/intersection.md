@@ -34,7 +34,9 @@ nextLabel: intersectionBy
     full records rather than by value equality.
   </p>
   <p>
-    There's no chain method; call the data-first function. On the async
+    The chain method is <code>.intersection(other)</code>, and there the
+    receiver is <code>iterable2</code> (the one that gets walked) while
+    <code>other</code> is <code>iterable1</code> (the membership set). On the async
     side, the concurrency marker from <code>.concurrent(n)</code> applies to
     <code>iterable2</code> — <code>iterable1</code> is drained up front to
     build the membership set.

@@ -28,7 +28,7 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    El <code>takeWhile</code> corriente tiene un problema de off-by-one
+    El <code>takeWhile</code> normal tiene un problema de off-by-one
     para este trabajo: el elemento que rompe el predicado es exactamente
     el que todavía quieres. Ambas bibliotecas traen el arreglo inclusivo,
     escrito desde extremos opuestos — el <code>takeWhileInclusive</code>

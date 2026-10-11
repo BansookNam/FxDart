@@ -25,7 +25,7 @@ nextLabel: map
     búfer extra.
   </p>
   <p>
-    Como te devuelve un <code>Iterable&lt;V&gt;</code> normal, se le aplican
+    Como te devuelve un <code>Iterable&lt;V&gt;</code> normal, puedes aplicarle
     directamente todos los operadores de cadena que has aprendido hasta ahora
     — incluidos los terminales numéricos (<code>sum()</code>,
     <code>average()</code>, <code>min()</code>, <code>max()</code>) cuando

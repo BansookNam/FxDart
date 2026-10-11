@@ -17,8 +17,8 @@ nextLabel: max
   <h2>강의</h2>
   <p>
     <code>min</code>은 숫자 전용 종결 연산자이자 fold입니다. 내부적으로는
-    <code>fxFold(double.infinity, ..., iterable)</code>로, <code>+infinity</code>에서
-    시작하는 최솟값과 각 원소를 비교해 나갑니다.
+    <code>fxFold(double.infinity, ..., iterable)</code>로, <code>+infinity</code>에서 시작하는
+    최솟값을 두고 각 원소와 비교합니다.
   </p>
   <p>
     꼭 기억해 둘 동작이 두 가지 있습니다. "안전한" API에 익숙한 사람이라면
@@ -33,7 +33,7 @@ nextLabel: max
     <li>
       이터러블 어디든 <code>NaN</code>이 하나라도 있으면 결과 전체가
       <strong>오염</strong>되어 <code>NaN</code>이 됩니다 — <code>NaN</code>과의
-      비교는 언제나 거짓이므로, 한번 최솟값 자리에 들어오면(또는 후보로
+      비교는 언제나 거짓이므로, 한 번 최솟값 자리에 들어오면(또는 후보로
       등장하면) 영원히 <code>NaN</code>으로 남습니다.
     </li>
   </ul>

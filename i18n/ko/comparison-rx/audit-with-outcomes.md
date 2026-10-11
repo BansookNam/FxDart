@@ -43,7 +43,7 @@ async: false
     비교입니다.)
   </p>
   <p>
-    pull 쪽은 애초에 실패를 채널에 올리지 않습니다. 같은 던짐이 로컬
+    풀 쪽은 애초에 실패를 채널에 올리지 않습니다. 같은 던짐이 로컬
     <code>try</code>/<code>catch</code> 하나 거리에서 다시 평범한 값 —
     nullable 레코드 — 이 되므로, 요구사항 전체가 <code>map</code> 다음
     <code>partition</code>입니다: 한 번의 패스, 두 개의 리스트, 양쪽 절반

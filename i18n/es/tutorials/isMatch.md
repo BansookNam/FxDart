@@ -35,7 +35,9 @@ nextLabel: matches
     Como las reglas anidan, la coincidencia profunda te sale casi gratis: un
     patrón como <code>{'address': {'city': 'seoul'}}</code> coincide con un map
     de usuario con un valor <code>address</code> mucho más grande y anidado,
-    siempre que <code>city</code> sea <code>'seoul'</code> en algún punto dentro de él.
+    siempre que la entrada <code>address</code> tenga una clave <code>city</code> cuyo
+    valor sea <code>'seoul'</code> — la ruta de claves del patrón tiene que coincidir
+    con el objetivo en esa posición, no basta con que aparezca en algún punto dentro de él.
   </p>
 
   <h2>Demo 1 · Coincidencia de Map</h2>

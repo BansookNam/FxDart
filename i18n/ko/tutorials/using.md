@@ -44,7 +44,7 @@ nextLabel: concurrent or parallel
     (한도가 있는 파이프라인은 완료되고, 완료는 해제로 이어집니다),
     조기 종료가 계획이라면 <code>try</code>/<code>finally</code>로 자원을
     직접 관리하세요. Dart 고유의 추가 기능입니다(FxTS에는 대응물이
-    없습니다). Rx의 <code>fxUsing</code>을 따랐습니다.
+    없습니다). Rx의 <code>using</code>을 따랐습니다.
   </p>
 
   <h2>데모 1 · 지연 읽기 둘레의 괄호</h2>

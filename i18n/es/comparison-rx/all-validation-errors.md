@@ -49,7 +49,7 @@ async: false
     los registros: la capa de errores tipados acumula por ti —
     <code>zipOrAccumulate</code> ejecuta cada regla y concatena los
     fallos en una <code>NonEmptyList</code>, y
-    <code>mapOrAccumulate</code> valida una colección entera fail-slow.
+    <code>mapOrAccumulate</code> valida una colección entera de fallo lento.
     Mira el tutorial de <code>accumulate</code> para esa versión
     completa; el modelo de streams no tiene contrapartida a la que
     recurrir.

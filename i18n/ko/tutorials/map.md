@@ -15,7 +15,7 @@ nextLabel: mapEffect
   <h2>강의</h2>
   <p>
     <code>map</code>은 가장 기본이 되는 변환 연산자입니다. 모든 원소에
-    함수를 적용하죠. FxDart에서는 <strong>지연 평가</strong>됩니다 —
+    함수를 적용합니다. FxDart에서는 <strong>지연 평가</strong>됩니다 —
     <code>map</code>을 호출하는 것만으로는 아무 일도 일어나지 않습니다.
     종결 연산자(<code>toList</code>, <code>each</code>,
     <code>reduce</code> …)가 파이프라인에서 값을 끌어당길 때 비로소 함수가

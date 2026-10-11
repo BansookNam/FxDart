@@ -168,15 +168,16 @@ back-channel that makes the limit real rather than advisory.
 > the constant applicative it is `fold`. `map`, `fold` and `traverse` are three
 > faces of one operation — which is a beautiful result, and requires
 > higher-kinded types to state even once. That is Chapter 10's subject, and
-> the reason FxDart ships four concrete traversals instead of one generic one.
+> the reason FxDart ships three concrete traversals (and their async twins) instead of one generic one.
 
 ## The cost of not having it generically
 
 Count the versions in the code above: `fxSequenceEither`,
-`flattenOrAccumulate`, `mapOrAccumulate`, `fxSeparateEither` — plus
+`flattenOrAccumulate`, `mapOrAccumulate` — plus
 `fxSequenceEitherAsync`, `flattenOrAccumulateAsync`, and `mapOrAccumulateAsync`
-for chains that are asynchronous. Seven functions where a language with
-higher-kinded types writes one.
+for chains that are asynchronous. Six functions where a language with
+higher-kinded types writes one. (`fxSeparateEither` is not among them: it
+splits, rather than swaps.)
 
 That is not incompetence, it is the language's ceiling, and it has a real cost
 to you: when FxDart adds a new effect type, none of your existing traversals
@@ -200,9 +201,10 @@ that hides a side effect is worse than the loop it replaced.
 
 1. What is `sequence` on an empty list — for `Either`, and for `Future`? Which
    law of Chapter 8 decides the answer?
-2. `traverse(xs, f)` and `xs.map(f)` followed by `sequence` give the same
-   result. Which is cheaper in Dart, and why does FxDart still ship both
-   spellings?
+2. FxDart has no fused `traverse(xs, f)`: fail-fast is `.map(f).sequence()`.
+   The accumulating side has two spellings, `mapOrAccumulate(f, xs)` and
+   `.map(f).flattenOrAccumulate()`. Do they give the same result, and why
+   does FxDart ship both?
 3. You have `Either<E, List<A>>` and want `List<Either<E, A>>` — the swap in
    the other direction. Is that always possible? Try it for a `Left`.
 4. `Future.wait` starts every future immediately. Write down two situations
@@ -215,11 +217,13 @@ that hides a side effect is worse than the loop it replaced.
    applicative's `pure`. The identity element of Chapter 8's list monoid is
    `[]`, and `sequence` of nothing must produce the identity; anything else
    would break the composition of two traversals over concatenated inputs.
-2. They are the same work; `traverse` avoids building the intermediate
-   `List<F<B>>`, which matters at scale but not at ten elements. FxDart ships
-   both because the two-step form composes into an existing lazy chain
-   (`.map(f).sequenceEither()`), while the fused form is the one you want when
-   the source is already materialised.
+2. Same result: both collect every `Left`. `mapOrAccumulate` applies `f` to
+   each element inside one accumulating scope, so it is the one to reach for
+   when `f` is a plain function that raises. FxDart ships both because the
+   two-step form composes into an existing lazy chain
+   (`.map(f).flattenOrAccumulate()`), for when the `Either`s already exist.
+   For fail-fast there is no fused form to ship: `.map(f)` is lazy, so
+   `.map(f).sequence()` is already a single pass that stops at the first `Left`.
 3. Yes, but the interesting case is `Left(e)`: it maps to `[Left(e)]`? Or to
    `[]`? Both are defensible, which is the tell that this direction is *not* a
    traversal — there is no law forcing the answer. The general swap

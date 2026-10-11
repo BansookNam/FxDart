@@ -1,7 +1,7 @@
 ---
 slug: tee-the-pipeline
 title: Una fuente, dos lectores independientes — RxDart vs FxDart
-description: Total y máximo de una fuente con efectos sin ejecutarla dos veces — un stream conectable vs fork compartiendo una sola pasada con buffer.
+description: Total y máximo de una fuente con efectos secundarios sin ejecutarla dos veces — un stream conectable frente a dos pliegues que avanzan sobre el mismo elemento.
 heading: Una fuente, dos lectores independientes
 order: 50
 tier: 4
@@ -31,27 +31,29 @@ async: false
     por consumidor. Escuchar dos veces un stream llano de suscripción
     única es un error; iterar dos veces un generador <code>sync*</code>
     lo ejecuta dos veces en silencio. Y ambas bibliotecas responden con
-    la misma idea — compartir una sola pasada. RxDart hace el stream
+    la misma idea: compartir una sola pasada. RxDart hace el stream
     <em>conectable</em>: <code>publish()</code> difiere la fuente, ambas
     reducciones se suscriben, y <code>connect()</code> arranca la única
-    suscripción que las alimenta. El <code>fxFork</code> de FxDart
-    ramifica una sola iteración con buffer: cada fork del mismo objeto
-    iterable es un cursor independiente sobre un buffer compartido, así
-    que el cuerpo del generador corre una vez sin importar cuántos
-    lectores tiren de él.
+    suscripción que las alimenta. El <code>tee</code> de FxDart mantiene
+    las dos reducciones en paso: cada elemento avanza el total y el pico
+    antes de que se pida el siguiente, así que la pasada única nunca tiene
+    que recordar nada.
   </p>
   <p>
-    Las diferencias son textura, no capacidad. La versión rx es sensible
-    al orden — los lectores deben engancharse <em>antes</em> de
-    <code>connect()</code>, y un rezagado se pierde eventos; eso es push:
-    la entrega ocurre estés listo o no. La versión fx es sensible a la
-    identidad — debes hacer fork del <em>mismo objeto</em>, y un fork que
-    se rezaga simplemente reproduce el buffer a su propio ritmo; eso es
-    pull: los valores esperan a la demanda. El coste es memoria: el
-    buffer compartido retiene cada valor hasta que el fork más lento lo
-    haya consumido, así que un lector muy rezagado mantiene viva la
-    pasada entera, donde el rezagado de rx simplemente se la habría
-    perdido. Cualquiera de las dos es una buena respuesta a «hacer un tee
-    del pipeline», lo que convierte esto en un empate — elige la que
-    encaje con el modelo en el que ya vive el resto de tu código.
+    Ninguno de los dos usa buffer, y por la misma razón de fondo: cada
+    lector ve cada elemento mientras es el actual. Eso es lo que compra
+    <code>connect()</code> al obligar a los lectores a engancharse
+    primero, y lo que compra <code>tee</code> al tomar a los lectores como
+    pliegues: una semilla y un paso, en lugar de dos pipelines libres de
+    avanzar por su cuenta. La restricción es el precio.
+    <code>publish()</code> alimenta cualquier operador de stream que
+    quieras suscribir; <code>tee</code> solo alimenta pliegues. Cuando los
+    dos lectores son de verdad pipelines independientes, la respuesta de
+    FxDart es <code>fxFork</code>: cada fork del mismo objeto iterable es
+    un cursor sobre una sola pasada con buffer compartido, y ahí vuelve el
+    buffer, que retiene cada valor hasta que el cursor más lento lo ha
+    consumido. Así que es un empate en capacidad: la herramienta general
+    cuesta memoria en ambos lados, y la especializada es gratis en ambos.
+    Elige la que encaje con el modelo en el que ya vive el resto de tu
+    código.
   </p>

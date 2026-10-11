@@ -10,7 +10,7 @@ prevLabel: fxEvents
 next: whenComplete.html
 nextLabel: whenComplete
 ---
-  <p class="hero-sub">Constructores fríos para una cadena de eventos: un valor, un cierre vacío, un future, un generador, un callback create — sin un Stream que ya tuvieras que envolver.</p>
+  <p class="hero-sub">Constructores fríos para una cadena de eventos: un valor, un stream vacío, un future, un generador, un callback create — sin un Stream que ya tuvieras que envolver.</p>
 
   {{signature}}
 
@@ -47,17 +47,17 @@ nextLabel: whenComplete
     stream interior fresco en cada listen — la factoría, no el wrapper;
     la cadena se mantiene de suscripción única. <code>using</code>
     adquiere un recurso al escuchar, lo refleja y lo libera exactamente
-    una vez — la contraparte push del
-    <code><a href="using.html">fxUsing</a></code> pull.
+    una vez — la contraparte push de
+    <code><a href="using.html">fxUsing</a></code>, de la capa pull.
     <code>fromPattern(add, remove)</code> es el puente típico
     <code>on</code>/<code>off</code>. Y
     <code>create(init)</code> llama a <code>init</code> con un
     <code>EventEmitter</code>: <code>add</code>, <code>addError</code>,
-    <code>close</code>, y <code>onCancel</code> para el teardown. Un
-    throw desde <code>init</code> se reenvía y el stream se cierra.
+    <code>close</code>, y <code>onCancel</code> para la limpieza. Si
+    <code>init</code> lanza una excepción, se reenvía y el stream se cierra.
   </p>
   <p>
-    Capa de eventos de fxdart, según el <code>of</code>/<code>just</code>,
+    Esto forma parte de la capa de eventos de fxdart, modelada sobre <code>of</code>/<code>just</code> de Rx,
     <code>EMPTY</code>, <code>NEVER</code>, <code>from</code>,
     <code>interval</code>, <code>timer</code>, <code>defer</code>,
     <code>generate</code>, <code>fromEventPattern</code>,

@@ -27,7 +27,8 @@ enum은 3개. 셀 수 있게 되면 타입을 결합하는 두 방식에 이름�
 것.** 가장 전형적인 모양이 이것입니다.
 
 ```dart run
-// Four fields; 2 × 2 × 2 × 2 = 16 representable combinations…
+// Four fields; counting each String? as just set or unset,
+// 2 × 2 × 2 × 2 = 16 representable combinations…
 class Request {
   Request(
       {this.loading = false,

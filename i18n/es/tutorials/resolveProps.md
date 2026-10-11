@@ -28,7 +28,7 @@ nextLabel: isMatch
     práctica, normalmente no es más lento que lanzarlos todos «a la vez»: en
     Dart, un <code>Future</code> empieza a ejecutarse en el momento en que se
     <em>crea</em>, no cuando se espera. Así que si construyes el mapa con
-    <code>delay(...)</code> o con peticiones que ya están en vuelo como valores
+    <code>delay(...)</code> o con peticiones ya en curso como valores
     —la forma habitual de llamar a esta función—, todas ellas ya se están
     ejecutando cuando <code>fxResolveProps</code> recibe el mapa; su bucle
     secuencial de <code>await</code> se limita a leer resultados que en su

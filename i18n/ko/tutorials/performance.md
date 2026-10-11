@@ -10,7 +10,7 @@ prevLabel: consume
 next: range.html
 nextLabel: range
 ---
-  <p class="hero-sub">라이브러리는 어떤 형태를 빠르게 만들 수는 있어도, 그 형태를 대신 골라 주지는 못합니다. 값을 하는 형태들을 모았습니다.</p>
+  <p class="hero-sub">라이브러리는 어떤 형태를 빠르게 만들 수는 있어도, 그 형태를 대신 골라 주지는 못합니다. 값어치를 하는 형태들을 모았습니다.</p>
 
   {{signature}}
 
@@ -60,7 +60,7 @@ nextLabel: range
     <strong>두 번</strong> 건드립니다. 읽으려고 한 번, 다시 쓰려고 한 번.
     그리고 세는 작업에서는 맵이 사실상 비용의 전부입니다. 두 연산자는
     대신 맵 안에 세워 둔 가변 셀에 누적하므로, 맵은 원소마다가 아니라
-    <em>서로 다른 키마다</em> 한 번 쓰입니다 — 백만 행을 세면 약 1.5×이고,
+    <em>서로 다른 키마다</em> 한 번 쓰입니다 — 백만 행을 세면 약 1.5배 빨라지고,
     <a href="../DartComparison/top-log-level.html">가장 잦은 로그 레벨</a>이
     직접 루프에 뒤처지지 않고 앞서는 이유입니다.
   </p>
@@ -88,7 +88,7 @@ nextLabel: range
     <a href="zip.html"><code>zip</code></a>,
     <a href="zipWithIndex.html"><code>zipWithIndex</code></a>,
     <a href="pairwise.html"><code>pairwise</code></a>, 또는 튜플로 가는
-    <code>map</code> — 는 원소마다 하나씩 할당하며, 레코드는 재사용할 수
+    <code>map</code>은 원소마다 하나씩 할당하며, 레코드는 재사용할 수
     없습니다. 바로 다음 단계가 그중 대부분을 버린다면, 파이프라인이 인덱스나
     값 하나만 들고 갈 수는 없는지 생각해 보세요.
     <a href="withIndex.html"><code>mapWithIndex</code></a>가 존재하는 이유가
@@ -102,7 +102,7 @@ nextLabel: range
   <h2>데모 2 · groupBy 대신 foldBy, 그리고 두 번째 순회의 값</h2>
   {{playground:1}}
 
-  <h2>직접 해보기</h2>
+  <h2>직접 해 보기</h2>
   <p>연습: 이 코드는 readings를 두 번 순회하고, 만들자마자 버리는 리스트를
     하나 만듭니다. 종결 연산자 하나로 끝나는 단일 체인으로 고쳐 보세요.</p>
   {{playground:2}}

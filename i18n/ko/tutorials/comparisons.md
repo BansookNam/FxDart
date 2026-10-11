@@ -24,10 +24,9 @@ nextLabel: delay &amp; sleep
   </p>
   <p>
     내부적으로는 두 값이 서로 <code>Comparable</code>해야 하고, 한 가지 예외를
-    빼면 런타임 타입까지 정확히 같아야 합니다. <code>num</code>과
-    <code>num</code>, <code>String</code>과 <code>String</code>은 섞일 수 있어
-    <code>int</code>와 <code>double</code>을 비교할 수 있지만, 그 외에 타입이
-    맞지 않으면 조용히 변환하는 대신 <code>ArgumentError</code>를 던집니다.
+    빼면 런타임 타입까지 정확히 같아야 합니다. <code>num</code>과 <code>num</code>,
+    <code>String</code>과 <code>String</code>은 섞어 쓸 수 있어서 <code>int</code>와
+    <code>double</code>도 비교할 수 있습니다. 그 외에 타입이 맞지 않으면 조용히 변환하는 대신 <code>ArgumentError</code>를 던집니다.
   </p>
   <p>
     네 함수 모두 커링되지 않습니다 — <code>fxGt(5)</code> 같은 부분 적용은

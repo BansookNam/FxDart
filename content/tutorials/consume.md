@@ -27,9 +27,9 @@ nextLabel: performance
   <p>
     The optional <code>n</code> makes it the natural partner for infinite
     or huge sources: <code>consume(5)</code> pulls exactly 5 values and
-    stops, even if the underlying iterable (<code>fxRange</code> with no
-    bound, <code>cycle</code>, <code>repeat</code> with a huge count) would
-    otherwise go on forever. Omit <code>n</code> to drain a finite iterable
+    stops, even if the underlying iterable (<code>cycle</code>, which never
+    ends, or an <code>fxRange</code> or <code>repeat</code> with a huge
+    count) would otherwise run for a very long time. Omit <code>n</code> to drain a finite iterable
     completely.
   </p>
   <p>
@@ -40,10 +40,10 @@ nextLabel: performance
     collect a result list you'd throw away anyway.
   </p>
 
-  <h2>Demo 1 · Bounding an infinite source</h2>
+  <h2>Demo 1 · Bounding a huge source</h2>
   <p>
-    <code>fxRange(1000000)</code> would normally never finish if fully pulled
-    — but <code>consume(5)</code> stops after 5 elements:
+    <code>fxRange(1000000)</code> is finite, but fully pulling it would visit
+    a million values — <code>consume(5)</code> stops after 5 elements:
   </p>
   {{playground:0}}
 
@@ -51,7 +51,7 @@ nextLabel: performance
   {{playground:1}}
 
   <h2>Try it yourself</h2>
-  <p>Exercise: consume only the first 3 values of an effectively-infinite
+  <p>Exercise: consume only the first 3 values of a huge
     <code>repeat()</code>, logging each one as it's pulled.</p>
   {{playground:2}}
 

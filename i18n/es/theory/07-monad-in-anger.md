@@ -79,7 +79,7 @@ parseId(raw).flatMap((id) =>
             Either.right(summarise(user, orders)))));
 ```
 
-Todo lenguaje con mónadas acaba criando sintaxis para aplanar esto. El mismo
+Todo lenguaje con mónadas acaba inventando sintaxis para aplanar esto. El mismo
 cálculo, cuatro superficies:
 
 | Lenguaje | Sintaxis | Qué emite el compilador |
@@ -155,10 +155,9 @@ Línea por línea, esto es el bloque `fxEither` de arriba con `await` donde esta
 `r.bind`. `async` marca el ámbito; `await` desenvuelve una capa; el compilador
 reescribe el cuerpo en continuaciones, que es `flatMap` con otro nombre. La
 prueba de que es monádico y no magia: `await` sobre un `Future<Future<T>>` te
-da `Future<T>` — aplanando, exactamente como exigía el capítulo 1.
+da un `T`, no un `Future<T>` — Dart aplana los futuros anidados, exactamente como exigía el capítulo 1.
 
-Lo que Dart *no* hizo fue generalizarlo. `await` funciona sobre `Future` (y
-sobre cualquier cosa con un `then`, por suerte estructural), y no hay `await`
+Lo que Dart *no* hizo fue generalizarlo. `await` funciona sobre `Future`, y no hay `await`
 para `Either`, ni `await` para `Iterable`, ni forma de escribir el tuyo. Todos
 los lenguajes de la tabla anterior tomaron la misma decisión al principio y
 luego generalizaron; el `async` de Dart es donde esa generalización se detuvo.

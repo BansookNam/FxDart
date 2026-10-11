@@ -14,10 +14,11 @@ nextLabel: streams
 
   <h2>Lección</h2>
   <p>
-    Como Dart no tiene currificación sin tipos, FxDart no puede sobrecargar un
-    único <code>map</code> para que funcione sobre <code>Iterable</code> y
-    <code>FxAsyncIterable</code> en posición data-first: los tipos de los
-    parámetros chocarían. Por eso cada operador perezoso y de agregación se
+    Como Dart no tiene sobrecarga de funciones — un nombre de nivel superior
+    solo puede tener una firma —, FxDart no puede hacer que un único
+    <code>map</code> funcione sobre <code>Iterable</code> y
+    <code>FxAsyncIterable</code> en posición data-first, como hacen los tipos
+    sobrecargados de FxTS. Por eso cada operador perezoso y de agregación se
     publica en dos formas de nivel superior: la normal para
     <code>Iterable</code>, y un gemelo <code>*Async</code> para
     <code>FxAsyncIterable</code> cuyo callback devuelve

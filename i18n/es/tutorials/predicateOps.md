@@ -25,12 +25,12 @@ nextLabel: when
     <a href="partition.html"><code>partition</code></a>. Una vez que has
     puesto nombre a las condiciones — <code>isEven</code>,
     <code>isPositive</code>, <code>isBlank</code> —, combinarlas no debería
-    costarte una lambda nueva con el parámetro vuelto a tipar cada vez. Estos
-    combinadores son justo eso.
+    costarte una lambda nueva con el parámetro escrito otra vez cada vez.
+    Estos combinadores son justo eso.
   </p>
   <p>
-    Son una extensión sobre <code>bool Function(T)</code>, así que a cualquier
-    predicado que ya tengas le crecen los métodos: una función de nivel
+    Son una extensión sobre <code>bool Function(T)</code>, así que cualquier
+    predicado que ya tengas recibe estos métodos: una función de nivel
     superior, un tear-off, un closure guardado o el resultado de otro
     combinador. Cada uno devuelve un predicado nuevo y no llama a nada hasta
     que se ejecuta <em>ese</em> predicado.
@@ -48,8 +48,8 @@ nextLabel: when
     <em>contra</em> —, así que un predicado sobre <code>int</code> pasa a ser
     un predicado sobre cualquier cosa que puedas convertir en
     <code>int</code>: <code>isEven.contramap&lt;String&gt;((s) =&gt; s.length)</code>
-    prueba la longitud de una cadena sin una palabra sobre cadenas dentro de
-    <code>isEven</code>.
+    prueba la longitud de una cadena sin que <code>isEven</code> tenga que
+    saber nada de cadenas.
   </p>
   <p>
     <code>.negate</code> es la forma de getter de extensión del

@@ -19,8 +19,8 @@ nextLabel: apply
     <code>fxTap</code>은 data-first입니다. <code>fxTap(f, value)</code>는
     <code>f(value)</code>를 실행하고 — 보통 <code>print</code>나 로그 호출,
     그 밖의 부수 효과입니다 — <code>value</code>를 손대지 않은 채
-    그대로 돌려줍니다. 존재 이유는 <em>값이 속한 표현식을 망가뜨리지 않고</em>
-    값을 들여다보기 위해서입니다. 어떤 값이든 <code>fxTap</code>으로 감싸기만
+    그대로 돌려줍니다. 목적은 <em>값이 속한 표현식을 망가뜨리지 않으면서</em>
+    값을 들여다보는 데 있습니다. 어떤 값이든 <code>fxTap</code>으로 감싸기만
     하면 주변 코드는 전혀 바꿀 필요가 없습니다.
   </p>
   <p>

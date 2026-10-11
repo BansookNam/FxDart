@@ -25,7 +25,7 @@ nextLabel: intersection
     <em>ambos</em> iterables, así que — a diferencia de
     <code>differenceBy</code> en otros lenguajes — ambos argumentos deben
     compartir el mismo tipo de elemento <code>A</code>; lo único que se
-    compara es el tipo de clave derivado <code>B</code>.
+    compara son los <em>valores</em> de clave derivados (de tipo <code>B</code>).
   </p>
   <p>
     Esta es la forma que buscas cuando la «lista de exclusión» y la «lista
@@ -36,9 +36,10 @@ nextLabel: intersection
   </p>
   <p>
     <code>difference</code> no es más que
-    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. No hay
-    método de cadena para ninguna de las dos — llama directamente a la
-    función data-first. En el lado asíncrono, el marcador de concurrencia se
+    <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>. Ambas
+    existen también como métodos de cadena (<code>.differenceBy(f, other)</code>),
+    donde el receptor es <code>iterable2</code> y <code>other</code> es
+    <code>iterable1</code>. En el lado asíncrono, el marcador de concurrencia se
     aplica a <code>iterable2</code>, igual que en
     <code>fxDifferenceAsync</code>.
   </p>

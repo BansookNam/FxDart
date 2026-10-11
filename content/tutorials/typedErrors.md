@@ -43,7 +43,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
 }</code></pre>
   <p>FxDart gives you the same shape in Dart:</p>
   <pre class="code"><code>// FxDart
-Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
+Either&lt;Failure, SuccessData&gt; getResult() => fxEither((r) {
   final user  = r.bind(findUser(userId));
   final order = r.bind(findOrder(user.id));
   final total = r.bind(calculateTotal(order));
@@ -78,7 +78,7 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     Everything hangs off the <code>r</code> the builder hands you — type
     <code>r.</code> and discover it all:
   </p>
-  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => either((r) {
+  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => fxEither((r) {
   final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
   r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n is out of range');
   return n;
@@ -120,7 +120,7 @@ switch (parsePort('8080')) {
     Validation wants <em>all</em> the errors, not the first one. This is
     Arrow's replacement for a separate <code>Validated</code> type:
   </p>
-  <pre class="code"><code>final user = either&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
+  <pre class="code"><code>final user = fxEither&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
   final name = acc.accumulating((r) => validateName(r, input));
   final age  = acc.accumulating((r) => validateAge(r, input));
   return User(name.value, age.value); // all errors reported together

@@ -32,23 +32,22 @@ nextLabel: foldByOrSkip
     <code>foldBy</code> acumula directamente en el mapa de resultado, como el
     bucle escrito a mano:
   </p>
-  <pre><code>// lo que escribirías a mano
+  <pre><code>// what you would write by hand
 for (final t in txns) {
   totals[t.category] = (totals[t.category] ?? 0) + t.amount;
 }
 
-// lo mismo, con nombre
-foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
+// the same thing, named
+fxFoldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    Sobre un millón de transacciones repartidas en cinco categorías, agrupar
-    primero cuesta <strong>2,7×</strong> el bucle escrito a mano.
-    <code>foldBy</code> cuesta <strong>0,91×</strong> — es algo <em>más
-    rápido</em> que el bucle que tiene al lado, y no es un artefacto de
-    redondeo. El bucle lee el mapa y luego lo reescribe, así que cada
+    Sobre una entrada grande con pocas categorías, agrupar primero cuesta
+    bastante más que el bucle escrito a mano, por esas listas por clave.
+    <code>foldBy</code> puede igualar al bucle e incluso adelantarlo: el bucle lee el mapa y luego lo reescribe, así que cada
     transacción calcula el hash de su categoría dos veces;
     <code>foldBy</code> acumula en una celda mutable alojada en el mapa, de modo
     que este se escribe una vez por <em>categoría</em> y no una vez por
-    transacción. Varios de los ejemplos de
+    transacción. (Aquí no se cita ninguna cifra; mide tu propia forma de datos con
+    <code>./benchmark.sh --ab</code>.) Varios de los ejemplos de
     <a href="../DartComparison/index.html">Dart vs FxDart</a> se pasaron a él
     justo por eso.
   </p>

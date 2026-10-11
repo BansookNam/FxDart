@@ -15,7 +15,7 @@ async: true
     Carga tres secciones de configuración remota —<code>features</code>,
     <code>limits</code>, <code>theme</code>— desde una API (simulada),
     <strong>de una en una y en orden</strong>, y después imprime cada valor
-    cargado. La petición falsa tarda 15 ms fijos; ambas versiones deben
+    cargado. La petición simulada tarda 15 ms fijos; ambas versiones deben
     imprimir las líneas que aparecen bajo <em>Salida esperada</em>.
   </p>
 

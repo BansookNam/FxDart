@@ -62,12 +62,14 @@ crumb: naming
   <p>
     <code>raise</code> is the accurate "cool" name — it is what the DSL is
     actually called, and tutorial URLs here are function-named
-    (<code>concurrent.html</code>, <code>fx.html</code>). It was reserved on
-    purpose: if Section&nbsp;13 later gains per-function tutorial pages
-    (<code>either.html</code>, <code>bind.html</code>, …), a
-    <code>raise.html</code> overview would collide with the future
-    <code>raise</code> function tutorial. <code>typedErrors.html</code> stays
-    free as the section's overview page forever.
+    (<code>concurrent.html</code>, <code>fx.html</code>). So the function-level
+    pages carry it: <a href="raise.html"><code>raise.html</code></a> covers the
+    <code>Raise</code> scope and <a href="either.html"><code>either.html</code></a>
+    covers <code>Either</code>. What a function name cannot do is introduce the
+    whole idea to someone who has not met it, which is why
+    <code>typedErrors.html</code> stays the section's overview page: it
+    names the feature by what it gives you, and the per-function pages hang
+    off it.
   </p>
 
   <h2>What about "Railway"?</h2>

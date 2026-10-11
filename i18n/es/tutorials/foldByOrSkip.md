@@ -20,7 +20,7 @@ nextLabel: countWhere
     <code><a href="filter.html">filter</a></code> +
     <code><a href="foldBy.html">foldBy</a></code> escrito como una única
     llamada estricta. Todo lo que <code>foldBy</code> garantiza sigue en pie:
-    <code>seed</code> inicia cada clave en lugar de arrastrarse entre ellas,
+    la semilla inicia cada clave en lugar de arrastrarse entre ellas,
     las claves salen en orden de primera aparición y el mapa se consulta una
     vez por elemento. La única vuelta de tuerca es la función de clave:
     devolver <code>null</code> significa «salta este elemento», la misma forma
@@ -63,7 +63,7 @@ nextLabel: countWhere
     <a href="../DartComparison/monthly-category-report.html">Informe mensual
     por categoría</a>: una de las dos páginas de comparación que publican tres
     barras en lugar de dos, porque la diferencia entre dos maneras de escribir
-    la misma tubería es precisamente lo que quieren mostrar.
+    el mismo pipeline es precisamente lo que quieren mostrar.
   </p>
 
   <h2>Demo 1 · El gasto de julio por categoría</h2>

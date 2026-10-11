@@ -27,7 +27,7 @@ nextLabel: fx
       <td>envolver un <code>map</code>/<code>where</code>/<code>take</code> de una línea</td>
     </tr>
     <tr>
-      <td>I/O sobre una colección conocida, como mucho <em>n</em> en vuelo, orden conservado</td>
+      <td>I/O sobre una colección conocida, como mucho <em>n</em> en curso, orden conservado</td>
       <td><code>.toAsync().map(f).concurrent(n)</code> o <code><a href="mapConcurrent.html">.mapConcurrent(n, f)</a></code></td>
       <td><code>Future.wait(xs.map(f))</code></td>
     </tr>

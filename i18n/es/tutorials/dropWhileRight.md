@@ -30,12 +30,13 @@ nextLabel: dropUntil
   </p>
   <p>
     A diferencia de <a href="takeWhileRight.html"><code>takeWhileRight</code></a>,
-    este va emitiendo sobre la marcha. Una racha coincidente se retiene en vez
+    la versión síncrona va emitiendo sobre la marcha. Una racha coincidente se retiene en vez
     de emitirse, porque podría resultar ser el sufijo; el primer elemento que
     <em>falla</em> el predicado demuestra que no lo era y libera la racha
     entera de golpe. Así el coste en memoria es la racha más larga, no la
     longitud de la fuente, y los valores siguen fluyendo mientras la fuente
-    está abierta.
+    está abierta. Su gemela asíncrona, <code>dropWhileRightAsync</code>, no:
+    primero vacía todo lo que hay aguas arriba en una lista y luego la recorta.
   </p>
   <p>
     Sobre una <code>List</code> la racha se busca caminando hacia atrás desde
@@ -46,7 +47,7 @@ nextLabel: dropUntil
   <h2>Demo 1 · Fundamentos</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Asíncrono, y el reparto</h2>
+  <h2>Demo 2 · Asíncrono, y la división con takeWhileRight</h2>
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>

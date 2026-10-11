@@ -19,7 +19,7 @@ nextLabel: take
     <code>fxCompress</code> is a positional mask: element <code>i</code> of
     <code>iterable</code> survives only if <code>selectors[i]</code> is
     <code>true</code>. It's built directly out of two functions you already
-    know — <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    know — <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, fxZip(selectors, iterable)))</code> —
     zip the mask with the data, filter to the true pairs, then unwrap. That
     also means it inherits <code>zip</code>'s behavior on mismatched
     lengths: iteration stops as soon as the <em>shorter</em> of

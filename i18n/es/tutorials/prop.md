@@ -27,7 +27,7 @@ nextLabel: props
   </p>
   <p>
     Si lo que quieres de verdad es extraer un campo de una <em>lista</em>
-    entera de mapas, tira de <a href="pluck.html"><code>fxPluck</code></a>: es
+    entera de mapas, usa <a href="pluck.html"><code>fxPluck</code></a>: es
     <code>fxProp</code> ya fijado a una clave y aplicado con map sobre toda la
     colección en una sola llamada.
   </p>

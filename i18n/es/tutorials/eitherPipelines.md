@@ -12,8 +12,7 @@ nextLabel: the naming rationale
 ---
   <p class="hero-sub">
     Errores tipados fusionados con los pipelines perezosos y conscientes de la
-    concurrencia de FxDart — la pieza que no tienen ni Arrow ni ninguna
-    librería FP de Dart.
+    concurrencia de FxDart — la pieza que Arrow no tiene.
   </p>
 
   {{signature}}
@@ -21,7 +20,7 @@ nextLabel: the naming rationale
   <h2>Lección</h2>
   <p>
     Una cadena de valores <code>Either</code> gana <em>terminales</em> que
-    entienden de Either: <code>rights()</code> y <code>lefts()</code> se
+    saben trabajar con Either: <code>rights()</code> y <code>lefts()</code> se
     quedan con uno de los dos lados, <code>separated()</code> parte los dos a
     la vez (con la misma forma de record que <code>partition</code>) y
     <code>sequence()</code> es todo o nada — recoge todos los aciertos en una

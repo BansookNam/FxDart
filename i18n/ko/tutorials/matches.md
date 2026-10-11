@@ -21,7 +21,7 @@ nextLabel: identity
     <code>bool Function(A)</code>를 원하는 자리에 넘기기가 불편합니다.
     <code>fxMatches(pattern)</code>은 패턴을 클로저로 감싸 바로 그 형태를
     반환합니다.
-    <code>fxMatches(pattern)(target) == fxIsMatch(target, pattern)</code>이 성립하죠.
+    <code>fxMatches(pattern)(target) == fxIsMatch(target, pattern)</code>이 성립합니다.
     술어를 한 번 만들어 두고 파이프라인 전체에서 재사용하세요.
   </p>
   <p>

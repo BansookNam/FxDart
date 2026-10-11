@@ -43,8 +43,8 @@ nextLabel: FxSubscriptions
     se cierran, y un <code>add</code> posterior lanza — aunque incluso un
     <code>LiveValue</code> cerrado sigue repitiendo su último valor a un
     suscriptor tardío antes de cerrarle el stream. Si conoces Rx, esto es
-    <code>BehaviorSubject</code> reducido a su comportamiento definitorio;
-    capa de eventos de fxdart, no parte de FxTS.
+    <code>BehaviorSubject</code> reducido a su comportamiento definitorio.
+    Es una capa de eventos de fxdart, no parte de FxTS.
   </p>
 
   <h2>Demo 1 · Los suscriptores tardíos arrancan desde el último valor</h2>

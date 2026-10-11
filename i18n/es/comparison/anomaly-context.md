@@ -1,11 +1,11 @@
 ---
 slug: anomaly-context
 title: Anomalías con su contexto alrededor — Dart vs FxDart
-description: Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — zipWithIndex + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.
+description: Muestra las lecturas de sensor por encima del límite más una línea antes y otra después — recorrido de índices + flatMap + uniq como un solo pipeline frente a un conjunto de índices construido en bucles anidados.
 heading: Anomalías con su contexto alrededor
 order: 42
 tier: 4
-functions: zipWithIndex, filter, flatMap, uniq, map, maxBy, join
+functions: range, filter, flatMap, uniq, map, maxBy, join
 domain: sensors
 verdict: fxdart
 async: false
@@ -31,7 +31,7 @@ async: false
   <p>
     «Cada coincidencia se expande a una ventana y luego las ventanas que se
     solapan se fusionan» es un problema de aplanar y deduplicar, y FxDart lo
-    escribe exactamente así: <code>zipWithIndex</code> conserva las
+    escribe exactamente así: recorrer los índices <code>0 … length-1</code> conserva las
     posiciones, <code>filter</code> encuentra las anomalías,
     <code>flatMap</code> expande cada una a <code>[i-1, i, i+1]</code> y
     <code>uniq</code> fusiona los solapamientos —una única expresión

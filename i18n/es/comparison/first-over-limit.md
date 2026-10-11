@@ -28,8 +28,8 @@ async: false
   <h2>Por qué difieren</h2>
   <p>
     No difieren, y aquí Dart nativo es la elección honesta. El
-    <code>skipWhile</code> del núcleo más <code>firstOrNull</code> (de
-    <code>package:collection</code>) es una línea limpia y perezosa que dice
+    <code>skipWhile</code> del núcleo más <code>firstOrNull</code> (en
+    <code>dart:core</code> desde Dart 3.0) es una línea limpia y perezosa que dice
     exactamente lo que significa, con el mismo resultado nullable que hay
     que gestionar. El <code>dropWhile → head</code> de FxDart es la misma
     idea con los nombres de FxTS: merece la pena si el resto de tu archivo

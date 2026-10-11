@@ -19,7 +19,7 @@ nextLabel: sum
     <code>fxReduceLazy</code> no reduce nada por sí mismo: lo que hace es
     <strong>construir un reductor</strong>. Le das una función de combinación y
     un valor inicial, y recibes de vuelta una función corriente de tipo
-    <code>Iterable&lt;A&gt; Function</code> que puedes llamar tantas veces como
+    <code>Acc Function(Iterable&lt;A&gt;)</code> que puedes llamar tantas veces como
     quieras, sobre tantos iterables distintos como quieras, sin repetir cada
     vez el valor inicial y el combinador.
   </p>

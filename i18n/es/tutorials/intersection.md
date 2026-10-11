@@ -35,7 +35,9 @@ nextLabel: intersectionBy
     registros completos en vez de por igualdad de valor.
   </p>
   <p>
-    No hay método de cadena; llama a la función data-first. En el lado
+    El método de cadena es <code>.intersection(other)</code>, y ahí el
+    receptor es <code>iterable2</code> (el que se recorre) mientras que
+    <code>other</code> es <code>iterable1</code> (el conjunto de pertenencia). En el lado
     asíncrono, el marcador de concurrencia de <code>.concurrent(n)</code> se
     aplica a <code>iterable2</code> — <code>iterable1</code> se consume por
     completo de antemano para construir el conjunto de pertenencia.

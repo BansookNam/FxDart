@@ -5,6 +5,8 @@ description: FxDart concurrentPool 튜토리얼: 고정 크기 풀로 요청을 
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
+prev: mapConcurrent.html
+prevLabel: mapConcurrent
 next: retry.html
 nextLabel: retry
 ---
@@ -27,10 +29,10 @@ nextLabel: retry
   <p>
     하류의 요구 마커에 의해 구동되는 <code>concurrent</code>와 달리,
     <code>concurrentPool</code>은 <strong>적극적으로 풀을 가득 채웁니다</strong>.
-    첫 pull부터 소비자가 몇 개를 기다리든 상관없이 최대 <code>n</code>개의
+    첫 풀부터 소비자가 몇 개를 기다리든 상관없이 최대 <code>n</code>개의
     요청을 계속 진행 상태로 유지합니다. 그래서 <code>.toList()</code>나
     <code>.each()</code>처럼 한 번에 하나씩만 당겨 가는 종결 연산자도 온전한
-    중첩 실행 효과를 얻으며, 결과는 끝나는 순서대로 보게 됩니다.
+    동시 실행 효과를 얻으며, 결과는 끝나는 순서대로 보게 됩니다.
   </p>
 
   <h2>데모 1 · 완료 순서</h2>
@@ -52,7 +54,7 @@ nextLabel: retry
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="concurrent.html"><code>concurrent</code></a> — 순서를 보존하는 변형 ·
-    <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 pull 기반 모델 ·
+    <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 풀 기반 모델 ·
     <a href="streams.html">Stream 브리지</a> — toStream() 앞에 concurrentPool 적용하기 ·
     <a href="debounce.html"><code>fxDebounce</code></a> — 콜백에 대한 호출 빈도 제한
   </div>

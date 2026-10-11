@@ -1,11 +1,11 @@
 ---
 slug: monthly-category-report
 title: 지출액순으로 정렬한 월간 카테고리 리포트 — Dart vs FxDart
-description: 가계부를 한 달로 필터링하고 카테고리별로 합산해 순위를 매깁니다 — 순수 Dart의 루프와 가변 맵을 FxDart의 filter + groupBy + sortBy와 비교합니다.
+description: 가계부를 한 달로 필터링하고 카테고리별로 합산해 순위를 매깁니다 — 순수 Dart의 루프와 가변 맵을 FxDart의 filter + foldBy + sortBy와 비교합니다.
 heading: 지출액순으로 정렬한 월간 카테고리 리포트
 order: 29
 tier: 3
-functions: filter, groupBy, map, sortBy, join, foldByOrSkip
+functions: filter, foldBy, map, sortBy, join, foldByOrSkip
 domain: transactions
 verdict: fxdart
 async: false
@@ -26,13 +26,13 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    순수 Dart에는 <code>groupBy</code>가 없으므로, 루프가 가변 맵 안에서
-    그룹화와 합산을 동시에 처리합니다 — 코드는 간결하지만 네 가지
+    순수 Dart에는 <code>groupBy</code>가 없으므로 루프가 가변 맵 안에서
+    그룹화와 합산을 한꺼번에 처리합니다. 코드는 간결하지만, 네 가지
     요구사항(7월만, 카테고리별, 합산, 순위)이 하나의 본문 안에 뒤섞여
-    있습니다. FxDart 체인은 이를 눈에 보이는 네 단계로 유지합니다:
-    <code>filter</code>로 해당 월을 거르고, <code>groupBy</code>로
-    카테고리를 나누고, <code>map</code>으로 각 그룹을 합계로 바꾸고,
-    <code>sortBy</code>로 내림차순 정렬한 다음 — <code>join</code>이
+    있습니다. FxDart 체인은 이를 눈에 보이는 단계들로 유지합니다:
+    <code>filter</code>로 해당 월을 거르고, <code>foldBy</code>로
+    카테고리별로 합계를 접고, <code>map</code>으로 항목들을 행으로 바꾸고,
+    <code>sortBy</code>로 내림차순 정렬한 다음, <code>join</code>이
     리포트 형식을 만듭니다. 요구사항을 하나 더 추가하는 일(예: 최소
     합계 조건)은 체인에 한 단계를 더하는 것으로 끝나지만, 루프에서는
     이미 복잡한 본문 안에 또 하나의 분기를 더하는 일이 됩니다.
@@ -40,13 +40,13 @@ async: false
 
   <h2>FxDart의 두 가지 표현</h2>
   <p>
-    아래 벤치마크에는 <strong>세 번째 막대</strong>가 있습니다 — 다른 한
-    페이지에만 있는 것입니다. 위의 체인이 기본으로 쓸 형태입니다:
+    아래 벤치마크에는 다른 한 페이지에만 있는 <strong>세 번째 막대</strong>가
+    있습니다. 위의 체인이 기본으로 쓸 형태입니다:
     <code>filter</code>와 <code>foldBy</code>가 각각 하나의 질문에 답하는 두
     단계입니다. 다만 이 형태가 못 하는 것이 하나 있습니다: 자기 술어를
     인라인하지 못합니다. <code>filter</code>는 지연 단계라 술어를
     이터레이터의 필드에 담아 두는데, AOT 컴파일러는 필드 너머를 보지
-    못합니다 — 거래 하나마다 실제 간접 호출을 내고 그 본문은 주변 루프에
+    못하므로, 거래 하나마다 실제 간접 호출이 일어나고 그 본문은 주변 루프에
     녹아들지 못합니다. <code>foldBy</code>는 그렇지 않습니다. 즉시(strict)
     연산자라 콜백이 매개변수이고 인라인됩니다.
   </p>
@@ -59,7 +59,7 @@ async: false
     막대의 차이가 그것이고, 첫 번째가 손으로 쓴 루프입니다.
   </p>
   <p>
-    기본은 체인으로 쓰십시오 — 무관한 두 질문은 두 단계로 나뉘어야 읽힙니다.
+    기본은 체인으로 쓰세요 — 무관한 두 질문은 두 단계로 나뉘어야 읽힙니다.
     파이프라인이 뜨거운 경로에 있고 프로파일이 그 술어를 지목할 때
     <code>foldByOrSkip</code>을 꺼내면 됩니다.
   </p>

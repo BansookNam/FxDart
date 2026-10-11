@@ -3,7 +3,7 @@ slug: lineage
 chapter: 21
 part: 5
 title: Lineage
-description: Haskell to Scala to Kotlin's Arrow to FxTS to FxDart — five translations of the same ideas, and what each one had to give up to fit its host language.
+description: Haskell to Scala to Kotlin's Arrow to FxTS to FxDart — four translations of the same ideas, and what each one had to give up to fit its host language.
 ---
 # Lineage
 
@@ -68,7 +68,7 @@ demonstrated. Arrow 2.x deleted almost all of it and rebuilt around one idea:
 
 ```
 either { val x = parse(raw).bind(); ... }      // Kotlin, Arrow 2
-either((r) { final x = r.bind(parse(raw)); ... })  // Dart, FxDart
+fxEither((r) { final x = r.bind(parse(raw)); ... })  // FxDart
 ```
 
 That is the direct ancestor of Chapter 15, and the reason FxDart's typed-error
@@ -84,7 +84,7 @@ prefix. That is a real ergonomic loss and the reason FxDart's scopes are
 
 ## FxTS: the pipeline half
 
-Everything in Parts I and III comes from the other parent. FxTS brought:
+The pipeline half — the vocabulary of Chapter 4 and everything in Part III — comes from the other parent. FxTS brought:
 
 - lazy pipelines built from small operators, sync and async under one
   vocabulary;
@@ -183,10 +183,12 @@ usually a design decision, not a shortfall.
    result type in every signature; the accumulation behaviour moved into a
    scope, which is strictly more explicit at the call site.
 2. FxTS can hold `map(f)` as a value and pass it around — operators are
-   first-class, so you can build a pipeline dynamically from a list of stages.
-   FxDart gets full static types through the whole chain, including inference
-   into the callbacks, which FxTS's `pipe` only achieves through a wall of
-   hand-written overloads.
+   first-class, so you can build a typed pipeline dynamically from a list of
+   stages. FxDart's list-of-stages `pipe`/`pipeLazy` exists but is untyped, so
+   that expressiveness is available only with static types thrown away. What
+   FxDart gets instead is full static types through the whole chain, including
+   inference into the callbacks, which FxTS's `pipe` only achieves through a
+   wall of hand-written overloads.
 3. `EitherT` generalises: it is one wrapper per monad, so a third effect is
    another transformer in the stack (at the cost of lifts everywhere).
    `fxEitherAsync` does not generalise — FxDart writes each useful combination by

@@ -30,8 +30,7 @@ nextLabel: debounce
     top-level 또는 static 함수를 쓰세요. 보낼 수 없는 것
     (<code>ReceivePort</code>, 열린 소켓)을 캡처한 클로저는 spawn에서
     <code>ArgumentError</code>를 던집니다 — isolate의 계약이지 fxdart가
-    만든 규칙이 아닙니다. 보낼 수 없는 입력이나 결과도 그 풀을
-    멈추지 않고 같은 방식으로 실패합니다. 웹에서는
+    만든 규칙이 아닙니다. 보낼 수 없는 입력이나 결과도 멈추지 않고 같은 방식으로, 그 pull에서 실패합니다. 웹에서는
     <code>UnsupportedError</code> — 거기서는
     <code>concurrent(n)</code>을 쓰세요. 아래 프로그램은 VM 전용이며
     라이브 플레이그라운드가 아닙니다.
@@ -39,7 +38,7 @@ nextLabel: debounce
     (<code>FutureOr</code>, <code>mapConcurrent</code>와 같은 모양) —
     동기 콜백은 여전히 빠른 경로입니다. 비동기 워커 안의 중첩
     <code>parallel</code>도 됩니다: 그 isolate가 자기 풀을 띄우고,
-    바깥 체인을 cancel하면 안쪽 풀을 먼저 걷습니다. 중첩은 한 단계가
+    바깥 체인을 cancel하면 안쪽 풀을 먼저 걷습니다. 중첩은 한 단계까지가
     계약입니다 — 세 번째 중첩 <code>parallel</code>은 부모와 함께
     죽으므로, <em>자기</em> 자식 풀을 걷을 기회가 없습니다.
   </p>
@@ -68,13 +67,13 @@ Future&lt;void&gt; main() async {
     <code>chunk: k</code>는 그 비용을 원소 <code>k</code>개당 한 번만
     냅니다.
   </p>
-  <pre><code>// 원소 20,000개, 각각 약 0.4µs의 일, 워커 4개:
-await fx(rows).parallel(4, parseRow).toList();             // 약 142ms
-await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
+  <pre><code>// 20,000 elements, ~0.4µs of work each, 4 workers:
+await fx(rows).parallel(4, parseRow).toList();             // ~142ms
+await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
 
-// 같은 일을 isolate 없이 평범한 반복문으로:               //   약 8ms</code></pre>
+// the same work in a plain loop, no isolates:            //   ~8ms</code></pre>
   <p>
-    이 모양에서 47배이고, 배치 형태가 되어서야 비로소 대체하려던 그
+    이 모양에서 47배 빨라지고, 배치 형태가 되어서야 비로소 대체하려던 그
     반복문을 실제로 이깁니다. <code>k</code>는
     <code>k × 콜백</code>이 5µs를 넉넉히 넘도록, 그러면서도 워커마다
     배치가 여러 개는 돌아가도록 잡으세요.
@@ -96,11 +95,11 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   약 3ms
     잡습니다:
   </p>
   <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
-// k = rows.length ~/ 16 — 4가 한 번, 두 번이 아님</code></pre>
+// k = rows.length ~/ 16 (4 workers x 4 chunks per worker)</code></pre>
   <p>
     소스는 <code>List</code>여야 합니다. generator나 async 소스에는
     길이가 없습니다 — <code>chunk: k</code>를 넘기세요.
-    <code>chunk:</code>와 <code>chunked:</code>를 같이 쓰면 던집니다.
+    1보다 큰 명시적 <code>chunk:</code>를 <code>chunked:</code>와 같이 쓰면 던집니다.
     호출에는 정책이 하나입니다.
   </p>
 

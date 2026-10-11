@@ -22,7 +22,7 @@ nextLabel: uniqStrict
     <code>distinctBy</code> is the Dart-idiomatic name; fxdart also accepts
     the FxTS spelling <code>uniqBy</code> — they're the same operator. It's the
     tool for "one row per customer," "one event per type," or dedupe by any
-    field or computed value — <code>uniq</code> itself is just
+    field or computed value — <code>uniq</code> itself behaves like
     <code>fxDistinctBy((a) =&gt; a, iterable)</code>.
   </p>
   <p>

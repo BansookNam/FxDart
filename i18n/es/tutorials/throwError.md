@@ -36,7 +36,7 @@ nextLabel: throwIf
   <h2>Demo 1 · Fundamentos</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Como valor de reserva de cases</h2>
+  <h2>Demo 2 · Como valor de reserva en cases</h2>
   <p>
     En lugar de pasar de largo en silencio, <code>fxThrowError</code> convierte
     un valor sin coincidencia en un fallo ruidoso y capturable:

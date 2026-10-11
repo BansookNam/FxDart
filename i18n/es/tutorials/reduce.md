@@ -25,17 +25,17 @@ nextLabel: fold
   <p>
     Esta es la forma <em>sin valor inicial</em>: toma el primer elemento del
     iterable como acumulador de partida y va combinando el resto sobre él. Por
-    eso mismo, llamarlo sobre un iterable vacío no tiene sentido —no hay primer
-    elemento del que partir— y por tanto lanza un <code>StateError</code>.
+    eso mismo, llamarlo sobre un iterable vacío no tiene sentido (no hay primer
+    elemento del que partir) y por tanto lanza un <code>StateError</code>.
   </p>
   <p>
     FxTS sobrecarga <code>reduce</code> para los casos con y sin valor inicial
-    según el número de argumentos: <code>fxReduce(f, iterable)</code> frente a
+    según el número de argumentos: <code>reduce(f, iterable)</code> frente a
     <code>reduce(f, seed, iterable)</code>. Dart no tiene sobrecarga por
-    aridad, así que FxDart reserva <code>reduce</code> para la forma sin valor
-    inicial y renombra la otra como <code><a href="fold.html">fold</a></code>,
+    aridad, así que FxDart reserva <code>fxReduce</code> para la forma sin valor
+    inicial y renombra la otra como <code><a href="fold.html">fxFold</a></code>,
     siguiendo la nomenclatura del propio <code>Iterable.fold</code> de Dart. Si
-    tienes un valor inicial, usa <code>fold</code>.
+    tienes un valor inicial, usa <code>fxFold</code>.
   </p>
   <p>
     En la cadena síncrona, <code>Fx</code> extiende <code>Iterable</code>, así

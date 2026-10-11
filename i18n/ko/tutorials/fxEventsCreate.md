@@ -1,7 +1,7 @@
 ---
 slug: fxEventsCreate
 title: fxEventsCreate — FxDart 101
-description: FxDart fxEventsCreate 튜토리얼: 값, Future, 생성기, create 콜백으로 이벤트 체인을 만들기 — 를 라이브 플레이그라운드와 함께 다룹니다.
+description: FxDart fxEventsCreate 튜토리얼: 값, Future, 생성기, create 콜백으로 이벤트 체인을 만드는 방법을 라이브 플레이그라운드와 함께 익힙니다.
 heading: 생성자
 section: 14
 crumb: fxEventsCreate
@@ -57,7 +57,7 @@ nextLabel: whenComplete
     스트림은 닫힙니다.
   </p>
   <p>
-    fxdart 이벤트 레이어, Rx의 <code>of</code>/<code>just</code>,
+    fxdart 이벤트 레이어의 일부이며, Rx의 <code>of</code>/<code>just</code>,
     <code>EMPTY</code>, <code>NEVER</code>, <code>from</code>,
     <code>interval</code>, <code>timer</code>, <code>defer</code>,
     <code>generate</code>, <code>fromEventPattern</code>,
@@ -72,12 +72,12 @@ nextLabel: whenComplete
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 1, 2, 3을 내보낸 뒤 닫는 <code>create</code>.</p>
+  <p>연습: 1, 2, 3을 내보낸 뒤 닫는 <code>create</code>를 만들어 보세요.</p>
   {{playground:2}}
 
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="fxEvents.html"><code>fxEvents</code></a> — 이미 가진 Stream을 감싸기 ·
-    <a href="using.html"><code>fxUsing</code></a> — 풀 레이어의 원본: 첫 pull에서 획득, 한 번 해제 ·
+    <a href="using.html"><code>fxUsing</code></a> — 풀 레이어의 원본: 첫 풀 때 획득하고 한 번 해제 ·
     <a href="share.html"><code>share</code></a> — 체인 한 번의 실행에 리스너가 여럿 필요할 때
   </div>

@@ -18,7 +18,7 @@ nextLabel: not
   <p>
     <code>fxNegate(f)</code> gives you back a new predicate that returns
     <code>!f(x)</code> for any <code>x</code>. It's most useful when you
-    already have a named predicate (<code>isEven</code>, <code>isEmpty</code>,
+    already have a named predicate (<code>isEven</code>, <code>fxIsEmpty</code>,
     a <code>fxMatches(pattern)</code> result) and want its opposite as a
     function value — for <code>filter</code>, <code>reject</code>, or
     anywhere else a predicate is expected — without redefining the logic.
@@ -36,7 +36,7 @@ nextLabel: not
   <h2>Demo 2 · Negating a library predicate</h2>
   <p>
     <code>fxNegate</code> composes with any predicate already in the library,
-    like the value-based <a href="isEmpty.html"><code>isEmpty</code></a>:
+    like the value-based <a href="isEmpty.html"><code>fxIsEmpty</code></a>:
   </p>
   {{playground:1}}
 
@@ -48,6 +48,6 @@ nextLabel: not
     <strong>Related:</strong>
     <a href="not.html"><code>fxNot</code></a> — negate a single boolean value ·
     <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — the usual home for a negated predicate ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based predicate to combine with negate ·
+    <a href="isEmpty.html"><code>fxIsEmpty</code></a> — a value-based predicate to combine with negate ·
     <a href="when.html"><code>fxWhen</code></a> — apply a callback only when a predicate holds
   </div>

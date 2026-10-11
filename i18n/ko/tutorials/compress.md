@@ -19,7 +19,7 @@ nextLabel: take
     <code>fxCompress</code>는 위치 기반 마스크입니다. <code>i</code>번 위치의
     <code>iterable</code> 원소는 <code>selectors[i]</code>가 <code>true</code>일
     때만 살아남습니다. 이미 알고 있는 두 함수만으로 그대로 만들어져 있습니다 —
-    <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, zip(selectors, iterable)))</code> —
+    <code>fxMap((r) =&gt; r.$2, fxFilter((r) =&gt; r.$1, fxZip(selectors, iterable)))</code> —
     마스크와 데이터를 zip한 뒤 true인 쌍만 걸러 내고 값을 꺼내는 식입니다.
     그래서 길이가 어긋날 때의 동작도 <code>zip</code>에서 그대로 물려받습니다.
     <em>더 짧은</em> 쪽, 그러니까 <code>selectors</code>와 <code>iterable</code>

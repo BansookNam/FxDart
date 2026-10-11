@@ -27,7 +27,7 @@ description: 고차 타입 — 그것이 무엇인지, Dart가 정확히 어디�
 | `List`, `Future`, `Fx` | `* → *` | 인자 하나 필요 |
 | `Either`, `Map` | `* → * → *` | 인자 둘 필요 |
 
-5장부터 9장까지는 전부 종이 `* → *`인 타입에 관한 이야기였습니다. 펑터,
+5~7장과 9장은 종이 `* → *`인 타입에 관한 이야기였습니다. 펑터,
 어플리커티브, 모나드, 순회 가능성은 타입이 아니라 *타입 생성자*의 성질입니다.
 `List<int>`는 모나드가 아니고, `List`가 모나드입니다.
 
@@ -142,13 +142,14 @@ void main() {
     Either.right(3),
   ];
 
-  // Four spellings of "swap the structures", because there is no
-  // way to write one that works for every effect type.
+  // Several spellings of "swap the structures" (fail-fast,
+  // accumulating, and fxSeparateEither, which splits instead),
+  // because no one version works for every effect type.
   print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
   print(fxSeparateEither(xs));
   print(fx(xs).sequence());
-  // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
+  // …plus fxSequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
 }
 ```
@@ -180,7 +181,7 @@ Dart의 추론이 동작하고, 에디터가 자동완성하며, 오류가 여�
    인터페이스는요?
 2. 위의 `Kind` 인코딩을 `Either`로 확장하고 그것의 `flatMap`을 작성하세요.
    캐스트가 몇 개 필요하고, 잘못된 캐스트라면 어디서 터지나요?
-3. `Fx<T>`에는 `map`, `flatMap`, `sequence` 형태의 종결자가 있습니다.
+3. `Fx<T>`에는 `map`, `flatMap`, `sequence` 같은 종결 연산이 있습니다.
    `dynamic`이나 공통 상위 타입 없이 "`map`이 있는 아무 FxDart 타입"을 받는 함수를
    쓸 수 있나요? 답을 종의 언어로 설명하세요.
 4. Dart는 `T extends Comparable<T>`를 허용합니다. 그것이 왜 이 장의 반례가

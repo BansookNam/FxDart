@@ -39,12 +39,12 @@ async: false
   <p>
     Así que el veredicto es un empate en vocabulario — y el resto honesto
     es solo el modelo de entrega. La versión stream eleva a un
-    <code>Stream</code> una lista que ya tiene en la mano y espera con
-    await a recuperar la colección; la versión pull termina antes de que
+    <code>Stream</code> una lista que ya tiene en la mano y recupera la
+    colección con await; la versión pull termina antes de que
     el primer <code>await</code> de la versión stream hubiera llegado a
     ejecutarse. En una lista fija de nueve elementos esa sobrecarga es lo
     bastante pequeña como para encogerse de hombros — exactamente la
-    diferencia entre este ejemplo y la agregación que carga con el
+    diferencia entre este ejemplo y la agregación que lleva el peso del
     veredicto en <em>Suma los importes pares válidos</em>: aquí el punto
     es que las dos bibliotecas están de acuerdo, hasta en la promoción de
     tipos.

@@ -17,7 +17,7 @@ nextLabel: compact
   <h2>강의</h2>
   <p>
     <code>whereNot</code>은
-    <code>fxWhere((a) =&gt; !f(a), iterable)</code>로 구현되어 있습니다 —
+    <code>fxFilter((a) =&gt; !f(a), iterable)</code>로 구현되어 있습니다 —
     오로지 가독성을 위해 존재합니다. <code>list.whereNot(isInvalid)</code>가
     <code>list.where((a) =&gt; !isInvalid(a))</code>보다 훨씬 자연스럽게 읽히고,
     술어에 이미 긍정형의 분명한 이름이 붙어 있다면 더욱 그렇습니다.

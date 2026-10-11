@@ -44,6 +44,6 @@ async: true
     dialectos: una cadena fluida para la preparación y luego fontanería
     imperativa para las peticiones. En la versión de FxDart la política se
     mantiene declarativa de principio a fin —<code>concurrent(3)</code> es
-    el pool de workers entero, y cambiar el límite (o eliminarlo) toca un
-    número en lugar de la forma de la función.
+    el pool de workers entero, y cambiar el límite edita un número y eliminarlo quita un paso, sin
+    tener que remodelar la función.
   </p>

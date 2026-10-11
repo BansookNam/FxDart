@@ -38,12 +38,13 @@ nextLabel: spaceBy
     later value with the same key opens a new one — an idle timeout per
     user, a "session ended" signal per room. Without
     <code>lastFor</code>, groups stay open until the source completes
-    (or errors, which errors every live group then the outer).
+    (or errors; an error is forwarded to every live group, then to the outer
+    stream).
   </p>
   <p>
     Cancelling the outer completes live groups silently, the same RxJS 9
-    rule the window family follows. fxdart events layer, after Rx's
-    <code>groupBy</code>.
+    rule the window family follows. This is part of fxdart's events layer,
+    modeled on Rx's <code>groupBy</code>.
   </p>
 
   <h2>Demo 1 · Groups as they open</h2>

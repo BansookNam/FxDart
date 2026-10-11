@@ -5,6 +5,8 @@ description: Tutorial de concurrentPool en FxDart: un pool de tamaño fijo de pe
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
+prev: mapConcurrent.html
+prevLabel: mapConcurrent
 next: retry.html
 nextLabel: retry
 ---
@@ -29,7 +31,7 @@ nextLabel: retry
   <p>
     A diferencia de <code>concurrent</code>, que se guía por el marcador de
     demanda que llega de aguas abajo, <code>concurrentPool</code> <strong>mantiene
-    su pool lleno de forma ansiosa</strong>: desde el primer pull conserva hasta
+    su pool lleno por adelantado</strong>: desde el primer pull conserva hasta
     <code>n</code> peticiones en vuelo, haya los consumidores que haya
     esperando. Incluso un operador terminal que tira de uno en uno como
     <code>.toList()</code> o <code>.each()</code> obtiene todo el solapamiento

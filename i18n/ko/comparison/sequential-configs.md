@@ -12,8 +12,8 @@ async: true
 ---
   <h2>요구사항</h2>
   <p>
-    (가상의) API에서 원격 설정 섹션 세 개 — <code>features</code>,
-    <code>limits</code>, <code>theme</code> — 를 <strong>하나씩,
+    (가상의) API에서 원격 설정 섹션 세 개(<code>features</code>,
+    <code>limits</code>, <code>theme</code>)를 <strong>하나씩,
     순서대로</strong> 불러온 다음, 불러온 값을 각각 출력하세요. 가짜
     fetch는 고정된 15ms가 걸립니다. 두 버전 모두 <em>예상 출력</em>
     아래에 표시된 줄을 출력해야 합니다.
@@ -35,7 +35,7 @@ async: true
     날, <code>.concurrent(8)</code>을 붙이기만 하면 같은 체인이 순서를
     유지하는 제한된 워커 풀로 바뀝니다 — 다른 곳은 아무것도 건드리지
     않습니다. 네이티브 루프에는 이런 다이얼이 없습니다. 다시 작성해야
-    합니다. 그 결말은
-    <a href="bounded-concurrency.html">두 개씩 프로필 가져오기</a>를
-    참고하세요.
+    합니다. 그 뒤의 이야기는
+    <a href="bounded-concurrency.html">두 개씩 프로필 가져오기</a>에서
+    볼 수 있습니다.
   </p>

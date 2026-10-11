@@ -10,7 +10,7 @@ prevLabel: identity
 next: tap.html
 nextLabel: tap
 ---
-  <p class="hero-sub">인자를 무시하고 언제나 같은 고정값을 반환하는 함수를 반환합니다.</p>
+  <p class="hero-sub">인자를 무시하고 언제나 같은 고정값을 돌려주는 함수입니다.</p>
 
   {{signature}}
 
@@ -18,10 +18,9 @@ nextLabel: tap
   <p>
     <code>fxAlways(a)</code>는 <code>a</code>를 클로저에 담아, 무엇을 인자로
     받든 버리고 매번 <code>a</code>를 반환하는 함수를 돌려줍니다.
-    파라미터가 선택적이라는 점이 핵심인데, 덕분에 <em>단항</em> 콜백이
-    필요한 어느 자리에나 그대로 들어맞습니다 — 매퍼, <code>orElse</code>
-    핸들러, 폴백 분기 등 — 매번 <code>(_) => a</code>를 직접 쓸 필요가
-    없습니다.
+    파라미터가 선택적인 것이 핵심입니다. 덕분에 <em>단항</em> 콜백이 필요한
+    자리(매퍼, <code>orElse</code> 핸들러, 폴백 분기 등)에 그대로 넣을 수
+    있고, 매번 <code>(_) => a</code>를 직접 쓸 필요가 없습니다.
   </p>
   <p>
     <a href="identity.html"><code>fxIdentity</code></a>의 상수 버전이라고 보면

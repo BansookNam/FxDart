@@ -12,7 +12,7 @@ nextLabel: the naming rationale
 ---
   <p class="hero-sub">
     Typed errors fused with FxDart's lazy, concurrency-aware pipelines — the
-    part neither Arrow nor any Dart FP library has.
+    part Arrow does not have.
   </p>
 
   {{signature}}

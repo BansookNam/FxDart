@@ -41,8 +41,8 @@ noBenchmark: timing
     cerrar.
   </p>
   <p>
-    Es deliberado: la capa de eventos de fxdart absorbió el enfoque Rx
-    para el lado push. <code>fxEvents</code> es una cadena envoltorio
+    Es deliberado: la capa de eventos de fxdart incorporó el enfoque de
+    Rx para el lado push. <code>fxEvents</code> es una cadena envoltorio
     fina sobre <code>Stream</code>s de Dart llanos — nunca una
     extensión, así que no colisiona con nada, rxdart incluido — que da a
     los operadores basados en tiempo un hogar que los pipelines pull con

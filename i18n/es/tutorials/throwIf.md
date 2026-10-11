@@ -17,7 +17,7 @@ nextLabel: cases
   <h2>Lección</h2>
   <p>
     <code>fxThrowIf(predicate, toError, value)</code> es una cláusula de guarda
-    que puedes soltar en mitad de una expresión: si
+    que puedes colocar en mitad de una expresión: si
     <code>predicate(value)</code> es true, lanza
     <code>toError(value)</code>; si no, te devuelve <code>value</code> sin
     cambios. Eso lo hace cómodo dentro de un callback de <code>map</code>,

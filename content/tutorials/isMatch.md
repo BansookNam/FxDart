@@ -35,7 +35,9 @@ nextLabel: matches
     Because the rules nest, you get deep matching almost for free: a
     pattern like <code>{'address': {'city': 'seoul'}}</code> matches a user
     map with a much larger, deeply nested <code>address</code> value, as
-    long as <code>city</code> is <code>'seoul'</code> somewhere inside it.
+    long as the <code>address</code> entry has a <code>city</code> key whose
+    value is <code>'seoul'</code> — the pattern's key path has to line up
+    with the target at that position, not just appear somewhere inside it.
   </p>
 
   <h2>Demo 1 · Map matching</h2>

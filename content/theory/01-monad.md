@@ -121,8 +121,8 @@ chain. Monads are how you compose functions that return contexts.
 Dart hides `flatMap` behind syntax you use daily. `await` *is* `flatMap` for
 `Future`: it takes the value out of a future, runs the rest of the function
 on it, and the result is one future — never a `Future<Future<T>>`. A
-`for`-in loop that appends to a list is `flatMap` for `List`. Chapter 14's
-`either { }` block is `flatMap` for `Either`.
+`for`-in loop that appends to a list is `flatMap` for `List`. Chapter 15's
+`fxEither((r) { … })` block is `flatMap` for `Either`.
 
 Watch the same computation written both ways — first as an explicit chain,
 then in FxDart's `fxEither` scope:

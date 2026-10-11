@@ -35,7 +35,7 @@ nextLabel: reduce
   <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
     <code>switchIfEmpty</code> / <code>defaultIfEmpty</code>를
-    따랐습니다. 비동기 형태는 비동기 대체 체인과 <code>Future</code>
+    본떴습니다. 비동기 형태는 비동기 대체 체인과 <code>Future</code>
     기본값을 받으며,
     <code><a href="concurrent.html">concurrent</a></code>와 조합됩니다.
   </p>

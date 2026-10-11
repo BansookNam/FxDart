@@ -48,7 +48,7 @@ nextLabel: mapEither
   </p>
   <p>
     <code>raiseLefts</code> es la otra dirección, solo sobre fallos
-    non-nullable, porque Dart no puede hacer <code>throw</code> de null.
+    no nulables, porque Dart no puede hacer <code>throw</code> de null.
     Desenvuelve cada <code>Right</code> y vuelve a poner cada
     <code>Left</code> en el canal de errores, para un límite que entrega el
     stream a código basado en <code>Stream</code> que espera errores de

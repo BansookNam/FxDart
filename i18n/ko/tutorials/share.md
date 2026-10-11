@@ -29,7 +29,7 @@ nextLabel: shareReplay
     <code>share()</code>가 그것을 해결합니다. <strong>첫</strong>
     리스너에서 연결하고 그때부터 모든 리스너에게 방송하므로, 몇 명이
     보고 있든 상류의 일은 한 번만 일어납니다. debounce 타이머, 소켓,
-    비싼 map — 구독자마다 하나가 아니라 전부 하나씩입니다.
+    비싼 map이 구독자 수만큼 생기지 않고 각각 하나씩만 생깁니다.
   </p>
   <p>
     <code>share({reset: true})</code> — 기본값 — 은 이제 Rx의
@@ -48,14 +48,13 @@ nextLabel: shareReplay
   </p>
   <p>
     <code>share()</code>는 <em>기억</em>하지도 않습니다: 이벤트가 지나간
-    뒤에 도착한 리스너는 그냥 놓친 것입니다. 이력의 창이 필요하면
-    <code><a href="shareReplay.html">shareReplay</a></code>가 다음
-    쪽입니다. 늦게 온 쪽이 현재 상태를 알아야 할 때 — 대부분의 UI가
+    뒤에 도착한 리스너는 그냥 놓친 것입니다. 이력을 남겨 두어야 한다면
+    <code><a href="shareReplay.html">shareReplay</a></code>를 쓰세요. 늦게 온 쪽이 현재 상태를 알아야 할 때 — 대부분의 UI가
     그렇습니다 —
     <code><a href="liveValue.html">LiveValue</a></code>가 답이고,
     <code>LiveValue.from(source)</code>과
     <code>LiveValue.seededFrom(seed, source)</code>이 스트림에서 바로
-    하나를 만듭니다. 이들은 <strong>뜨겁습니다</strong>: 구독이 즉시
+    하나를 만듭니다. 이들은 <strong>핫(hot)</strong>입니다: 구독이 즉시
     열리므로 아무도 리슨하기 전에 도착한 값도 <code>value</code>를
     갱신하고, <code>close()</code>는 소스를 취소합니다. 선택적 시드가
     아니라 이름 붙은 생성자인 것은 널 가능한 <code>T</code>도 null로

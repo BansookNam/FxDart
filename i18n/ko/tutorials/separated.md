@@ -22,8 +22,8 @@ nextLabel: share
     이 세 연산자는
     <code><a href="eitherPipelines.html">FxEitherOps</a></code>의
     푸시 쪽 짝입니다.
-    <code>rights()</code>는 성공만, 풀어서 남기고;
-    <code>lefts()</code>는 실패만, 풀어서 남기고;
+    <code>rights()</code>는 성공 값만 풀어서 남기고;
+    <code>lefts()</code>는 실패 값만 풀어서 남기고;
     <code>separated()</code>는
     <code>(failures, successes)</code>로 가릅니다 —
     <code>Either</code> 모양의

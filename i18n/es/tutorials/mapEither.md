@@ -10,7 +10,7 @@ prevLabel: attempt
 next: separated.html
 nextLabel: separated
 ---
-  <p class="hero-sub">Ejecuta cada evento en su propio ámbito raise: <code>r.raise</code> (y <code>r.ensure</code> / <code>r.bind</code>) se convierte en un <code>Left</code>, un retorno normal en un <code>Right</code>.</p>
+  <p class="hero-sub">Ejecuta cada evento en su propio ámbito Raise: <code>r.raise</code> (y <code>r.ensure</code> / <code>r.bind</code>) se convierte en un <code>Left</code>, un retorno normal en un <code>Right</code>.</p>
 
   {{signature}}
 
@@ -29,9 +29,9 @@ nextLabel: separated
   <p>
     Una excepción <em>lanzada</em> se queda en el canal de error — ese es el
     contrato del constructor <code>fxEither</code>, y mantiene
-    a <code>attempt</code> como el único sitio donde un throw se convierte en un
+    a <code>attempt</code> como el sitio donde un throw en el stream se convierte en un
     valor. Cuando un callback tanto eleva como lanza, prefiere
-    <code>fxEitherCatching</code> dentro de <code>mapEither</code> para que salga un
+    <code>fxEitherCatching</code> dentro de <code>mapEither</code> para que salga un único
     <code>Either</code>.
   </p>
   <p>
@@ -63,6 +63,6 @@ nextLabel: separated
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="attempt.html"><code>attempt</code></a> — la frontera que convierte un throw en un <code>Left</code> ·
-    <a href="raise.html"><code>fxEither</code> constructor</a> — el mismo ámbito raise, sobre un solo valor ·
+    <a href="raise.html"><code>fxEither</code> constructor</a> — el mismo ámbito Raise, sobre un solo valor ·
     <a href="separated.html"><code>rights</code> / <code>separated</code></a> — parte los <code>Either</code>s resultantes
   </div>

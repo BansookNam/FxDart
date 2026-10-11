@@ -62,7 +62,7 @@ nextLabel: debounced search
     a terminal: <code>fxEvents(a).sequenceEqual(b)</code> returns
     <code>Future&lt;bool&gt;</code>, false on the first value or length
     mismatch, and an error from either side fails the future. The same
-    question exists on pull: <code>sequenceEqual</code> /
+    question exists on pull: <code>fxSequenceEqual</code> /
     <code>Fx.sequenceEqual</code> for iterables,
     <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code> for

@@ -39,7 +39,7 @@ async: false
   </p>
   <p>
     FxDart dice la cosa directamente: <code>zipWithIndex</code> empareja
-    cada elemento con su posición, y un <code>map</code> corriente
+    cada elemento con su posición, y un <code>map</code> normal
     formatea la pareja. Esto no es tanto un hueco push-contra-pull como un
     hueco de vocabulario — un operador de emparejado con índice es
     trivialmente expresable en cualquiera de los dos modelos, simplemente

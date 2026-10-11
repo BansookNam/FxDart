@@ -30,7 +30,7 @@ noBenchmark: timing
 
   <h2>Por qué difieren</h2>
   <p>
-    El espaciado va de tiempo, así que cabría esperar que el stream
+    El espaciado tiene que ver con el tiempo, así que cabría esperar que el stream
     ganara — y RxDart sí tiene la palabra para ello:
     <code>interval</code> retiene cada evento 100&nbsp;ms antes de que
     llegue al ping, y el backpressure mantiene todo el asunto secuencial.
@@ -45,8 +45,8 @@ noBenchmark: timing
     comprobación con Stopwatch imprime <code>spaced: true</code> en ambos
     lados. Llámalo un empate con una salvedad por bando: RxDart nombra el
     concepto explícitamente, lo que se lee mejor en un pipeline lleno de
-    otros operadores de tiempo; a FxDart le sale como consecuencia de una
-    línea de la demanda, pero solo porque esta tarea quiere llamadas
+    otros operadores de tiempo; a FxDart le sale como consecuencia de la demanda, en una sola
+    línea, pero solo porque esta tarea quiere llamadas
     estrictamente seriales — para espaciar eventos que llegan con su
     propio calendario (un stream de eventos real), acude al lado stream
     del puente (<code>fxStream</code>) y al vocabulario temporal de

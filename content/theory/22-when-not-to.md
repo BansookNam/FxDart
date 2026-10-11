@@ -83,7 +83,7 @@ it pays and not everywhere.
 
 ![A checklist, not a philosophy](diagrams/t22-1-checklist.svg)
 
-*Figure 22-1. Four questions, asked before writing the pipeline. Three "no"s and a loop is the right answer — which is a normal outcome, not a failure of nerve.*
+*Figure 22-1. Four questions, asked before writing the pipeline. Four "no"s (zero yeses) and a loop is the right answer — which is a normal outcome, not a failure of nerve.*
 
 ## The checklist
 
@@ -99,7 +99,7 @@ Before reaching for the pipeline vocabulary:
    a "seen" set — if the imperative version needs a paragraph, the pipeline is
    usually shorter *and* clearer.
 
-Three or four yeses: use the tools. One yes: use the tools for that part only.
+Two or more yeses: use the tools. One yes: use the tools for that part only.
 Zero: write the loop, and do not apologise.
 
 ## What to keep regardless
@@ -140,8 +140,8 @@ is the cheapest code review you will ever run.
    If fewer than two, rewrite it as a loop and compare the diff.
 2. Write the worst reasonable pipeline for "sum the even numbers in a list",
    then the loop. Which is shorter? Which would you rather debug at 2am?
-3. Chapter 14 found the pipeline faster in three of 53 cases. What did those
-   three have in common, and does your hot path have it?
+3. Chapter 14 found the pipeline faster in 21 of 53 cases, and slower in 19.
+   What did the biggest wins have in common, and does your hot path have it?
 4. Name a piece of code in your project where typed errors would be *worse*
    than an exception, and say precisely why.
 
@@ -155,10 +155,13 @@ is the cheapest code review you will ever run.
    sum += x;` versus a chain plus a fold with a seed. Debugging at 2am favours
    the version where every value is visible in a local variable — which is a
    genuine argument, not a concession.
-3. All three refused work: they used `take`/`first` after a stage whose native
-   equivalent did the whole job (a full sort, a full scan). If your hot path
-   consumes everything it produces, that mechanism is unavailable to you and
-   the ratio will not favour the pipeline.
+3. The largest (`restock-plan`, `top-expenses`, `top-log-level`) were not
+   refused work: they were a named step — a sort, a count — that the library
+   implements more cheaply than the hand-written equivalent builds it, so the
+   win belongs to that step rather than to pipelines as such. A smaller group
+   (`valid-emails`) did refuse work with `take`. If your hot path does neither,
+   those mechanisms are unavailable to you and the ratio will not favour the
+   pipeline.
 4. Anything the caller cannot act on: a failed assertion about an internal
    invariant, a corrupted cache file at startup, a programming mistake in an
    argument. Modelling those as `Either` forces every caller to handle a case
