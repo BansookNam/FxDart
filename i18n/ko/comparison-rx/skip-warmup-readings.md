@@ -36,10 +36,10 @@ async: false
   <p>
     주목할 점: 이 작업에서 RxDart 패널은 순수 <code>dart:async</code>입니다
     — <code>skipWhile</code>, <code>map</code>, <code>toList</code>가 모두
-    코어 <code>Stream</code>에 실려 있으므로, 여기서는 RxDart의 import가
-    아무것도 벌어들이지 못합니다. 이것이 반대편에서 바라본 티어 1 겹침의
+    코어 <code>Stream</code>에 실려 있으므로, 여기서는 RxDart를 import해도
+    얻는 것이 없습니다. 이것이 반대편에서 바라본 티어 1 겹침의
     모습입니다: 공유 어휘가 플랫폼 자체에 사는 경우도 있습니다. 남는 것은
-    전달 모델뿐입니다 — pull 체인이 평범한 값으로 반환하는 것을 수집하기
+    전달 모델뿐입니다 — 풀(pull) 체인이 평범한 값으로 반환하는 것을 수집하기
     위한 <code>async</code> main과 <code>await</code>, 이벤트 루프는
     필요하지도 않은데 말이죠. 무승부입니다.
   </p>

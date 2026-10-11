@@ -31,7 +31,7 @@ async: false
     páginas se solapan, así que un id repetido llega en una <em>página
     distinta</em> — nunca junto a su primera aparición una vez aplanadas
     las páginas. Ese es exactamente el trabajo que el
-    <code>Stream.distinct</code> corriente hace mal en silencio: es solo
+    <code>Stream.distinct</code> habitual hace mal en silencio: es solo
     adyacente, así que en este feed dejaría pasar de largo todas las
     repeticiones. La deduplicación aquí necesita memoria de todo el feed,
     mientras que el aplanado en sí es fluido en ambos modelos —

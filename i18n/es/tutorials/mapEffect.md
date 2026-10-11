@@ -17,7 +17,7 @@ nextLabel: flatMap
   <h2>Lección</h2>
   <p>
     Si miras el código fuente verás que <code>mapEffect</code> es literalmente
-    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code> — la misma
+    <code>Iterable&lt;B&gt; fxMapEffect&lt;A, B&gt;(f, iterable) =&gt; fxMap(f, iterable);</code> — la misma
     función, la misma pereza, la misma firma. Existe únicamente para
     documentar la <em>intención</em> en el punto de llamada: usa
     <code>mapEffect</code> cuando el valor de retorno del callback importa
@@ -47,7 +47,7 @@ nextLabel: flatMap
   {{playground:1}}
 
   <h2>Pruébalo tú</h2>
-  <p>Ejercicio: usa <code>mapEffect</code> para hacer <code>print</code> de una
+  <p>Ejercicio: usa <code>mapEffect</code> para imprimir con <code>print</code> una
     línea <code>'billing $&lt;dollars&gt;'</code> por cada importe mientras
     conviertes céntimos a dólares.</p>
   {{playground:2}}

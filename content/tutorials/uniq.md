@@ -20,7 +20,7 @@ nextLabel: uniqBy
     values already seen, and yields each element only the first time it
     shows up. <code>distinct</code> is the Dart-idiomatic name; fxdart also
     accepts the FxTS spelling <code>uniq</code> — they're the same operator.
-    It's implemented as <code>fxUniqBy((a) =&gt; a, iterable)</code> —
+    It behaves like <code>fxUniqBy((a) =&gt; a, iterable)</code> —
     the identity key — so if you ever need to dedupe by something other than
     equality of the whole value, reach for
     <a href="uniqBy.html"><code>uniqBy</code></a> instead.

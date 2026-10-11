@@ -19,8 +19,9 @@ nextLabel: findIndex
     <code>firstWhereOrNull</code> is the Dart-idiomatic name; fxdart also
     accepts the FxTS spelling <code>find</code> — they're the same operator.
     It's what <code>head</code> and <code>filter</code>
-    look like fused together — in fact it's implemented as exactly that:
-    <code>fxHead(fxFilter(f, iterable))</code>. That fusion is what makes it
+    look like fused together — the async version is literally
+    <code>fxHead(fxFilterAsync(f, iterable))</code>, and the sync one is a
+    direct loop that behaves the same way. That fusion is what makes it
     lazy and short-circuiting: it pulls elements one at a time, testing each
     against <code>f</code>, and stops the instant it finds a match. Nothing
     further downstream is ever touched.
@@ -46,6 +47,6 @@ nextLabel: findIndex
     <strong>Related:</strong>
     <a href="findIndex.html"><code>findIndex</code></a> — same search, returns a position ·
     <a href="filter.html"><code>filter</code></a> — every match, not just the first ·
-    <a href="head.html"><code>head</code></a> — what <code>find</code> is built from ·
+    <a href="head.html"><code>head</code></a> — what <code>find</code> is equivalent to when fused with <code>filter</code> ·
     <a href="matches.html"><code>fxMatches</code></a> — a ready-made shape-matching predicate
   </div>

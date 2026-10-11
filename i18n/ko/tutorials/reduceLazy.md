@@ -18,7 +18,7 @@ nextLabel: sum
   <p>
     <code>fxReduceLazy</code>는 스스로 무언가를 접지 않습니다 —
     <strong>리듀서를 만들어 냅니다</strong>. 결합 함수와 시드를 건네면
-    <code>Iterable&lt;A&gt; Function</code> 타입의 평범한 함수가 돌아오고,
+    <code>Acc Function(Iterable&lt;A&gt;)</code> 타입의 평범한 함수가 돌아오고,
     시드와 결합 함수를 매번 다시 적지 않고도 원하는 만큼 여러 번, 서로 다른
     이터러블에 얼마든지 호출할 수 있습니다.
   </p>

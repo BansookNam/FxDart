@@ -26,14 +26,14 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    순수 Dart에는 청크 분할 기능이 아예 없습니다 — 도움 없이는
-    <code>sublist</code>를 도는 인덱스 루프에, 짧은 마지막 페이지를
+    순수 Dart에는 청크 분할 기능이 아예 없습니다. 도움 없이 하려면
+    <code>sublist</code>를 도는 인덱스 루프에 짧은 마지막 페이지를
     위한 <code>min</code> 가드까지 필요합니다. <code>package:collection</code>의
     <code>slices</code>가 이를 해결해 주며, 이미 이 패키지를 쓰고
     있다면 두 코드는 거의 쌍둥이입니다. FxDart의 강점은
     <code>chunk</code>가 추가 의존성이 필요 없고, 지연 평가되며(페이지는
     소비할 때 만들어집니다), 바로 같은 단계가 비동기 체인에서도
-    동작한다는 점입니다 — <code>concurrent</code> 단계 앞에서 요청을
+    동작한다는 점입니다. <code>concurrent</code> 단계 앞에서 요청을
     배치로 묶는 것이 대표적인 용례입니다. 크지는 않지만 실질적인
     이점입니다.
   </p>

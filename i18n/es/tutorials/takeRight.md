@@ -19,9 +19,12 @@ nextLabel: takeWhile
     <code>takeLast</code> es la imagen especular de <code>take</code>: en lugar
     de los primeros <code>length</code> valores, obtienes los últimos. Pero hay
     una pega: para saber cuáles son los «últimos», <code>takeLast</code> tiene que
-    ver antes todos los elementos. Internamente <strong>materializa</strong> la
-    fuente entera en una lista antes de emitir nada, así que, a diferencia de la
-    mayoría de operadores de FxDart, no funciona sobre secuencias infinitas.
+    ver antes todos los elementos. Tiene que <strong>consumir</strong> la
+    fuente entera antes de emitir nada (una <code>List</code> se indexa
+    directamente; cualquier otra fuente se lee a través de un búfer circular que
+    guarda solo los últimos <code>length</code> elementos), así que, a
+    diferencia de la mayoría de operadores de FxDart, no funciona sobre
+    secuencias infinitas.
     <code>takeLast</code> es el nombre idiomático en Dart; fxdart también
     acepta <code>takeRight</code>, la grafía de FxTS: son el mismo operador.
   </p>
@@ -46,6 +49,6 @@ nextLabel: takeWhile
     <strong>Relacionado:</strong>
     <a href="take.html"><code>take</code></a> — los primeros n en vez de los últimos n ·
     <a href="dropRight.html"><code>dropRight</code></a> — descarta los últimos n ·
-    <a href="reverse.html"><code>reverse</code></a> — también materializa la fuente ·
+    <a href="reverse.html"><code>reverse</code></a> — materializa la fuente entera ·
     <a href="slice.html"><code>slice</code></a> — una ventana de índices arbitraria
   </div>

@@ -1,11 +1,11 @@
 ---
 slug: latency-percentiles
 title: Latencia p50/p95 por endpoint — Dart vs FxDart
-description: Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sortBy + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.
+description: Tabla de percentiles a partir de logs de peticiones en crudo — groupBy + sort + nth por endpoint frente a un bucle que acumula filas con ordenaciones in situ.
 heading: Latencia p50/p95 por endpoint
 order: 40
 tier: 4
-functions: filter, groupBy, map, sortBy, nth, maxBy, join
+functions: filter, groupBy, map, sort, sortBy, nth, maxBy, join
 domain: logs
 verdict: fxdart
 async: false
@@ -29,15 +29,16 @@ async: false
   <h2>Por qué difieren</h2>
   <p>
     Un percentil es «ordena y luego indexa»: en FxDart eso es literalmente
-    <code>sortBy</code> + <code>nth</code>, aplicados dentro de un pipeline
+    <code>sort</code> + <code>nth</code>, aplicados dentro de un pipeline
     <code>groupBy</code> → <code>map</code> que convierte cada grupo de
     endpoint en una fila de estadísticas; ordenar la tabla y encontrar el
-    peor endpoint reutilizan esas mismas filas con <code>sortBy</code> y
+    peor endpoint reutilizan esas mismas filas con <code>sortBy</code> (que solo ordena
+    la tabla final, no los percentiles) y
     <code>maxBy</code>. La versión nativa hace las mismas cuentas, pero a
     través de una lista mutable de filas rellenada en un bucle
     <code>for</code>, un <code>..sort()</code> in situ, acceso por índice en
     crudo y un comparador con <code>reduce</code> para el máximo. Ambas son
-    correctas; el lado de fxdart mantiene «agrupar → resumir → ordenar»
+    correctas; el lado de FxDart mantiene «agrupar → resumir → ordenar»
     como tres trazos visibles en lugar de un solo bucle que hace los tres a
     la vez.
   </p>

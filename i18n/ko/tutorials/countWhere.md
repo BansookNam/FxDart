@@ -17,8 +17,8 @@ nextLabel: sort
   <h2>강의</h2>
   <p>
     "이 중 몇 개가 연체 / 세일 중 / 짝수인가?"는 자꾸
-    <code>filter(pred).size()</code>로 쓰이곤 했습니다 — 개념상 폴드
-    하나인 것에 체인 두 단계와 지연 중간 단계라니요.
+    <code>filter(pred).size()</code>로 쓰이곤 했습니다. 개념상 폴드 하나인
+    계산에 체인 단계가 둘이고 지연 중간 단계까지 생기는 셈입니다.
     <code>countWhere(pred)</code>가 바로 그 폴드입니다. 파이프라인을 한 번
     순회하며 일치할 때마다 증가시키고 개수를 반환합니다. 도중에 아무것도
     구체화되지 않습니다.
@@ -30,8 +30,7 @@ nextLabel: sort
     다른 모든 <code>*Async</code> 연산자처럼 원소마다 조건을 await합니다.
   </p>
   <p>
-    Dart 고유의 추가 기능입니다 — Kotlin <code>count { }</code>의
-    형태입니다.
+    Dart 고유의 추가 기능이며, 형태는 Kotlin의 <code>count { }</code>와 같습니다.
   </p>
 
   <h2>데모 1 · 조건 하나, 숫자 하나</h2>
@@ -47,6 +46,6 @@ nextLabel: sort
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="countBy.html"><code>countBy</code></a> — 키별 개수 ·
-    <a href="count.html"><code>size</code>/<code>count</code></a> — 전부 세기 ·
+    <a href="size.html"><code>size</code>/<code>count</code></a> — 전부 세기 ·
     <a href="filter.html"><code>filter</code></a> — 일치한 값 자체가 필요할 때
   </div>

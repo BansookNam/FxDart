@@ -80,17 +80,19 @@ ningún tipo nuevo:
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Future<Either<String, int>> lookup(String key) async {
+Future<Either<String, String>> lookup(String key) async {
   await Future.delayed(const Duration(milliseconds: 10));
-  return key == 'port'
-      ? Either.right(8080)
-      : Either.left('missing: $key');
+  return switch (key) {
+    'port' => Either.right('8080'),
+    'host' => Either.right('localhost'),
+    _ => Either.left('missing: $key'),
+  };
 }
 
 void main() async {
   final ok = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('port'));
-    final host = r.bind(await lookup('port'));
+    final host = r.bind(await lookup('host'));
     return 'http://$host:$port';
   });
   print(ok);
@@ -212,9 +214,10 @@ ejecutará más tarde, que es lo que la regla de la fuga prohíbe.
 2. ¿Qué devuelve `fxEither` cuando el bloque lanza una excepción genuina en vez
    de hacer raise? Pruébalo, y explica por qué ese es el comportamiento por
    defecto correcto.
-3. ¿Por qué un ámbito no puede reanudarse — es decir, por qué no hay un
-   `r.recover(...)` que continúe el bloque después de un fallo? Responde en
-   términos del mecanismo.
+3. ¿Por qué un ámbito no puede reanudarse — es decir, por qué nada puede
+   continuar el *mismo* bloque después de un fallo? (`r.recover(...)` existe,
+   pero envuelve un bloque anidado y gestiona su fallo; no reanuda el bloque que
+   hizo raise.) Responde en términos del mecanismo.
 4. `fxNullable` no tiene ningún valor de error. ¿Cuál es su tipo `E`, y qué te
    dice eso sobre la relación entre `Either<E, A>` y `A?`?
 
@@ -236,7 +239,10 @@ ejecutará más tarde, que es lo que la regla de la fuga prohíbe.
    locales han desaparecido. Reanudar requeriría capturar la continuación antes
    del desenrollado, que es la mitad de las continuaciones delimitadas que
    `Raise` deliberadamente no implementa. La recuperación por tanto ocurre
-   *fuera*, sobre el `Either` devuelto — `result.fold(...)` o `getOrElse`.
+   *fuera* del bloque que hizo raise: sobre el `Either` devuelto
+   (`result.fold(...)` o `getOrElse`), o ejecutando la parte arriesgada en un
+   `r.recover(block, onRaise)` anidado, que sustituye el bloque anidado entero
+   por un valor en lugar de reanudarlo.
 4. Su `E` es efectivamente `void`/`Null` — no hay nada que llevar. `A?` es
    `Either<Unit, A>` con el lado de fallo sin llevar información, así que todo
    cómputo anulable es un `Either` que ha olvidado por qué falló. Ese es el

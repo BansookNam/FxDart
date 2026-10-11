@@ -25,7 +25,7 @@ nextLabel: filter
     <code>(valor, f(valor))</code>, perezosamente.
   </p>
   <p>
-    Donde se gana el sueldo es en las cadenas async. Busca un precio por
+    Aquí es donde se justifica: en las cadenas async. Busca un precio por
     artículo y el par mantiene el artículo junto al precio (quizá ausente),
     de modo que el respaldo
     <code>r.$2&nbsp;??&nbsp;r.$1.listPrice</code> y la etiqueta «¿de qué

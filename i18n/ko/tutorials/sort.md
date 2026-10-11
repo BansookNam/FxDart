@@ -24,9 +24,9 @@ nextLabel: sortBy
     FxDart의 <code>sort</code>가 <strong>입력을 절대 변경하지 않는다</strong>는
     것입니다. 언제나 새 <code>List</code>를 할당하며
     (<code>List.of(iterable)..sort(f)</code>),
-    원본 이터러블은 그대로 남습니다. FxTS는 나중에 원본을 변경하는
-    <code>sort</code>에 대해 변경을 일으키지 않는 대안으로
-    <code>fxToSorted</code>를 추가했지만,
+    원본 이터러블은 그대로 남습니다. FxTS는 원본을 바꾸는
+    <code>sort</code> 대신 원본을 바꾸지 않는
+    <code>fxToSorted</code>를 나중에 추가했지만,
     FxDart에서 <code>fxToSorted</code>는 그저 별칭입니다 —
     <code>sort</code>가 이미 원본을 건드리지 않으니 구분할 이유가
     없기 때문입니다.
@@ -42,8 +42,8 @@ nextLabel: sortBy
     <strong>비동기</strong> 체인에는 이런
     사정이 없습니다. <code>FxAsync.sort(f)</code>는 그 자체가 종결
     연산자로서 <code>Future&lt;List&lt;T&gt;&gt;</code>를 바로 반환하는데,
-    파이프라인 전체를 먼저 <code>await</code>해야 하는 연산에서
-    <code>FxAsync</code>가 자기 자신을 반환할 수는 없기 때문입니다.
+    전체 파이프라인을 먼저 <code>await</code>해야 하는 연산이라
+    <code>FxAsync</code>가 자기 자신을 반환할 수 없기 때문입니다.
   </p>
   <p>
     비교자를 직접 작성하는 대신 추출한 키를 기준으로 정렬하고 싶다면

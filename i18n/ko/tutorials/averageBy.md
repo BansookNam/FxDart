@@ -44,6 +44,6 @@ nextLabel: min
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="average.html"><code>average</code></a> — 파이프라인이 이미 숫자를 담고 있을 때 ·
-    <a href="sumBy.html"><code>sumBy</code></a> — 분자에 해당하는 사촌 ·
+    <a href="sumBy.html"><code>sumBy</code></a> — 분자를 구하는 짝 함수 ·
     <a href="maxBy.html"><code>maxBy</code></a> · <a href="minBy.html"><code>minBy</code></a> — 계열의 나머지
   </div>

@@ -18,7 +18,7 @@ void main() {
   print(fxZip3([1, 2, 3], ['a', 'b'], [true, false, true]).toList());
   // [(1, a, true), (2, b, false)]
 
-  // zip3 has no chain method — feed its result back into fx() to keep going:
+  // Wrap the top-level result in fx() to keep chaining (fx(a).zip3(b, c) works too):
   final labels = fx(fxZip3(names, langs, years))
       .map((r) => '${r.$1}/${r.$3}')
       .toList();

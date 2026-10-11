@@ -26,14 +26,14 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    El ventaneo en sí queda en tablas: <code>bufferCount(7)</code> y
+    El ventaneo en sí queda igualado: <code>bufferCount(7)</code> y
     <code>chunk(7)</code> son el idioma idéntico para la misma ventana
     fija, y ambos emitirían una ventana final corta si 21 no dividiera
     exacto. El trabajo se parte en <em>numerar</em> las ventanas. RxDart
     no tiene operador con índice, así que la jugada idiomática es reclutar
     a <code>scan</code> como contador — un record acumulador cuyo único
     papel es llevar <code>week + 1</code> junto al búfer. Funciona, pero
-    el fold es un espectador vestido con la ropa de un operador de estado.
+    el fold es un mero espectador disfrazado de operador de estado.
   </p>
   <p>
     El lado pull tiene una palabra hecha a propósito:

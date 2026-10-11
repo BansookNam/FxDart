@@ -27,8 +27,8 @@ nextLabel: fork
     <code>fxReverseAsync</code>도 같은 규칙을 따릅니다. 상류의 모든 원소를
     먼저 await한 다음 뒤에서부터 되돌려 줍니다. 진짜 역순이 아니라 시퀀스의
     뒷부분만 필요하다면 <code>takeRight</code>을 쓰는 편이 낫습니다.
-    이쪽도 구체화하기는 하지만, 적어도 순서대로 출력할 값이 모이는 즉시
-    멈춥니다.
+    이쪽은 전체 소스 대신 <code>n</code>개의 원소만
+    버퍼링합니다.
   </p>
 
   <h2>데모 1 · 기본</h2>
@@ -43,7 +43,7 @@ nextLabel: fork
 
   <div class="callout">
     <strong>관련 항목:</strong>
-    <a href="takeRight.html"><code>takeRight</code></a> — 역시 구체화하지만 뒷부분만 필요 ·
+    <a href="takeRight.html"><code>takeRight</code></a> — 역시 소스 전체를 읽지만 뒷부분만 버퍼링 ·
     <a href="dropRight.html"><code>dropRight</code></a> ·
     <a href="sort.html"><code>sort</code></a> — 마찬가지로 새 리스트로 구체화
   </div>

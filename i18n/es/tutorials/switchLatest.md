@@ -54,7 +54,7 @@ nextLabel: mergeScan
     es como arrancas una petición ahora y aun así reproduces las respuestas en
     orden. Capa de eventos de fxdart, siguiendo a <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code> y <code>fxConcatEager</code> de Rx.
+    <code>exhaustAll</code> y <code>concatEager</code> de Rx.
   </p>
 
   <h2>Demo 1 · switchLatest — gana el interno más nuevo</h2>

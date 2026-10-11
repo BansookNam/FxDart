@@ -27,7 +27,7 @@ nextLabel: split
     두 개 미만이면 아무것도 내놓지 않습니다 — 만들 쌍이 없기 때문입니다.
   </p>
   <p>
-    레코드 필드가 양쪽을 모두 손 닿는 곳에 둡니다.
+    레코드 필드로 두 값을 모두 바로 꺼낼 수 있습니다.
     <code>p.$2&nbsp;-&nbsp;p.$1</code>이 증감량이고,
     <code>p.$2.compareTo(p.$1)</code>이 방향입니다. 이는 정확히
     2원소 리스트 대신 타입이 있는 레코드를 쓰는
@@ -36,7 +36,7 @@ nextLabel: split
   </p>
   <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). RxDart의
-    <code>pairwise</code>를 따랐습니다. 비동기 형태는 pull이 있기 전까지
+    <code>pairwise</code>를 따랐습니다. 비동기 형태는 풀(pull)이 일어나기 전까지
     아무것도 계산하지 않으며
     <code><a href="concurrent.html">concurrent</a></code>와 조합됩니다.
   </p>

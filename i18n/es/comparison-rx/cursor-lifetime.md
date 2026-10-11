@@ -1,7 +1,7 @@
 ---
 slug: cursor-lifetime
 title: La vida de un cursor alrededor de una lectura — RxDart vs FxDart
-description: Abrir un cursor, leer cinco filas, garantizar el cierre — Rx.using alrededor de un stream vs usingAsync alrededor de un pull perezoso, dos ports de una misma idea.
+description: Abrir un cursor, leer cinco filas, garantizar el cierre — Rx.using alrededor de un stream vs usingAsync alrededor de un pull perezoso, dos adaptaciones de una misma idea.
 heading: La vida de un cursor alrededor de una lectura
 order: 32
 tier: 3
@@ -28,8 +28,8 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    En su mayor parte no difieren — ambos son ports de la misma idea de
-    Rx, y FxDart lo dice: <code>fxUsingAsync</code> llegó
+    En su mayor parte no difieren — ambos son adaptaciones de la misma idea
+    de Rx, y FxDart lo dice: <code>fxUsingAsync</code> llegó
     después del <code>using</code> de Rx. La forma es el mismo paréntesis
     de tres partes: adquirir, usar, liberar. <code>Rx.using</code> crea el
     cursor cuando el stream recibe un listener y llama al liberador cuando

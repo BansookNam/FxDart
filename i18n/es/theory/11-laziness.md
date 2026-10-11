@@ -3,7 +3,7 @@ slug: laziness
 chapter: 11
 part: 3
 title: La pereza
-description: Una tubería como descripción del trabajo en vez del trabajo mismo — qué cambia la pereza sobre el coste, qué cambia sobre el significado (nada), y las dos formas en que puede perjudicarte.
+description: Un pipeline como descripción del trabajo en vez del trabajo mismo — qué cambia la pereza sobre el coste, qué cambia sobre el significado (nada), y las dos formas en que puede perjudicarte.
 ---
 # La pereza
 
@@ -12,7 +12,7 @@ description: Una tubería como descripción del trabajo en vez del trabajo mismo
 > - el modelo de coste: el trabajo es proporcional a lo que *consumes*, no a lo
 >   que escribes
 > - por qué la pereza no puede cambiar ninguna ley de la Parte II
-> - los dos peligros reales: efectos dentro de una tubería, y una fuente que
+> - los dos peligros reales: efectos dentro de un pipeline, y una fuente que
 >   solo se puede leer una vez
 
 ## Dos tipos de operador
@@ -40,8 +40,12 @@ una nueva descripción con una etapa más. `toList`, `each`, `fold`, `first`,
 `sum` son **terminales** — tiran de los valores, y solo entonces se ejecuta
 algo.
 
-La regla para distinguirlos es el tipo de retorno, y nunca miente: si te
-devuelve otro `Fx`, todavía no ha pasado nada.
+La regla para distinguirlos es el tipo de retorno — con una familia de
+excepciones. Si te devuelve otro `Fx`, todavía no se ha tirado de nada,
+*salvo* en los operadores que deben ver todos los elementos antes de poder
+emitir uno: `sort`, `sortBy`, `sortByDesc` y las variantes `*Strict`
+(`uniqStrict`, `uniqByStrict`) devuelven un `Fx` pero hacen su trabajo de
+inmediato.
 
 ![Una descripción, luego un pull](diagrams/t11-1-description-pull.svg)
 
@@ -79,9 +83,9 @@ versión ansiosa de ese programa construye una lista de un millón de elementos,
 luego la filtra en otra lista, y después descarta todo menos tres.
 
 Esta es la diferencia que aparece en la propia suite de benchmarks de FxDart
-como los casos en los que la tubería *gana* a un bucle escrito a mano — el
-bucle suele ser más rápido por elemento, pero la cadena perezosa se niega a
-hacer el trabajo directamente. El capítulo 14 pone números a ambas
+como los casos en los que el pipeline *gana* a un bucle escrito a mano — el
+bucle suele ser más rápido por elemento, pero la cadena perezosa se ahorra
+por completo el trabajo. El capítulo 14 pone números a ambas
 direcciones.
 
 De ese mismo modelo se desprenden dos consecuencias más:
@@ -114,7 +118,7 @@ void main() {
 Esta es la parte que vale la pena decir con todas las letras, porque es lo que
 hace que fiarse de la pereza sea seguro. Cada ley de la Parte II es una
 ecuación entre *valores*: la ley de functor dice que `m.map(f).map(g)` es
-igual a `m.map(g ∘ f)`, y que dos tuberías sean iguales significa que producen
+igual a `m.map(g ∘ f)`, y que dos pipelines sean iguales significa que producen
 los mismos elementos en el mismo orden.
 
 Cuándo ocurre la evaluación no forma parte de esa ecuación. Así que:
@@ -126,7 +130,7 @@ Cuándo ocurre la evaluación no forma parte de esa ecuación. Así que:
   observable — **mientras los callbacks sean puros.**
 
 Esa última cláusula es toda la trampa, y es la cláusula del capítulo 2. En una
-tubería pura, la pereza es invisible salvo en la factura. En una impura, es
+pipeline pura, la pereza es invisible salvo en la factura. En una impura, es
 visible en todas partes, porque *cuándo* ocurre un efecto es exactamente lo
 que un efecto te deja observar.
 
@@ -163,7 +167,7 @@ y las recetas se pueden cocinar cero veces o dos.
 > hasta que se fuerza, lo que te da estructuras de datos infinitas y
 > cláusulas `where` que no cuestan nada si no se usan — y fugas de memoria
 > cuando una cadena de thunks crece sin forzarse. Dart es estricto; una
-> tubería perezosa es la pereza recreada al nivel de las *secuencias*, y el
+> pipeline perezosa es la pereza recreada al nivel de las *secuencias*, y el
 > mecanismo es un protocolo pull en vez de thunks. La diferencia práctica:
 > obtienes los beneficios del cortocircuito y del streaming, no obtienes (ni
 > tienes que depurar) una acumulación de thunks sin límite, y `fx(xs).map(f)`
@@ -171,8 +175,8 @@ y las recetas se pueden cocinar cero veces o dos.
 
 ## El segundo peligro: fuentes de un solo uso
 
-Una tubería sobre una `List` se puede tirar repetidamente — una lista se puede
-releer. Una tubería sobre una fuente que se consume al leerla no puede:
+Un pipeline sobre una `List` se puede tirar repetidamente — una lista se puede
+releer. Un pipeline sobre una fuente que se consume al leerla no puede:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -203,7 +207,7 @@ la fuente.
 
 ## Cuándo se gana el sueldo
 
-La pereza paga siempre que la tubería pudiera producir más de lo que
+La pereza paga siempre que el pipeline pudiera producir más de lo que
 necesitas: tomar los primeros N, buscar la primera coincidencia, transmitir un
 archivo que dejarás de leer, componer filtros cuya selectividad combinada es
 alta. También paga en memoria — un elemento en vuelo en vez de una lista por
@@ -213,11 +217,12 @@ Cuesta cuando todo se consume de todas formas y la fuente es pequeña: entonces
 el protocolo por elemento es sobrecarga frente a un bucle plano, y el
 capítulo 14 mide exactamente cuánto. Y cuesta en depurabilidad — una traza de
 pila dentro de una cadena perezosa muestra fotogramas de iterador, no tu
-tubería, que es el precio de la indirección.
+pipeline, que es el precio de la indirección.
 
 ## Ejercicios
 
-1. `fx(xs).map(f).toList()` y `xs.map(f).toList()` hacen el mismo trabajo.
+1. `fx(xs).map(f).toList()` y una versión ansiosa que construye una lista por
+   etapa hacen el mismo trabajo con un solo `map`.
    ¿En qué punto empieza a ganar la versión de FxDart, y qué operador de la
    cadena lo causa?
 2. Predice la salida de una cadena que llama a `peek(print)` antes de
@@ -234,15 +239,17 @@ tubería, que es el precio de la indirección.
    hecho — `take`, `first`, `some`, `find`, o un `filter` que rechaza la
    mayoría de los elementos antes de un `map` costoso. Sin esa etapa, las dos
    hacen el mismo trabajo, y la versión ansiosa tiene menos maquinaria por
-   elemento.
+   elemento. (El `Iterable.map`, `where` y `take` propios de Dart también son
+   perezosos; la referencia aquí es la versión ansiosa de una lista por etapa,
+   como en el listado del modelo de costes.)
 2. Dos líneas. `take(2)` deja de tirar después del segundo elemento, así que
    nunca se le pregunta a `peek` por los elementos tres en adelante — el pull
    es lo que impulsa la etapa anterior, y se detuvo.
 3. Cualquier cadena asignada a una variable y consumida por dos terminales,
    como en el listado de arriba. Arreglo uno: `final xs = chain.toList();` y
-   luego usa `xs` dos veces. Arreglo dos: usa `fxFork`/`tee` para dividir un
-   pull en dos consumidores, de modo que la fuente se siga leyendo una sola
-   vez.
+   luego usa `xs` dos veces. Arreglo dos: usa `fxFork` para alimentar a dos
+   consumidores desde un solo pull, o `tee` para plegar dos reductores en una
+   pasada, de modo que la fuente se siga leyendo una sola vez.
 4. Una vez con `.first` — un pull le basta. Con `.last`, las 999.999 veces:
    `last` tiene que llegar al final, así que no queda nada que saltarse. La
    misma cadena, la misma pereza, coste opuesto, decidido por completo por el

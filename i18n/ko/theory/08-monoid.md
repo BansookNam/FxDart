@@ -17,11 +17,11 @@ description: 결합적인 결합 연산에 항등원 하나 — 쓸모 있는 �
 
 **반군(semigroup)** 은 결합적인 이항 연산을 가진 타입입니다.
 
-`fxCombine(a, fxCombine(b, c)) == fxCombine(fxCombine(a, b), c)`
+`combine(a, combine(b, c)) == combine(combine(a, b), c)`
 
 **모노이드(monoid)** 는 항등원을 가진 반군입니다.
 
-`fxCombine(empty, a) == a == fxCombine(a, empty)`
+`combine(empty, a) == a == combine(a, empty)`
 
 그게 전부입니다. `+`와 `0`을 가진 `int`, `*`와 `1`을 가진 `int`, `+`와 `''`를
 가진 `String`, `+`와 `[]`를 가진 `List`, `&&`와 `true`를 가진 `bool`. 오늘도
@@ -120,7 +120,7 @@ void main() {
 그 성질이 없습니다. 문자열 이어 붙이기, 리스트 덧붙이기, 함수 합성 모두
 결합적이지만 어느 것도 교환적이지 않습니다.
 
-이 구분은 FxDart의 비동기 장에서 실제로 이빨을 드러냅니다. `concurrent(n)`은
+이 구분은 FxDart의 비동기 장에서 실제로 힘을 발휘합니다. `concurrent(n)`은
 원소를 순서 없이 평가하지만 **소스 순서대로** 내보내는데, 바로 그래야 하류의
 fold가 교환이 아니라 결합만 요구하기 때문입니다. 완료 순서대로 결과를 내주는
 라이브러리라면 여러분의 코드에 더 강한 법칙을 말없이 요구하는 셈입니다.
@@ -149,7 +149,8 @@ void main() {
   print('length: ${all.length}');
 
   // Nel is an extension type over List, so it costs nothing at
-  // runtime — and `orNull` is the only way in from a plain list.
+  // runtime. From a plain list: `orNull` or `toNelOrNull()`;
+  // or build one with `NonEmptyList.of(head, tail)`.
   print(NonEmptyList.orNull(<String>[]));
 }
 ```
@@ -194,7 +195,7 @@ API 설계에서도 그렇습니다. "씨앗과 결합 연산을 달라"는 인�
 
 ## 정답과 해설
 
-1. 둘 다 예입니다. `max`는 결합적이고 교환적이며, 그 항등원은 음의 무한대인데
+1. 반군은 예, 모노이드는 단서가 붙습니다. `max`는 결합적이고 교환적이며, 그 항등원은 음의 무한대인데
    Dart의 `int`에는 그런 값이 없습니다 — 그래서 `max`는 `int` 위에서는 *반군*이고,
    `double`(`double.negativeInfinity`)이나 `null`을 항등원으로 삼는 `int?` 위에서만
    모노이드입니다. `max`에는 `reduce`가 자연스럽고 `fold`에는 어색한 씨앗이
@@ -212,5 +213,5 @@ API 설계에서도 그렇습니다. "씨앗과 결합 연산을 달라"는 인�
 4. `Future.wait`는 결과에 대한 리스트 모노이드를 씁니다 — 인자 순서대로 이어
    붙이고, `[]`가 항등원입니다(아무것도 기다리지 않으면 빈 리스트). 실패는
    누적되지 *않습니다*. 기본값에서는 첫 오류가 이기고 나머지는 버려지는데, 6장이
-   `zipOrAccumulate`와 대비했던 그 빨리 실패 동작입니다. `eagerError: false`는
+   `zipOrAccumulate`와 대비했던 그 빨리 실패 동작입니다. `eagerError: true`는
    언제 보고할지를 바꿀 뿐 몇 개를 보고할지는 바꾸지 않습니다.

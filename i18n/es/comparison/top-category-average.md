@@ -29,7 +29,7 @@ async: false
     El núcleo de Dart no tiene ni <code>groupBy</code> ni
     <code>maxBy</code>; <code>package:collection</code> aporta ambos — pero
     como funciones de nivel superior, no como pasos de una cadena. La
-    versión nativa se lee por tanto de dentro afuera:
+    versión nativa se lee, por tanto, de dentro hacia fuera:
     <code>maxBy(</code>… envolviendo un <code>map</code> sobre las
     entradas de un <code>groupBy(</code>… — tres modismos (llamada a
     función, cadena de métodos, llamada a función) para una sola idea de

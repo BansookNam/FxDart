@@ -41,8 +41,8 @@ prevLabel: debounced search
     The
     <a href="../DartComparison/bounded-concurrency.html">Dart comparison</a>
     of the worker-pool job verdicts <strong>fxdart</strong> on clarity;
-    the native pool is shorter than it looks once you have written it
-    twice. This page is that job plus the typed-error half, which the
+    the native pool is harder to get right than it looks once you have
+    written it twice. This page is that job plus the typed-error half, which the
     comparison examples do not show.
   </p>
 

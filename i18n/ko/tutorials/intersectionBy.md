@@ -32,7 +32,9 @@ nextLabel: compress
     <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>입니다.
   </p>
   <p>
-    체인 메서드는 없습니다. data-first 함수나 그 비동기 짝을 호출하세요.
+    체인 메서드는 <code>.intersectionBy(f, other)</code>입니다. 리시버가
+    <code>iterable2</code>(순회되는 쪽)이고 <code>other</code>가
+    <code>iterable1</code>(키 집합)입니다.
     <code>.concurrent(n)</code>의 동시성 표시는
     <code>fxIntersectionAsync</code>와 똑같이
     <code>iterable2</code>에 적용됩니다.

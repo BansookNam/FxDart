@@ -33,8 +33,10 @@ nextLabel: compress
     más que <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
   </p>
   <p>
-    No existe método de cadena; llama a la función data-first o a su
-    contraparte asíncrona. El marcador de concurrencia de
+    El método de cadena es <code>.intersectionBy(f, other)</code>; el
+    receptor es <code>iterable2</code> (el que se recorre) y
+    <code>other</code> es <code>iterable1</code> (el conjunto de claves).
+    El marcador de concurrencia de
     <code>.concurrent(n)</code> se aplica a <code>iterable2</code>,
     exactamente igual que con <code>fxIntersectionAsync</code>.
   </p>

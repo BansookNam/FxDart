@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: FxDart type predicates: isNull, isBool, isNum, isString, isDateTime, isList, isMap, and friends, as filter-friendly tear-offs.
+description: FxDart type predicates: fxIsNull, fxIsBool, fxIsNum, fxIsString, isDateTime, fxIsList, fxIsMap, and friends, as filter-friendly tear-offs.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates
@@ -21,7 +21,7 @@ nextLabel: fromEntries
     specific reason: Dart's <code>is</code> operator can't be torn off as a
     first-class function value, but <code>filter</code>, <code>takeWhile</code>,
     <code>find</code>, and friends all want a <code>bool Function(A)</code>.
-    <code>fxFilter(isString, mixedList)</code> reads better than
+    <code>fxFilter(fxIsString, mixedList)</code> reads better than
     <code>fxFilter((a) => a is String, mixedList)</code>, and that's the whole
     point of this page.
   </p>
@@ -52,7 +52,7 @@ nextLabel: fromEntries
   <div class="callout">
     <strong>Related:</strong>
     <a href="filter.html"><code>filter</code></a> — the usual place these get plugged in ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — a value-based check, not a type check ·
+    <a href="isEmpty.html"><code>fxIsEmpty</code></a> — a value-based check, not a type check ·
     <a href="compact.html"><code>fxCompact</code></a> — drop nulls from an iterable ·
     <a href="matches.html"><code>fxMatches</code></a> — a predicate for shape, not type
   </div>

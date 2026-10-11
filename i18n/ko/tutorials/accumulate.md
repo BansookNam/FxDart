@@ -13,17 +13,16 @@ nextLabel: Either × pipelines
   <p class="hero-sub">
     검증에는 첫 번째 에러가 아니라 <em>모든</em> 에러가 필요합니다. 여기
     있는 연산들은 모든 분기를 실행하고 실패를
-    <code>NonEmptyList</code>로 이어 붙입니다 — 별도의
-    <code>Validated</code> 타입을 대체하는 Arrow 2.x의 방식입니다.
+    <code>NonEmptyList</code>로 이어 붙입니다. Arrow 2.x는 별도의
+    <code>Validated</code> 타입 대신 이 방식을 씁니다.
   </p>
 
   {{signature}}
 
   <h2>강의</h2>
   <p>
-    <code>fxEither&lt;Nel&lt;E&gt;, _&gt;(...)</code> 안에서 — 에러 타입이
-    <code>NonEmptyList</code>인 모든 스코프에서 — 스코프는 누적 어휘를
-    갖게 됩니다:
+    에러 타입이 <code>NonEmptyList</code>인 <code>fxEither&lt;Nel&lt;E&gt;, _&gt;(...)</code>
+    스코프 안에서는 누적 연산을 쓸 수 있습니다:
   </p>
   <ul>
     <li><code>r.zipOrAccumulate2..5(branches…, combine)</code> — 서로
@@ -59,15 +58,16 @@ nextLabel: Either × pipelines
 
   <h2>데모 4 · dependent — 형제 값을 읽는 규칙</h2>
   <p>
-    브랜치는 형제의 <code>Accumulated.value</code>를 읽는 순간 폭발합니다 —
-    누적의 단 하나뿐인 강한 규칙입니다. 하지만 실제 검증에는 의존 규칙이
-    있습니다("<em>지출</em>에는 양수 <em>금액</em>이 필요하다"). 그래서
-    폼들은 번번이 수동 <code>if&nbsp;(!acc.hasErrors)</code> 가드로
-    내려가곤 했습니다. <code>acc.dependent(block)</code>은 그 가드에 이름을
-    붙인 것입니다. 블록은 지금까지의 모든 브랜치가 성공했을 때만 실행되고 —
-    그래서 그 안의 형제 <code>.value</code> 읽기는 구조적으로 안전합니다 —
-    아니면 통째로 건너뜁니다. (Arrow에는 대응물이 없습니다. Arrow
-    사용자들도 같은 가드를 손으로 굴립니다.)
+    브랜치는 형제의 <code>Accumulated.value</code>를 아직 끝나지 않은 상태에서
+    읽으면 오류가 납니다. 누적에서 지켜야 할 유일하고 엄격한 규칙입니다. 하지만
+    실제 검증에는 의존 규칙이 있습니다("<em>지출</em>에는 양수 <em>금액</em>이
+    필요하다"). 그래서 폼 검증 코드는 번번이 수동
+    <code>if&nbsp;(!acc.hasErrors)</code> 가드를 직접 써야 했습니다.
+    <code>acc.dependent(block)</code>은 그 가드에 이름을 붙인 것입니다. 블록은
+    지금까지의 모든 브랜치가 성공했을 때만 실행되므로, 그 안에서 형제
+    <code>.value</code>를 읽어도 구조적으로 안전합니다. 그렇지 않으면 블록 전체를
+    건너뜁니다. (Arrow에는 대응하는 기능이 없습니다. Arrow 사용자들도 같은 가드를
+    직접 씁니다.)
   </p>
   {{playground:4}}
 
@@ -81,7 +81,7 @@ nextLabel: Either × pipelines
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="nonEmptyList.html"><code>NonEmptyList</code></a> — 에러를 실어 나르는 그릇 ·
-    <a href="eitherPipelines.html">Either × 파이프라인</a> — <code>fx()</code> 체인 위에서 동시성과 함께 하는 fail-slow 검증 ·
+    <a href="eitherPipelines.html">Either × 파이프라인</a> — <code>fx()</code> 체인 위에서 동시성을 더한 fail-slow 검증 ·
     <a href="raise.html"><code>fxEither</code> &amp; Raise</a> — 이 기능이 확장하는 fail-fast 스코프 ·
     <a href="typedErrors.html">타입 있는 에러 — 전체 가이드</a>
   </div>

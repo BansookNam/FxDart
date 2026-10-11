@@ -26,7 +26,7 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    이것은 FxDart 연산자에 대응하는 RxDart의 가장 훌륭한 짝 중 하나입니다.
+    이 예제는 RxDart가 FxDart 연산자와 가장 잘 맞아떨어지는 경우 중 하나입니다.
     순수 <code>Stream.distinct</code>는 <em>인접한</em> 이벤트만
     비교하므로(FxDart의 <code>uniqAdjacent</code>가 같은 아이디어입니다),
     RxDart는 <code>distinctUnique</code>를 추가합니다: 스트림 전체에 걸친

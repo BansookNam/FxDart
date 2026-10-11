@@ -52,7 +52,7 @@ nextLabel: throttle
 
   <h2>메서드 표기</h2>
   <p>
-    콜백 쪽에서 같은 것을 메서드로 부를 수 있습니다.
+    콜백에서도 같은 연산을 메서드 형태로 쓸 수 있습니다.
     <code>saveDraft.fxDebounce(wait)</code>는
     <code>fxDebounce(saveDraft, wait)</code>와 같고, 이름 붙은 인자도 그대로
     받습니다.
@@ -78,10 +78,10 @@ save('hello');   // only this one reaches _post</code></pre>
     같은 아이디어가 이벤트 레이어에도 있습니다. 몰아치는 대상이 콜백이
     아니라 <code>Stream</code>이라면
     <code>fxEvents(s).debounce(window)</code>가 각 버스트의 트레일링 값을
-    — <code>window</code> 동안 새 이벤트가 없을 때 — 내보내고, 스트림이
-    닫힐 때 아직 대기 중인 값은 버려지지 않고 마지막에 방출됩니다. 이
-    체인이 속한 곳은 <a href="fxEvents.html"><code>fxEvents</code></a>
-    문서를 참고하세요.
+    — <code>window</code> 동안 새 이벤트가 없을 때 — 내보냅니다. 스트림이
+    닫힐 때 대기 중이던 값도 버리지 않고 마지막으로 내보냅니다. 이 체인이
+    어디에 속하는지는 <a href="fxEvents.html"><code>fxEvents</code></a>
+    문서에서 확인하세요.
   </p>
   {{playground:3}}
 

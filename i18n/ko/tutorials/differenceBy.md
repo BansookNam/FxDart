@@ -24,8 +24,8 @@ nextLabel: intersection
     <code>f</code>-키에 나타나지 않는 원소만 남습니다(결과 안의 중복은 제거됩니다).
     <code>f</code> 함수는 <em>양쪽</em> 이터러블에 모두 적용되므로,
     일부 언어의 <code>differenceBy</code>와 달리 두 인자는 같은 원소 타입
-    <code>A</code>를 공유해야 합니다. 비교되는 것은 파생된 키 타입
-    <code>B</code>뿐입니다.
+    <code>A</code>를 공유해야 합니다. 비교되는 것은 파생된 키 <em>값</em>(타입
+    <code>B</code>)뿐입니다.
   </p>
   <p>
     "제외 목록"과 "원본 목록"이 단순한 값이 아니라 온전한 레코드일 때
@@ -34,9 +34,11 @@ nextLabel: intersection
     <code>sku</code>로 맞추는 경우가 그렇습니다.
   </p>
   <p>
-    <code>difference</code> 자체가 사실
+    <code>difference</code> 자체는 그저
     <code>fxDifferenceBy((a) =&gt; a, iterable1, iterable2)</code>입니다. 둘 다
-    체인 메서드가 없으니 data-first 함수를 직접 호출하세요. 비동기 쪽에서는
+    체인 메서드로도 있으며(<code>.differenceBy(f, other)</code>), 이때
+    수신자가 <code>iterable2</code>이고 <code>other</code>가
+    <code>iterable1</code>입니다. 비동기 쪽에서는
     <code>fxDifferenceAsync</code>와 마찬가지로 동시성 표시가
     <code>iterable2</code>에 적용됩니다.
   </p>

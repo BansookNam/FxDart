@@ -24,7 +24,7 @@ nextLabel: concat
   </p>
   <p>
     <code>fxPrependAsync</code>는 <code>a</code>로 <code>Future</code>도 받습니다.
-    이 값은 첫 번째로 값을 끌어오는 시점에, 실제 원본에 닿기 전에 먼저 await 됩니다.
+    이 값은 첫 번째로 값을 끌어오는 시점에, 실제 원본에 닿기 전에 먼저 await합니다.
   </p>
 
   <h2>데모 1 · 기본</h2>

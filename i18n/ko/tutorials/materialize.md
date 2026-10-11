@@ -52,16 +52,15 @@ nextLabel: debounced search
     <code>(matches, rest)</code>로 나누되 소스 <strong>한</strong> 번의
     실행을 공유합니다. 레코드는 즉시 반환되고, 어느 쪽이든 듣기 시작하면
     소스가 시작되며, 아무도 듣지 않는 쪽에 속하는 값은 버퍼에 담기지
-    않고 버려집니다. 양쪽 반쪽을 모두 원하면 소스가 발화하기 전에 둘 다
+    않고 버려집니다. 양쪽 반쪽을 모두 원하면 소스가 값을 내보내기 전에 둘 다
     들으세요.
   </p>
   <p>
     <code>sequenceEqual</code>은 두 수열이 같은 값을 같은 순서로 담고
     함께 끝나는지 묻습니다. 이벤트 레이어에서는 터미널입니다:
     <code>fxEvents(a).sequenceEqual(b)</code>는
-    <code>Future&lt;bool&gt;</code>을 돌려주고, 첫 값 또는 길이 불일치에서
-    false이며, 어느 쪽의 에러든 퓨처를 실패시킵니다. 같은 질문이 pull에도
-    있습니다: iterable에는 <code>sequenceEqual</code> /
+    <code>Future&lt;bool&gt;</code>을 돌려주고, 값이 처음 달라지거나 길이가 다르면 false이며, 어느 쪽의 에러든 퓨처를 실패시킵니다. 같은 질문이 pull에도
+    있습니다: iterable에는 <code>fxSequenceEqual</code> /
     <code>Fx.sequenceEqual</code>,
     <code>fxSequenceEqualAsync</code> /
     <code>FxAsync.sequenceEqual</code>는

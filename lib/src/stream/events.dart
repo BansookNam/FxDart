@@ -85,7 +85,7 @@ class FxEvents<T> {
 
   /// A stream that emits [error] and then closes.
   ///
-  /// fxdart events layer, after Rx's `fxThrowError`.
+  /// fxdart events layer, after Rx's `throwError`.
   FxEvents.error(Object error, [StackTrace? stackTrace])
     : _inner = Stream<T>.error(error, stackTrace);
 

@@ -36,7 +36,9 @@ async: true
     순서를 지키려면 모아서 정렬해야 합니다.
   </p>
   <p>
-    FxDart 패널은 이전 예제의 다리를 반대 방향으로 건넌 것입니다.
+    FxDart 패널은
+    <a href="stream-into-pipeline.html">스트림이 타입 있는 파이프라인으로 흘러들 때</a>의
+    다리를 반대 방향으로 건넌 것입니다.
     가져오는 절반은 풀 파이프라인이고 —
     <code>mapConcurrent(2, …)</code>는 지연이 어떻게 굴든 구조적으로
     순서를 지킵니다 — <code>chunk(2)</code>(FxDart의

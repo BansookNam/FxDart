@@ -44,21 +44,22 @@ nextLabel: difference
   <p>
     <code>takeUniqBy</code> takes its callback as a <em>parameter</em> of a
     body small enough to inline into the caller, so the compiler inlines the
-    closure with it. Measured over 1,000,000 log lines, AOT:
+    closure with it. Measured over 1,000,000 log lines, AOT, the composable chain takes
+    13.7 ms against 10.4 ms for a hand-written loop:
   </p>
   <table>
     <thead><tr><th>Spelling</th><th>Time</th></tr></thead>
     <tbody>
       <tr><td><code>filter().uniqBy().take(3)</code></td><td>13.7 ms</td></tr>
-      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11.3 ms</strong></td></tr>
-      <tr><td>a hand-written loop</td><td>10.2 ms</td></tr>
+      <tr><td>a hand-written loop</td><td>10.4 ms</td></tr>
     </tbody>
   </table>
   <p>
-    Both spellings, and both bars, are on
+    The <code>takeUniqBy(3, …)</code> spelling is built to close that gap by
+    inlining the callbacks. Both spellings are on
     <a href="../DartComparison/recent-errors.html">Recent error messages,
-    deduped</a> — the one comparison page that publishes three bars instead of
-    two, because the gap between two ways of writing the same pipeline is the
+    deduped</a>, one of only two comparison pages that carry a third bar,
+    because the gap between two ways of writing the same pipeline is the
     point it makes.
   </p>
   <p>

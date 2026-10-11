@@ -18,7 +18,7 @@ nextLabel: not
   <p>
     <code>fxNegate(f)</code>는 임의의 <code>x</code>에 대해
     <code>!f(x)</code>를 반환하는 새 술어를 돌려줍니다. 이미 이름이 붙은 술어가
-    있고(<code>isEven</code>, <code>isEmpty</code>,
+    있고(<code>isEven</code>, <code>fxIsEmpty</code>,
     <code>fxMatches(pattern)</code>의 결과 등) 그 반대를 함수 값으로 쓰고 싶을 때
     가장 유용합니다 — <code>filter</code>, <code>reject</code>를 비롯해
     술어를 요구하는 어디에든, 로직을 다시 정의하지 않고 넘길 수 있습니다.
@@ -36,7 +36,7 @@ nextLabel: not
   <h2>데모 2 · 라이브러리 술어 뒤집기</h2>
   <p>
     <code>fxNegate</code>는 라이브러리에 이미 있는 어떤 술어와도 조합됩니다.
-    값 기반 술어인 <a href="isEmpty.html"><code>isEmpty</code></a>가 그 예입니다.
+    값 기반 술어인 <a href="isEmpty.html"><code>fxIsEmpty</code></a>가 그 예입니다.
   </p>
   {{playground:1}}
 
@@ -48,6 +48,6 @@ nextLabel: not
     <strong>관련 항목:</strong>
     <a href="not.html"><code>fxNot</code></a> — 불리언 값 하나를 뒤집기 ·
     <a href="filter.html"><code>filter</code></a> / <a href="reject.html"><code>reject</code></a> — 뒤집은 술어가 주로 쓰이는 자리 ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — negate와 조합하기 좋은 값 기반 술어 ·
+    <a href="isEmpty.html"><code>fxIsEmpty</code></a> — negate와 조합하기 좋은 값 기반 술어 ·
     <a href="when.html"><code>fxWhen</code></a> — 술어가 참일 때만 콜백 적용하기
   </div>

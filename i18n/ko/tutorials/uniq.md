@@ -19,9 +19,9 @@ nextLabel: uniqBy
     <code>distinct</code>는 이터러블을 한 번만 훑으면서 이미 본 값을
     <code>Set</code>에 담아 두고, 각 원소를 처음 등장할 때만 방출합니다.
     <code>distinct</code>가 Dart다운 이름이고, fxdart는 FxTS식 표기인
-    <code>uniq</code>도 함께 받습니다 — 같은 연산자입니다. 구현은
+    <code>uniq</code>도 함께 받습니다 — 같은 연산자입니다. 동작은
     <code>fxUniqBy((a) =&gt; a, iterable)</code>, 즉 항등 키를 쓰는
-    형태이므로, 값 전체의 동등성이 아닌 다른 기준으로 중복을 없애야 한다면
+    형태와 같으므로, 값 전체의 동등성이 아닌 다른 기준으로 중복을 없애야 한다면
     <a href="uniqBy.html"><code>uniqBy</code></a>를 쓰면 됩니다.
   </p>
   <p>

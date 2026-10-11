@@ -89,10 +89,10 @@ nextLabel: pipe
     la misma cadena; lo único que cambia es por qué extremo de la expresión se
     empieza a leer:
   </p>
-  <pre><code>// la función: hay que volver al principio para abrir el paréntesis
+  <pre><code>// the function: you go back to the front to open the paren
 fx(orders.where(isPaid)).groupBy((o) =&gt; o.customerId);
 
-// el getter: de izquierda a derecha, como se lee .toList()
+// the getter: left to right, the way .toList() reads
 orders.where(isPaid).fx.groupBy((o) =&gt; o.customerId);</code></pre>
   <p>
     Esta es la forma idiomática en Dart, y es gratis: <code>Fx</code> es un

@@ -3,7 +3,7 @@ slug: lineage
 chapter: 21
 part: 5
 title: Linaje
-description: De Haskell a Scala a Arrow de Kotlin a FxTS a FxDart — cinco traducciones de las mismas ideas, y qué tuvo que ceder cada una para encajar en su lenguaje anfitrión.
+description: De Haskell a Scala a Arrow de Kotlin a FxTS a FxDart — cuatro traducciones de las mismas ideas, y qué tuvo que ceder cada una para encajar en su lenguaje anfitrión.
 ---
 # Linaje
 
@@ -20,7 +20,7 @@ description: De Haskell a Scala a Arrow de Kotlin a FxTS a FxDart — cinco trad
 | **Haskell** (1990) | typeclasses, mónadas como interfaz, `do` | nada — es la fuente; el costo es el propio lenguaje |
 | **Scala** (2004) | mónadas en un lenguaje OO, `for`-comprehensions, Cats | complejidad de resolución de implícitos; dos sintaxis para todo |
 | **Kotlin + Arrow** (2017) | errores tipados sin HKTs, `Raise`, context receivers | abstracción genérica sobre efectos — eliminada en Arrow 2 |
-| **FxTS** (2021) | tuberías perezosas, `concurrent(n)`, en TypeScript | leyes como contrato declarado; los tipos de TS se borran en tiempo de ejecución |
+| **FxTS** (2021) | pipelines perezosas, `concurrent(n)`, en TypeScript | leyes como contrato declarado; los tipos de TS se borran en tiempo de ejecución |
 | **FxDart** (2025) | el modelo de FxTS + los errores de Arrow, en Dart | `pipe` curried, y toda abstracción HKT |
 
 Lee la columna derecha como una sola frase: **cada traducción conservó la
@@ -72,7 +72,7 @@ reconstruyó alrededor de una idea: **un scope con una salida no local.**
 
 ```
 either { val x = parse(raw).bind(); ... }      // Kotlin, Arrow 2
-either((r) { final x = r.bind(parse(raw)); ... })  // Dart, FxDart
+fxEither((r) { final x = r.bind(parse(raw)); ... })  // FxDart
 ```
 
 Ese es el ancestro directo del capítulo 15, y la razón por la que la API de
@@ -87,11 +87,11 @@ el prefijo explícito `r.`. Esa es una pérdida ergonómica real y la razón
 por la que los scopes de FxDart son "scope-first por diseño": escribes `r.`
 y el editor lista el vocabulario.
 
-## FxTS: la mitad de la tubería
+## FxTS: la mitad de el pipeline
 
-Todo en las Partes I y III viene del otro padre. FxTS aportó:
+La mitad de los pipelines — el vocabulario del capítulo 4 y todo lo de la Parte III — viene del otro padre. FxTS aportó:
 
-- tuberías perezosas construidas con pequeños operadores, síncronas y
+- pipelines perezosas construidas con pequeños operadores, síncronas y
   asíncronas bajo un mismo vocabulario;
 - `concurrent(n)` y su canal de retorno — el mecanismo del capítulo 13,
   inventado ahí;
@@ -131,7 +131,7 @@ void main() async {
 ```
 
 Dos linajes, una librería, y la costura entre ellos es deliberada: la mitad
-de la tubería nunca menciona `Either`, y la mitad de errores nunca menciona
+de el pipeline nunca menciona `Either`, y la mitad de errores nunca menciona
 la pereza. Se encuentran solo en los recorridos del capítulo 9.
 
 > 🎓 **Ideas más viejas que todas ellas.** Las mónadas entraron en la
@@ -142,9 +142,9 @@ la pereza. Se encuentran solo en los recorridos del capítulo 9.
 > de ML y Haskell de ese mismo período. Las continuaciones delimitadas — el
 > mecanismo del capítulo 15 — son todavía más viejas, del Scheme de los años
 > 80. Casi nada de este libro se inventó en la última década; lo que cambió
-> es que los lenguajes convencionales crecieron suficiente sistema de tipos
-> para hospedar las ideas, que es por qué el mismo conjunto llegó a Kotlin,
-> TypeScript, Swift y Dart en unos pocos años entre sí.
+> es que los lenguajes convencionales crecieron lo bastante en su sistema de
+> tipos para alojar las ideas, que es por qué el mismo conjunto llegó a
+> Kotlin, TypeScript, Swift y Dart con pocos años de diferencia.
 
 ## Leyendo a los ancestros
 
@@ -195,13 +195,15 @@ carencia.
    el comportamiento de acumulación se movió a un scope, que es
    estrictamente más explícito en el punto de llamada.
 2. FxTS puede guardar `map(f)` como un valor y pasarlo — los operadores son
-   de primera clase, así que puedes construir una tubería dinámicamente a
-   partir de una lista de etapas. FxDart obtiene tipos estáticos completos
-   a lo largo de toda la cadena, incluida la inferencia dentro de los
+   de primera clase, así que puedes construir un pipeline tipado dinámicamente a
+   partir de una lista de etapas. El `pipe`/`pipeLazy` de FxDart que toma una
+   lista de etapas existe, pero no es tipado, así que esa expresividad solo está
+   disponible tirando los tipos estáticos. Lo que FxDart obtiene en cambio son
+   tipos estáticos completos a lo largo de toda la cadena, incluida la inferencia dentro de los
    callbacks, que el `pipe` de FxTS solo logra a través de un muro de
    overloads escritos a mano.
 3. `EitherT` generaliza: es un wrapper por mónada, así que un tercer efecto
-   es otro transformer más en la pila (al costo de lifts en todas partes).
+   es otro transformador más en la pila (al costo de lifts en todas partes).
    `fxEitherAsync` no generaliza — FxDart escribe cada combinación útil a
    mano, y hay pocas, porque las combinaciones que la gente realmente usa
    son pocas.

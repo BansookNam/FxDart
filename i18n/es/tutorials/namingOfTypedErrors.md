@@ -68,12 +68,14 @@ crumb: naming
   <p>
     <code>raise</code> es el nombre «molón» y además exacto: es como se llama
     de verdad el DSL, y aquí las URL de los tutoriales llevan nombre de
-    función (<code>concurrent.html</code>, <code>fx.html</code>). Se reservó a
-    propósito: si la sección&nbsp;13 gana más adelante páginas de tutorial por
-    función (<code>either.html</code>, <code>bind.html</code>, …), un resumen
-    en <code>raise.html</code> chocaría con el futuro tutorial de la función
-    <code>raise</code>. <code>typedErrors.html</code> queda libre para siempre
-    como página de resumen de la sección.
+    función (<code>concurrent.html</code>, <code>fx.html</code>). Así que
+    el nombre lo llevan las páginas por función: <a href="raise.html"><code>raise.html</code></a>
+    cubre el scope <code>Raise</code> y <a href="either.html"><code>either.html</code></a>
+    cubre <code>Either</code>. Lo que un nombre de función no puede hacer es
+    presentar la idea completa a quien aún no la conoce, y por eso
+    <code>typedErrors.html</code> sigue siendo la página de resumen de la sección:
+    nombra la funcionalidad por lo que te da, y las páginas por función
+    cuelgan de ella.
   </p>
 
   <h2>¿Y «railway»?</h2>

@@ -18,14 +18,13 @@ nextLabel: zip
   <p>
     <code>concat</code> encadena dos iterables uno detrás de otro sin copiar
     ninguno de los dos a una lista nueva. Es totalmente perezoso por ambos lados:
-    el segundo iterable ni se toca mientras el pipeline no tire de valores más
+    el segundo iterable ni se toca mientras el pipeline no pida valores más
     allá del final del primero — así que concatenar una primera fuente costosa
     o infinita con una segunda es seguro siempre que no pidas más de lo que
     tiene la primera.
   </p>
   <p>
-    <code>fxConcatAsync</code> es transparente, igual que las primas asíncronas de
-    <code>take</code> y <code>concat</code>: no serializa ninguno de los dos
+    <code>fxConcatAsync</code> es transparente, igual que <code>take</code>: no serializa ninguno de los dos
     lados internamente, así que un <code>concurrent(n)</code> aguas abajo
     sigue pudiendo solapar las peticiones contra el lado que esté activo
     en ese momento.

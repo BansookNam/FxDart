@@ -26,7 +26,7 @@ nextLabel: pairwise
     <code>step</code>(기본값 1)만큼 앞으로 미끄러집니다.
   </p>
   <p>
-    두 개의 손잡이로 온 가족을 커버합니다. <code>step</code>은 윈도우의
+    손잡이 두 개로 이 연산자 가족 전체를 다룹니다. <code>step</code>은 윈도우의
     간격을 정합니다. <code>step&nbsp;&lt;&nbsp;size</code>는 서로 겹치게,
     <code>step&nbsp;==&nbsp;size</code>는 <code>chunk</code>와 똑같이
     타일처럼 깔리게, <code>step&nbsp;&gt;&nbsp;size</code>는 사이를 띄워
@@ -37,7 +37,7 @@ nextLabel: pairwise
     둘은 하나의 구현을 공유합니다.
   </p>
   <p>
-    Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다) — 이름은
+    fxdart 확장 기능입니다(FxTS에는 대응물이 없습니다) — 이름은
     Kotlin의 <code>windowed</code>에서 왔고, RxDart 독자에게는
     <code>bufferCount(size, startEvery)</code>로 익숙할 것입니다. 다른
     모든 fxdart 연산자처럼 지연 평가됩니다. 윈도우는 pull 한 번에 하나씩

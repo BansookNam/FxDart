@@ -56,7 +56,7 @@ nextLabel: createSeededRandom
     <code>fxShuffleAsync</code>.
   </p>
   <p>
-    It is not called <code>fxShuffle</code>, and that is not a style choice.
+    It is not called <code>shuffle</code>, and that is not a style choice.
     <code>List.shuffle</code> already exists in <code>dart:core</code> and
     shuffles <strong>in place, returning void</strong>. An instance member
     always beats an extension, so a <code>List</code> receiver would silently

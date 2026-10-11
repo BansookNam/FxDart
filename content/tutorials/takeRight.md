@@ -19,9 +19,11 @@ nextLabel: takeWhile
     <code>takeLast</code> is <code>take</code>'s mirror image: instead of
     the first <code>length</code> values, you get the last ones. There's a
     catch, though — to know what the "last" values are, <code>takeLast</code>
-    has to see every element first. It <strong>materializes</strong> the
-    whole source into a list internally before yielding anything, so unlike
-    most FxDart operators it does not work on infinite sequences.
+    has to see every element first. It has to <strong>consume</strong> the
+    whole source before yielding anything (a <code>List</code> is indexed
+    directly; any other source is read through a ring buffer holding only the
+    last <code>length</code> elements), so unlike most FxDart operators it
+    does not work on infinite sequences.
     <code>takeLast</code> is the Dart-idiomatic name; fxdart also accepts the
     FxTS spelling <code>takeRight</code> — they're the same operator.
   </p>
@@ -46,6 +48,6 @@ nextLabel: takeWhile
     <strong>Related:</strong>
     <a href="take.html"><code>take</code></a> — first n instead of last n ·
     <a href="dropRight.html"><code>dropRight</code></a> — drop the last n ·
-    <a href="reverse.html"><code>reverse</code></a> — also materializes the source ·
+    <a href="reverse.html"><code>reverse</code></a> — materializes the whole source ·
     <a href="slice.html"><code>slice</code></a> — arbitrary index window
   </div>

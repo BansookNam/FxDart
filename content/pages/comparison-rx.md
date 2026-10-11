@@ -48,14 +48,14 @@ description: 50 real tasks solved twice — RxDart streams vs FxDart pull pipeli
     <strong>25 examples whose source is already in memory</strong>, AOT-compiled
     and measured at <strong>N&nbsp;=&nbsp;1,000,000</strong>, the pull pipeline
     is faster in <strong>every one</strong> — a median of
-    <strong>2.7×</strong>, rising to <strong>88×</strong> where a
+    <strong>3.5×</strong>, rising to <strong>91×</strong> where a
     short-circuiting search stops early
     (<a href="first-over-budget-rx.html">#1</a>, 78.9&nbsp;ms vs
     0.9&nbsp;ms) and costing whole seconds on the heavier reports
-    (<a href="stock-after-moves.html">#11</a>, 3.4&nbsp;s vs 175&nbsp;ms).
+    (<a href="stock-after-moves.html">#11</a>, 3.3&nbsp;s vs 163&nbsp;ms).
     Where the work is <em>genuinely</em> asynchronous, the same harness
     finds the two models level: across those 16 examples the median gap is
-    <strong>1.05×</strong>, and most carry a tie badge. That contrast is
+    <strong>1.08×</strong>, and half carry a tie badge. That contrast is
     the section in one line — streams are not slow, but putting
     synchronous data through one means paying for a delivery that never
     needed to happen.

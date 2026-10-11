@@ -23,7 +23,9 @@ nextLabel: find
     indexar en una <code>List</code>. <code>elementAtOrNull</code> es el nombre
     idiomático en Dart (refleja <code>Iterable.elementAtOrNull</code>); fxdart
     también acepta la grafía de FxTS <code>fxNth</code> — son el mismo operador.
-    Un índice negativo, o uno más allá del final, simplemente da <code>null</code>;
+    Con la función de nivel superior, un índice negativo o uno más allá del final
+    simplemente da <code>null</code> (el método de la cadena, más abajo, es el del
+    SDK y difiere con los índices negativos);
     a diferencia de la indexación de arrays de algunos lenguajes, aquí los índices
     no dan la vuelta para contar desde el final — el índice tiene que ser una posición
     válida y no negativa.
@@ -32,7 +34,9 @@ nextLabel: find
     En la cadena síncrona, <code>fx(iterable).elementAtOrNull(index)</code> es el
     método heredado de <code>Iterable</code>: llámalo directamente sobre
     cualquier cadena <code>Fx</code>, ya que <code>Fx</code> <em>es</em> un
-    <code>Iterable</code>. Para un <code>FxAsyncIterable</code>, usa la función
+    <code>Iterable</code>. Al ser el método del SDK, devuelve <code>null</code>
+    más allá del final, pero lanza un <code>RangeError</code> con un índice
+    negativo. Para un <code>FxAsyncIterable</code>, usa la función
     de nivel superior <code>elementAtOrNullAsync(index, iterable)</code>.
   </p>
 

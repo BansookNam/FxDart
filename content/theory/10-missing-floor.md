@@ -27,7 +27,7 @@ function from types to types, and its kind is written `* → *`.
 | `List`, `Future`, `Fx` | `* → *` | needs one argument |
 | `Either`, `Map` | `* → * → *` | needs two |
 
-Chapters 5 to 9 were all about types of kind `* → *`: functor, applicative,
+Chapters 5 to 7 and 9 were about types of kind `* → *`: functor, applicative,
 monad and traversable are properties of a *type constructor*, not of a type.
 `List<int>` is not a monad; `List` is.
 
@@ -142,13 +142,14 @@ void main() {
     Either.right(3),
   ];
 
-  // Four spellings of "swap the structures", because there is no
-  // way to write one that works for every effect type.
+  // Several spellings of "swap the structures" (fail-fast,
+  // accumulating, and fxSeparateEither, which splits instead),
+  // because no one version works for every effect type.
   print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
   print(fxSeparateEither(xs));
   print(fx(xs).sequence());
-  // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
+  // …plus fxSequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
 }
 ```

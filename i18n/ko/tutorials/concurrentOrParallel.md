@@ -20,7 +20,7 @@ nextLabel: parallel
     <code>Future</code>를 <em>이</em> isolate 위에서 겹칩니다 — I/O, 기다림.
     <code><a href="parallel.html">parallel(n, worker)</a></code>은
     CPU 일을 <em>다른</em> isolate들에 겹칩니다. 콜백이 시간을 어디에
-    쓰는지로 고르세요. "더 빠르게" 하고 싶은 양이 아닙니다.
+    쓰는지로 고르세요. "더 빠르게" 하고 싶은 정도로 고를 것이 아닙니다.
   </p>
   <table>
     <tr><th></th><th><code>concurrent(n)</code></th><th><code>parallel(n)</code></th></tr>
@@ -34,18 +34,20 @@ nextLabel: parallel
   <p>
     I/O는 대부분 기다림입니다. 요청이 떠 있는 동안 isolate는 쉬고
     있으므로 <code>concurrent(4)</code>로 <code>Future</code> 네 개를
-    겹치면 벽시계가 줄고, 다른 isolate는 필요 없습니다. CPU 일이
-    <em>곧</em> isolate입니다. 반환할 때까지 이벤트 루프(그리고 Flutter
-    프레임)를 막습니다. 그때 쓰는 것이 <code>parallel</code>입니다.
+    겹치면 벽시계가 줄고, 다른 isolate는 필요 없습니다. CPU 일은
+    그 시간 내내 isolate를 <em>점유합니다</em>. 반환할 때까지 이벤트 루프(그리고
+    Flutter 프레임)를 막습니다. 그때 쓰는 것이 <code>parallel</code>입니다.
   </p>
   <p>
     isolate hop은 공짜가 아닙니다. 각 원소를 직렬화하고, 보내고, 돌리고,
     다시 직렬화하고, 순서를 맞춥니다. 본문이 <code>x + 1</code>인
     콜백은 덧셈보다 hop에 더 오래 걸립니다. 워커를 네 개로 늘리면
-    <em>더 느려집니다</em>. 거둘 CPU는 없는데 택배비는 네 배입니다.
-    측정: <code>x + 1</code> 천 개는 워커 네 개가 하나보다 약 두 배
-    걸렸고, 20000번 tight loop는 워커 네 개가 하나보다 약 두 배
-    <em>빨랐습니다</em>. 일이 hop보다 무겁지 않으면 이 isolate에
+    <em>더 느려집니다</em>. 아낄 CPU 시간은 없는데 택배비만 네 배가 듭니다.
+    측정(<a href="../parallel-benchmark.html">parallel 벤치마크</a> 참고):
+    요소당 비용이 싼 <code>log-fingerprint</code> 사례에서 평범한
+    <code>.parallel()</code>은 단일 isolate 루프보다 약 2.5배 오래
+    걸렸고(13.7초 대 5.4초), 요소당 비용이 큰
+    <code>password-rehash</code> 사례는 약 6배 <em>빨랐습니다</em>. 일이 hop보다 무겁지 않으면 이 isolate에
     남으세요.
   </p>
   <pre><code>// I/O — overlap Futures here

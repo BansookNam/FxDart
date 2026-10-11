@@ -52,7 +52,7 @@ nextLabel: tee3
   <p>
     <code>tee</code> no es una abreviatura: es la letra <strong>T</strong>,
     tomada de la pieza en T de la fontanería. Un empalme en T divide una
-    tubería en dos, así que lo que entra por un lado sale por dos a la vez.
+    pipeline en dos, así que lo que entra por un lado sale por dos a la vez.
     Unix se quedó con la imagen para su orden <code>tee</code>, que lee la
     entrada estándar y la envía a la salida estándar <em>y</em> a un fichero
     al mismo tiempo:

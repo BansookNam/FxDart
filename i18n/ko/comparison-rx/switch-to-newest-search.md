@@ -45,7 +45,7 @@ noBenchmark: timing
     위의 얇은 래퍼 체인으로 — 결코 extension이 아니어서 rxdart를
     포함해 다른 어떤 스트림 라이브러리와도 공존합니다. RxDart의 연산자
     카탈로그는 여전히 훨씬 큽니다; 살아남은 결과들에 진짜 값별 처리가
-    필요해지면 <code>.pull()</code>로 타입 있는 pull 체인으로
+    필요해지면 <code>.pull()</code>로 타입 있는 풀(pull) 체인으로
     건너가세요. <code>switchMap</code>을 정의하는 사용 사례에서 두
     패널은 연산자 대 연산자로 동등합니다: 무승부입니다.
   </p>

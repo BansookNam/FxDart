@@ -101,9 +101,9 @@ Constraints on the name:
 The getter form dissolves the conflict. As an extension *member*, the name
 lives in a different namespace from the top-level function — but more
 importantly, a getter wants a different part of speech. Dart's core libraries
-name derived views of an object with past participles: `Iterable.reversed`,
-`List.sorted(...)`, `String.split(...).reversed`. `fn.curried` follows that
-convention exactly — it reads as "the curried form of `fn`", a *view*, which
+name derived views of an object with past participles: `List.reversed`
+returns a reversed view of the list rather than a command to reverse it.
+`fn.curried` follows that Dart idiom — it reads as "the curried form of `fn`", a *view*, which
 is precisely what it returns. `fn.curry` would read as an imperative command;
 `fxCurry(fn)` was FxTS's spelling for a language that needed it.
 

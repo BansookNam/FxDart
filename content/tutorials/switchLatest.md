@@ -54,7 +54,7 @@ nextLabel: mergeScan
     is how you start a request now and still play the responses in
     order. fxdart events layer, after Rx's <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code> and <code>fxConcatEager</code>.
+    <code>exhaustAll</code> and <code>concatEager</code>.
   </p>
 
   <h2>Demo 1 · switchLatest — newest inner wins</h2>

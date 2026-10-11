@@ -19,9 +19,9 @@ nextLabel: cases
     <code>fxThrowIf(predicate, toError, value)</code>는 식 한가운데에 끼워 넣을 수
     있는 가드 절입니다. <code>predicate(value)</code>가 참이면
     <code>toError(value)</code>를 던지고, 아니면 <code>value</code>를 손대지 않고
-    그대로 돌려줍니다. 덕분에 <code>map</code> 콜백 안에서 쓰기 좋습니다.
-    파이프라인을 흘러가는 원소를 하나씩 검증하다가 잘못된 값이 나오는 순간
-    바로 실패시킬 수 있기 때문입니다.
+    그대로 돌려줍니다. 그래서 <code>map</code> 콜백 안에서 쓰기 좋습니다.
+    파이프라인을 흘러가는 원소를 하나씩 검증하고, 잘못된 원소가 나오는 순간
+    바로 실패시킬 수 있습니다.
   </p>
   <p>
     본질적으로는 <a href="when.html"><code>fxWhen</code></a>에서 "then" 분기가

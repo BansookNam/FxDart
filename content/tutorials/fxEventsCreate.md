@@ -57,7 +57,7 @@ nextLabel: whenComplete
     from <code>init</code> is forwarded and the stream closes.
   </p>
   <p>
-    fxdart events layer, after Rx's <code>of</code>/<code>just</code>,
+    This is part of fxdart's events layer, modeled on Rx's <code>of</code>/<code>just</code>,
     <code>EMPTY</code>, <code>NEVER</code>, <code>from</code>,
     <code>interval</code>, <code>timer</code>, <code>defer</code>,
     <code>generate</code>, <code>fromEventPattern</code>,

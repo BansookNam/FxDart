@@ -37,7 +37,7 @@ nextLabel: bounded concurrent fetch
   </p>
   <p>
     <code><a href="mapEither.html">mapEither</a></code> ejecuta cada
-    resultado entregado en un ámbito raise. Un payload malo se convierte en un
+    resultado entregado en un ámbito Raise. Un payload malo se convierte en un
     <code>Left</code>; las consultas posteriores siguen llegando. Pon
     <code><a href="attempt.html">attempt</a></code> en la fuente solo
     cuando un <em>throw</em> deba convertirse en un valor — y si la cadena también

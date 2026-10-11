@@ -37,8 +37,9 @@ async: true
     recoger y ordenar.
   </p>
   <p>
-    El panel FxDart es el puente del ejemplo anterior cruzado en la otra
-    dirección. La mitad de los fetches es un pipeline pull —
+    El panel FxDart es el puente de
+    <a href="stream-into-pipeline.html">Un stream alimenta un pipeline tipado</a>
+    cruzado en la otra dirección. La mitad de los fetches es un pipeline pull —
     <code>mapConcurrent(2, …)</code> es ordenado por construcción, hagan
     lo que hagan los retardos — <code>chunk(2)</code> (el
     <code>bufferCount</code> de FxDart) empareja los resultados, y

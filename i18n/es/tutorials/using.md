@@ -33,19 +33,19 @@ nextLabel: concurrent or parallel
     sean asíncronos y compone con
     <code><a href="concurrent.html">concurrent</a></code> — release sigue
     disparándose exactamente una vez aunque haya pulls solapados en
-    vuelo. Si <code>acquire</code> falla, no hay nada que liberar, y el
+    curso. Si <code>acquire</code> falla, no hay nada que liberar, y el
     error simplemente se propaga.
   </p>
   <p>
     Una salvedad honesta, directa del modelo pull: un consumidor que
     <em>abandona</em> la iteración — un <code>break</code> dentro de un
-    <code>for-in</code>, soltar el iterador — nunca llega al final, así
+    <code>for-in</code>, descartar el iterador — nunca llega al final, así
     que <code>release</code> no puede ejecutarse. Acota la iteración con
     <code><a href="take.html">take</a></code> (un pipeline acotado
     completa, y completar libera) o gestiona el recurso con
     <code>try</code>/<code>finally</code> cuando la salida anticipada sea
     el plan. Extensión de fxdart (sin contraparte en FxTS), inspirada en
-    el <code>fxUsing</code> de Rx.
+    el <code>using</code> de Rx.
   </p>
 
   <h2>Demo 1 · El paréntesis alrededor de una lectura perezosa</h2>

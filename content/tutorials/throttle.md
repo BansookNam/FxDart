@@ -5,6 +5,8 @@ description: FxDart throttle tutorial: invoke a function at most once per wait p
 heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
+prev: debounce.html
+prevLabel: debounce
 next: shuffle.html
 nextLabel: shuffle
 ---
@@ -89,5 +91,5 @@ final handler = onScroll.fxThrottle(
     <a href="debounce.html"><code>fxDebounce</code></a> — waits for quiet instead of a fixed schedule ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — building timing demos ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — seeded randomness ·
-    <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines
+    <a href="concurrent.html"><code>concurrent</code></a> — bounding in-flight work in async pipelines
   </div>

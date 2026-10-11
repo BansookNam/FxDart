@@ -37,6 +37,6 @@ async: false
     Dart nativo obtiene la serie densa con un <code>for</code> contador y la
     agrupación con <code>slices</code>/<code>indexed</code> de
     <code>package:collection</code> — funciona, pero el paso de sumar un
-    grupo es un <code>fold</code> con valor inicial las dos veces, y las dos
+    grupo es un <code>fold</code> con valor inicial en ambos casos, y las dos
     fases no se componen en un único flujo visible.
   </p>

@@ -61,13 +61,13 @@ crumb: monad
     —listas, mónadas— de forma declarativa y legible. La comprensión de listas
     de Python es el ejemplo más famoso:
   </p>
-  <pre class="code"><code># Un bucle normal
+  <pre class="code"><code># A plain loop
 results = []
 for x in range(5):
     if x > 0:
         results.append(x * 2)
 
-# Un bloque de comprensión
+# A comprehension block
 results = [x * 2 for x in range(5) if x > 0]</code></pre>
   <p>
     El código se acorta muchísimo y mantiene tu atención en <em>qué</em> estás
@@ -81,27 +81,27 @@ results = [x * 2 for x in range(5) if x > 0]</code></pre>
     notación <code>do</code> de Haskell— no es en el fondo más que una
     envoltura bonita (azúcar sintáctico) sobre las operaciones
     <code>flatMap</code> y <code>map</code> de la mónada. Encadena varias
-    mónadas sin una comprensión y el código se hunde en un <em>callback
-    hell</em> sin fin. Compáralo en Scala: supongamos que buscamos un usuario
+    mónadas sin una comprensión y el código se hunde en un <em>infierno de
+    callbacks</em> sin fin. Compáralo en Scala: supongamos que buscamos un usuario
     y luego el pedido de ese usuario —dos pasos consecutivos, con la mónada
     <code>Option</code> porque cualquiera de los dos podría faltar.
   </p>
   <p>❌ Usando solo los métodos de la mónada (difícil de leer):</p>
-  <pre class="code"><code>// flatMap y map se anidan, y el código se va desplazando hacia la derecha.
+  <pre class="code"><code>// flatMap and map nest, and the code keeps sliding to the right.
 val result = findUser(1).flatMap(user =&gt;
   findOrder(user.id).map(order =&gt;
-    s"Pedido de ${user.name}: ${order.item}"
+    s"${user.name}'s order: ${order.item}"
   )
 )</code></pre>
   <p>🟢 Usando un bloque de comprensión (muy intuitivo):</p>
-  <pre class="code"><code>// for-comprehension de Scala
+  <pre class="code"><code>// Scala for-comprehension
 val result = for {
-  user  &lt;- findUser(1)        // saca user de la caja (en realidad, flatMap)
-  order &lt;- findOrder(user.id) // saca order de la caja (en realidad, flatMap/map)
-} yield s"Pedido de ${user.name}: ${order.item}"</code></pre>
+  user  &lt;- findUser(1)        // take user out of the box (really flatMap)
+  order &lt;- findOrder(user.id) // take order out of the box (really flatMap/map)
+} yield s"${user.name}'s order: ${order.item}"</code></pre>
   <p>
     El compilador reescribe automáticamente el bloque <code>for</code> de
-    abajo en la cadena <code>flatMap</code>/<code>map</code> de arriba. Dicho
+    arriba en la cadena <code>flatMap</code>/<code>map</code> mostrada antes. Dicho
     de otro modo, cada vez que extraes una variable con el símbolo
     <code>&lt;-</code> dentro de un bloque de comprensión estás ejecutando en
     realidad la operación matemática de abrir la caja de la mónada y

@@ -8,8 +8,8 @@ crumb: monad
 ---
   <p class="hero-sub">
     모나드(Monad)와 컴프리헨션 블록(Comprehension Block)은 함수형
-    프로그래밍에서 가장 중요하면서도, 동시에 가장 악명 높게 헷갈리는
-    개념들입니다. 결론부터 말씀드리면, 모나드는 데이터를 다루는
+    프로그래밍에서 가장 중요하면서도 가장 헷갈리기 쉬운
+    개념입니다. 결론부터 말씀드리면, 모나드는 데이터를 다루는
     <strong>'규칙을 가진 상자'</strong>이고, 컴프리헨션 블록은 이 상자들을
     <strong>'아주 쉽게 열고 닫게 해주는 마법의 문법(Syntactic
     Sugar)'</strong>입니다. 두 개념이 어떻게 연결되는지 구체적으로 쪼개서
@@ -58,13 +58,13 @@ crumb: monad
     생성하는 문법입니다. 파이썬(Python)의 리스트 컴프리헨션이 가장 유명한
     예시입니다.
   </p>
-  <pre class="code"><code># 일반적인 반복문
+  <pre class="code"><code># A plain loop
 results = []
 for x in range(5):
     if x > 0:
         results.append(x * 2)
 
-# 컴프리헨션 블록
+# A comprehension block
 results = [x * 2 for x in range(5) if x > 0]</code></pre>
   <p>
     코드가 훨씬 간결해지고 <em>"무엇(What)을 만들 것인가"</em>에 집중하게
@@ -76,32 +76,32 @@ results = [x * 2 for x in range(5) if x > 0]</code></pre>
   <p>
     컴프리헨션 블록(스칼라의 <code>for</code> 컴프리헨션, 하스켈의
     <code>do</code> 표기법 등)은 사실 모나드의 <code>flatMap</code>과
-    <code>map</code> 연산을 보기 좋게 포장한 껍데기(Syntactic Sugar)입니다.
+    <code>map</code> 연산을 읽기 쉽게 감싼 문법(Syntactic Sugar)입니다.
     모나드를 연속해서 사용할 때 컴프리헨션이 없다면, 코드는 <em>콜백
-    지옥(Callback Hell)</em>처럼 끝없이 파고들게 됩니다. 스칼라(Scala) 언어의
+    지옥(Callback Hell)</em>처럼 끝없이 깊어집니다. 스칼라(Scala) 언어의
     예시를 통해 비교해 보겠습니다. 사용자(User)를 찾고, 그 사용자의
     주문(Order)을 찾는 연속된 과정을 가정해 봅시다. (데이터가 없을 수도
     있으므로 <code>Option</code> 모나드를 사용합니다.)
   </p>
   <p>❌ 모나드 메서드만 사용했을 때 (읽기 어려움):</p>
-  <pre class="code"><code>// flatMap과 map이 중첩되면서 코드가 오른쪽으로 계속 밀려납니다.
+  <pre class="code"><code>// flatMap and map nest, and the code keeps sliding to the right.
 val result = findUser(1).flatMap(user =&gt;
   findOrder(user.id).map(order =&gt;
-    s"${user.name}님의 주문: ${order.item}"
+    s"${user.name}'s order: ${order.item}"
   )
 )</code></pre>
   <p>🟢 컴프리헨션 블록을 사용했을 때 (매우 직관적임):</p>
-  <pre class="code"><code>// for 컴프리헨션 블록 사용
+  <pre class="code"><code>// Scala for-comprehension
 val result = for {
-  user  &lt;- findUser(1)        // 상자에서 user를 꺼냄 (실제로는 flatMap)
-  order &lt;- findOrder(user.id) // 상자에서 order를 꺼냄 (실제로는 flatMap/map)
-} yield s"${user.name}님의 주문: ${order.item}"</code></pre>
+  user  &lt;- findUser(1)        // take user out of the box (really flatMap)
+  order &lt;- findOrder(user.id) // take order out of the box (really flatMap/map)
+} yield s"${user.name}'s order: ${order.item}"</code></pre>
   <p>
-    컴파일러는 아래의 <code>for</code> 컴프리헨션 블록을 위쪽의
+    컴파일러는 위의 <code>for</code> 컴프리헨션 블록을 그 앞에 나온
     <code>flatMap</code> / <code>map</code> 체인으로 자동으로 변환합니다.
-    즉, 컴프리헨션 블록 안에서 <code>&lt;-</code> 기호를 써서 변수를
-    뽑아내는 행위 자체가, 사실은 모나드의 상자를 열고 체인(Chain)을 걸어주는
-    수학적 연산을 수행하고 있는 것입니다.
+    즉, 컴프리헨션 블록 안에서 <code>&lt;-</code> 기호로 변수를
+    뽑아내는 순간, 실제로는 모나드의 상자를 열고 체인을 거는
+    수학적 연산이 실행되고 있는 것입니다.
   </p>
 
   <h2>요약하자면</h2>

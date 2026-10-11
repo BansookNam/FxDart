@@ -46,6 +46,6 @@ nextLabel: sort
   <div class="callout">
     <strong>Related:</strong>
     <a href="countBy.html"><code>countBy</code></a> — counts per key ·
-    <a href="count.html"><code>size</code>/<code>count</code></a> — count everything ·
+    <a href="size.html"><code>size</code>/<code>count</code></a> — count everything ·
     <a href="filter.html"><code>filter</code></a> — when you need the matches themselves
   </div>

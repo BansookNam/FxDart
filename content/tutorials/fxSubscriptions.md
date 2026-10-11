@@ -34,16 +34,18 @@ nextLabel: materialize
   <p>
     <code>pauseAll()</code> and <code>resumeAll()</code> are the softer
     version, for when the work should stop without the wiring coming
-    apart — a screen going to the background, a tab losing focus. Paused
-    subscriptions buffer rather than drop, so nothing is lost across the
-    gap.
+    apart — a screen going to the background, a tab losing focus. A paused
+    subscription to a single-subscription stream buffers its events, so
+    nothing is lost across the gap; a <em>broadcast</em> stream does not
+    buffer for a paused listener, so events fired during the pause are
+    dropped.
   </p>
   <p>
     The bag is emptied <em>before</em> its cancellations are awaited, so a
     second <code>cancelAll()</code> during the wait cannot cancel anything
     twice, and the same object can hold a fresh generation of
-    subscriptions afterwards. fxdart events layer, after Rx's
-    <code>CompositeSubscription</code>.
+    subscriptions afterwards. This is part of fxdart's events layer, modeled on
+    Rx's <code>CompositeSubscription</code>.
   </p>
   <p>
     It pairs naturally with

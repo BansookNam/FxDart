@@ -30,12 +30,12 @@ nextLabel: fold
   </p>
   <p>
     FxTS overloads <code>reduce</code> for both the seeded and unseeded case
-    by argument count — <code>fxReduce(f, iterable)</code> vs.
+    by argument count — <code>reduce(f, iterable)</code> vs.
     <code>reduce(f, seed, iterable)</code>. Dart has no arity-based
-    overloading, so FxDart keeps <code>reduce</code> for the unseeded form
-    and renames the seeded one to <code><a href="fold.html">fold</a></code> —
+    overloading, so FxDart keeps <code>fxReduce</code> for the unseeded form
+    and renames the seeded one to <code><a href="fold.html">fxFold</a></code> —
     matching Dart's own <code>Iterable.fold</code> naming. If you have a seed,
-    reach for <code>fold</code>.
+    reach for <code>fxFold</code>.
   </p>
   <p>
     On the sync chain, <code>Fx</code> extends <code>Iterable</code>, so

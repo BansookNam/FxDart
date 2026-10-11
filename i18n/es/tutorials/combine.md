@@ -19,7 +19,7 @@ nextLabel: stopOn
     <code><a href="combineLatest.html">combineLatest</a></code>,
     <code><a href="withLatestFrom.html">withLatestFrom</a></code> y
     <code><a href="waitAll.html">zip</a></code> difieren en quién puede
-    disparar una emisión y en si todo lado debe haber hablado.
+    disparar una emisión y en si todos los lados deben haber hablado.
     <code>fxCombine</code> es la forma unificada: una lista de
     <code>CombineSpec</code>, cada uno un <code>source</code> más dos
     flags. Es una función de nivel superior, no
@@ -28,8 +28,8 @@ nextLabel: stopOn
   </p>
   <p>
     <code>causesEmit: true</code> (el valor por defecto) significa que un
-    evento de esta fuente puede producir una salida, una vez que todo
-    spec <code>requireFirst</code> tiene un valor. Specs todos-true son
+    evento de esta fuente puede producir una salida, una vez que todos los specs
+    con <code>requireFirst</code> tienen un valor. Specs todos-true son
     <code>FxEvents.combineLatestAll</code>.
     <code>causesEmit: false</code> significa que esta fuente es solo
     contexto: actualiza el slot pero nunca dispara una emisión por sí

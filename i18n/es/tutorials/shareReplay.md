@@ -23,7 +23,7 @@ nextLabel: LiveValue
     recortado por <code>size</code> (por defecto 1; <code>null</code> es
     ilimitado) y <code>maxAge</code>, y cada
     <strong>suscriptor tardío reproduce primero el búfer retenido</strong>,
-    y después se sube a las actualizaciones en vivo. Los errores no se
+    y después pasa a recibir las actualizaciones en vivo. Los errores no se
     retienen. Tras
     <code>close</code>, un oyente tardío sigue recibiendo el búfer, y luego
     el cierre. Capa de eventos de fxdart, siguiendo al
@@ -61,7 +61,7 @@ nextLabel: LiveValue
     y <code>shareReplay</code> de Rx.
   </p>
 
-  <h2>Demo 1 · Un suscriptor tardío ve el búfer</h2>
+  <h2>Demo 1 · Un oyente tardío ve el búfer</h2>
   {{playground:0}}
 
   <h2>Demo 2 · CompletionValue emite al cerrar</h2>

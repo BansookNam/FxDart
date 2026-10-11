@@ -1,7 +1,7 @@
 ---
 slug: rank-labels
 title: Etiquetas de puesto para una tabla de clasificación — Dart vs FxDart
-description: Numera de 1 a n una tabla de clasificación ya ordenada — los records de indexed de Dart 3 frente a zipWithIndex + map en FxDart.
+description: Numera de 1 a n una tabla de clasificación ya ordenada — los records que devuelve indexed en Dart 3 frente a zipWithIndex + map en FxDart.
 heading: Etiquetas de puesto para una tabla de clasificación
 order: 6
 tier: 1

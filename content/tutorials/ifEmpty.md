@@ -33,7 +33,7 @@ nextLabel: reduce
     whatever reaches this point, not by the original source.
   </p>
   <p>
-    fxdart extension (no FxTS counterpart), after Rx's
+    This is an fxdart extension (no FxTS counterpart), modeled on Rx's
     <code>switchIfEmpty</code> / <code>defaultIfEmpty</code>. The async
     forms accept an async fallback chain and a <code>Future</code>
     default, and compose with

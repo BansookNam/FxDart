@@ -28,7 +28,7 @@ nextLabel: Either combinators
     que trates el caso de fallo.
   </p>
   <p>
-    El conjunto de métodos es el que Arrow 2.x ha depurado:
+    El conjunto de métodos es el que Arrow 2.x ha seleccionado con cuidado:
     <code>fold</code> colapsa ambos lados en un único valor,
     <code>map</code>/<code>mapLeft</code> transforman uno de los dos lados,
     <code>flatMap</code> encadena un paso falible dependiente, y
@@ -64,7 +64,7 @@ nextLabel: Either combinators
   <p>
     Las excepciones y los errores tipados se mantienen estrictamente
     separados: una excepción <em>lanzada</em> atraviesa el código de errores
-    tipados sin que nada la toque. Para capturar un throw dentro de un
+    tipados sin que nada la toque. Para capturar una excepción lanzada dentro de un
     <code>Either</code>, sé explícito con <code>Either.catching</code> (tipo
     de fallo <code>Object</code>) o <code>Either.catchingWith</code> (que
     primero convierte la excepción a tu propio tipo de fallo). Ejercicio: haz

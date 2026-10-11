@@ -30,8 +30,9 @@ nextLabel: includes
     <code>int?</code> return type.
   </p>
   <p>
-    Internally it pairs each element with its index (via <code>zipWithIndex</code>)
-    and stops at the first one that passes <code>f</code>.
+    The sync version is a counted loop that stops at the first element that
+    passes <code>f</code>; the async version pairs each element with its index
+    (via <code>zipWithIndex</code>) and stops at the first one that passes.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -49,5 +50,5 @@ nextLabel: includes
     <a href="find.html"><code>find</code></a> — same search, returns the value ·
     <a href="includes.html"><code>fxIncludes</code></a> — just "is it there?" ·
     <a href="nth.html"><code>fxNth</code></a> — the inverse: index in, value out ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers this under the hood
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — what powers the async version under the hood
   </div>

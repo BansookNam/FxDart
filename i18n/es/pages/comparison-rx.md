@@ -22,7 +22,7 @@ description: 50 tareas reales resueltas dos veces —streams de RxDart frente a 
     consumidor decide cuándo pedir, lo que hace naturales la pereza, el
     manejo tipado de errores y la concurrencia acotada en orden
     (<code><a href="../tutorials/concurrent.html">.concurrent(n)</a></code>),
-    y convierte el backpressure en un no-problema: no tirar
+    y el backpressure deja de ser un problema: no tirar
     <em>es</em> el backpressure. Los dos se encuentran en los puentes —
     <code><a href="../tutorials/streams.html">fromStream / toStream</a></code> —
     y varios de los ejemplos de abajo usan las dos bibliotecas juntas a
@@ -51,14 +51,14 @@ description: 50 tareas reales resueltas dos veces —streams de RxDart frente a 
     <strong>25 ejemplos cuya fuente ya está en memoria</strong>, compilados
     AOT y medidos con <strong>N&nbsp;=&nbsp;1.000.000</strong>, el pipeline
     pull es más rápido en <strong>todos</strong> — una mediana de
-    <strong>2,7×</strong>, que sube a <strong>88×</strong> cuando una
+    <strong>3,5×</strong>, que sube a <strong>91×</strong> cuando una
     búsqueda se corta antes de tiempo
     (<a href="first-over-budget-rx.html">#1</a>, 78,9&nbsp;ms vs
-    0,9&nbsp;ms) y se mide en segundos enteros en los informes más pesados
-    (<a href="stock-after-moves.html">#11</a>, 3,4&nbsp;s vs 175&nbsp;ms).
+    0,9&nbsp;ms) y cuesta segundos enteros en los informes más pesados
+    (<a href="stock-after-moves.html">#11</a>, 3,3&nbsp;s vs 163&nbsp;ms).
     Donde el trabajo es <em>genuinamente</em> asíncrono, el mismo banco de
     pruebas encuentra los dos modelos a la par: en esos 16 ejemplos la
-    diferencia mediana es de <strong>1,05×</strong>, y la mayoría lleva
+    diferencia mediana es de <strong>1,08×</strong>, y la mitad lleva
     insignia de empate. Ese contraste resume la sección en una línea: los
     streams no son lentos, pero hacer pasar datos síncronos por uno es
     pagar una entrega que nunca hizo falta.

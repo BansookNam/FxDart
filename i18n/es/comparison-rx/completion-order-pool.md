@@ -28,8 +28,8 @@ async: true
 
   <h2>Por qué difieren</h2>
   <p>
-    Este es el reflejo especular del ejemplo anterior, y el veredicto se
-    voltea a tablas. El orden de terminación es lo que una fusión
+    Este es el reflejo especular del ejemplo anterior, y el veredicto pasa a
+    ser empate. El orden de terminación es lo que una fusión
     <em>es</em>: el <code>flatMap(maxConcurrent: 3)</code> de RxDart se
     suscribe a tres streams internos y reenvía el que dispare primero,
     así que «el más rápido primero, de tres en tres» es el comportamiento

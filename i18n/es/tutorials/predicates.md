@@ -1,7 +1,7 @@
 ---
 slug: predicates
 title: predicates — FxDart 101
-description: Predicados de tipo de FxDart: isNull, isBool, isNum, isString, isDateTime, isList, isMap y compañía, listos para usar con filter.
+description: Predicados de tipo de FxDart: fxIsNull, fxIsBool, fxIsNum, fxIsString, isDateTime, fxIsList, fxIsMap y compañía, listos para usar con filter.
 heading: <code>predicates</code>
 section: 8
 crumb: predicates
@@ -21,14 +21,14 @@ nextLabel: fromEntries
     motivo muy concreto: el operador <code>is</code> de Dart no se puede pasar
     como valor de función, pero <code>filter</code>, <code>takeWhile</code>,
     <code>find</code> y compañía esperan un <code>bool Function(A)</code>.
-    <code>fxFilter(isString, mixedList)</code> se lee mejor que
+    <code>fxFilter(fxIsString, mixedList)</code> se lee mejor que
     <code>fxFilter((a) => a is String, mixedList)</code>, y de eso va toda esta
     página.
   </p>
   <p>
     <code>fxIsNil</code> es un port directo de la comprobación «es
     <code>null</code> o <code>undefined</code>» de FxTS; como Dart colapsa
-    ambos en <code>null</code>, es idéntica byte a byte a <code>fxIsNull</code>.
+    ambos en <code>null</code>, es idéntica a <code>fxIsNull</code>.
     Existen tres nombres más solo por paridad con FxTS, marcados como
     <code>@Deprecated</code>: <code>fxIsUndefined</code> (en Dart no hay
     <code>undefined</code>, así que es <code>fxIsNull</code> a secas),
@@ -52,7 +52,7 @@ nextLabel: fromEntries
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="filter.html"><code>filter</code></a> — el sitio habitual donde se enchufan ·
-    <a href="isEmpty.html"><code>isEmpty</code></a> — una comprobación de valor, no de tipo ·
+    <a href="isEmpty.html"><code>fxIsEmpty</code></a> — una comprobación de valor, no de tipo ·
     <a href="compact.html"><code>fxCompact</code></a> — descarta los nulls de un iterable ·
     <a href="matches.html"><code>fxMatches</code></a> — un predicado de forma, no de tipo
   </div>

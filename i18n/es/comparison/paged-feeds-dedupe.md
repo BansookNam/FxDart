@@ -29,8 +29,8 @@ async: true
     Cada almacén se convierte en una secuencia asíncrona con
     <code>fxRange</code> + <code>flatMap</code> (número de página → página
     de eventos), y <code>uniqBy</code> + <code>take(8)</code> rematan el
-    trabajo. Como la cadena está basada en pull, que <code>take</code> se
-    detenga detiene también la paginación: la última página de la réplica
+    trabajo. Como la cadena está basada en pull, cuando <code>take</code> se
+    detiene, la paginación también se para: la última página de la réplica
     no se pide nunca.
   </p>
 

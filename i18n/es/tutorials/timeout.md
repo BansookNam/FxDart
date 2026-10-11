@@ -16,7 +16,7 @@ nextLabel: using
 
   <h2>Lección</h2>
   <p>
-    Un pipeline es tan reactivo como su await más lento.
+    Un pipeline es tan ágil como la espera más lenta que contiene.
     <code>timeout(limit)</code> le pone un límite a eso: cada pull — el
     trabajo de producir <em>un</em> elemento, atraviese los operadores de
     aguas arriba que atraviese — debe terminar dentro de

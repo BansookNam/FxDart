@@ -59,7 +59,7 @@ nextLabel: createSeededRandom
     <code>fxShuffleAsync</code>.
   </p>
   <p>
-    No se llama <code>fxShuffle</code>, y no es una cuestión de estilo.
+    No se llama <code>shuffle</code>, y no es una cuestión de estilo.
     <code>List.shuffle</code> ya existe en <code>dart:core</code> y baraja
     <strong>en el sitio, devolviendo void</strong>. Un miembro de instancia
     siempre gana a una extensión, así que con un <code>List</code> como
@@ -77,6 +77,6 @@ final b = [1, 2, 3]..shuffle();      // dart:core, in place, void</code></pre>
     <strong>Relacionado:</strong>
     <a href="throttle.html"><code>fxThrottle</code></a> — limitación de frecuencia para callbacks ·
     <a href="debounce.html"><code>fxDebounce</code></a> — limitación que espera a que haya calma ·
-    <a href="toAsync.html"><code>toAsync</code></a> — eleva una lista para usarla con shuffleAsync ·
+    <a href="toAsync.html"><code>toAsync</code></a> — convierte una lista en un iterable asíncrono para usarla con shuffleAsync ·
     <a href="sort.html"><code>sort</code></a> — el instinto contrario: orden determinista
   </div>

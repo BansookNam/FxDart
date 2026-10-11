@@ -12,7 +12,7 @@ nextLabel: the naming rationale
 ---
   <p class="hero-sub">
     타입 있는 에러가 FxDart의 지연·동시성 파이프라인과 융합됩니다 —
-    Arrow에도, 다른 어떤 Dart FP 라이브러리에도 없는 부분입니다.
+    Arrow에는 없는 부분입니다.
   </p>
 
   {{signature}}
@@ -26,7 +26,7 @@ nextLabel: the naming rationale
     <code>sequence()</code>는 전부 아니면 전무입니다 — 모든 성공을 리스트
     하나로 모으되 <em>즉시</em>, 첫 <code>Left</code>에서 실패합니다.
     파이프라인이 지연 평가되므로 fail-fast는 말 그대로입니다.
-    <code>sequence()</code>는 첫 실패에서 <em>당기기</em>를 멈추고, 그래서
+    <code>sequence()</code>는 첫 실패에서 <em>풀(pull)</em>을 멈추고, 그래서
     뒤쪽 원소는 아예 계산되지 않습니다.
   </p>
   <p>

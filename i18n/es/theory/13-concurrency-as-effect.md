@@ -73,7 +73,7 @@ Un pull ordinario es «dame el siguiente elemento». El iterador asíncrono de
 FxDart toma un argumento: `iterator.next(concurrent)`, donde `concurrent` es
 un marcador que lleva un ancho. Una etapa que lo recibe puede:
 
-- honrarlo — iniciar n pulls anteriores a la vez, retener los resultados, y
+- atenderlo — iniciar n pulls anteriores a la vez, retener los resultados, y
   entregarlos en orden; o
 - reenviarlo — un `map` no puede paralelizar nada por sí mismo, así que pasa
   la petición más arriba.
@@ -97,7 +97,7 @@ precombinado.
 
 Preservar el orden no es gratis: si el elemento 2 termina antes que el 1, su
 resultado espera. A cambio obtienes una secuencia que es *igual* a la serial,
-que es lo que te permite meter `concurrent(n)` en una tubería existente sin
+que es lo que te permite meter `concurrent(n)` en un pipeline existente sin
 releer el resto.
 
 Cuando de verdad no te importa, pide el orden de finalización y obtén los
@@ -153,7 +153,7 @@ asume alineación posicional con la entrada.
 **Compartir estado mutable entre callbacks.** Con `concurrent(n)`, hay n
 callbacks en vuelo a la vez y su intercalado no está especificado. Un
 contador incrementado dentro de `map` está bien en un solo isolate (no hay
-apropiación entre sentencias), pero una lectura-modificación-escritura *a
+expropiación entre sentencias), pero una lectura-modificación-escritura *a
 través de un await* no lo está:
 
 ```dart run
@@ -180,7 +180,7 @@ void main() async {
 ```
 
 El arreglo no es un lock; es no escribir ese código. Devuelve valores y
-pliégalos después — donde el orden *sí* está garantizado— en vez de mutar
+pliégalos después — donde el orden *sí* está garantizado — en vez de mutar
 estado compartido dentro de una etapa concurrente.
 
 **Fan-out sin límite.** `Future.wait(items.map(fetch))` inicia todo: bien
@@ -190,7 +190,7 @@ viene de los límites del lado remoto, no de la longitud de tu lista.
 
 ## Cuándo se gana el sueldo
 
-Cualquier tubería cuyo trabajo por elemento sea E/S: peticiones HTTP,
+Cualquier pipeline cuyo trabajo por elemento sea E/S: peticiones HTTP,
 lecturas de archivo, idas y vueltas a una base de datos. La ganancia es
 aproximadamente el ancho, hasta el punto en que el lado remoto se convierte
 en el cuello de botella — y la medición del primer listado es la que hay que
@@ -227,9 +227,9 @@ dónde está la ganancia — esperar, no calcular.
    `.map((n) async { …; return -10; }).concurrent(3)` y luego
    `fold(100, (a, d) => a + d)`. El estado se movió fuera de la región
    concurrente hacia la ordenada — que es el arreglo general, y la razón de
-   que `fold` se ejecute después de la tubería y no dentro de ella.
+   que `fold` se ejecute después de el pipeline y no dentro de ella.
 4. Nada se rompe *mecánicamente* — `chunk` agrupará con gusto lo que sea que
-   llegue— pero los trozos ya no corresponden a posiciones de entrada, así
+   llegue — pero los trozos ya no corresponden a posiciones de entrada, así
    que cualquier código que asuma «el trozo 0 son las primeras diez
    entradas» ahora está equivocado. Con `concurrent(4)` la correspondencia
    se mantiene, porque el orden se preserva. Este es el coste concreto de

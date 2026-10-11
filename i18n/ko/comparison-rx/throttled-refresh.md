@@ -40,7 +40,7 @@ noBenchmark: timing
     처리됩니다.
   </p>
   <p>
-    fxdart는 push 쪽을 위해 Rx의 접근을 의도적으로 흡수해
+    fxdart는 푸시(push) 쪽을 위해 Rx의 접근을 의도적으로 흡수해
     여기에 도달했습니다: <code>fxEvents</code>는 평범한
     <code>Stream</code> 위의 래퍼 체인으로 — extension이 아니어서 멤버
     충돌 하나 없이 어떤 스트림 라이브러리와도 공존합니다. RxDart의

@@ -55,7 +55,7 @@ nextLabel: mergeScan
     응답은 여전히 순서대로 재생하는 방법이 그것입니다. fxdart
     이벤트 레이어, Rx의 <code>switchAll</code>,
     <code>mergeAll</code>, <code>concatAll</code>,
-    <code>exhaustAll</code>, <code>fxConcatEager</code>를
+    <code>exhaustAll</code>, <code>concatEager</code>를
     따랐습니다.
   </p>
 

@@ -17,7 +17,7 @@ nextLabel: compact
   <h2>Lección</h2>
   <p>
     <code>whereNot</code> está implementado como
-    <code>fxWhere((a) =&gt; !f(a), iterable)</code>: existe puramente por
+    <code>fxFilter((a) =&gt; !f(a), iterable)</code>: existe puramente por
     legibilidad. <code>list.whereNot(isInvalid)</code> se lee de forma más
     natural que <code>list.where((a) =&gt; !isInvalid(a))</code>, sobre todo
     cuando el predicado ya tiene un nombre claro y en positivo.
@@ -27,7 +27,7 @@ nextLabel: compact
     escribir una negación en el punto de llamada.
   </p>
   <p>
-    Todo el comportamiento de <code>where</code> se traslada sin cambios: es
+    Todo el comportamiento de <code>where</code> se mantiene sin cambios: es
     perezoso, y la forma asíncrona hereda el camino concurrente dedicado de
     <code>fxWhereAsync</code>, así que <code>.concurrent(n)</code> evalúa
     realmente <code>n</code> predicados en paralelo sin dejar de devolver los

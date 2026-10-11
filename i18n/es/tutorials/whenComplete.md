@@ -23,7 +23,7 @@ nextLabel: sampleOn
     Los ganchos opcionales <code>onError</code> / <code>onDone</code> cubren las
     otras dos notificaciones. Un callback que lanza se convierte en un evento de
     error y la cadena continúa — el evento cuyo peek falló
-    no se reemite. Capa de eventos de fxdart, siguiendo a <code>fxTap</code> /
+    no se reemite. Capa de eventos de fxdart, siguiendo a <code>tap</code> /
     <code>doOn*</code> de Rx.
   </p>
   <p>
@@ -41,7 +41,7 @@ nextLabel: sampleOn
   <p>
     La cadena ya no baja a <code>.stream</code> para
     <code>endWith</code>, <code>ifEmpty</code>, <code>uniq</code>,
-    <code>takeRight</code>, <code>takeWhile</code> tampoco — ahora son
+    <code>takeRight</code> ni <code>takeWhile</code>: ahora todos son
     métodos de <code>FxEvents</code>. <code>uniq</code> es global
     (no adyacente): el conjunto de vistos crece sin límite, así que un feed de larga
     vida más un <code>uniq</code> ilimitado es una fuga de memoria; prefiere
@@ -49,10 +49,10 @@ nextLabel: sampleOn
     repeticiones consecutivas.
   </p>
   <p>
-    Capa de eventos de fxdart, siguiendo a <code>fxTap</code>,
+    Capa de eventos de fxdart, siguiendo a <code>tap</code>,
     <code>catchError</code> en su forma que no cambia de stream, y
     <code>finalize</code> de Rx. Los nombres de la capa pull ganan donde ya
-    significan lo mismo: <code>peek</code> no <code>fxTap</code>,
+    significan lo mismo: <code>peek</code> no <code>tap</code>,
     <code>takeRight</code> no <code>takeLast</code>,
     <code>uniq</code> no <code>distinct</code>.
   </p>

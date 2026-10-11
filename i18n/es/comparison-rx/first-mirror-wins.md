@@ -44,8 +44,8 @@ noBenchmark: timing
   </p>
   <p>
     Una cadena pull solo puede negarse a <em>arrancar</em> el fetch de
-    respaldo, nunca cancelar uno en vuelo; la capa de eventos absorbe en
-    cambio el enfoque Rx: una cadena envoltorio fina sobre
+    respaldo, nunca cancelar uno en vuelo; la capa de eventos incorpora, en
+    cambio, el enfoque de Rx: una cadena envoltorio fina sobre
     <code>Stream</code>s llanos que no colisiona con nada, rxdart
     incluido. El catálogo de operadores de
     RxDart sigue siendo mucho más amplio — fxdart mantiene pequeño el

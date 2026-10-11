@@ -1,14 +1,14 @@
 ---
 slug: streams
 title: Stream bridges — FxDart 101
-description: FxDart Stream bridges: fromStream, fromStreamLatest, fromStreamChunked, fromStreamNext, fxStream, and toStream() — four ways to pull a Dart Stream into FxAsyncIterable, with a live playground.
+description: FxDart Stream bridges: fxFromStream, fromStreamLatest, fromStreamChunked, fromStreamNext, fxStream, and toStream() — four ways to pull a Dart Stream into FxAsyncIterable, with a live playground.
 heading: Stream bridges
 section: 11
 crumb: Stream bridges
 next: concurrent.html
 nextLabel: concurrent
 ---
-  <p class="hero-sub">fromStream, fxStream, and .toStream() — cross freely between Dart's Stream and FxDart's FxAsyncIterable.</p>
+  <p class="hero-sub">fxFromStream, fxStream, and .toStream() — cross freely between Dart's Stream and FxDart's FxAsyncIterable.</p>
 
   {{signature}}
 
@@ -40,13 +40,13 @@ nextLabel: concurrent
     stream may keep emitting while the consumer is busy. RxJS 9 names the
     four <code>iterateEach</code>, <code>iterateLatest</code>,
     <code>iterateBuffered</code> and <code>iterateNext</code>. FxDart maps
-    them onto <code>fromStream*</code> (raw iterable) and
+    them onto <code>fxFromStream</code> and <code>fromStream*</code> (raw iterable) and
     <code>FxEvents.pull*</code> (chain):
   </p>
   <table>
     <thead><tr><th>RxJS 9</th><th>FxDart</th><th>while you are busy</th></tr></thead>
     <tbody>
-      <tr><td><code>iterateEach</code></td><td><code>fromStream</code> / <code>.pull()</code></td><td>lossless FIFO — pause the source, queue every value</td></tr>
+      <tr><td><code>iterateEach</code></td><td><code>fxFromStream</code> / <code>.pull()</code></td><td>lossless FIFO — pause the source, queue every value</td></tr>
       <tr><td><code>iterateLatest</code></td><td><code>fromStreamLatest</code> / <code>.pullLatest()</code></td><td>drop superseded — keep only the newest unread value</td></tr>
       <tr><td><code>iterateBuffered</code></td><td><code>fromStreamChunked</code> / <code>.pullChunked()</code></td><td>batch — yield the arrivals as one list</td></tr>
       <tr><td><code>iterateNext</code></td><td><code>fromStreamNext</code> / <code>.pullNext()</code></td><td>demand-gated drop — ignore anything that arrived with no pull waiting</td></tr>
@@ -59,7 +59,7 @@ nextLabel: concurrent
     work in batches, and next when stale events are worse than gaps.
   </p>
 
-  <h2>Demo 1 · fromStream and fxStream</h2>
+  <h2>Demo 1 · fxFromStream and fxStream</h2>
   <p>Both wrap a <code>Stream.fromIterable</code> so you can pipe an existing
     stream through FxDart operators:</p>
   {{playground:0}}

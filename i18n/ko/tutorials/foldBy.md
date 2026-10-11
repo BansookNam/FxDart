@@ -17,7 +17,7 @@ nextLabel: foldByOrSkip
   <h2>강의</h2>
   <p>
     <code>foldBy</code>는 <code><a href="fold.html">fold</a></code>를 소스
-    전체에 한 번이 아니라 키마다 한 번씩 실행하는 것입니다. 각
+    전체에 한 번 실행하는 대신 키마다 한 번씩 실행하는 것입니다. 각
     원소가 자기 키를 고르고, 그 값이 해당 키의 누적값에 접혀 들어갑니다.
     그래서 결과는 원소가 아니라 답의
     <code>Map&lt;K, Acc&gt;</code>입니다.
@@ -31,20 +31,20 @@ nextLabel: foldByOrSkip
     그대로 버려집니다. <code>foldBy</code>는 손으로 짠 반복문처럼 결과 맵에
     곧바로 누적합니다.
   </p>
-  <pre><code>// 손으로 짠다면 이렇게
+  <pre><code>// what you would write by hand
 for (final t in txns) {
   totals[t.category] = (totals[t.category] ?? 0) + t.amount;
 }
 
-// 같은 일에 이름을 붙인 것
-foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
+// the same thing, named
+fxFoldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    카테고리 다섯 개에 걸친 백만 건의 거래에서, 먼저 그룹으로 묶는 방식은
-    손으로 짠 반복문의 <strong>2.7배</strong>가 듭니다. <code>foldBy</code>는
-    <strong>0.91배</strong>입니다 — 바로 옆의 반복문보다 조금 <em>빠르고</em>,
-    반올림 착시가 아닙니다. 반복문은 맵을 읽고 다시 쓰므로 거래마다 카테고리를
+    카테고리가 적은 큰 입력에서는, 먼저 그룹으로 묶는 방식이 키마다 만들어지는
+    리스트 때문에 손으로 짠 반복문보다 눈에 띄게 더 듭니다.
+    <code>foldBy</code>는 반복문과 맞먹고 오히려 살짝 앞설 수도 있습니다. 반복문은 맵을 읽고 다시 쓰므로 거래마다 카테고리를
     두 번 해시합니다. <code>foldBy</code>는 맵 안에 세워 둔 가변 셀에
-    누적하므로, 맵은 거래마다가 아니라 <em>카테고리마다</em> 한 번 쓰입니다.
+    누적하므로, 맵은 거래마다가 아니라 <em>카테고리마다</em> 한 번 쓰입니다. (여기서는 수치를 싣지 않습니다. 직접 쓰는
+    형태는 <code>./benchmark.sh --ab</code>로 재어 보세요.)
     <a href="../DartComparison/index.html">Dart vs FxDart</a> 예제 중 여럿이
     바로 이 이유로 이 함수로 옮겨 갔습니다.
   </p>
@@ -85,10 +85,11 @@ foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code
   {{playground:2}}
 
   <div class="callout">
-    <strong>쓰지 말아야 할 때:</strong> 실행 중인 값이 두 개 필요한 누적값 —
-    평균은 합계<em>와</em> 개수가 모두 필요합니다 — 은 그것들을 레코드에
-    담아 옮겨야 하고, 레코드는 원소마다 할당됩니다. 그러면 피하려던 그룹핑보다
-    비용이 더 큽니다. 그럴 때는 <code>groupBy</code>를 쓰세요.
+    <strong>쓰지 말아야 할 때:</strong> 누적하면서 실행 중인 값을 두 개 이상
+    들고 가야 할 때입니다. 평균은 합계<em>와</em> 개수가 모두 필요하므로 그
+    둘을 레코드에 담아 옮겨야 하고, 레코드는 원소마다 할당됩니다. 그러면
+    피하려던 그룹핑보다 비용이 더 큽니다. 그럴 때는 <code>groupBy</code>를
+    쓰세요.
   </div>
 
   <div class="callout">

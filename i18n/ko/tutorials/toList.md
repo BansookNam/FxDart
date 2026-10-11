@@ -17,7 +17,7 @@ nextLabel: each
   <h2>강의</h2>
   <p>
     <code>toList</code>는 가장 많이 쓰이는 <strong>종결 연산자</strong>입니다.
-    그 시점까지 계획에 불과했던 체인을 실제로 실행시키는 것이 바로 이 함수입니다.
+    이 함수는 그때까지 계획에 불과했던 체인을 실제로 실행합니다.
     <code>.toList()</code>를 호출하면 이터러블에 남아 있는 모든 값을 순서대로
     끌어당겨 진짜 <code>List&lt;T&gt;</code>에 담습니다. 상류의 모든 것 —
     <code>.map()</code>, <code>.filter()</code>, <code>.take()</code> — 은

@@ -32,7 +32,7 @@ nextLabel: fxPipe
 
   <h2>Demo 1 · Fundamentos</h2>
   <p>El ejemplo clásico del dartdoc: calcular el mínimo y el máximo de una
-    lista en una sola pasada:</p>
+    lista en una sola llamada:</p>
   {{playground:0}}
 
   <h2>Demo 2 · Proyectar varios campos</h2>
@@ -41,7 +41,7 @@ nextLabel: fxPipe
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: usa <code>fxJuxt</code> para calcular <code>sum</code> y
-    <code>average</code> de esta lista en una sola pasada.</p>
+    <code>average</code> de esta lista en una sola llamada.</p>
   {{playground:2}}
 
   <div class="callout">

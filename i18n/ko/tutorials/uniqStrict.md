@@ -58,7 +58,7 @@ nextLabel: uniqAdjacent
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련 함수:</strong>
+    <strong>관련 항목:</strong>
     <a href="uniq.html"><code>distinct</code></a> — 지연 방식의 기본값 ·
     <a href="uniqBy.html"><code>distinctBy</code></a> — 계산된 키로 중복 제거 ·
     <a href="uniqAdjacent.html"><code>uniqAdjacent</code></a> — 인접한 중복만 제거 ·

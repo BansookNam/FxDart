@@ -99,7 +99,7 @@ extension Let<T> on T {
 
 Both sides agree, for both cases — that is naturality, and it is the formal
 statement of "this conversion does not look at the values". `toList()`,
-`toAsync()`, `first`, `sequence` and `flatten` are all natural transformations,
+`toAsync()`, `first`, `sequence` and `flat` are all natural transformations,
 which is why none of them can be surprising: they cannot depend on the contents
 they are moving.
 
@@ -124,8 +124,8 @@ Translated:
 |---|---|
 | `T` | the type constructor — `Either<E, _>`, `List`, `Future` |
 | `η` (unit) | `of` / `Either.right` / `[x]` / `Future.value` |
-| `μ` (join) | `flatten` — `List<List<A>> → List<A>` |
-| `flatMap(f)` | `μ ∘ T(f)` — map, then flatten |
+| `μ` (join) | `flat` — `List<List<A>> → List<A>` |
+| `flatMap(f)` | `μ ∘ T(f)` — map, then `flat` |
 | the coherence conditions | Chapter 1's three laws |
 
 ```dart run
@@ -141,12 +141,11 @@ void main() {
   print(fx(nested).flat().toList());
 
   // flatMap = μ ∘ T(f): map to a nested structure, then join.
-  int f(int n) => n;
   final viaMapThenJoin =
       fx([1, 2, 3]).map((n) => [n, n * 10]).flat().toList();
   final viaFlatMap =
       fx([1, 2, 3]).flatMap((n) => [n, n * 10]).toList();
-  print([viaMapThenJoin, viaFlatMap, f(1)]);
+  print([viaMapThenJoin, viaFlatMap]);
 }
 ```
 

@@ -32,14 +32,14 @@ async: true
     <code>null</code>) 옆에 붙잡아 두고, 그 덕에 대체 값
     <code>r.$2&nbsp;??&nbsp;r.$1.bookPrice</code>가 한 줄이 됩니다.
     그리고 팬아웃은 제한되어야 합니다 — <code>attach</code>가
-    <code>map</code>과 같은 병렬 안전 기계를 타므로
-    <code>concurrent(3)</code>이 연산자로서의 제한입니다. 집계는 어휘에서
-    저절로 떨어집니다. 총액은 <code>sumBy</code>, 대체 횟수는
+    <code>map</code>과 같은 병렬 안전 기계를 타므로 제한은
+    연산자인 <code>concurrent(3)</code>이 맡습니다. 집계는 이 어휘만
+    쓰면 저절로 나옵니다. 총액은 <code>sumBy</code>, 대체 횟수는
     <code>countWhere</code>.
   </p>
   <p>
     네이티브 버전은 그 전부를 지어야 합니다. 제한을 위한 공유 커서 워커
-    풀, 비동기 건너뛰기에서 입력이 살아남도록 손수 만든
+    풀, 비동기 경계를 넘어도 입력이 살아남도록 손수 만든
     <code>(item, price)</code> 레코드, 순서를 지키는 미리 크기 잡은 결과
     슬롯, 그리고 개수를 위한 <code>where(…).length</code> 한 바퀴. 어느
     것도 어렵지는 않습니다 — 전부가 네 단계짜리 과제를 파묻는

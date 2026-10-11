@@ -23,8 +23,8 @@ nextLabel: toAsync
     함수가 원하는 콜백 형태와 정확히 일치합니다.
   </p>
   <p>
-    FxTS는 이를 <code>fxCurry(f)</code>라는 함수로 제공하는데, 여기에는 Dart에
-    없는 두 가지가 쓰입니다. 런타임 항수 리플렉션(<code>fn.length</code>)과
+    FxTS는 이를 <code>fxCurry(f)</code> 함수로 제공하는데, 이 구현은 Dart에
+    없는 두 기능에 기댑니다. 런타임 항수 리플렉션(<code>fn.length</code>)과
     재귀적 조건부 타입입니다. 그래서 FxDart는 항수(2–5)마다 확장을 하나씩
     선언하고 모두 동일한 <code>curried</code> 게터를 노출한 뒤, 함수의
     <em>정적</em> 타입을 보고 컴파일러가 알맞은 것을 고르게 합니다.

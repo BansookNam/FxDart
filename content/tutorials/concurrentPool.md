@@ -5,6 +5,8 @@ description: FxDart concurrentPool tutorial: a fixed-size pool of in-flight requ
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
+prev: mapConcurrent.html
+prevLabel: mapConcurrent
 next: retry.html
 nextLabel: retry
 ---

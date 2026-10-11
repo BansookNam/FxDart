@@ -32,7 +32,7 @@ async: false
     trabajo de <code>scan</code>: todos los estados intermedios de un
     fold, conservados. El pipeline se lee como la propia definición — los
     días (<code>fxRange</code>), transformados con <code>map</code> a
-    hubo-gasto-o-no, recorridos con <code>scan</code> hasta formar una
+    «hubo gasto o no», recorridos con <code>scan</code> hasta formar una
     racha acumulada que se reinicia en los días con gasto, y
     <code>max</code> elige el pico. El bucle nativo calcula lo mismo con
     dos contadores mutables y un <code>if</code> — lo verificas

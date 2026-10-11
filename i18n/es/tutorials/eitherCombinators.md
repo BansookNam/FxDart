@@ -17,8 +17,9 @@ nextLabel: either &amp; Raise
   <h2>Lección</h2>
   <p>
     <a href="either.html"><code>Either</code></a> por sí solo te da
-    <code>map</code>, <code>flatMap</code> y <code>fold</code>. Estos cuatro
-    métodos cubren las formas que acababan convirtiéndose en un
+    <code>map</code>, <code>flatMap</code> y <code>fold</code>. Los cuatro de
+    abajo — <code>map2</code> (hasta <code>map5</code>), <code>alt</code>,
+    <code>orElse</code> y <code>filterOrElse</code> — cubren las formas que acababan convirtiéndose en un
     <code>flatMap</code> con un <code>if</code> dentro.
   </p>
 
@@ -77,9 +78,9 @@ nextLabel: either &amp; Raise
   <p>
     Es la forma sobre un valor <code>Either</code> de
     <a href="raise.html"><code>Raise.ensure</code></a>, que hace el mismo
-    trabajo dentro de un constructor <code>either { }</code>. Dentro de un
+    trabajo dentro de un constructor <code>fxEither</code>. Dentro de un
     constructor, prefiere <code>ensure</code>; sobre un valor que ya tienes en
-    la mano, esto.
+    la mano, este método.
   </p>
 
   <h2>Demo 1 · map2 y map3</h2>

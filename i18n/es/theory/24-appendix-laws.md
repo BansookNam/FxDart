@@ -110,7 +110,7 @@ contraejemplo estándar.
 | Identidad | `id ∘ f` == `f` == `f ∘ id` |
 
 **Permite:** extraer o insertar en línea cualquier composición de funciones
-puras, incluidas las etapas de una tubería.
+puras, incluidas las etapas de un pipeline.
 
 ## Las condiciones previas detrás de todas ellas
 
@@ -120,7 +120,7 @@ puras, incluidas las etapas de una tubería.
    observacional para `Future`; igualdad de conjuntos para `Set`. Una ley
    puede cumplirse bajo una y fallar bajo otra (capítulo 19).
 3. **Alguien lo comprobó.** Las leyes de un tipo son una afirmación. Hasta que
-   existe un test de propiedades, son un comentario (capítulo 19).
+   exista un test de propiedades, no son más que un comentario (capítulo 19).
 
 ## Plantilla de prueba
 

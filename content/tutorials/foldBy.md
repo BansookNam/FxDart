@@ -36,15 +36,15 @@ for (final t in txns) {
 }
 
 // the same thing, named
-foldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
+fxFoldBy((Tx t) =&gt; t.category, 0.0, (sum, t) =&gt; sum + t.amount, txns);</code></pre>
   <p>
-    On a million transactions across five categories, grouping first costs
-    <strong>2.7×</strong> the hand-written loop. <code>foldBy</code> costs
-    <strong>0.91×</strong> of it — it is slightly <em>faster</em> than the loop
-    beside it, and that is not a rounding artefact. The loop reads the map and
+    On a large input with few categories, grouping first costs noticeably
+    more than the hand-written loop, because of those per-key lists.
+    <code>foldBy</code> can match the loop and even edge past it: the loop reads the map and
     then writes it back, so every transaction hashes its category twice;
     <code>foldBy</code> folds into a mutable cell held in the map, so the map is
-    written once per <em>category</em> rather than once per transaction. Several
+    written once per <em>category</em> rather than once per transaction. (No
+    figure is quoted here; measure your own shape with <code>./benchmark.sh --ab</code>.) Several
     of the <a href="../DartComparison/index.html">Dart vs FxDart</a> examples
     moved onto it for exactly this reason.
   </p>

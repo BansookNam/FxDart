@@ -10,7 +10,7 @@ prevLabel: combineLatest
 next: switchMap.html
 nextLabel: switchMap
 ---
-  <p class="hero-sub"><em>소스</em> 이벤트가 올 때마다, 그 이벤트와 다른 스트림의 최신 값에 대한 <code>fxCombine</code> 결과를 내보냅니다 — 다른 쪽은 트리거가 아니라 컨텍스트입니다.</p>
+  <p class="hero-sub"><em>소스</em> 이벤트가 올 때마다, <code>combine(event, latest)</code>를 내보내 그 이벤트를 다른 스트림의 최신 값과 짝지웁니다 — 다른 쪽은 트리거가 아니라 컨텍스트입니다.</p>
 
   {{signature}}
 
@@ -22,7 +22,7 @@ nextLabel: switchMap
     한쪽이 이끌고, 다른 쪽은 참조됩니다.
     <code>withLatestFrom(other, combine)</code>이 그 비대칭을
     표현합니다 — 각 소스 이벤트는
-    <code>fxCombine(event, latestOfOther)</code>를 내보내고,
+    <code>combine(event, latestOfOther)</code>를 내보내고,
     <code>other</code>의 이벤트는 기억된 값을 갱신할 뿐
     <strong>아무것도</strong> 내보내지 않습니다.
   </p>
@@ -41,7 +41,7 @@ nextLabel: switchMap
     <code>other</code>에 <code>startWith</code> 시드를 주세요). 수명은
     소스를 따릅니다: 소스가 닫히면 체인이 닫히고, <code>other</code>의
     닫힘은 그냥 무시됩니다 — 컨텍스트 쪽의 라이브 피드가 파이프라인을
-    붙들어 두는 일은 없습니다. fxdart 이벤트 계층이며, Rx의 같은 이름
+    붙들어 두는 일은 없습니다. fxdart 이벤트 레이어이며, Rx의 같은 이름
     연산자를 따랐습니다.
   </p>
 
@@ -58,6 +58,6 @@ nextLabel: switchMap
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="combineLatest.html"><code>combineLatest</code></a> — 양쪽 모두 트리거 ·
-    <a href="sampleOn.html"><code>sampleOn</code></a> — 결합 없이 트리거-와-최신 아이디어 ·
+    <a href="sampleOn.html"><code>sampleOn</code></a> — 트리거 시점의 최신 값만 내보내는 아이디어, 결합은 없음 ·
     <a href="fxEvents.html"><code>fxEvents</code></a> — 컨텍스트 쪽에 시드를 주는 <code>startWith</code>
   </div>

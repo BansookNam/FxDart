@@ -33,7 +33,7 @@ async: true
   <p>
     La tarea cambia de naturaleza a mitad de camino —primero una
     clasificación síncrona, luego E/S con límite de tasa— y el código de
-    solo una de las versiones cambia de naturaleza con ella. En FxDart la
+    una sola de las versiones cambia con ella. En FxDart la
     costura es un único paso de la cadena: <code>sortBy</code> +
     <code>take</code> eligen los comercios, <code>toAsync</code> cruza al
     mundo asíncrono, y <code>map</code> + <code>concurrent(2)</code>
@@ -43,6 +43,6 @@ async: true
     acotada se convierte en un pool de workers hecho a mano —cursor
     compartido, huecos de resultado predimensionados, futures de worker— que
     empequeñece la clasificación de dos líneas a la que sirve. Cambiar el
-    límite, o eliminarlo, es un número en la cadena frente a todo ese
+    límite edita un número y eliminarlo quita un paso, frente a todo ese
     andamiaje.
   </p>

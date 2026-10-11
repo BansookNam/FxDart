@@ -19,9 +19,9 @@ nextLabel: takeRight
     <code>take</code> is how a lazy pipeline stays finite. It stops pulling
     from its source the moment it has yielded <code>length</code> values —
     the upstream never sees more requests than that. Because FxDart sources
-    like <code>fxRange</code>, <code>repeat</code>, and <code>cycle</code> can
-    be infinite, <code>take</code> is often the only thing that makes a
-    pipeline safe to run at all.
+    like <code>cycle</code> can be infinite (<code>fxRange</code> and
+    <code>repeat</code> are finite, but can be huge), <code>take</code> is
+    often the only thing that makes a pipeline safe to run at all.
   </p>
   <p>
     It comes as a data-first function (<code>fxTake(n, iterable)</code>) and as
@@ -53,6 +53,6 @@ nextLabel: takeRight
     <strong>Related:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — last n instead of first n ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — take by predicate ·
-    <a href="range.html"><code>fxRange</code></a> · <a href="cycle.html"><code>cycle</code></a> — infinite sources ·
+    <a href="range.html"><code>fxRange</code></a> — a finite source · <a href="cycle.html"><code>cycle</code></a> — an infinite source ·
     <a href="concurrent.html"><code>concurrent</code></a> — parallel evaluation
   </div>

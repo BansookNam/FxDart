@@ -23,7 +23,7 @@ nextLabel: sampleOn
     Optional <code>onError</code> / <code>onDone</code> hooks cover the
     other two notifications. A throwing callback becomes an error
     event and the chain continues — the event whose peek failed is
-    not re-emitted. fxdart events layer, after Rx's <code>fxTap</code> /
+    not re-emitted. fxdart events layer, after Rx's <code>tap</code> /
     <code>doOn*</code>.
   </p>
   <p>
@@ -49,10 +49,10 @@ nextLabel: sampleOn
     go.
   </p>
   <p>
-    fxdart events layer, after Rx's <code>fxTap</code>,
+    fxdart events layer, after Rx's <code>tap</code>,
     <code>catchError</code> in its non-switching shape, and
     <code>finalize</code>. Pull-layer names win where they already
-    mean the same thing: <code>peek</code> not <code>fxTap</code>,
+    mean the same thing: <code>peek</code> not <code>tap</code>,
     <code>takeRight</code> not <code>takeLast</code>,
     <code>uniq</code> not <code>distinct</code>.
   </p>

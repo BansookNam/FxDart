@@ -29,12 +29,12 @@ nextLabel: fold
   </p>
   <p>
     FxTS는 인자 개수로 <code>reduce</code>의 시드 있는 형태와 없는 형태를
-    오버로드합니다 — <code>fxReduce(f, iterable)</code> 대
+    오버로드합니다 — <code>reduce(f, iterable)</code> 대
     <code>reduce(f, seed, iterable)</code>처럼요. Dart에는 인자 개수 기반
-    오버로딩이 없기 때문에, FxDart는 <code>reduce</code>를 시드 없는 형태로
-    남기고 시드 있는 쪽은 <code><a href="fold.html">fold</a></code>로 이름을
+    오버로딩이 없기 때문에, FxDart는 <code>fxReduce</code>를 시드 없는 형태로
+    남기고 시드 있는 쪽은 <code><a href="fold.html">fxFold</a></code>로 이름을
     바꿨습니다 — Dart 자체의 <code>Iterable.fold</code> 명명과 맞춘 것입니다.
-    시드가 있다면 <code>fold</code>를 쓰세요.
+    시드가 있다면 <code>fxFold</code>를 쓰세요.
   </p>
   <p>
     동기 체인에서는 <code>Fx</code>가 <code>Iterable</code>을 확장하므로

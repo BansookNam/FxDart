@@ -7,7 +7,7 @@ description: Adónde ir después, con una nota honesta sobre la dificultad de ca
 ---
 # Apéndice C · Lecturas adicionales
 
-Ordenadas por lo pronto que resultan útiles, con una nota clara sobre su
+Ordenadas según lo pronto que resultan útiles, con una nota clara sobre su
 dificultad. Nada de esto es obligatorio; cada capítulo de este libro se
 sostiene por sí solo.
 
@@ -16,7 +16,7 @@ sostiene por sí solo.
 | Fuente | Buena para | Dificultad |
 |---|---|---|
 | **Tutoriales de FxDart 101** | la superficie de la API, una función cada vez, con demos ejecutables | fácil |
-| **Dart vs FxDart** (52 ejemplos) | si una tubería es la herramienta adecuada para una tarea dada, con veredictos | fácil |
+| **Dart vs FxDart** (53 ejemplos) | si un pipeline es la herramienta adecuada para una tarea dada, con veredictos | fácil |
 | **RxDart vs FxDart** | la decisión pull/push del capítulo 12, aplicada a 50 problemas reales | fácil |
 | **`WHY_CURRIED.md`** | el razonamiento detrás del capítulo 4 — qué le debe un port a su fuente | moderada |
 | **`ARROW_MIGRATION_BLOCKER.md`** | el muro de los HKT del capítulo 10, documentado tal como se topó con él | moderada |
@@ -69,7 +69,7 @@ sostiene por sí solo.
 | Quieres saber | Ve a |
 |---|---|
 | «¿Qué función de FxDart hace X?» | los tutoriales 101 |
-| «¿Debería usar aquí una tubería?» | Dart vs FxDart, y el capítulo 22 |
+| «¿Debería usar aquí un pipeline?» | Dart vs FxDart, y el capítulo 22 |
 | «¿Cómo modelo este fallo?» | el capítulo 18, y luego la guía de errores tipados de Arrow |
 | «¿Por qué no hay un `traverse` genérico?» | el capítulo 10, y luego `ARROW_MIGRATION_BLOCKER.md` |
 | «¿Es legal mi tipo?» | el capítulo 19 y el apéndice B, y luego escribe el test de propiedades |

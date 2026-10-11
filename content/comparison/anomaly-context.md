@@ -1,11 +1,11 @@
 ---
 slug: anomaly-context
 title: Anomalies with surrounding context — Dart vs FxDart
-description: Show over-limit sensor readings plus one line before and after — zipWithIndex + flatMap + uniq as one pipeline vs an index set built in nested loops.
+description: Show over-limit sensor readings plus one line before and after — index walk + flatMap + uniq as one pipeline vs an index set built in nested loops.
 heading: Anomalies with surrounding context
 order: 42
 tier: 4
-functions: zipWithIndex, filter, flatMap, uniq, map, maxBy, join
+functions: range, filter, flatMap, uniq, map, maxBy, join
 domain: sensors
 verdict: fxdart
 async: false
@@ -30,8 +30,8 @@ async: false
   <p>
     "Each hit expands to a window, then overlapping windows merge" is a
     flatten-plus-dedupe problem, and FxDart spells it exactly that way:
-    <code>zipWithIndex</code> keeps positions, <code>filter</code> finds the
-    anomalies, <code>flatMap</code> expands each into
+    walking the indices <code>0 … length-1</code> keeps positions,
+    <code>filter</code> finds the anomalies, <code>flatMap</code> expands each into
     <code>[i-1, i, i+1]</code>, and <code>uniq</code> merges the overlaps —
     one uninterrupted expression from readings to printed lines. Native Dart
     has no <code>flatMap</code>-into-<code>uniq</code> idiom for this, so

@@ -20,8 +20,8 @@ nextLabel: each
     es lo que de verdad ejecuta una cadena que, hasta ese momento, no era más
     que un plan. Llamar a <code>.toList()</code> extrae en orden todos los
     valores que queden en el iterable y los recoge en una
-    <code>List&lt;T&gt;</code> de verdad. Todo lo que hay aguas arriba —cada
-    <code>.map()</code>, <code>.filter()</code>, <code>.take()</code>— solo se
+    <code>List&lt;T&gt;</code> de verdad. Todo lo que hay aguas arriba (cada
+    <code>.map()</code>, <code>.filter()</code>, <code>.take()</code>) solo se
     ejecuta porque <code>toList</code> pidió valores.
   </p>
   <p>

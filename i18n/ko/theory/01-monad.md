@@ -119,7 +119,7 @@ void main() {
 Dart는 `flatMap`을 매일 쓰는 문법 뒤에 숨겨 둡니다. `await`가 곧 `Future`의
 `flatMap`입니다 — future에서 값을 꺼내 나머지 함수를 그 값으로 실행하고,
 결과는 future 하나입니다. 절대 `Future<Future<T>>`가 되지 않죠. 리스트에
-덧붙이는 `for`-in 루프는 `List`의 `flatMap`이고, 14장의 `either { }` 블록은
+덧붙이는 `for`-in 루프는 `List`의 `flatMap`이고, 15장의 `fxEither((r) { … })` 블록은
 `Either`의 `flatMap`입니다.
 
 같은 계산을 두 가지로 써 봅시다. 먼저 명시적인 체인, 그다음 FxDart의
@@ -290,7 +290,7 @@ abstract class Monad<M> {
 }
 ```
 
-FxDart의 타입 있는 오류가 이식해 온 코틀린 Arrow는 컴파일러 플러그인과
+FxDart의 타입 있는 오류 처리가 옮겨 온 코틀린 Arrow는 컴파일러 플러그인과
 컨텍스트 리시버로 이 벽을 우회합니다. 스칼라는 종(kind) 시스템을 언어에
 갖고 있습니다. Dart는 둘 다 없고, 어떤 기교로도 되찾을 수 없습니다 — 시도는
 결국 `dynamic` 캐스트로 끝나고, 그러면 애초에 추상화가 지키려던 타입

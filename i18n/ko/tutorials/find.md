@@ -19,8 +19,9 @@ nextLabel: findIndex
     <code>firstWhereOrNull</code>은 Dart다운 이름이고, fxdart는 FxTS식
     표기인 <code>find</code>도 함께 받습니다 — 같은 연산자입니다.
     <code>head</code>와 <code>filter</code>를 하나로
-    합친 모습이며 — 실제로 구현도 정확히 그렇습니다:
-    <code>fxHead(fxFilter(f, iterable))</code>. 이 결합 덕분에 지연 평가와
+    합친 모습이며 — 비동기 버전은 말 그대로
+    <code>fxHead(fxFilterAsync(f, iterable))</code>이고, 동기 버전은 똑같이
+    동작하는 직접 반복문입니다. 이 결합 덕분에 지연 평가와
     단락 평가가 가능합니다. 원소를 하나씩 끌어와 <code>f</code>로 검사하고,
     일치하는 것을 찾는 즉시 멈춥니다. 그보다 뒤에 있는 원소는 전혀
     건드리지 않습니다.
@@ -47,6 +48,6 @@ nextLabel: findIndex
     <strong>관련 항목:</strong>
     <a href="findIndex.html"><code>findIndex</code></a> — 같은 탐색, 위치를 반환 ·
     <a href="filter.html"><code>filter</code></a> — 첫 번째가 아니라 일치하는 모든 원소 ·
-    <a href="head.html"><code>head</code></a> — <code>find</code>를 이루는 재료 ·
+    <a href="head.html"><code>head</code></a> — <code>filter</code>와 결합하면 <code>find</code>와 같아지는 함수 ·
     <a href="matches.html"><code>fxMatches</code></a> — 형태 비교용으로 미리 만들어진 술어
   </div>

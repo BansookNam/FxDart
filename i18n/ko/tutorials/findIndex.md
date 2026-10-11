@@ -30,8 +30,9 @@ nextLabel: includes
     이 지점에서는 FxTS의 관례를 그대로 따릅니다.
   </p>
   <p>
-    내부적으로는 각 원소를 인덱스와 짝지은 뒤(<code>zipWithIndex</code> 사용)
-    <code>f</code>를 통과하는 첫 번째 원소에서 멈춥니다.
+    동기 버전은 <code>f</code>를 통과하는 첫 번째 원소에서 멈추는 카운터
+    반복문이고, 비동기 버전은 각 원소를 인덱스와 짝지은 뒤(<code>zipWithIndex</code> 사용)
+    통과하는 첫 번째 원소에서 멈춥니다.
   </p>
 
   <h2>데모 1 · 기본</h2>
@@ -49,5 +50,5 @@ nextLabel: includes
     <a href="find.html"><code>find</code></a> — 같은 탐색, 값을 반환 ·
     <a href="includes.html"><code>fxIncludes</code></a> — 그저 "있는가?"만 확인 ·
     <a href="nth.html"><code>fxNth</code></a> — 그 반대: 인덱스를 넣고 값을 받기 ·
-    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — 내부 동작을 떠받치는 함수
+    <a href="zipWithIndex.html"><code>zipWithIndex</code></a> — 비동기 버전의 내부 동작을 떠받치는 함수
   </div>

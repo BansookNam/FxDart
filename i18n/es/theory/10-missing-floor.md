@@ -27,7 +27,7 @@ es. `List` es una función de tipos a tipos, y su kind se escribe `* → *`.
 | `List`, `Future`, `Fx` | `* → *` | necesita un argumento |
 | `Either`, `Map` | `* → * → *` | necesita dos |
 
-Los capítulos 5 a 9 trataban por completo de tipos de kind `* → *`: functor,
+Los capítulos 5 a 7 y 9 trataban de tipos de kind `* → *`: functor,
 applicative, mónada y traversable son propiedades de un *constructor de tipos*,
 no de un tipo. `List<int>` no es una mónada; `List` sí lo es.
 
@@ -137,8 +137,8 @@ conclusión para Dart.
 ## La factura, contada
 
 Toda abstracción de la Parte II que un lenguaje de orden superior escribe una
-vez, FxDart la escribe por tipo. En concreto, para una sola operación —el
-recorrido (traverse)— la librería ofrece:
+vez, FxDart la escribe por tipo. En concreto, para una sola operación (el
+recorrido, `traverse`), la librería ofrece:
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -150,13 +150,14 @@ void main() {
     Either.right(3),
   ];
 
-  // Four spellings of "swap the structures", because there is no
-  // way to write one that works for every effect type.
+  // Several spellings of "swap the structures" (fail-fast,
+  // accumulating, and fxSeparateEither, which splits instead),
+  // because no one version works for every effect type.
   print(fxSequenceEither(xs));
   print(flattenOrAccumulate(xs));
   print(fxSeparateEither(xs));
   print(fx(xs).sequence());
-  // …plus sequenceEitherAsync, flattenOrAccumulateAsync,
+  // …plus fxSequenceEitherAsync, flattenOrAccumulateAsync,
   //   mapOrAccumulateAsync for the async chain.
 }
 ```

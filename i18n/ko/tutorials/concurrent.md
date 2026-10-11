@@ -19,7 +19,7 @@ nextLabel: mapConcurrent
     <strong>동시성 마커</strong> 모델이며, 이는
     <code>FxAsyncIterator.next([Concurrent? concurrent])</code>에 내장되어
     있습니다. <code>.concurrent(3)</code>을 호출하면,
-    이 연산자를 거치는 모든 pull이 <code>Concurrent(3)</code> 마커를
+    이 연산자를 거치는 모든 풀(pull)이 <code>Concurrent(3)</code> 마커를
     <em>상류</em>로 한 단계씩 전달하면서 값을 만들어 내는 쪽에게 "하나씩 말고
     한 번에 3개를 평가하라"고 알립니다. 상류 연산자(보통은 지연 평가되는
     <code>map</code>)는 이 마커를 보고, Future 하나를 await한 뒤 그다음 것을
@@ -33,8 +33,8 @@ nextLabel: mapConcurrent
     이것이 <code>toAsync</code> 강의에서 언급했던 역채널입니다. Dart의
     <code>Stream</code>은 나중에 상류 소스에게 "한 번에 3개를 달라"고 요청할
     방법이 없습니다. <code>Stream</code>은 자기 페이스대로 값을 밀어내기
-    때문입니다. FxDart의 pull 기반
-    <code>next()</code> 프로토콜은 매 pull마다 그 요청을 상류로 실어 나르며,
+    때문입니다. FxDart의 풀 기반
+    <code>next()</code> 프로토콜은 매 풀마다 그 요청을 상류로 실어 나르며,
     이것이 바로 <code>concurrent(n)</code>을 가능하게 하는 기반입니다.
   </p>
   <p>
@@ -49,8 +49,8 @@ nextLabel: mapConcurrent
   </p>
   <p>
     지연이 0인 fetch N=100k에서, 손으로 짠 워커 풀이 여전히 약 10% 더
-    빠릅니다 (AOT). 남은 값은 순서 있는 배치 장치이지
-    <code>map</code> 층이 아닙니다 — 체인을 쓰는 대가입니다.
+    빠릅니다 (AOT). 그 남은 비용은 순서를 지키는 배치 장치에서 오는 것이지
+    <code>map</code> 층에서 오는 것이 아닙니다. 체인을 쓰는 대가입니다.
   </p>
 
   <h2>데모 1 · 순차 실행과 concurrent(3) 비교, 시간 측정</h2>
@@ -76,7 +76,7 @@ nextLabel: mapConcurrent
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="concurrentPool.html"><code>concurrentPool</code></a> — 완료 순서로 내보내는 변형 ·
-    <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 pull 기반 모델 ·
+    <a href="toAsync.html"><code>toAsync</code></a> — 이 동작이 기반으로 삼는 풀 기반 모델 ·
     <a href="asyncVariants.html">async 변형</a> — *Async 명명 규칙 ·
     <a href="map.html"><code>map</code></a> — concurrent와 가장 자주 함께 쓰이는 연산자 ·
     <a href="concurrentOrParallel.html">concurrent or parallel</a> — I/O vs CPU

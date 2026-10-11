@@ -32,7 +32,7 @@ nextLabel: race
     <code>concurrent: n</code> como mucho <em>n</em> internos corren a la
     vez y el resto espera en una cola; comparten una sola variable de
     estado — gana la última emisión interna. <code>concurrent</code>
-    nulo es ilimitado. El resultado cierra cuando la fuente ha cerrado y
+    nulo significa ilimitado. El resultado cierra cuando la fuente ha cerrado y
     todo interno ha terminado.
   </p>
   <p>

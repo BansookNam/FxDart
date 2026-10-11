@@ -134,7 +134,7 @@ async: false
     <code>countBy</code> y el bucle a mano ocupan <strong>la misma
     memoria</strong> — con menos de 0,1 MB de diferencia en cada escala —
     porque ambos guardan cuatro contadores y nada más.
-    <code>groupListsBy</code> materializa cada una del millón de entradas
+    <code>groupListsBy</code> materializa cada una de las entradas
     en <code>List</code>s por nivel solo para tomar sus longitudes, y con
     N=1.000.000 eso son 44 MB de basura que hay que reservar y que el
     recolector debe recorrer.
@@ -145,14 +145,14 @@ async: false
     38,8 y 50,1 ms — 11 ms de dispersión — mientras que FxDart se movió
     entre 19,1 y 20,3 ms y el bucle a mano entre 27,9 y 30,4 ms. Sus
     muestras lentas son recolecciones que los otros dos nunca provocan. Así
-    que su brecha es en parte tubería y en parte basura; las otras dos
-    columnas son solo tubería.
+    que su brecha es en parte pipeline y en parte basura; las otras dos
+    columnas son solo pipeline.
   </p>
   <p>
     La barra de arriba sigue marcando <em>empate</em> con N=10.000 aunque
-    FxDart va holgadamente por delante, porque 365 µs frente a 191 µs son
-    174 µs: reales, pero por debajo del umbral de 0,6 ms del banco de
-    pruebas. Nadie percibe 174 µs, así que la insignia se niega a reclamar
+    FxDart va holgadamente por delante, porque 351 µs frente a 199 µs son
+    152 µs: reales, pero por debajo del umbral de 0,6 ms del banco de
+    pruebas. Nadie percibe 152 µs, así que la insignia se niega a reclamar
     la victoria.
   </p>
   <p>

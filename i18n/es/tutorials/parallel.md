@@ -1,7 +1,7 @@
 ---
 slug: parallel
 title: parallel — FxDart 101
-description: Tutorial de parallel en FxDart: el gemelo de CPU de concurrent — un pool de isolates, un worker top-level enviable, orden conservado, y chunk para amortizar el hop. Solo VM y Flutter.
+description: Tutorial de parallel en FxDart: el gemelo de CPU de concurrent — un pool de isolates, chunked: true, fxPipe().then() para fusionar workers e IsolatePool para reutilizarlos. Solo VM y Flutter.
 heading: <code>parallel</code>
 section: 11
 crumb: parallel
@@ -38,7 +38,7 @@ nextLabel: debounce
     (<code>FutureOr</code>, la misma forma que
     <code>mapConcurrent</code>) — un callback síncrono sigue siendo el
     camino rápido. Un <code>parallel</code> anidado dentro de un worker
-    async está permitido: ese isolate crea su propio pool, y el cancel
+    async está permitido: ese isolate crea su propio pool, y la cancelación
     de la cadena exterior apaga el pool interno. Un nivel de anidación
     es el contrato — un tercer <code>parallel</code> anidado muere con
     su padre, así que no puede apagar <em>sus</em> hijos.
@@ -82,7 +82,7 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
   <p>
     Un lote no cambia lo que observas: el orden es el mismo, la
     contrapresión es la misma, y un worker que lanza sigue emitiendo los
-    resultados de los elementos <em>anteriores</em> y luego raisea en el
+    resultados de los elementos <em>anteriores</em> y luego lanza el error en el
     elemento que de verdad falló. Cambian dos cosas. El primer elemento
     ahora espera a todo su lote, así que un <code>take(1)</code> quiere un
     <code>chunk</code> pequeño o ninguno. Y un <em>input</em> o
@@ -97,11 +97,12 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <code>chunked: true</code> lo hace a partir de la longitud:
   </p>
   <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
-// k = rows.length ~/ 16 — un 4, no dos</code></pre>
+// k = rows.length ~/ 16 (4 workers x 4 chunks per worker)</code></pre>
   <p>
     La fuente tiene que ser una <code>List</code>. Un generator o una
     fuente async no tiene longitud — pasa <code>chunk: k</code>.
-    <code>chunk:</code> y <code>chunked:</code> juntos lanzan; la
+    Un <code>chunk:</code> explícito mayor que 1 junto con
+    <code>chunked:</code> lanza; la
     llamada tiene una sola política.
   </p>
 

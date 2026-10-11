@@ -36,8 +36,9 @@ async: true
     general means collecting and sorting.
   </p>
   <p>
-    The FxDart panel is the previous example's bridge crossed in the other
-    direction. The fetching half is a pull pipeline —
+    The FxDart panel is the bridge from
+    <a href="stream-into-pipeline.html">A stream feeds a typed pipeline</a>
+    crossed in the other direction. The fetching half is a pull pipeline —
     <code>mapConcurrent(2, …)</code> is ordered by construction, whatever
     the delays do — <code>chunk(2)</code> (FxDart's
     <code>bufferCount</code>) pairs the results, and <code>toStream()</code>

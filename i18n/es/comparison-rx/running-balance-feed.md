@@ -39,7 +39,7 @@ async: false
     con semilla de FxDart sigue a FxTS y produce primero la semilla misma,
     así que el panel usa el <code>fxScan1</code> sin semilla — para un saldo
     que abre a cero, cada suma parcial <em>es</em> el saldo, y las dos
-    cadencias encajan exactamente. Más allá de eso, el único residuo es la
+    cadencias encajan exactamente. Más allá de eso, lo único que queda es la
     entrega: la versión stream recolecta a través de un main
     <code>async</code>, la versión pull es una sola cadena síncrona. Un
     empate justo — ambos lados dicen el requisito con un único operador.

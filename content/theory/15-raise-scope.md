@@ -77,17 +77,19 @@ actually write — failure inside async — with no new type at all:
 ```dart run
 import 'package:fxdart/fxdart.dart';
 
-Future<Either<String, int>> lookup(String key) async {
+Future<Either<String, String>> lookup(String key) async {
   await Future.delayed(const Duration(milliseconds: 10));
-  return key == 'port'
-      ? Either.right(8080)
-      : Either.left('missing: $key');
+  return switch (key) {
+    'port' => Either.right('8080'),
+    'host' => Either.right('localhost'),
+    _ => Either.left('missing: $key'),
+  };
 }
 
 void main() async {
   final ok = await fxEitherAsync<String, String>((r) async {
     final port = r.bind(await lookup('port'));
-    final host = r.bind(await lookup('port'));
+    final host = r.bind(await lookup('host'));
     return 'http://$host:$port';
   });
   print(ok);
@@ -205,8 +207,10 @@ forbids.
    easier to add a guard — "fail if the value drops below 3" — between steps?
 2. What does `fxEither` return when the block throws a genuine exception rather
    than raising? Try it, and explain why that is the right default.
-3. Why can a scope not be resumed — that is, why is there no `r.recover(...)`
-   that continues the block after a failure? Answer in terms of the mechanism.
+3. Why can a scope not be resumed — that is, why can nothing continue the
+   *same* block after a failure? (`r.recover(...)` exists, but it wraps a nested
+   block and handles its failure; it does not resume the block that raised.)
+   Answer in terms of the mechanism.
 4. `fxNullable` has no error value at all. What is its `E` type, and what does
    that tell you about the relationship between `Either<E, A>` and `A?`?
 
@@ -227,8 +231,10 @@ forbids.
    failure, the block's stack frames are already unwound and its local
    variables are gone. Resuming would require capturing the continuation before
    unwinding, which is the half of delimited continuations `Raise` deliberately
-   does not implement. Recovery therefore happens *outside*, on the returned
-   `Either` — `result.fold(...)` or `getOrElse`.
+   does not implement. Recovery therefore happens *outside* the block that
+   raised: on the returned `Either` (`result.fold(...)` or `getOrElse`), or by
+   running the risky part in a nested `r.recover(block, onRaise)`, which
+   substitutes a value for the whole nested block rather than resuming it.
 4. Its `E` is effectively `void`/`Null` — there is nothing to carry.
    `A?` is `Either<Unit, A>` with the failure side carrying no information, so
    every nullable computation is an `Either` that has forgotten why it failed.

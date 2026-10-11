@@ -19,7 +19,7 @@ nextLabel: repeat
     <code>fxRange</code>는 <code>sync*</code> 제너레이터를 사용해 필요할 때마다
     정수를 만들어 냅니다 — 미리 할당해 두는 것은 없습니다. 인자를 하나만 주면
     <code>fxRange(4)</code>는 <code>0, 1, 2, 3</code>을 세고(즉 <code>0</code>부터
-    <code>start</code> 직전까지), 두 개를 주면 <code>fxRange(1, 4)</code>는
+    그 단일 인자 직전까지 — 매개변수 이름은 <code>start</code>이지만 사실상 끝값입니다), 두 개를 주면 <code>fxRange(1, 4)</code>는
     <code>1, 2, 3</code>을 셉니다. 세 번째 인자는 간격을 정하는데,
     <em>음수</em> 간격을 주면 거꾸로 셀 수도 있습니다. 예를 들어
     <code>fxRange(4, 1, -1)</code>은 <code>4, 3, 2</code>를 냅니다.
@@ -32,8 +32,8 @@ nextLabel: repeat
     필요할 때 쓰기 좋은 대체 수단입니다.
   </p>
   <p>
-    FxTS의 <code>fxRange</code>도 숫자에 대한 유한 제너레이터인데, 이 포팅 역시
-    같은 계약을 유지합니다 — 여기에는 무한 형태가 없습니다(그건
+    FxTS의 <code>range</code>처럼 숫자에 대한 유한 제너레이터인
+    <code>fxRange</code>는 항상 유한합니다 — 여기에는 무한 형태가 없습니다(그건
     <code>cycle</code>의 몫입니다). 끝없이 이어지는 카운터가 필요하다면
     <code>fxRange</code>를 <code>cycle</code>, <code>take</code>와 함께 쓰세요.
   </p>

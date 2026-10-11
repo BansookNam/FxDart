@@ -44,7 +44,7 @@ nextLabel: foldBy
     bucle a mano sobre un millón de elementos, y el margen se mantiene desde un
     puñado de claves hasta decenas de miles.
     <a href="../DartComparison/top-log-level.html">Nivel de log más frecuente</a>
-    desarrolla el número de principio a fin.
+    desarrolla el cálculo de principio a fin.
   </p>
   <p>
     Como siempre, es un operador terminal: nada de aguas arriba se ejecuta

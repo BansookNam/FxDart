@@ -24,7 +24,7 @@ nextLabel: tee
     해결합니다. <code>fxFork(iterable)</code>을 <em>같은</em>
     <code>iterable</code> 객체로 호출할 때마다, 공유되며 지연 방식으로
     커지는 하나의 버퍼 위에 독립적인 커서가 만들어집니다. 몇 개의 fork가
-    어떤 순서로 읽든 하부 소스는 정확히 한 번만 순회됩니다.
+    어떤 순서로 읽든 원본 소스는 정확히 한 번만 순회됩니다.
   </p>
   <p>
     공유는 넘겨받은 <code>iterable</code>의 동일성(내부적으로

@@ -129,7 +129,7 @@ Nadie publica un programa sin efectos; el objetivo es saber *dónde* están. La
 disposición estándar es un **núcleo puro con una cáscara con efectos**:
 parsear, decidir y calcular en funciones puras; leer y escribir en los bordes.
 
-Las tuberías hacen visible la costura, porque una tubería perezosa es una
+Los pipelines hacen visible la costura, porque un pipeline perezoso es una
 *descripción* del trabajo y no el trabajo. Compara dónde queda el efecto:
 
 ```dart run
@@ -162,7 +162,7 @@ void main() {
 ```
 
 `receipts` es comprobable solo por igualdad, y `peek` te da una costura
-declarada para las veces en que necesitas observar una tubería sin romper esa
+declarada para las veces en que necesitas observar un pipeline sin romper esa
 propiedad — es un efecto *etiquetado* en lugar de uno oculto:
 
 ```dart run
@@ -203,7 +203,7 @@ nada. El capítulo 22 defiende ese caso con calma.
    `final`?
 3. `fxMemoize` sobre una función de tipo `int Function(int)` es seguro. ¿Qué
    sale mal si el tipo del argumento es una `List<int>` mutable?
-4. Toma la tubería `receipts` de arriba y añade un requisito: registrar cada
+4. Toma el pipeline `receipts` de arriba y añade un requisito: registrar cada
    pedido que quedó filtrado. Hazlo sin volver impura a `receipts`.
 
 ## Soluciones
@@ -214,7 +214,7 @@ nada. El capítulo 22 defiende ese caso con calma.
    «pura» se enuncia siempre relativa a una observación — la misma sutileza
    aparece en el ejercicio del capítulo 1 sobre la igualdad de `Future`.
 2. Algo como `class Rate { const Rate(this.pct); final int pct;
-   int fxApply(int n) => n * pct ~/ 100; }`. Es referencialmente transparente
+   int apply(int n) => n * pct ~/ 100; }`. Es referencialmente transparente
    porque `pct` no puede cambiar; la instancia es parte de la entrada, solo
    que escrita como receptor en vez de como argumento. Quita `final` y la
    misma llamada puede devolver dos respuestas, así que la sustitución falla.
@@ -223,7 +223,7 @@ nada. El capítulo 22 defiende ese caso con calma.
    lista, vuelve a llamar y recibe la respuesta del contenido *antiguo*. La
    caché no está mal; la suposición sí lo estaba.
 4. Devuelve los pedidos rechazados en lugar de registrarlos — `fxFork` o una
-   división al estilo `partition` hacen la función total en lo que informa, y
+   división al estilo `partition` hacen que la función devuelva todo lo que tiene que informar, y
    quien llama (la cáscara) decide qué imprimir. Si solo necesitas observar,
    usa `.peek(rejected.add)` en la rama rechazada: sigue siendo un efecto
    declarado en una costura con nombre, y sigue sin haber E/S dentro del

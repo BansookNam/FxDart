@@ -95,7 +95,7 @@ FxEvents<List<T>> fxCombine<T>(Iterable<CombineSpec<T>> specs) {
 ///
 /// Contrast [FxEvents.concat], which waits to subscribe to the next
 /// source until the current one completes. An empty [sources] closes
-/// immediately. fxdart events layer, after Rx's `fxConcatEager`.
+/// immediately. fxdart events layer, after Rx's `concatEager`.
 FxEvents<T> fxConcatEager<T>(Iterable<Stream<T>> sources) {
   final list = List<Stream<T>>.of(sources);
   final out = StreamController<T>();

@@ -45,9 +45,9 @@ nextLabel: retryOn
   <p>
     <code>throttleOn(selector)</code>는 내부 창마다 이벤트를 최대 하나
     내보냅니다: <code>leading</code>(기본 켜짐, 스트림 형태 throttle과
-    같음)은 창의 첫 값을 지키고, <code>trailing</code>은 내부가 발화할
-    때 — 또는 창 한가운데 소스가 닫힐 때 — 본 가장 새로운 값을
-    지킵니다. fxdart 이벤트 레이어, Rx의 선택자 형태
+    같음)은 창의 첫 값을 남기고, <code>trailing</code>은 내부가 발화할
+    때 — 또는 창 한가운데 소스가 닫힐 때 — 그 창에서 본 가장 새로운 값을
+    남깁니다. fxdart 이벤트 레이어는 Rx의 선택자 형태인
     <code>debounce</code>, <code>delayWhen</code>,
     <code>throttle</code>을 따랐습니다.
   </p>
@@ -59,7 +59,7 @@ nextLabel: retryOn
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 내부 창마다 스크롤 오프셋 하나, 리딩 엣지.</p>
+  <p>연습: 내부 창마다 스크롤 오프셋을 하나만 남기되, 리딩 엣지로 잡아 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

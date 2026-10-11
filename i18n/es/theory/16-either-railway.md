@@ -3,7 +3,7 @@ slug: either-railway
 chapter: 16
 part: 4
 title: Either como una vía de tren
-description: Dos vías, un cambio de agujas por paso — la imagen que hace obvio el cortocircuito, más el mapeo de errores, la recuperación, y cómo componen en una tubería los pasos tipados por fallo.
+description: Dos vías, un cambio de agujas por paso — la imagen que hace obvio el cortocircuito, más el mapeo de errores, la recuperación, y cómo componen en un pipeline los pasos tipados por fallo.
 ---
 # Either como una vía de tren
 
@@ -12,7 +12,7 @@ description: Dos vías, un cambio de agujas por paso — la imagen que hace obvi
 > - mapear el lado del fallo, y por qué los tipos de error necesitan eso para
 >   componer
 > - recuperación: `fold`, `getOrElse`, y dónde un programa deja de ser total
-> - `Either` dentro de una tubería — `sequence`, `separate`, y la forma de una
+> - `Either` dentro de un pipeline — `sequence`, `separate`, y la forma de una
 >   importación real
 
 ## Dos vías
@@ -55,7 +55,7 @@ void main() {
 }
 ```
 
-Una vez en la vía roja un valor está inerte: cada `map` y `flatMap`
+Una vez en la vía roja, un valor está inerte: cada `map` y `flatMap`
 subsiguiente es un no-op. Eso es cortocircuitar, y no necesita ningún soporte
 especial en ningún lugar aguas abajo — por lo que puedes añadir un paso en
 medio de una cadena sin tocar el resto.
@@ -166,7 +166,7 @@ decisión. Empujar ese punto lo más tarde posible — al manejador HTTP, a la U
 al código de salida de la CLI — es el hábito más útil que ofrece este
 capítulo.
 
-## Either en una tubería
+## Either en un pipeline
 
 El trabajo real tiene muchas filas, y los recorridos del capítulo 9 son cómo la
 vía de tren escala más allá de un solo valor:
@@ -195,10 +195,10 @@ void main() {
 ```
 
 Tres políticas, un solo parser. Esa separación — la función por fila no sabe
-nada de la política, la tubería la elige — es lo que compra la forma de dos
+nada de la política, el pipeline la elige — es lo que compra la forma de dos
 vías a escala.
 
-> 🎓 **Programación orientada a vía de tren, y dónde la metáfora hace agua.**
+> 🎓 **Programación orientada a vías de tren, y dónde la metáfora hace agua.**
 > La charla de Scott Wlaschin sobre «railway-oriented programming» es donde la
 > mayoría se encuentra con esta imagen, y es buena — pero describe `Either`
 > usado *monádicamente*, que es solo la mitad de la historia. La imagen no

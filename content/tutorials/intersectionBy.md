@@ -33,8 +33,9 @@ nextLabel: compress
     <code>fxIntersectionBy((a) =&gt; a, iterable1, iterable2)</code>.
   </p>
   <p>
-    No chain method exists; call the data-first function or its async
-    counterpart. The concurrency marker from <code>.concurrent(n)</code>
+    The chain method is <code>.intersectionBy(f, other)</code>; the
+    receiver is <code>iterable2</code> (the one that gets walked) and
+    <code>other</code> is <code>iterable1</code> (the key set). The concurrency marker from <code>.concurrent(n)</code>
     applies to <code>iterable2</code>, exactly as with
     <code>fxIntersectionAsync</code>.
   </p>

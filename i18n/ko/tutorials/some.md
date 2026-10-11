@@ -20,14 +20,13 @@ nextLabel: predicates
     <code>some</code>도 함께 받습니다 — 같은 연산자입니다. 이 함수는
     <code>every</code>를 거울에 비춘 함수입니다. 왼쪽에서 오른쪽으로 훑다가
     조건을 만족하는 값을 찾는 순간 단락하며 곧바로 <code>true</code>를
-    반환합니다. 끝까지 찾지 못하면 — 빈 이터러블도 여기에 해당하는데, 이는
-    <code>every</code>와 정반대의 공허참 사례입니다 — 전부 확인한 뒤에야
-    <code>false</code>를 반환합니다.
+    반환합니다. 끝까지 찾지 못하면 전부 확인한 뒤에야 <code>false</code>를
+    반환합니다. 빈 이터러블도 여기에 해당하며, <code>every</code>와 정반대의
+    공허 참 사례입니다.
   </p>
   <p>
-    동기 체인의 <code>.any(f)</code>는 Dart의 <code>Iterable</code>에서
-    그대로 온 것이라 — <code>Fx</code>가 상속합니다 — 따로 정의할 필요가
-    없습니다. 비동기 체인과 data-first 형태의
+    동기 체인의 <code>.any(f)</code>는 Dart의 <code>Iterable</code>이 제공하는
+    메서드를 <code>Fx</code>가 상속하므로 따로 정의하지 않았습니다. 비동기 체인과 data-first 형태의
     <code>fxAny(f, iterable)</code>는 fxdart가 제공하며, FxTS식 표기인
     <code>some</code>도 모든 자리에서 그대로 동작합니다.
   </p>

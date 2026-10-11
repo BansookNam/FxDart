@@ -23,13 +23,13 @@ nextLabel: sampleOn
     <code>onError</code> / <code>onDone</code> 훅이 나머지 두 알림을
     덮습니다. 콜백이 throw하면 에러 이벤트가 되고 체인은 계속됩니다
     — peek가 실패한 그 이벤트는 다시 내보내지지 않습니다. fxdart
-    이벤트 레이어, Rx의 <code>fxTap</code> /
+    이벤트 레이어, Rx의 <code>tap</code> /
     <code>doOn*</code>을 따랐습니다.
   </p>
   <p>
     <code>handleError</code>는 에러마다 계속하는 형태입니다:
     맞는 에러(<code>test</code>를 생략하면 모든 에러)가
-    <code>onError</code>를 실행하고 스트림은 계속 갑니다. 소스를
+    <code>onError</code>를 실행하고 스트림은 이어집니다. 소스를
     취소하고 갈아타는
     <code><a href="onErrorResume.html">onErrorResume</a></code>이
     아닙니다. 잡음을 기록하거나 삼킬 때는 handleError를, 연결을
@@ -44,16 +44,16 @@ nextLabel: sampleOn
     <code>takeWhile</code>에서도 <code>.stream</code>으로 떨어지지
     않습니다 — 이제 <code>FxEvents</code> 메서드입니다.
     <code>uniq</code>는 전역입니다(인접이 아님): 본 값의 집합이
-    한없이 자라므로, 오래 사는 피드에 묶이지 않은
+    한없이 자라므로, 오래 사는 피드에 상한 없이 쓴
     <code>uniq</code>는 메모리 누수입니다. 연속 반복만 걸러야 할
     때는 <code>uniqAdjacent</code>를 쓰세요.
   </p>
   <p>
-    fxdart 이벤트 레이어, Rx의 <code>fxTap</code>,
+    fxdart 이벤트 레이어, Rx의 <code>tap</code>,
     갈아타지 않는 모양의 <code>catchError</code>, 그리고
     <code>finalize</code>를 따랐습니다. 이미 같은 뜻을 가진 곳에서는
     풀 레이어 이름이 이깁니다: <code>peek</code>이지
-    <code>fxTap</code>이 아니고, <code>takeRight</code>이지
+    <code>tap</code>이 아니고, <code>takeRight</code>이지
     <code>takeLast</code>가 아니고, <code>uniq</code>이지
     <code>distinct</code>가 아닙니다.
   </p>

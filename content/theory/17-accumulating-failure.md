@@ -176,8 +176,10 @@ That is the behaviour a user expects and the reason this machinery exists.
 
 1. **One branch per independent concern.** A branch that validates two fields
    cannot report on the second if the first failed.
-2. **Raise more than once in a branch when it makes sense.** A branch may
-   contribute several errors; `age` above raises up to two.
+2. **A branch stops at its first raise.** `raise` returns `Never`, so `age`
+   above contributes one error, not two. A branch contributes several only by
+   handing over a whole list — `bindNel` on an `EitherNel`, or a nested
+   `mapOrAccumulate`.
 3. **Never read `.value` inside an independent branch.** That is what
    `dependent` is for, and reading early detonates the whole scope.
 4. **Order the errors the way the user reads the form.** Branch order is
@@ -216,16 +218,18 @@ so five slow independent checks all run even when the first has already failed.
    import?
 3. Why is the error type `Nel<String>` and not `List<String>`? Give the state
    that `List` admits and `Nel` forbids.
-4. A branch calls an API. Should it be `accumulating` or `dependent`, and what
-   changes if two branches call the same API?
+4. A validation rule needs the result of an API call. Where does the `await`
+   go, given that `accumulating` and `dependent` take synchronous blocks, and
+   what changes if two rules need the same call?
 
 ## Solutions
 
 1. It would run, read `age.value` from a failed branch, and detonate — raising
-   the accumulated errors from inside the branch rather than at the end of the
-   scope. The output is still a `Left` with the parse error, but the mechanism
-   is an early exit rather than a clean accumulation, and a rule that needed to
-   run after it would be skipped. `dependent` exists to make this impossible by
+   *all* the errors accumulated so far (here `Left([email: must contain @,
+   age: not a number])`, since `email` is missing too) from inside the branch
+   rather than at the end of the scope. The output is still a `Left` with the
+   parse errors, but the mechanism is an early exit rather than a clean
+   accumulation, and a rule that needed to run after it would be skipped. `dependent` exists to make this impossible by
    construction.
 2. Every failure is retained until the end, so worst case you hold 10,000 error
    strings — fine. At 10M rows it is not: you would stream and report, capping
@@ -236,9 +240,12 @@ so five slow independent checks all run even when the first has already failed.
    which is unrepresentable nonsense of exactly the kind Chapter 3 is about.
    `Nel` makes the guarantee structural: a failure always carries at least one
    reason, so no consumer needs a "no errors?" branch.
-4. `accumulating`, if the call is independent — you want its failure reported
-   alongside the others. If two branches call the same API, they run
-   sequentially inside the scope and you pay twice; hoist the call above the
-   scope, pass the result in, and keep the branches pure. That also makes the
-   validation testable without a network, which is Chapter 2's argument arriving
-   again from a different direction.
+4. Neither takes an `async` block: `accumulating` and `dependent` run
+   synchronous callbacks, so the call cannot be awaited inside a branch. Do the
+   `await` outside the scope, then pass the result in: the branch that checks
+   it is `accumulating` if it is independent of the other fields (you want its
+   failure reported alongside theirs) and `dependent` if it reads sibling
+   values. If two branches need the same API, call it once above the scope
+   rather than twice. That also keeps the validation pure and testable without
+   a network, which is Chapter 2's argument arriving again from a different
+   direction.

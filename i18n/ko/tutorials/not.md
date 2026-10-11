@@ -16,10 +16,9 @@ nextLabel: predicate combinators
 
   <h2>강의</h2>
   <p>
-    <code>fxNot</code>이 하는 일은 <code>!a</code>와 똑같습니다 — 다만 그것을
-    일급 함수로 제공하므로, <code>(b) =&gt; !b</code>를 직접 쓰는 대신
+    <code>fxNot</code>이 하는 일은 <code>!a</code>와 똑같습니다 — 다만 일급 함수로 제공하므로, <code>(b) =&gt; !b</code>를 직접 쓰는 대신
     <code>bool Function(bool)</code>이 필요한 자리에 그대로 넘길 수 있습니다.
-    FxTS의 <code>fxNot</code>은 타입을 가리지 않고 JavaScript의 "truthy" 값에
+    FxTS의 <code>not</code>은 타입을 가리지 않고 JavaScript의 "truthy" 값에
     동작하지만, Dart에는 암묵적 truthiness가 없으므로 Dart 포팅판은
     실제 <code>bool</code>만 받습니다.
   </p>

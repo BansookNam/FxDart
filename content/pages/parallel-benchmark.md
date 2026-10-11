@@ -132,8 +132,8 @@ await fx(lines).parallel(10, fingerprint, chunk: 37500).toList();
     does not refresh these four rows.
   </p>
   <p>
-    The default form does not improve at all — it drifts slightly
-    <em>worse</em>, and its cost stays around 8µs per element whatever the
+    The default form does not improve at all — it drifts
+    <em>worse</em> (768.8 to 873.5&nbsp;ms, about 14%), and its cost stays around 8µs per element whatever the
     pool size. The chunked form scales 5.4× across the same range.
   </p>
   <p>

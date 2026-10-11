@@ -1,4 +1,4 @@
-Debounced&lt;T&gt; debounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false})
+Debounced&lt;T&gt; fxDebounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false})
 
 class Debounced&lt;T&gt; {
   void call(T arg);   // Debounced is callable: debounced(arg)

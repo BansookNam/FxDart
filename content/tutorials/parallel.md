@@ -96,12 +96,12 @@ await fx(rows).parallel(4, parseRow, chunk: 512).toList(); //   ~3ms
     <code>chunked: true</code> does that from the source length:
   </p>
   <pre><code>await fx(rows).parallel(4, parseRow, chunked: true);
-// k = rows.length ~/ 16 — one 4, not two</code></pre>
+// k = rows.length ~/ 16 (4 workers x 4 chunks per worker)</code></pre>
   <p>
     The source must be a <code>List</code>. A generator or an async
     source has no length — pass <code>chunk: k</code> instead.
-    <code>chunk:</code> and <code>chunked:</code> together throw; the
-    call has one policy.
+    An explicit <code>chunk:</code> larger than 1 together with
+    <code>chunked:</code> throws; the call has one policy.
   </p>
 
   <h2>Two CPU stages, one hop</h2>

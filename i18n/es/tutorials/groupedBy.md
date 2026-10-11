@@ -33,7 +33,7 @@ nextLabel: indexBy
     clave</strong>, exactamente como itera el mapa de <code>groupBy</code>.
     Igual que <code><a href="sortBy.html">sortBy</a></code>, tiene que ver
     todos los valores antes de poder producir el primer grupo, así que el
-    agrupamiento en sí es ansioso mientras la cadena a su alrededor sigue
+    agrupamiento en sí es estricto mientras la cadena a su alrededor sigue
     siendo componible.
   </p>
   <p>

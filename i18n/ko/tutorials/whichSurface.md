@@ -14,7 +14,7 @@ nextLabel: fx
 
   <h2>강의</h2>
   <p>
-    FxDart는 트렌치코트 안의 라이브러리 네 개가 아닙니다. 실제 프로그램이
+    FxDart는 라이브러리 네 개를 한 벌로 묶어 놓은 것이 아닙니다. 실제 프로그램이
     이 일들을 가로지르기 때문에 한 패키지이고, 가로지를 때도 이름은
     그대로입니다. 실수는 함수 목록에서 시작하는 것입니다. 일에서
     시작하세요:
@@ -32,9 +32,9 @@ nextLabel: fx
       <td><code>Future.wait(xs.map(f))</code></td>
     </tr>
     <tr>
-      <td>값이 도착할 때 도착 (키 입력, 틱, 소켓)</td>
+      <td>값이 도착하는 대로 (키 입력, 틱, 소켓)</td>
       <td><code><a href="fxEvents.html">fxEvents(stream)</a></code></td>
-      <td><code>sleep</code>을 넣은 pull 파이프라인</td>
+      <td><code>fxSleep</code>을 넣은 pull 파이프라인</td>
     </tr>
     <tr>
       <td>호출자가 실패를 다룸</td>
@@ -47,17 +47,16 @@ nextLabel: fx
     술어이고, 이벤트 층의 짝은
     <code><a href="stopOn.html">stopOn</a></code>입니다.
     단어 하나, 뜻 하나. 이음새는 이름이 있습니다:
-    <code>.toAsync()</code>는 데이터를 수요로 올리고,
-    <code>.pull()</code>은 이벤트를 수요로 올리고,
+    <code>.toAsync()</code>는 데이터를 pull 쪽으로 끌어올리고,
+    <code>.pull()</code>은 이벤트를 pull 쪽으로 끌어올리고,
     <code>.toStream()</code>은 반대 방향입니다.
   </p>
 
   <div class="callout">
     <strong>0.8.10 채널 규칙.</strong>
     <code>attempt</code>는
-    <strong>다음</strong>
     <code><a href="retryOn.html">retryOn</a></code> /
-    <code>retryOnError</code>, 앞이 아닙니다.
+    <code>retryOnError</code> <strong>뒤에</strong> 둡니다. 앞에 두지 않습니다.
     그 연산자들은 에러 채널을 보고, 실패가 <code>Left</code>가 되면
     거기에는 재시도할 것이 남지 않습니다.
   </div>

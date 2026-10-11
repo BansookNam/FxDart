@@ -29,12 +29,14 @@ nextLabel: dropUntil
     <a href="reject.html"><code>reject</code></a> would have removed it.
   </p>
   <p>
-    Unlike <a href="takeWhileRight.html"><code>takeWhileRight</code></a>, this
-    one streams. A matching run is held back rather than emitted, because it
+    Unlike <a href="takeWhileRight.html"><code>takeWhileRight</code></a>, the
+    sync version streams. A matching run is held back rather than emitted, because it
     might turn out to be the suffix; the first element that <em>fails</em> the
     predicate proves it was not, and releases the whole run at once. So the
     memory cost is the longest run, not the length of the source, and values
-    keep flowing while the source is still open.
+    keep flowing while the source is still open. The async twin,
+    <code>dropWhileRightAsync</code>, does not: it drains the whole
+    upstream into a list first, then trims it.
   </p>
   <p>
     Over a <code>List</code> the run is found by walking backwards from the
@@ -45,7 +47,7 @@ nextLabel: dropUntil
   <h2>Demo 1 · Basics</h2>
   {{playground:0}}
 
-  <h2>Demo 2 · Async, and the split</h2>
+  <h2>Demo 2 · Async, and the split with takeWhileRight</h2>
   {{playground:1}}
 
   <h2>Try it yourself</h2>

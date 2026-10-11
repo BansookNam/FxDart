@@ -10,7 +10,7 @@ prevLabel: attempt
 next: separated.html
 nextLabel: separated
 ---
-  <p class="hero-sub">이벤트마다 자신의 raise 스코프에서 돌립니다. <code>r.raise</code> (그리고 <code>r.ensure</code> / <code>r.bind</code>)는 <code>Left</code>가 되고, 평범한 반환은 <code>Right</code>가 됩니다.</p>
+  <p class="hero-sub">이벤트마다 자신의 Raise 스코프에서 돌립니다. <code>r.raise</code> (그리고 <code>r.ensure</code> / <code>r.bind</code>)는 <code>Left</code>가 되고, 평범한 반환은 <code>Right</code>가 됩니다.</p>
 
   {{signature}}
 
@@ -27,9 +27,7 @@ nextLabel: separated
     취소하지 않으며, 이후 이벤트도 도착합니다.
   </p>
   <p>
-    <em>던져진</em> 예외는 에러 채널에 남습니다 — 그것이
-    <code>fxEither</code> 빌더의 계약이고,
-    <code>attempt</code>가 throw를 값으로 바꾸는 단 한 곳입니다.
+    <em>던져진</em> 예외는 에러 채널에 남습니다. 이는 <code>fxEither</code> 빌더의 계약이며, 스트림에서 throw가 값으로 바뀌는 자리는 <code>attempt</code>뿐입니다.
     콜백이 raise도 하고 throw도 하면
     <code>mapEither</code> 안에서 <code>fxEitherCatching</code>을
     써서 <code>Either</code> 하나가 나오게 하세요.
@@ -37,14 +35,13 @@ nextLabel: separated
   <p>
     <code>mapEitherAsync</code>는 비동기 쌍둥이입니다.
     <code>asyncMap</code>처럼 한 번에 이벤트 하나.
-    <code>fxEitherAsync</code>의 규칙이 그대로 옵니다. raise는
+    <code>fxEitherAsync</code>의 규칙도 그대로 적용됩니다. raise는
     await된 체인 안에서 일어나야 합니다. await되지 않은
     future에서의 raise는 스코프보다 오래 살아남아
     <code>Left</code>가 아니라 처리되지 않은 존 에러가 됩니다.
   </p>
   <p>
-    소스 에러는 두 연산자 모두 손대지 않고 통과합니다. 그것도
-    <code>Left</code>로 만들고 싶으면 위쪽에
+    소스 에러는 두 연산자 모두 손대지 않고 통과합니다. 이들을 <code>Left</code>로 만들고 싶으면 위쪽에
     <code>attempt</code>를 두세요.
   </p>
 

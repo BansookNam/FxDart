@@ -49,9 +49,9 @@ async: true
     mezclar, y el fallo no llega a tocar el pipeline en ningún momento.
   </p>
   <p>
-    La segunda orden, vacía, aterriza igual en ambos lados —
+    La segunda orden, vacía, se resuelve igual en ambos lados —
     <code>defaultIfEmpty</code>, un operador que FxDart tomó de Rx. El
-    veredicto se lo lleva FxDart por el plato principal: la recuperación
+    veredicto es para FxDart por lo principal: la recuperación
     de errores por elemento es una frase en el modelo pull y una
     construcción en el modelo push.
   </p>

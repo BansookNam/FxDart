@@ -21,7 +21,7 @@ noBenchmark: timing
     (válido = el email contiene <code>@</code>, la contraseña ≥ 8
     caracteres) e imprime el estado combinado — tres líneas de los cuatro
     eventos de campo, porque el primer cambio aterriza antes de que la
-    contraseña haya hablado; termina con el estado final del botón de
+    contraseña haya emitido; termina con el estado final del botón de
     envío. Las dos versiones deben imprimir las líneas que aparecen bajo
     <em>Salida esperada</em>.
   </p>
@@ -36,7 +36,7 @@ noBenchmark: timing
     No difieren. El estado de <em>último-valor-por-fuente</em> es el
     combinador que define el modelo push, y ambos paneles lo declaran
     en una línea: retener el valor más nuevo de cada campo,
-    esperar a que ambos hayan hablado, re-emitir el par en cada cambio
+    esperar a que ambos hayan emitido, re-emitir el par en cada cambio
     de cualquiera de los lados. RxDart escribe
     <code>Rx.combineLatest2(emails(), passwords(), ...)</code>; fxdart
     escribe <code>fxEvents(emails()).combineLatest(passwords(),
@@ -46,8 +46,8 @@ noBenchmark: timing
     a mano ha desaparecido.
   </p>
   <p>
-    La capa de eventos de fxdart absorbe el enfoque Rx
-    exactamente para esta clase de trabajo: una cadena envoltorio
+    La capa de eventos de fxdart incorpora el enfoque de
+    Rx justamente para esta clase de trabajo: una cadena envoltorio
     deliberada sobre <code>Stream</code>s llanos — no una extensión, así
     que convive con rxdart o cualquier otra biblioteca de streams sin
     conflictos — que porta los combinadores de último valor que los

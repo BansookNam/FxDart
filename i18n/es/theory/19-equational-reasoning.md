@@ -9,7 +9,7 @@ description: Refactorizar como sustitución — usar las leyes de la Parte II pa
 
 > **En este capítulo**
 > - refactorizar como una cadena de sustituciones, cada una justificada por una ley con nombre
-> - una transformación resuelta: cinco etapas reducidas a dos, sobre el papel
+> - una transformación resuelta: cinco etapas reducidas a tres, sobre el papel
 > - leyes como property tests, con un generador y sin framework de testing
 > - las precondiciones que hacen válido todo el método, y cómo fallan
 
@@ -52,7 +52,7 @@ void main() {
       .filter((n) => n > 5)
       .fold(0, (a, b) => a + b);
 
-  // After: two stages. Same value, by four substitutions.
+  // After: three stages. Same value, by two rewrites.
   final after = fx(source)
       .map((n) => n * 2 + 1)
       .filter((n) => n > 5)
@@ -62,7 +62,8 @@ void main() {
 }
 ```
 
-Los cuatro pasos, cada uno con su licencia:
+Los cuatro pasos (dos reescrituras y dos lugares donde dejar las cosas como
+están), cada uno con su licencia:
 
 1. `map((n) => n)` es `map(id)` → elimínalo. **Identidad de functor.**
 2. `map(f).map(g)` → `map(g ∘ f)`, dando `map((n) => n * 2 + 1)`.
@@ -210,7 +211,7 @@ que no has testeado es un comentario.
 
 ## Cuándo se gana el sueldo
 
-Cada vez que simplificas una tubería, extraes un helper, o fusionas dos
+Cada vez que simplificas un pipeline, extraes un helper, o fusionas dos
 etapas por rendimiento — ese es el método de este capítulo, lo nombres o no.
 Nombrarlo es lo que convierte "creo que esto es lo mismo" en "esto es lo
 mismo, y aquí está el porqué".
@@ -240,10 +241,10 @@ decir.
 
 1. No en general. Solo vale cuando `p` es un predicado sobre el valor *sin
    mapear* — es decir, cuando la versión tras el intercambio testea lo
-   mismo. Rómpelo con `f = (n) => n * 2` y `p = (n) => n > 5`: filtrar
-   primero conserva 6, 7, 8…, mapear primero conserva 3, 4… duplicados. Las
-   dos respuestas difieren porque `p` se escribió para un tipo de valor
-   distinto.
+   mismo. Rómpelo con `f = (n) => n * 2` y `p = (n) => n > 5` sobre `[3, 6]`: filtrar
+   primero conserva solo el 6 y lo dobla, dando `[12]`; mapear primero da
+   `[6, 12]` y conserva ambos, ya que 6 > 5. Las dos respuestas difieren porque
+   `p` pregunta por un valor distinto a cada lado del intercambio.
 2. Elimina el `toList()` intermedio (una materialización, no un paso
    semántico); aplica composición de functor para fusionar los dos `map`;
    conserva el `toList()` final. El costo cambia en el primer paso: una
@@ -255,7 +256,7 @@ decir.
    satisface, que es por qué "toda mónada es un functor" es un teorema y no
    una convención.
 4. `cache.put(k, v).get(k) == v` — y nota que la ecuación solo *tipa* si
-   `put` devuelve el caché. Un `put` de tipo `void` deja la propiedad
-   inenunciable sin hablar de mutación y orden, que es la misma razón por la
+   `put` devuelve el caché. Un `put` de tipo `void` hace imposible
+   enunciar la propiedad sin hablar de mutación y orden, que es la misma razón por la
    que las APIs inmutables son más fáciles de testear: las ecuaciones
    necesitan valores en ambos lados.

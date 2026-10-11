@@ -43,6 +43,6 @@ async: true
     equivocarse sutilmente: un off-by-one en el cursor compartido, olvidar
     predimensionar la lista de resultados, perder el orden). En la versión
     de FxDart la política de concurrencia es un único paso de la cadena, así
-    que cambiar el límite —o quitarlo— toca un número en lugar de toda la
-    forma de la función.
+    que cambiar el límite edita un número y quitarlo elimina un paso, en lugar
+    de tocar toda la forma de la función.
   </p>

@@ -51,14 +51,14 @@ async: false
     veinte millones de llamadas a <code>(t) => -t.amount</code>. El tipo
     de clave es un <code>K extends Comparable</code> genérico — aquí
     <code>num</code> — así que cada una de esas claves es un
-    <code>double</code> encajonado en el montículo comparado por un
+    <code>double</code> encajonado en el montón comparado por un
     <code>compareTo</code> virtual.
   </p>
   <p>
     El <code>sortBy</code> de FxDart extrae primero. Un recorrido de la
-    lista escribe cada clave en un <code>Float64List</code> (vio que
-    todas eran <code>double</code>). Luego mezcla las claves y las filas
-    <em>juntas</em>, en orden: cada comparación son dos dobles de máquina
+    lista escribe cada clave en un <code>Float64List</code> (comprueba que
+    todas son <code>double</code>). Luego mezcla las claves y las filas
+    <em>juntas</em>, de forma secuencial: cada comparación opera sobre dos doubles nativos
     de un array tipado, con una comparación de la VM en estos datos (los
     importes son positivos finitos ordinarios, así que no hay NaN ni
     <code>-0.0</code> que fuerce el camino más lento de
@@ -74,7 +74,7 @@ async: false
     <code>double</code>, <code>int</code> o <code>String</code>,
     <code>sortBy</code> recae en el comparador genérico y la ventaja
     desaparece. La memoria con un millón de filas está cerca (unos
-    123 MB frente a 130 MB) — ambos retienen la copia de filas más un
+    123 MB en nativo frente a 130 MB en FxDart) — ambos retienen la copia de filas más un
     búfer auxiliar. Aquí los importes son todos distintos, así que la
     estabilidad no se ve en las tres líneas impresas.
   </p>

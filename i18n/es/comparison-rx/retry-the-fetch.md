@@ -1,7 +1,7 @@
 ---
 slug: retry-the-fetch
 title: Reintentar el fetch inestable — RxDart vs FxDart
-description: Un fetch que falla dos veces y luego acierta — Rx.retry re-suscribe una fábrica de streams, el retry de fxdart re-ejecuta un Future, ambos en una llamada.
+description: Un fetch que falla dos veces y luego acierta — Rx.retry re-suscribe una fábrica de streams, el fxRetry de fxdart re-ejecuta un Future, ambos en una llamada.
 heading: Reintentar el fetch inestable
 order: 29
 tier: 3
@@ -35,7 +35,7 @@ async: true
     conteo es el número de <em>reintentos</em> después del primer intento
     (aquí <code>2</code>, para tres intentos). En FxDart la cosa inestable
     es una función que devuelve un <code>Future</code>, así que
-    <code>retry</code> simplemente la llama otra vez —
+    <code>fxRetry</code> simplemente la llama otra vez —
     <code>attempts</code> es el presupuesto total (<code>3</code>), y el
     último error se relanza con su stack trace original cuando el
     presupuesto se agota.
@@ -44,7 +44,7 @@ async: true
     Un empate genuino. Las formas solo divergen cuando la cosa reintentada
     crece: si se convierte en un pipeline de varios valores, RxDart
     mantiene el mismo idioma de fábrica, mientras que FxDart envuelve el
-    terminal (<code>retry(3, () => fxAsync(…).toList())</code>) o pasa a
-    reintentos por elemento — un par con entidad propia, dos ejemplos más
-    adelante.
+    terminal (<code>fxRetry(3, () => fxAsync(…).toList())</code>) o pasa a
+    reintentos por elemento, que es un caso aparte con entidad propia, dos
+    ejemplos más adelante.
   </p>

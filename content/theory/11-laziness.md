@@ -37,8 +37,11 @@ void main() {
 description with one more stage. `toList`, `each`, `fold`, `first`, `sum` are
 **terminal** — they pull values through, and only then does anything run.
 
-The rule for telling them apart is the return type, and it never lies: if you
-get another `Fx` back, nothing happened yet.
+The rule for telling them apart is the return type — with one family of
+exceptions. If you get another `Fx` back, nothing has been pulled yet, *except*
+from the operators that must see every element before they can emit one:
+`sort`, `sortBy`, `sortByDesc` and the `*Strict` variants (`uniqStrict`,
+`uniqByStrict`) return an `Fx` but do their work immediately.
 
 ![A description, then a pull](diagrams/t11-1-description-pull.svg)
 
@@ -206,9 +209,9 @@ indirection.
 
 ## Exercises
 
-1. `fx(xs).map(f).toList()` and `xs.map(f).toList()` do the same work. At what
-   point does the FxDart version start to win, and which operator in the chain
-   is what causes it?
+1. `fx(xs).map(f).toList()` and an eager version that builds a list per stage
+   do the same work for one `map`. At what point does the FxDart version start
+   to win, and which operator in the chain is what causes it?
 2. Predict the output of a chain that calls `peek(print)` before `take(2)` over
    a ten-element source. How many lines print, and why?
 3. Write a chain whose callbacks run twice by accident. Then fix it two
@@ -221,14 +224,16 @@ indirection.
 1. It wins as soon as a stage *discards* work the eager version has already
    done — `take`, `first`, `some`, `find`, or a `filter` that rejects most
    elements before an expensive `map`. With no such stage the two do identical
-   work, and the eager version has less per-element machinery.
+   work, and the eager version has less per-element machinery. (Dart's own
+   `Iterable.map`, `where` and `take` are lazy too; the baseline here is the
+   eager list-per-stage version, as in the cost-model listing.)
 2. Two lines. `take(2)` stops pulling after the second element, so `peek` is
    never asked about elements three onwards — the pull is what drives the
    upstream, and it stopped.
 3. Any chain assigned to a variable and consumed by two terminals, as in the
    listing above. Fix one: `final xs = chain.toList();` then use `xs` twice.
-   Fix two: use `fxFork`/`tee` to split one pull into two consumers, so the
-   source is still read once.
+   Fix two: use `fxFork` to feed two consumers from one pull, or `tee` to fold
+   two reducers in one pass, so the source is still read once.
 4. Once with `.first` — one pull satisfies it. With `.last`, all 999,999 times:
    `last` has to reach the end, so there is nothing left to skip. Same chain,
    same laziness, opposite cost, decided entirely by the terminal.

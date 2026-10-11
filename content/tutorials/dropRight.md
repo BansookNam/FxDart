@@ -18,15 +18,17 @@ nextLabel: dropWhile
   <p>
     <code>dropRight</code> omits the last <code>length</code> values instead
     of the first. As with <code>takeRight</code>, there's no way to know
-    which elements are "last" without seeing the whole source, so
-    <code>dropRight</code> <strong>materializes</strong> it into a list
-    before yielding anything. It's the right tool when you have, say, a
-    known-size batch and want everything except a trailing footer or
-    sentinel — but it needs a finite source.
+    which elements are "last" without looking ahead, so it needs a finite
+    source. The sync version stays lazy, though: over a <code>List</code> it
+    indexes straight to the cut-off, and over any other iterable it holds a
+    small buffer of <code>length</code> elements and releases each value only
+    once <code>length</code> newer ones have arrived. It's the right tool when
+    you have, say, a known-size batch and want everything except a trailing
+    footer or sentinel.
   </p>
   <p>
-    <code>fxDropRightAsync</code> carries the same constraint: it awaits the
-    entire upstream before it can start producing values.
+    <code>fxDropRightAsync</code> is different: it awaits the entire upstream
+    into a list before it can start producing values.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -43,5 +45,5 @@ nextLabel: dropWhile
     <strong>Related:</strong>
     <a href="drop.html"><code>drop</code></a> — drop from the front instead ·
     <a href="takeRight.html"><code>takeRight</code></a> — keep the last n instead of dropping them ·
-    <a href="reverse.html"><code>reverse</code></a> — also materializes the source
+    <a href="reverse.html"><code>reverse</code></a> — materializes the whole source
   </div>

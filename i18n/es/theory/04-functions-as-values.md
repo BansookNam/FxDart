@@ -42,14 +42,14 @@ void main() {
   print(shout2('  hello  '));
   print(['  a ', ' b'].map(shout2).toList());
 
-  // pipe1 is the same idea with the value supplied first.
+  // fxPipe1 is the same idea with the value supplied first.
   print(fxPipe1('  hi ', shout2));
 }
 ```
 
 La composición es asociativa — `(f ∘ g) ∘ h` es igual a `f ∘ (g ∘ h)` — y la
 función identidad es su unidad. Eso es un monoide (capítulo 8), y es la razón
-de que puedas agrupar las etapas de una tubería como quieras sin cambiar el
+de que puedas agrupar las etapas de un pipeline como quieras sin cambiar el
 resultado. Es también la razón de que «extraer un ayudante» sea siempre
 seguro: sacar tres pasos encadenados a una función con nombre es exactamente
 la reagrupación que permite la ley.
@@ -103,16 +103,15 @@ cualquier número de etapas tiene que recurrir a `dynamic`:
 ```dart
 // FxDart ships this for FxTS parity — and every stage boundary
 // is an unchecked cast.
-final result = pipe(
-  [1, 2, 3, 4],
+final result = pipe([1, 2, 3, 4], [
   (dynamic xs) =>
       fxMap((dynamic n) => (n as int) * 2, xs as Iterable),
   (dynamic xs) => fxToList(xs as Iterable<int>),
-);
+]);
 ```
 
 Cada frontera de etapa es un cast sin comprobar. El error de tipos que querías
-que atrapara el compilador — una etapa `String` en una tubería de `int` —
+que atrapara el compilador — una etapa `String` en un pipeline de `int` —
 llega ahora en tiempo de ejecución, en mitad de un iterador perezoso, con una
 traza que apunta a las tripas de la librería.
 
@@ -133,7 +132,7 @@ void main() {
 
 La cadena es una composición *tipada*: cada método devuelve `Fx<R>` con el
 nuevo tipo de elemento, así que el compilador sigue el valor hasta el final y
-tu editor puede autocompletarlo. Lo que renuncia es a poder sostener una etapa
+tu editor puede autocompletarlo. Lo que sacrifica es la posibilidad de sostener una etapa
 como valor de primera clase y pasarla por ahí — en FxTS, `map(f)` por sí solo
 es un valor; en FxDart es una llamada a método que necesita un receptor.
 `WHY_CURRIED.md` en el repositorio recoge ese intercambio al completo.
@@ -150,7 +149,7 @@ es un valor; en FxDart es una llamada a método que necesita un receptor.
 ## Funciones de orden superior que ya usas
 
 Una función que toma o devuelve funciones es de **orden superior**, y el
-vocabulario de las tuberías no es otra cosa que funciones de orden superior:
+vocabulario de los pipelines no es otra cosa que funciones de orden superior:
 `map`, `filter`, `fold`, `sortBy` toman comportamiento como argumento. Dos más
 de FxDart que conviene conocer por su nombre:
 
@@ -178,7 +177,7 @@ void main() {
 ## Cuándo se gana el sueldo
 
 Tratar las funciones como valores paga cuando el comportamiento varía pero la
-estructura no — una tubería, cuatro políticas pasadas por argumento; un
+estructura no — un pipeline, cuatro políticas pasadas por argumento; un
 validador compuesto de reglas pequeñas con nombre. Paga también a la hora de
 probar: un parámetro de función es la costura más barata que existe, y no
 necesita ningún framework de mocks.
@@ -215,7 +214,7 @@ gana su fama.
 2. `D Function(A) compose3<A, B, C, D>(...)` construido como
    `compose2(compose2(f, g), h)` o `compose2(f, compose2(g, h))`. La misma
    función porque la composición es asociativa — la misma ley que te deja
-   reagrupar etapas de una tubería, y la misma forma que la asociatividad
+   reagrupar etapas de un pipeline, y la misma forma que la asociatividad
    monádica del capítulo 1.
 3. `int Function(int)`. Dart no puede expresar «una función de cualquier
    aridad» como parámetro de tipo, así que `curried` está escrito una vez por
@@ -229,6 +228,6 @@ gana su fama.
    elemento en el mismo orden, y cortocircuita igual. Si un predicado tiene un
    efecto colateral (contar cuántos elementos vio, digamos), las dos versiones
    difieren: la forma encadenada ejecuta `odd` solo sobre los supervivientes, y
-   la fusionada también, pero un efecto ordenado *entre* los dos filtros se
-   movería. La pureza es lo que convierte la fusión en un refactor y no en una
+   la fusionada también, pero un efecto que ocurre *entre* los dos filtros
+   cambiaría de posición. La pureza es lo que convierte la fusión en un refactor y no en una
    reescritura.

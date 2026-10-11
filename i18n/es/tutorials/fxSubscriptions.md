@@ -35,18 +35,20 @@ prevLabel: LiveValue
     <code>pauseAll()</code> y <code>resumeAll()</code> son la versión suave,
     para cuando el trabajo debe pararse sin que se deshaga el cableado: una
     pantalla que pasa a segundo plano, una pestaña que pierde el foco. Las
-    suscripciones en pausa almacenan en vez de descartar, así que no se pierde
-    nada durante el hueco.
+    suscripción en pausa a un stream de suscripción única almacena sus eventos
+    en un búfer, así que no se pierde nada durante el hueco; un stream
+    <em>broadcast</em> no almacena para un listener en pausa, así que los
+    eventos emitidos durante la pausa se descartan.
   </p>
   <p>
     La bolsa se vacía <em>antes</em> de esperar sus cancelaciones, así que un
     segundo <code>cancelAll()</code> durante la espera no puede cancelar nada
     dos veces, y el mismo objeto puede albergar después una generación nueva
-    de suscripciones. Capa de eventos de fxdart, siguiendo a
-    <code>CompositeSubscription</code> de Rx.
+    de suscripciones. Esto forma parte de la capa de eventos de fxdart,
+    modelada sobre <code>CompositeSubscription</code> de Rx.
   </p>
   <p>
-    Se lleva de forma natural con
+    Encaja de forma natural con
     <code><a href="stopOn.html">stopOn</a></code>: usa <code>stopOn</code>
     cuando una cadena debe terminar porque algo <em>ha pasado</em>, y
     <code>FxSubscriptions</code> cuando un conjunto de cadenas debe terminar

@@ -27,8 +27,8 @@ nextLabel: count
     (<code>Comparable.compare</code>) 비교되고, 동점일 때는 먼저 만난
     <strong>첫</strong> 원소를 유지하며, 빈 파이프라인은
     <code>null</code>을 반환합니다 — <code>infinity</code>가 아닙니다.
-    숫자용 <code><a href="min.html">min</a></code>이 하는 일이 그것이죠.
-    되돌아갈 "영 원소"가 없기 때문입니다.
+    숫자용 <code><a href="min.html">min</a></code>은 <code>infinity</code>를 돌려주지만,
+    minBy에는 돌아갈 "영 원소"가 없기 때문입니다.
   </p>
 
   <h2>데모 1 · 기본 사용법, 빈 경우 &amp; 동점</h2>

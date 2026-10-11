@@ -45,8 +45,7 @@ prevLabel: shuffle
   {{playground:1}}
 
   <h2>직접 해 보기</h2>
-  <p>연습: 같은 시드로 양쪽을 만들어 완전히 동일한 "무작위" 패
-    두 벌을 나눠 보세요.</p>
+  <p>연습: 같은 시드로 두 생성기를 만들어, 똑같은 "무작위" 패 두 벌을 나눠 보세요.</p>
   {{playground:2}}
 
   <div class="callout">

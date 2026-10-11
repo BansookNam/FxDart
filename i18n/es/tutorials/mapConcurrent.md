@@ -28,15 +28,16 @@ nextLabel: concurrentPool
   <p>
     Como <em>es</em> la composición — no una reimplementación —, todas las
     garantías se conservan: los resultados llegan en <strong>orden de
-    origen</strong> (usa la forma larga con
-    <code><a href="concurrentPool.html">concurrentPool</a></code> cuando
-    quieras orden de finalización), como mucho <code>concurrency</code>
+    origen</strong> (cuando quieras orden de
+    finalización, usa la forma larga con
+    <code><a href="concurrentPool.html">concurrentPool</a></code> en lugar
+    de <code>concurrent</code>), como mucho <code>concurrency</code>
     callbacks están en vuelo, y los operadores aguas abajo siguen tirando
     perezosamente. Sobre una cadena ya async compone
     <code>map(f).concurrent(n)</code>, saltándose el puente.
   </p>
   <p>
-    Es una adición nativa de Dart: FxTS canaliza <code>concurrent</code>
+    Es una adición nativa de Dart: FxTS encadena <code>concurrent</code>
     como paso separado, y esa forma larga sigue disponible cuando necesites
     intercalar otro operador entre el map y el límite.
   </p>

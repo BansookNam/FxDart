@@ -29,7 +29,8 @@ Los errores de diseño son casi siempre el mismo error: **el tipo tiene más
 valores que el dominio.** Aquí está la forma clásica.
 
 ```dart run
-// Four fields; 2 × 2 × 2 × 2 = 16 representable combinations…
+// Four fields; counting each String? as just set or unset,
+// 2 × 2 × 2 × 2 = 16 representable combinations…
 class Request {
   Request(
       {this.loading = false,
@@ -135,7 +136,7 @@ void main() {
 ```
 
 Un record es la herramienta correcta cuando el emparejamiento es *local* — un
-paso intermedio de una tubería, un retorno de dos valores. Es la herramienta
+paso intermedio de un pipeline, un retorno de dos valores. Es la herramienta
 equivocada en cuanto el emparejamiento tiene un nombre en el dominio y reglas
 asociadas, porque un record no puede llevar una invariante. `(String, int)` no
 puede prometer que el `int` sea no negativo;
@@ -171,7 +172,7 @@ es una lista de tareas escrita por el compilador e imposible de olvidar.
 vayan a crecer: estados de petición/respuesta, resultados de parseo, mensajes
 de protocolo, cualquier cosa con un «o» en su especificación.
 
-Sáltatelo para datos genuinamente abiertos, para una estructura que solo son
+Sáltatelo para datos genuinamente abiertos, para una estructura que son solo
 tres números independientes y — importante — en la frontera con JSON, donde el
 mundo te entrega un saco de nulables de todos modos. Ahí el tipo suma es
 aquello *hacia lo que* parseas: un único sitio convierte el mapa informe en un
@@ -204,7 +205,7 @@ parseo es el tema de la Parte IV.
 3. Los dieciséis menos los cuatro reales: `loading` con `data`, `loading` con
    `error`, `data` con `error`, `cancelled` con cualquier otra cosa, y el
    estado vacío en que los cuatro son null/false. El vacío suele ser el
-   reventón (no hay nada que renderizar); las combinaciones suelen ser el bug
+   que falla (no hay nada que renderizar); las combinaciones suelen ser el bug
    silencioso, porque gana el primer `if` de la función de render y el resto
    del estado se descarta sin leer.
 4. `Either` es una suma, así que el compilador puede demostrar que hay

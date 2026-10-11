@@ -31,7 +31,7 @@ nextLabel: race
     inner emission becomes the new state and is forwarded. With
     <code>concurrent: n</code> at most <em>n</em> inners run at a time
     and the rest wait in a queue; they share one state variable — the
-    latest inner emission wins. Null <code>concurrent</code> is
+    latest inner emission wins. A null <code>concurrent</code> means
     unlimited. The result closes when the source has closed and every
     inner has finished.
   </p>

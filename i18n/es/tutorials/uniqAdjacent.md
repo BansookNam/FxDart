@@ -38,8 +38,8 @@ nextLabel: takeUniqBy
   <p>
     Extensión de fxdart (sin contraparte en FxTS) — Rx lo llama
     <code>distinctUntilChanged</code>, los streams de Dart lo llaman
-    <code>Stream.distinct</code>. El callback de clave async corre de un
-    elemento en uno (la comparación es inherentemente ordenada), pero el
+    <code>Stream.distinct</code>. El callback de clave async se ejecuta
+    elemento a elemento (la comparación es inherentemente ordenada), pero el
     tramo de aguas arriba sigue evaluándose en paralelo bajo
     <code><a href="concurrent.html">concurrent</a></code>.
   </p>

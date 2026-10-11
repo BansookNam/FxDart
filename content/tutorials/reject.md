@@ -17,7 +17,7 @@ nextLabel: compact
   <h2>Lecture</h2>
   <p>
     <code>whereNot</code> is implemented as
-    <code>fxWhere((a) =&gt; !f(a), iterable)</code> — it exists purely for
+    <code>fxFilter((a) =&gt; !f(a), iterable)</code> — it exists purely for
     readability. <code>list.whereNot(isInvalid)</code> reads more naturally
     than <code>list.where((a) =&gt; !isInvalid(a))</code>, especially once
     the predicate already has a clear, positive name. <code>whereNot</code>

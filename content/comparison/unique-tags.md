@@ -37,9 +37,9 @@ async: false
   </p>
   <p>
     The clock is not a tie. The Benchmark bars below have FxDart at
-    <strong>1.47× the speed</strong> of the native chain on a million posts —
-    73.5 ms against 108.0 ms — and the ratio holds all the way down (1.36× at
-    N=10,000, 1.29× at N=100; those two still carry a <em>same speed</em>
+    <strong>1.37× the speed</strong> of the native chain on a million posts —
+    78 ms against 107 ms — and the ratio holds all the way down (1.36× at
+    N=10,000, 1.25× at N=100; those two still carry a <em>same speed</em>
     badge only because the absolute gap there is under the site's 0.6 ms
     perception floor). Both sides do identical work: three million tag
     strings pulled through a flattener, hashed into a set that keeps 500

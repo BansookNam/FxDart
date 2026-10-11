@@ -10,7 +10,7 @@ prevLabel: zip3
 next: zipWithIndex.html
 nextLabel: zipWithIndex
 ---
-  <p class="hero-sub">두 이터러블을 zip하면서 각 쌍을 함수로 결합하는 것을 한 번에 처리합니다.</p>
+  <p class="hero-sub">두 이터러블을 zip하면서 각 쌍을 함수로 한 번에 결합합니다.</p>
 
   {{signature}}
 
@@ -19,8 +19,7 @@ nextLabel: zipWithIndex
     <code>fxZipWith</code>는 <code>zip</code> 뒤에 그 쌍들에 대한
     <code>map</code>을 붙인 것과 정확히 같습니다 — 실제로 FxDart의 구현도
     <code>fxMap((r) => f(r.$1, r.$2), zip(...))</code>입니다. 중간의
-    <code>(A, B)</code> 레코드는 필요 없고 결합한 결과만 원할 때
-    꺼내 쓰세요. 나란히 놓인 두 리스트를 곱하거나, 이름과 나이를 하나의
+    <code>(A, B)</code> 레코드가 필요 없고 결합한 결과만 원할 때 이 함수를 쓰세요. 나란히 놓인 두 리스트를 곱하거나, 이름과 나이를 하나의
     라벨로 포맷하는 식으로 말이죠.
   </p>
   <p>

@@ -19,8 +19,9 @@ nextLabel: takeRight
     <code>take</code> es lo que mantiene finito a un pipeline perezoso. Deja de
     pedir valores a su fuente en cuanto ha emitido <code>length</code> valores:
     aguas arriba nunca recibe más peticiones que esas. Dado que fuentes de
-    FxDart como <code>fxRange</code>, <code>repeat</code> y <code>cycle</code>
-    pueden ser infinitas, muchas veces <code>take</code> es lo único que hace
+    FxDart como <code>cycle</code> pueden ser infinitas
+    (<code>fxRange</code> y <code>repeat</code> son finitas, pero pueden ser
+    enormes), muchas veces <code>take</code> es lo único que hace
     que un pipeline sea seguro de ejecutar.
   </p>
   <p>
@@ -53,6 +54,6 @@ nextLabel: takeRight
     <strong>Relacionado:</strong>
     <a href="takeRight.html"><code>takeRight</code></a> — los últimos n en vez de los primeros n ·
     <a href="takeWhile.html"><code>takeWhile</code></a> — tomar según un predicado ·
-    <a href="range.html"><code>fxRange</code></a> · <a href="cycle.html"><code>cycle</code></a> — fuentes infinitas ·
+    <a href="range.html"><code>fxRange</code></a> — una fuente finita · <a href="cycle.html"><code>cycle</code></a> — una fuente infinita ·
     <a href="concurrent.html"><code>concurrent</code></a> — evaluación en paralelo
   </div>

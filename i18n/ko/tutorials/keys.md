@@ -19,7 +19,7 @@ nextLabel: values
     <code>fxKeys(map)</code>은 Dart의 <code>map.keys</code>를 FxTS 스타일로
     얇게 감싼 것입니다 — 객체 관련 함수 어휘(<code>fxEntries</code>,
     <code>fxKeys</code>, <code>fxValues</code>)를 일관되게 읽히도록 하고
-    <code>fx()</code>에 자연스럽게 끼워 넣기 위해 존재하죠. Dart의
+    <code>fx()</code>에 자연스럽게 끼워 넣기 위해 존재합니다. Dart의
     <code>Map.keys</code>는 이미 지연 뷰이므로 <code>fxKeys</code>가 별도의
     버퍼링을 더하지는 않습니다 — 동일한 지연
     <code>Iterable&lt;K&gt;</code>를 그대로 건네줄 뿐입니다.

@@ -46,10 +46,12 @@ nextLabel: reduceLazy
     distintos es peor que uno que cuenta hacia atrás.
   </p>
   <p>
-    Ambos son estrictos donde <code>fold</code> no lo es. Caminar hacia atrás
-    exige saber dónde está el final, así que una fuente que no sea
-    <code>List</code> se materializa primero y <code>fxFoldRightAsync</code>
-    vacía el stream antes de empezar: nunca lo apuntes a una fuente infinita.
+    <code>fold</code> también es ansioso, pero hace streaming: mantiene un solo
+    acumulador y nunca retiene la fuente. Los dos pliegues por la derecha son
+    distintos. Caminar hacia atrás exige saber dónde está el final, así que una
+    fuente que no sea <code>List</code> se materializa primero (y
+    <code>fxFoldRightAsync</code> vacía el stream antes de empezar), y no pueden
+    cortocircuitar: nunca los apuntes a una fuente infinita.
   </p>
 
   <h2>Demo 1 · La dirección cambia la respuesta</h2>

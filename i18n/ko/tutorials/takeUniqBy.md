@@ -27,7 +27,7 @@ nextLabel: difference
     하나가 둘의 일을 하게 만드는 장치입니다.
   </p>
   <p>
-    기본은 체인으로 쓰십시오. 이름 붙은 세 단계가 두 일을 겸하는 콜백
+    기본은 체인으로 쓰세요. 이름 붙은 세 단계가 두 일을 겸하는 콜백
     하나보다 잘 읽히고, 지연 체인도 똑같이 단축 평가합니다. 이 연산자가
     존재하는 이유는 하나뿐이며, 그게 무엇인지 아는 편이 좋습니다.
   </p>
@@ -43,25 +43,27 @@ nextLabel: difference
   <p>
     <code>takeUniqBy</code>는 콜백을 호출자에 인라인될 만큼 작은 본문의
     <em>매개변수</em>로 받습니다. 그래서 컴파일러가 클로저 본문을 함께
-    인라인합니다. 로그 100만 줄, AOT 기준 측정값:
+    인라인합니다. 로그 100만 줄, AOT 기준으로 합성 가능한 체인은
+    13.7 ms, 손으로 쓴 루프는 10.4 ms가 걸립니다:
   </p>
   <table>
     <thead><tr><th>표현</th><th>시간</th></tr></thead>
     <tbody>
       <tr><td><code>filter().uniqBy().take(3)</code></td><td>13.7 ms</td></tr>
-      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11.3 ms</strong></td></tr>
-      <tr><td>손으로 쓴 루프</td><td>10.2 ms</td></tr>
+      <tr><td>손으로 쓴 루프</td><td>10.4 ms</td></tr>
     </tbody>
   </table>
   <p>
-    두 표현과 두 막대 모두
+    <code>takeUniqBy(3, …)</code> 표현은 콜백을 인라인해 그 격차를 좁히도록
+    만들어졌습니다. 두 표현 모두
     <a href="../DartComparison/recent-errors.html">최근 오류 메시지, 중복
-    제거</a> 페이지에 있습니다 — 같은 파이프라인을 쓰는 두 방식의 차이가
-    그 페이지가 말하려는 바라서, 유일하게 막대를 둘이 아니라 셋 싣습니다.
+    제거</a> 페이지에 있습니다. 막대를 둘이 아니라 셋 싣는 단 두 개의 비교
+    페이지 중 하나인데, 같은 파이프라인을 쓰는 두 방식의 차이가
+    그 페이지가 말하려는 바이기 때문입니다.
   </p>
   <p>
     정리하면: 파이프라인이 뜨거운 경로에 있고 프로파일이 이 콜백들을 지목할
-    때 꺼내십시오. 그전에는 아닙니다. FxTS에 대응물이 없는 fxdart 확장이며,
+    때 꺼내세요. 그전에는 아닙니다. FxTS에 대응물이 없는 fxdart 확장이며,
     async 짝도 없습니다 — 이득이 인라인인데 async 기계장치가 그것을 압도하기
     때문입니다.
   </p>
@@ -77,7 +79,7 @@ nextLabel: difference
   {{playground:2}}
 
   <div class="callout">
-    <strong>관련:</strong>
+    <strong>관련 항목:</strong>
     <a href="uniqBy.html"><code>uniqBy</code></a> — 이 연산자가 접어 넣은 지연 중복 제거 ·
     <a href="take.html"><code>take</code></a> — 접어 넣은 지연 개수 제한 ·
     <a href="uniqStrict.html"><code>uniqStrict</code></a> — 같은 계열의 다른 즉시 연산자 ·

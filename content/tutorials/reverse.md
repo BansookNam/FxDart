@@ -27,8 +27,8 @@ nextLabel: fork
     <code>fxReverseAsync</code> follows the same rule: it awaits every element
     of the upstream first, then replays them back to front. If you only need
     the tail of a sequence rather than a true reversal, prefer
-    <code>takeRight</code> — it materializes too, but at least stops as soon
-    as it has the values it needs to output in order.
+    <code>takeRight</code> — it buffers only <code>n</code> elements instead
+    of the whole source.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -43,7 +43,7 @@ nextLabel: fork
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="takeRight.html"><code>takeRight</code></a> — also materializes, only needs the tail ·
+    <a href="takeRight.html"><code>takeRight</code></a> — also reads the whole source, but buffers only the tail ·
     <a href="dropRight.html"><code>dropRight</code></a> ·
     <a href="sort.html"><code>sort</code></a> — also materializes into a new list
   </div>

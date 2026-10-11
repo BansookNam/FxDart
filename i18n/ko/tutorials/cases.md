@@ -20,8 +20,8 @@ nextLabel: add
     매처를 만듭니다. 각 쌍을 순서대로 시도해서, 술어가 참을 반환하는
     첫 번째 쌍의 매퍼를 적용해 결과를 만듭니다.
     <code>if</code>/<code>else if</code> 연쇄를 함수형으로 대체하는
-    도구이며, <code>map</code>과도 잘 어울립니다 — 반환값이 그대로
-    넘길 수 있는 평범한 단항 함수 <code>T -&gt; R</code>이기 때문입니다.
+    도구이며, <code>map</code>과도 잘 어울립니다. 반환되는 함수가 그대로 넘길
+    수 있는 평범한 단항 함수 <code>T -&gt; R</code>이기 때문입니다.
   </p>
   <p>
     <strong>이 형태는 FxTS와 의도적으로 다릅니다.</strong> FxTS의
@@ -38,9 +38,10 @@ nextLabel: add
   </p>
   <p>
     아무것도 매치되지 않고 <code>orElse</code>도 주어지지 않으면
-    <code>fxCases</code>는 <code>value</code> 자체를 반환하려 합니다 —
-    이는 <code>T</code>가 마침 <code>R</code>도 만족할 때에만 호출 지점에서
-    컴파일되며, 그렇지 않으면 런타임에 <code>StateError</code>를 던집니다.
+    <code>fxCases</code>는 <code>value</code>가 이미 <code>R</code>이면
+    <code>value</code> 자체를 반환하고 —
+    그렇지 않으면 <code>StateError</code>를 던집니다. 이는 컴파일 타임이 아니라
+    런타임 검사입니다.
     실무에서는 술어가 모든 경우를 빠짐없이 다룬다고 확신할 수 있는 게
     아니라면 항상 <code>orElse</code>를 넘기세요.
   </p>
@@ -61,5 +62,5 @@ nextLabel: add
     <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — 술어 하나, 결과 타입은 동일 ·
     <a href="throwError.html"><code>fxThrowError</code></a> — 매치 실패가 치명적이어야 할 때 흔히 쓰는 orElse ·
     <a href="always.html"><code>fxAlways</code></a> — 상수 orElse ·
-    <a href="matches.html"><code>fxMatches</code></a> — case에 끼워 넣을 수 있는 술어
+    <a href="matches.html"><code>fxMatches</code></a> — <code>fxCases</code> 쌍에 넣을 수 있는 술어
   </div>

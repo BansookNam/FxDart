@@ -38,9 +38,9 @@ nextLabel: add
   </p>
   <p>
     If nothing matches and no <code>orElse</code> is given, <code>fxCases</code>
-    falls back to returning <code>value</code> itself — which only compiles
-    at the call site if <code>T</code> happens to also satisfy <code>R</code>
-    — otherwise it throws a <code>StateError</code> at runtime. In practice,
+    returns <code>value</code> itself if it already is an <code>R</code> —
+    otherwise it throws a <code>StateError</code>. That is a runtime check,
+    not a compile-time one. In practice,
     always pass <code>orElse</code> unless you're certain your predicates are
     exhaustive.
   </p>

@@ -1,11 +1,11 @@
 ---
 slug: budget-alerts
 title: Categories over their monthly budget — Dart vs FxDart
-description: Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs groupBy + filter + sortBy in FxDart.
+description: Total spend per category, keep the ones over budget, rank by overage — mutable-map bookkeeping in plain Dart vs foldBy + filter + sortBy in FxDart.
 heading: Categories over their monthly budget
 order: 28
 tier: 3
-functions: groupBy, map, filter, sortBy, join
+functions: foldBy, map, filter, sortBy, join
 domain: transactions
 verdict: fxdart
 async: false
@@ -29,11 +29,11 @@ async: false
   <p>
     The formatting line is identical in both versions — the difference is
     everything before it. Native Dart does the grouping by hand in a
-    mutable map, then switches idiom twice: a <code>for</code> loop to
+    mutable map, then switches idiom again and again: a <code>for</code> loop to
     total, a <code>where</code> to filter, a cascade-<code>sort</code>
     with a hand-built comparator to rank. The FxDart version is one
-    vocabulary end to end: <code>groupBy</code>, <code>map</code> to
-    totals, <code>filter</code> against the budget, <code>sortBy</code>
+    vocabulary end to end: <code>foldBy</code> to totals, <code>map</code>
+    to rows, <code>filter</code> against the budget, <code>sortBy</code>
     the overage, <code>join</code>. Each business rule — over budget,
     worst first — is one named step you can point at in a code review.
   </p>

@@ -21,8 +21,8 @@ nextLabel: onErrorResume
     <strong>재구독</strong>이고, 모양은 두 가지입니다. 하나는 팩토리로
     스트림을 다시 만드는 것이고 —
     <code><a href="onErrorResume.html">FxEvents.retry</a></code>, 이미
-    다뤘습니다 — 한 번짜리 <code>StreamController</code>에 맞는
-    수입니다. 다른 하나는 같은 스트림을 다시 듣는 것이고, 이 페이지가
+    다뤘습니다 — 한 번만 쓰는 <code>StreamController</code>에 맞는
+    쪽입니다. 다른 하나는 같은 스트림을 다시 듣는 것이고, 이 페이지가
     그것입니다: <code>retryOnError</code>, <code>retryOn</code>,
     <code>repeat</code>, <code>repeatOn</code>.
   </p>

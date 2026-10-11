@@ -28,25 +28,25 @@ async: false
 
   <h2>Por qué difieren</h2>
   <p>
-    La tarea es un solo pensamiento — quedarse con el mes, agrupar,
+    La tarea es una sola idea — quedarse con el mes, agrupar,
     totalizar, rankear, top tres — y la versión FxDart es una sola cadena:
     <code>filter</code> conserva julio, <code>groupedBy</code>
     produce registros <code>(key:, items:)</code>, así que el total por
     categoría está a un paso de <code>map</code>, y
     <code>sortByDesc</code> dice «el más grande primero» por clave. Dart
-    nativo reparte el mismo pensamiento a través de un <code>Map</code>:
-    <code>groupListsBy</code> (de <code>package:collection</code>) termina
+    nativo reparte esa misma lógica en un <code>Map</code>:
+    <code>groupListsBy</code> (de <code>package:collection</code>) rompe
     la cadena fluida, y el orden descendente se convierte en el volteo de
     operandos del comparador
-    <code>(a,&nbsp;b)&nbsp;=&gt;&nbsp;b…compareTo(a…)</code> — un
-    criadero clásico de bugs silenciosos, y la razón por la que el lado
+    <code>(a,&nbsp;b)&nbsp;=&gt;&nbsp;b…compareTo(a…)</code> — una
+    fuente clásica de bugs silenciosos, y la razón por la que el lado
     FxDart nunca niega una clave.
   </p>
   <p>
     Honestamente: <code>package:collection</code> cubre bien el
     agrupamiento, y para un informe puntual la versión nativa está bien.
-    La cadena se gana el sueldo conforme el informe crece — cada paso
+    La cadena se justifica a medida que el informe crece — cada paso
     añadido (un filtro, un segundo criterio de ranking) extiende el
     pipeline en vez de otro viaje de ida y vuelta por
-    <code>fxEntries</code>.
+    <code>.entries</code>.
   </p>

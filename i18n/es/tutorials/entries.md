@@ -28,7 +28,7 @@ nextLabel: keys
     Como los pares son records de Dart, puedes desestructurarlos directamente
     en un bucle <code>for</code> — <code>for (final (key, value) in
     fxEntries(map))</code> — o acceder a los campos posicionales
-    <code>.$1</code> (clave) y <code>.$2</code> (valor) dentro de una
+    <code>.$1</code> (clave) y <code>.$2</code> (valor) dentro de un
     callback de <code>map</code>/<code>filter</code> cuando desestructurar
     no resulte cómodo.
   </p>

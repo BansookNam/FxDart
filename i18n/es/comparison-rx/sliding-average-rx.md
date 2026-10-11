@@ -29,7 +29,7 @@ async: false
   <p>
     RxDart escribe una ventana deslizante como una parametrización del
     loteo: <code>bufferCount(3, 1)</code> — búferes de tres, con un búfer
-    nuevo empezando cada evento. Funciona, pero la codificación gotea dos
+    nuevo empezando cada evento. Funciona, pero la codificación se filtra dos
     veces. Tienes que saber que el segundo argumento es
     <code>startBufferEvery</code> y que <code>1</code> significa
     «deslizante»; y al final del stream el operador vuelca sus búferes aún

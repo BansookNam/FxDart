@@ -44,6 +44,6 @@ async: false
     tier 1 desde la otra dirección: a veces el vocabulario compartido vive
     en la propia plataforma. El único resto es el modelo de entrega — un
     main <code>async</code> y un <code>await</code> para recolectar lo que
-    una cadena pull devuelve como un valor corriente, sin event loop de
+    una cadena pull devuelve como un valor normal, sin event loop de
     por medio. Empate.
   </p>

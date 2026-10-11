@@ -38,7 +38,7 @@ nextLabel: debounceOn
   <p>
     <code>delay(duration)</code> es el más simple de los tres: el stream
     entero se desplaza una cantidad fija, con su separación intacta y sin
-    descartar nada. El cierre espera a que aterrice el último evento
+    descartar nada. El cierre espera a que llegue el último evento
     retrasado, así que no se pierde nada al final; los errores se reenvían de
     inmediato, ya que solo los datos merecen retenerse.
   </p>

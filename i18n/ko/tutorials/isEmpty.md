@@ -16,7 +16,7 @@ nextLabel: every
 
   <h2>강의</h2>
   <p>
-    이것은 <strong>결코</strong> <code>Iterable.isEmpty</code>와 같은 것이
+    이 함수는 <strong>결코</strong> <code>Iterable.isEmpty</code>와 같은 것이
     아닙니다 — 모든 <code>List</code>, <code>Set</code>, <code>Fx</code> 체인에서
     이미 거저 얻는 그 게터 말입니다.
     그 게터는 이터러블에만 있어서, <code>null</code>에 대해서는 예외가 나거나
@@ -25,7 +25,7 @@ nextLabel: every
     "아무것도 아닌" 것인가? <code>null</code>, 빈 <code>String</code>, 그리고
     빈 <code>Iterable</code>/<code>Map</code>/<code>Set</code>에 대해
     <code>true</code>를 반환하고, 그 밖의 모든 값에는 <code>false</code>를
-    반환합니다. 숫자와 불리언도 여기 포함되며, 결코 "비어 있다"고 보지 않습니다.
+    반환합니다. 숫자와 불리언이 여기 해당하는데, 이들은 결코 "비어 있다"고 보지 않습니다.
   </p>
   <p>
     인자가 <code>Object?</code> 하나뿐이라서, 별도의 람다로 감쌀 필요 없이

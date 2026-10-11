@@ -26,7 +26,7 @@ async: false
 
   <h2>차이가 나는 이유</h2>
   <p>
-    순수 <code>takeWhile</code>에는 이 작업에서 하나 차이(off-by-one)
+    순수 <code>takeWhile</code>에는 이 작업에서 한 칸 어긋나는(off-by-one)
     문제가 있습니다: 술어를 깨뜨리는 요소가 정확히 아직 원하는 그
     요소입니다. 두 라이브러리 모두 포함형 수정판을 싣고 있는데, 서로
     반대편 끝에서 표기합니다 — RxDart의 <code>takeWhileInclusive</code>는

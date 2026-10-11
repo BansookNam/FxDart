@@ -18,7 +18,7 @@ nextLabel: dropRight
   <p>
     <code>skip</code> es el opuesto de <code>take</code>: descarta los primeros
     <code>length</code> valores y emite todo lo que venga después. Sigue siendo
-    perezoso —no se omite nada hasta que alguien tira realmente del pipeline— y
+    perezoso: no se omite nada hasta que alguien tira realmente del pipeline— y
     funciona sin problemas sobre fuentes infinitas, ya que solo necesita contar
     un número fijo de elementos antes de dejar pasar el resto tal cual.
   </p>

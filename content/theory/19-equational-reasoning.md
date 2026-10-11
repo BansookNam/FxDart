@@ -9,7 +9,7 @@ description: Refactoring as substitution — using the laws of Part II to transf
 
 > **In this chapter**
 > - refactoring as a chain of substitutions, each justified by a named law
-> - a worked transformation: five stages down to two, on paper
+> - a worked transformation: five stages down to three, on paper
 > - laws as property tests, with a generator and no test framework
 > - the preconditions that make the whole method valid, and how they fail
 
@@ -51,7 +51,7 @@ void main() {
       .filter((n) => n > 5)
       .fold(0, (a, b) => a + b);
 
-  // After: two stages. Same value, by four substitutions.
+  // After: three stages. Same value, by two rewrites.
   final after = fx(source)
       .map((n) => n * 2 + 1)
       .filter((n) => n > 5)
@@ -61,7 +61,8 @@ void main() {
 }
 ```
 
-The four steps, each with its licence:
+The four steps (two rewrites and two places to leave things alone), each with
+its licence:
 
 1. `map((n) => n)` is `map(id)` → delete it. **Functor identity.**
 2. `map(f).map(g)` → `map(g ∘ f)`, giving `map((n) => n * 2 + 1)`.
@@ -228,9 +229,10 @@ and equations have nothing to say.
 
 1. Not in general. It holds only when `p` is a predicate on the *unmapped*
    value — that is, when the version after the swap tests the same thing.
-   Break it with `f = (n) => n * 2` and `p = (n) => n > 5`: filtering first
-   keeps 6, 7, 8…, mapping first keeps 3, 4… doubled. The two answers differ
-   because `p` was written for a different type of value.
+   Break it with `f = (n) => n * 2` and `p = (n) => n > 5` on `[3, 6]`:
+   filtering first keeps only 6 and then doubles it, giving `[12]`; mapping
+   first gives `[6, 12]` and keeps both, since 6 > 5. The two answers differ
+   because `p` asks about a different value on each side of the swap.
 2. Delete the intermediate `toList()` (a materialisation, not a semantic step);
    apply functor composition to fuse the two `map`s; keep the final `toList()`.
    The cost changes at the first step: one intermediate list disappears, which

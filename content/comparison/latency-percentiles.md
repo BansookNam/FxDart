@@ -1,11 +1,11 @@
 ---
 slug: latency-percentiles
 title: p50/p95 latency per endpoint — Dart vs FxDart
-description: Percentile table from raw request logs — groupBy + sortBy + nth per endpoint vs a row-accumulating loop with in-place sorts.
+description: Percentile table from raw request logs — groupBy + sort + nth per endpoint vs a row-accumulating loop with in-place sorts.
 heading: p50/p95 latency per endpoint
 order: 40
 tier: 4
-functions: filter, groupBy, map, sortBy, nth, maxBy, join
+functions: filter, groupBy, map, sort, sortBy, nth, maxBy, join
 domain: logs
 verdict: fxdart
 async: false
@@ -28,10 +28,11 @@ async: false
   <h2>Why they differ</h2>
   <p>
     A percentile is "sort, then index" — in FxDart that is literally
-    <code>sortBy</code> + <code>nth</code>, applied inside a
+    <code>sort</code> + <code>nth</code>, applied inside a
     <code>groupBy</code> → <code>map</code> pipeline that turns each
     endpoint group into a stats row; ranking the table and finding the worst
-    endpoint reuse the same rows with <code>sortBy</code> and
+    endpoint reuse the same rows with <code>sortBy</code> (which only ranks
+    the final table, not the percentiles) and
     <code>maxBy</code>. The native version does the same math but through a
     mutable row list filled in a <code>for</code> loop, an in-place
     <code>..sort()</code>, raw index access, and a <code>reduce</code>

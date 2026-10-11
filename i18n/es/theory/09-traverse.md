@@ -33,7 +33,7 @@ efecto sigue siendo efecto; lo que cambia es cuál queda por fuera.
 
 ![Intercambiar las estructuras](diagrams/t9-1-traverse-swap.svg)
 
-*Figura 9-1. Cada elemento lleva su propio efectito; tras el intercambio, un solo efecto lleva la lista entera. Los valores no cambian — solo el anidamiento.*
+*Figura 9-1. Cada elemento lleva su propio efecto; tras el intercambio, un solo efecto lleva la lista entera. Los valores no cambian — solo el anidamiento.*
 
 ```dart run
 import 'package:fxdart/fxdart.dart';
@@ -172,15 +172,16 @@ canal de retorno que hace que el límite sea real y no una recomendación.
 > `map`, `fold` y `traverse` son tres caras de una sola operación — lo cual es
 > un resultado precioso, y requiere tipos de orden superior para enunciarlo
 > siquiera una vez. Ese es el tema del capítulo 10, y la razón de que FxDart
-> traiga cuatro recorridos concretos en lugar de uno genérico.
+> traiga tres recorridos concretos (y sus gemelos asíncronos) en lugar de uno genérico.
 
 ## El coste de no tenerlo genéricamente
 
 Cuenta las versiones del código de arriba: `fxSequenceEither`,
-`flattenOrAccumulate`, `mapOrAccumulate`, `fxSeparateEither` — más
+`flattenOrAccumulate`, `mapOrAccumulate` — más
 `fxSequenceEitherAsync`, `flattenOrAccumulateAsync` y `mapOrAccumulateAsync`
-para cadenas asíncronas. Siete funciones donde un lenguaje con tipos de orden
-superior escribe una.
+para cadenas asíncronas. Seis funciones donde un lenguaje con tipos de orden
+superior escribe una. (`fxSeparateEither` no está entre ellas: separa, en
+lugar de intercambiar.)
 
 Eso no es incompetencia, es el techo del lenguaje, y tiene un coste real para
 ti: cuando FxDart añada un nuevo tipo de efecto, ninguno de tus recorridos
@@ -191,7 +192,7 @@ séptima, octava y novena.
 
 Cualquier frontera donde una colección de cosas independientes y falibles debe
 convertirse en una decisión: parsear un fichero de configuración, validar una
-importación, cargar N registros, abanicarse hacia N servicios. Si has escrito
+importación, cargar N registros, llamar a N servicios en paralelo. Si has escrito
 `for (final x in xs) { final r = f(x); if (r.isLeft) return r; out.add(...); }`
 más de dos veces, eso es un recorrido y deberías decirlo.
 
@@ -204,9 +205,10 @@ que esconde un efecto colateral es peor que el bucle al que sustituyó.
 
 1. ¿Qué es `sequence` sobre una lista vacía — para `Either`, y para `Future`?
    ¿Qué ley del capítulo 8 decide la respuesta?
-2. `traverse(xs, f)` y `xs.map(f)` seguido de `sequence` dan el mismo
-   resultado. ¿Cuál es más barato en Dart, y por qué FxDart trae aun así las
-   dos grafías?
+2. FxDart no tiene un `traverse(xs, f)` fusionado: el fallo rápido es
+   `.map(f).sequence()`. El lado acumulativo tiene dos grafías,
+   `mapOrAccumulate(f, xs)` y `.map(f).flattenOrAccumulate()`. ¿Dan el mismo
+   resultado, y por qué FxDart trae ambas?
 3. Tienes `Either<E, List<A>>` y quieres `List<Either<E, A>>` — el intercambio
    en la otra dirección. ¿Es siempre posible? Pruébalo con un `Left`.
 4. `Future.wait` arranca todos los futures de inmediato. Anota dos situaciones
@@ -219,11 +221,14 @@ que esconde un efecto colateral es peor que el bucle al que sustituyó.
    applicative. El elemento identidad del monoide de listas del capítulo 8 es
    `[]`, y `sequence` de nada debe producir la identidad; cualquier otra cosa
    rompería la composición de dos recorridos sobre entradas concatenadas.
-2. Es el mismo trabajo; `traverse` evita construir la `List<F<B>>` intermedia,
-   lo cual importa a escala pero no con diez elementos. FxDart trae ambas
+2. El mismo resultado: ambas recogen todos los `Left`. `mapOrAccumulate` aplica
+   `f` a cada elemento dentro de un único ámbito acumulativo, así que es la que
+   conviene cuando `f` es una función normal que hace raise. FxDart trae ambas
    porque la forma en dos pasos compone dentro de una cadena perezosa existente
-   (`.map(f).sequenceEither()`), mientras que la forma fusionada es la que
-   quieres cuando la fuente ya está materializada.
+   (`.map(f).flattenOrAccumulate()`), para cuando los `Either` ya existen.
+   Para el fallo rápido no hay forma fusionada que traer: `.map(f)` es
+   perezoso, así que `.map(f).sequence()` ya es una sola pasada que se detiene
+   en el primer `Left`.
 3. Sí, pero el caso interesante es `Left(e)`: ¿se convierte en `[Left(e)]`? ¿O
    en `[]`? Ambas son defendibles, y eso delata que esta dirección *no* es un
    recorrido — no hay ninguna ley que fuerce la respuesta. El intercambio

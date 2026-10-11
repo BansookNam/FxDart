@@ -44,7 +44,7 @@ zone error (loud, but not cancellable).
 **What we did (v0.6):** per-element scopes in `mapOrAccumulate(Async)` so a
 raise can never cross elements; pinned tests for `Future.wait`'s error
 behavior; docs say "raise only in the same awaited chain".
-**Future plan (v0.7):** ship `parZip2..5` / `parZipOrAccumulate2..5` with the
+**Future plan (unscheduled; the v0.7 target slipped, and none of this shipped by 0.9.0):** ship `parZip2..5` / `parZipOrAccumulate2..5` with the
 documented divergence (fail-fast on throw, siblings run to completion,
 results discarded).
 
@@ -69,12 +69,15 @@ nothing expressible.
 
 ## Deliberate deferrals (not blockers — staged scope)
 
+The original v0.7/v0.8 targets slipped: the package is at 0.9.0 and none of these
+exist in `lib/src` yet, so they are marked unscheduled rather than dated.
+
 | Feature | Target | Why deferred |
 |---|---|---|
-| `Effect`/`AsyncEffect` typedefs + combinators | v0.7 | Coherent as its own release; typed-error core is useful alone. |
-| `parZip2..5`, `parZipOrAccumulate2..5` | v0.7 | Needs the cancellation-divergence docs (blocker #4). |
-| `Resource`/`resourceScope`, `Semaphore` | v0.7 | Resource machinery unlocks Saga later; no v0.6 dependency. |
-| `Schedule` + `retry`/`repeat`, `CircuitBreaker`, `Saga` | v0.8 | Pure addition on top of the core; Saga reuses Resource. |
+| `Effect`/`AsyncEffect` typedefs + combinators | unscheduled (was v0.7) | Coherent as its own release; typed-error core is useful alone. |
+| `parZip2..5`, `parZipOrAccumulate2..5` | unscheduled (was v0.7) | Needs the cancellation-divergence docs (blocker #4). |
+| `Resource`/`resourceScope`, `Semaphore` | unscheduled (was v0.7) | Resource machinery unlocks Saga later; no v0.6 dependency. |
+| `Schedule` + `retry`/`repeat`, `CircuitBreaker`, `Saga` | unscheduled (was v0.8) | Pure addition on top of the core; Saga reuses Resource. |
 | `Option`, `Ior` | on demand | Nullable-first policy; `T?` covers it until a nesting case appears. |
 | Optics (+ codegen package) | future | Needs a separate `build_runner` generator package; large scope. |
 | STM, collectors, latches/barriers, arities > 5 | not planned | No Dart-shaped demand; Arrow itself treats these as niche. |

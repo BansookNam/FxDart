@@ -7,7 +7,7 @@ void main() {
   final rows = ['  ', 'ok', 'fine', 'x', 'valid'];
 
   // TODO: keep the rows that are neither blank nor short.
-  final kept = fx(rows).filter(isBlank.or(isShort).negate).toList();
+  final kept = fx(rows).filter((s) => true /* TODO */).toList();
 
   print(kept); // [fine, valid]
 }

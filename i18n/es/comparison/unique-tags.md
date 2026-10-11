@@ -39,10 +39,10 @@ async: false
   </p>
   <p>
     El reloj no empata. Las barras de Benchmark de abajo ponen a FxDart a
-    <strong>1,47× la velocidad</strong> de la cadena nativa con un millón de
-    entradas — 73,5 ms frente a 108,0 ms — y la proporción se mantiene hasta
-    abajo (1,36× con N=10.000, 1,29× con N=100; esas dos escalas siguen
-    llevando la insignia <em>misma velocidad</em> sólo porque la diferencia
+    <strong>1,37× la velocidad</strong> de la cadena nativa con un millón de
+    entradas — 78 ms frente a 107 ms — y la proporción se mantiene hasta
+    abajo (1,36× con N=10.000, 1,25× con N=100; esas dos escalas siguen
+    llevando la insignia <em>misma velocidad</em> solo porque la diferencia
     absoluta ahí queda por debajo del umbral de percepción de 0,6 ms que usa
     el sitio). Ambos lados hacen exactamente el mismo trabajo: tres millones
     de cadenas de etiqueta tiradas a través de un aplanador, metidas en un
@@ -60,16 +60,16 @@ async: false
     iterador interno de <code>List</code>, así que los tres millones de
     avances internos se convierten en llamadas indirectas. El
     <code>flatMap</code> de FxDart guarda un simple
-    <code>Iterator&lt;B&gt;?</code> que sólo contiene el iterador interno
+    <code>Iterator&lt;B&gt;?</code> que solo contiene el iterador interno
     real y usa <code>null</code> para «todavía no hay ninguno abierto», de
     modo que ese mismo punto de llamada se mantiene monomórfico y se
     incorpora.
   </p>
   <p>
-    No es una conjetura. Cambiando <em>sólo</em> el aplanador — el
+    No es una conjetura. Cambiando <em>solo</em> el aplanador — el
     <code>flatMap</code> de FxDart alimentando el propio
-    <code>toSet().toList()..sort()</code> nativo — ya se baja a 78 ms;
-    cambiando sólo el otro extremo, el <code>expand</code> del núcleo hacia
+    <code>toSet().toList()..sort()</code> nativo — ya baja a 78 ms;
+    cambiando solo el otro extremo, el <code>expand</code> del núcleo hacia
     <code>uniq</code> y <code>sort</code>, se queda en 108 ms. Copiando
     <code>ExpandIterator</code> a mano dentro del benchmark y tocando nada
     más que ese centinela (iterador vacío → <code>null</code>) se pasa de 105

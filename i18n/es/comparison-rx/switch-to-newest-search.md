@@ -34,8 +34,8 @@ noBenchmark: timing
     No difieren. «Lo más nuevo cancela lo más viejo» es una
     afirmación sobre <em>suscripciones</em>, y la capa
     <code>fxEvents</code> las tiene: su <code>switchMap</code>
-    mapea cada consulta a un stream de búsqueda interno y des-suscribe
-    el anterior en el momento en que llega una consulta más nueva, así
+    mapea cada consulta a un stream de búsqueda interno y cancela la suscripción del
+    anterior en el momento en que llega una consulta más nueva, así
     que a un resultado obsoleto no le queda ningún oyente al que llegar.
     Arrancan tres búsquedas, sobreviven dos resultados, y nada de esa
     lógica aparece en el código del usuario — en ninguno de los dos

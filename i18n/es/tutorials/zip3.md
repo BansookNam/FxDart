@@ -29,16 +29,15 @@ nextLabel: zipWith
     Existe como función propia porque Dart no tiene genéricos variádicos: un
     único <code>zip</code> que tomara una lista de iterables tendría que
     borrar los tipos de cada entrada, y <code>(A, B, C)</code> es justo lo que
-    hace que el resultado merezca la pena. La misma razón por la que a
-    <a href="tee.html"><code>tee</code></a> le acompaña <code>tee3</code>.
+    hace que el resultado merezca la pena. Es la misma razón por la que
+    <a href="tee.html"><code>tee</code></a> tiene también <code>tee3</code>.
   </p>
   <p>
-    Una asimetría que conviene conocer: <code>zip</code> tiene método de
-    cadena (<code>fx(a).zip(b)</code>) y <code>zip3</code> no — una cadena
-    tiene un solo receptor y <code>zip3</code> necesita tres iguales. Llámalo
-    como función de nivel superior y envuelve el resultado en
-    <code>fx()</code> para seguir, como hace la última línea de la demo.
-    <code>fxZip3Async</code> es la forma asíncrona y, igual que
+    Tanto <code>zip</code> como <code>zip3</code> tienen método de cadena
+    (<code>fx(a).zip(b)</code>, <code>fx(a).zip3(b, c)</code>); la cadena
+    lleva el receptor como primera entrada. La demo llama a la función de nivel
+    superior <code>fxZip3</code> y envuelve el resultado en <code>fx()</code>
+    para seguir. <code>fxZip3Async</code> es la forma asíncrona y, igual que
     <code>fxZipAsync</code>, lanza las tres llamadas a <code>next()</code> antes
     de esperar ninguna, así que las fuentes se tiran en paralelo por cada
     record en lugar de una detrás de otra.

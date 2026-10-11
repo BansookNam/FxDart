@@ -28,27 +28,30 @@ nextLabel: parallel
     <tr><td>Callback</td><td>cualquier closure</td><td>función top-level o static</td></tr>
     <tr><td>Valores</td><td>cualquier cosa</td><td>enviables</td></tr>
     <tr><td>Plataformas</td><td>VM, Flutter, web</td><td>solo VM / Flutter</td></tr>
-    <tr><td>Trabajo barato (<code>x + 1</code>, <code>Future.delayed(0)</code>)</td><td>un marcador; los hops son baratos</td><td>un mensaje de isolate por elemento — casi siempre una pérdida</td></tr>
-    <tr><td>El trabajo adecuado</td><td>HTTP, DB, archivos, <code>await</code></td><td>parseo JSON, imágenes, crypto, un bucle apretado</td></tr>
+    <tr><td>Trabajo barato (<code>x + 1</code>, <code>Future.delayed(0)</code>)</td><td>un marcador; los saltos son baratos</td><td>un mensaje de isolate por elemento — casi siempre una pérdida</td></tr>
+    <tr><td>El trabajo adecuado</td><td>HTTP, DB, archivos, <code>await</code></td><td>parseo JSON, imágenes, crypto, un bucle ajustado</td></tr>
   </table>
   <p>
     I/O es sobre todo espera. Mientras una petición está en vuelo el isolate
-    está idle, así que solapar cuatro <code>Future</code>s con
+    está ocioso, así que solapar cuatro <code>Future</code>s con
     <code>concurrent(4)</code> recorta el tiempo de reloj y no necesita
     otro isolate. El trabajo de CPU <em>es</em> el isolate: bloquea el
     event loop (y un frame de Flutter) hasta que vuelve. Para eso está
     <code>parallel</code>.
   </p>
   <p>
-    El hop de isolate no es gratis. Cada elemento se serializa, se envía,
+    El salto entre isolates no es gratis. Cada elemento se serializa, se envía,
     se ejecuta, se serializa de vuelta y se reordena. Un callback cuyo
-    cuerpo es <code>x + 1</code> gasta más tiempo en ese hop que en la
+    cuerpo es <code>x + 1</code> gasta más tiempo en ese salto que en la
     suma — cuatro workers entonces lo hacen <em>más lento</em> que uno,
-    porque pagas cuatro veces el porte sin CPU que recuperar.
-    Medido: mil <code>x + 1</code> con cuatro workers tardaron
-    aproximadamente el doble que con uno; un bucle apretado de 20000
-    iteraciones con cuatro workers fue aproximadamente el doble de
-    <em>rápido</em> que con uno. Si el trabajo no es más pesado que el hop,
+    porque pagas cuatro veces el coste de envío sin trabajo de CPU que recuperar.
+    Medido (véase el
+    <a href="../parallel-benchmark.html">benchmark de parallel</a>): en el caso
+    de coste barato por elemento <code>log-fingerprint</code>,
+    <code>.parallel()</code> simple tardó aproximadamente 2.5× lo que el bucle
+    de un solo isolate (13.7 s frente a 5.4 s), mientras que el caso de coste
+    elevado por elemento <code>password-rehash</code> fue aproximadamente 6×
+    más <em>rápido</em>. Si el trabajo no es más pesado que el salto,
     quédate en este isolate.
   </p>
   <pre><code>// I/O — overlap Futures here

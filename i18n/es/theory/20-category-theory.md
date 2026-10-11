@@ -45,8 +45,8 @@ tipos, y también conjuntos, espacios, y órdenes.*
 El paso que hace tropezar a la gente es que una categoría *olvida de qué
 están hechos los objetos*. `int` no es un conjunto de números aquí; es un
 punto con flechas que salen de él. Cada teorema de la materia es por tanto
-un enunciado sobre la *forma de la composición*, y por eso se transfiere a
-la programación en absoluto.
+un enunciado sobre la *forma de la composición*, y por eso siquiera se transfiere
+a la programación.
 
 ## Functores, otra vez
 
@@ -105,7 +105,7 @@ extension Let<T> on T {
 
 Ambos lados coinciden, en ambos casos — eso es naturalidad, y es el
 enunciado formal de "esta conversión no mira los valores". `toList()`,
-`toAsync()`, `first`, `sequence` y `flatten` son todas transformaciones
+`toAsync()`, `first`, `sequence` y `flat` son todas transformaciones
 naturales, que es por qué ninguna puede sorprender: no pueden depender del
 contenido que están moviendo.
 
@@ -130,8 +130,8 @@ Traducido:
 |---|---|
 | `T` | el constructor de tipo — `Either<E, _>`, `List`, `Future` |
 | `η` (unidad) | `of` / `Either.right` / `[x]` / `Future.value` |
-| `μ` (join) | `flatten` — `List<List<A>> → List<A>` |
-| `flatMap(f)` | `μ ∘ T(f)` — map, y luego flatten |
+| `μ` (join) | `flat` — `List<List<A>> → List<A>` |
+| `flatMap(f)` | `μ ∘ T(f)` — map, y luego `flat` |
 | las condiciones de coherencia | las tres leyes del capítulo 1 |
 
 ```dart run
@@ -147,12 +147,11 @@ void main() {
   print(fx(nested).flat().toList());
 
   // flatMap = μ ∘ T(f): map to a nested structure, then join.
-  int f(int n) => n;
   final viaMapThenJoin =
       fx([1, 2, 3]).map((n) => [n, n * 10]).flat().toList();
   final viaFlatMap =
       fx([1, 2, 3]).flatMap((n) => [n, n * 10]).toList();
-  print([viaMapThenJoin, viaFlatMap, f(1)]);
+  print([viaMapThenJoin, viaFlatMap]);
 }
 ```
 
@@ -243,4 +242,4 @@ ganó su reputación.
    `Left(e)` sigue siendo `Left(e)`, `Right(Left(e))` se vuelve `Left(e)`,
    `Right(Right(a))` se vuelve `Right(a)`. Entonces `flatMap(f)` es
    `map(f)` seguido de ese colapso, que es exactamente lo que hace la
-   implementación cuando hace pattern-matching sobre ambos niveles.
+   implementación cuando hace coincidencia de patrones sobre ambos niveles.

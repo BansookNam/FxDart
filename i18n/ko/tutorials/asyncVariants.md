@@ -14,10 +14,11 @@ nextLabel: streams
 
   <h2>강의</h2>
   <p>
-    Dart에는 타입 없는 커링이 없기 때문에, FxDart는 하나의
-    <code>map</code>을 오버로드해서 data-first 위치의
+    Dart에는 함수 오버로딩이 없어서 — 최상위 이름 하나에는 시그니처가 하나뿐이라서 —
+    FxDart는 FxTS의 오버로드된 타입처럼 하나의
+    <code>map</code>이 data-first 위치의
     <code>Iterable</code>과 <code>FxAsyncIterable</code> 양쪽에서
-    동작하게 만들 수 없습니다. 매개변수 타입이 충돌하기 때문입니다.
+    동작하게 만들 수 없습니다.
     그래서 모든 지연 연산자와 집계 연산자는 최상위 함수로 두 가지
     형태를 제공합니다. <code>Iterable</code>용의 평범한 이름, 그리고
     콜백이 <code>R</code> 대신 <code>FutureOr&lt;R&gt;</code>를 반환하는

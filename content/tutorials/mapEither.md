@@ -29,7 +29,7 @@ nextLabel: separated
   <p>
     A <em>thrown</em> exception stays on the error channel — that is the
     <code>fxEither</code> builder's contract, and it keeps
-    <code>attempt</code> the single place where a throw turns into a
+    <code>attempt</code> the place where a throw on the stream turns into a
     value. When a callback both raises and throws, prefer
     <code>fxEitherCatching</code> inside <code>mapEither</code> so one
     <code>Either</code> comes out.

@@ -63,7 +63,7 @@ nextLabel: countWhere
     <a href="../DartComparison/monthly-category-report.html">Informe mensual
     por categoría</a>: una de las dos páginas de comparación que publican tres
     barras en lugar de dos, porque la diferencia entre dos maneras de escribir
-    la misma tubería es precisamente lo que quieren mostrar.
+    el mismo pipeline es precisamente lo que quieren mostrar.
   </p>
 
   <h2>Demo 1 · El gasto de julio por categoría</h2>

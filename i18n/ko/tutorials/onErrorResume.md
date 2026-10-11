@@ -24,7 +24,7 @@ nextLabel: attempt
     있습니다.
   </p>
   <p>
-    그래서 <code>onErrorReturn(value)</code>은 한 번의 구조가 아니라
+    그래서 <code>onErrorReturn(value)</code>은 한 번에 구하는 방식이 아니라
     <em>에러마다의 대체</em>입니다. 모든 에러가 하나의
     <code>value</code> 이벤트가 되고 스트림은 계속 갑니다 — 나쁜 판독이
     자리표시자가 되고 피드는 살아남아야 하는 불안정한 센서에 맞습니다.
@@ -33,7 +33,7 @@ nextLabel: attempt
     <code>onErrorResume(f)</code>이 한 번의 전환입니다.
     <strong>첫</strong> 에러에서 소스는 그 자리에서 취소되고,
     <code>f</code>가 그 에러로부터 만든 스트림이 영원히 넘겨받습니다 —
-    네트워크 실패 시 캐시로 가는 수입니다. 원래 소스의 것은 더 이상
+    네트워크가 실패하면 캐시로 넘어가는 전형적인 방식입니다. 원래 소스의 것은 더 이상
     보이지 않고, <code>f</code> 자신이 던진 에러는 삼켜지지 않고
     전달됩니다.
   </p>

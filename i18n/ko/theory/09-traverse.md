@@ -165,16 +165,17 @@ void main() async {
 > 순회 가능합니다. 법칙이 둘(펑터처럼 항등과 합성) 있고, 유명한 따름정리가
 > 하나 있습니다. 항등 어플리커티브로 `traverse` 하면 그냥 `map`이고, 상수
 > 어플리커티브로 하면 `fold`입니다. `map`, `fold`, `traverse`는 한 연산의 세
-> 얼굴입니다 — 아름다운 결과이고, 한 번이라도 서술하려면 고차 타입이
+> 얼굴입니다 — 아름다운 결과이고, 단 한 번이라도 적으려면 고차 타입이
 > 필요합니다. 그것이 10장의 주제이며, FxDart가 일반적인 순회 하나 대신 구체적인
-> 순회 넷을 싣는 이유입니다.
+> 순회 셋(과 그 비동기 짝)을 싣는 이유입니다.
 
 ## 일반적으로 갖지 못한 대가
 
 위 코드에 나온 버전을 세어 보세요. `fxSequenceEither`, `flattenOrAccumulate`,
-`mapOrAccumulate`, `fxSeparateEither` — 여기에 비동기 체인을 위한
+`mapOrAccumulate` — 여기에 비동기 체인을 위한
 `fxSequenceEitherAsync`, `flattenOrAccumulateAsync`, `mapOrAccumulateAsync`까지.
-고차 타입이 있는 언어가 하나로 쓰는 자리에 함수 일곱 개입니다.
+고차 타입이 있는 언어가 하나로 쓰는 자리에 함수 여섯 개입니다.
+(`fxSeparateEither`는 여기에 들지 않습니다. 맞바꾸는 것이 아니라 가르는 함수니까요.)
 
 이것은 무능이 아니라 언어의 천장이고, 여러분에게 실제 비용을 물립니다. FxDart에
 새 효과 타입이 추가되면, 누군가 일곱 번째, 여덟 번째, 아홉 번째 변종을 손으로
@@ -196,8 +197,10 @@ in xs) { final r = f(x); if (r.isLeft) return r; out.add(...); }` 를 두 번 �
 
 1. 빈 리스트에 대한 `sequence`는 무엇인가요 — `Either`에 대해, 그리고 `Future`에
    대해? 8장의 어떤 법칙이 답을 정하나요?
-2. `traverse(xs, f)`와 `xs.map(f)` 후 `sequence`는 같은 결과를 줍니다. Dart에서
-   어느 쪽이 더 싸고, FxDart는 왜 그래도 두 철자를 다 싣나요?
+2. FxDart에는 융합된 `traverse(xs, f)`가 없습니다. 빨리 실패는
+   `.map(f).sequence()`입니다. 누적 쪽에는 `mapOrAccumulate(f, xs)`와
+   `.map(f).flattenOrAccumulate()`라는 두 철자가 있습니다. 둘은 같은 결과를
+   주나요, 그리고 FxDart는 왜 둘 다 싣나요?
 3. `Either<E, List<A>>`가 있고 `List<Either<E, A>>`를 원합니다 — 반대 방향의
    맞바꾸기. 언제나 가능한가요? `Left`에 대해 해 보세요.
 4. `Future.wait`는 모든 future를 즉시 시작합니다. 그것이 정확히 옳은 상황 둘과,
@@ -209,10 +212,13 @@ in xs) { final r = f(x); if (r.isLeft) return r; out.add(...); }` 를 두 번 �
    리스트입니다. 8장 리스트 모노이드의 항등원이 `[]`이고, 아무것도 없는 것의
    `sequence`는 반드시 항등원을 내놓아야 합니다. 그렇지 않으면 이어 붙인 입력에
    대한 두 순회의 합성이 깨집니다.
-2. 같은 양의 일이지만 `traverse`는 중간의 `List<F<B>>`를 만들지 않습니다. 규모가
-   크면 의미가 있고 원소 열 개에서는 아닙니다. FxDart가 둘 다 싣는 이유는 두 단계
-   형태(`.map(f).sequenceEither()`)가 기존 지연 체인에 합성되기 때문이고, 융합된
-   형태는 소스가 이미 재료화되어 있을 때 원하는 것이기 때문입니다.
+2. 결과는 같습니다. 둘 다 모든 `Left`를 모읍니다. `mapOrAccumulate`는 각 원소에
+   `f`를 하나의 누적 스코프 안에서 적용하므로, `f`가 raise 하는 평범한 함수일 때
+   손이 가는 쪽입니다. FxDart가 둘 다 싣는 이유는 두 단계 형태
+   (`.map(f).flattenOrAccumulate()`)가 이미 `Either`들이 존재할 때 기존 지연
+   체인에 합성되기 때문입니다. 빨리 실패에는 싣을 융합 형태가 없습니다. `.map(f)`가
+   지연이므로 `.map(f).sequence()`가 이미 첫 `Left`에서 멈추는 한 번의
+   순회입니다.
 3. 가능하지만, 흥미로운 경우는 `Left(e)`입니다. `[Left(e)]`로 갈까요, `[]`로
    갈까요? 둘 다 변호할 수 있고, 그것이 이 방향은 순회가 *아니라는* 신호입니다 —
    답을 강제하는 법칙이 없으니까요. 일반적인 맞바꿈 `F<T<A>> → T<F<A>>`는

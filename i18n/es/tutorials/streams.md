@@ -1,14 +1,14 @@
 ---
 slug: streams
 title: Stream bridges — FxDart 101
-description: Puentes con Stream en FxDart: fromStream, fxStream y toStream() — ida y vuelta entre los Stream de Dart y FxAsyncIterable, con un playground en vivo.
+description: Puentes con Stream en FxDart: fxFromStream, fxStream y toStream() — ida y vuelta entre los Stream de Dart y FxAsyncIterable, con un playground en vivo.
 heading: Stream bridges
 section: 11
 crumb: Stream bridges
 next: concurrent.html
 nextLabel: concurrent
 ---
-  <p class="hero-sub">fromStream, fxStream y .toStream() — cruza libremente entre el Stream de Dart y el FxAsyncIterable de FxDart.</p>
+  <p class="hero-sub">fxFromStream, fxStream y .toStream() — cruza libremente entre el Stream de Dart y el FxAsyncIterable de FxDart.</p>
 
   {{signature}}
 
@@ -44,13 +44,13 @@ nextLabel: concurrent
     RxJS 9 nombra las cuatro <code>iterateEach</code>,
     <code>iterateLatest</code>, <code>iterateBuffered</code> e
     <code>iterateNext</code>. FxDart las mapea a
-    <code>fromStream*</code> (iterable crudo) y
+    <code>fxFromStream</code> y <code>fromStream*</code> (iterable crudo) y
     <code>FxEvents.pull*</code> (cadena):
   </p>
   <table>
     <thead><tr><th>RxJS 9</th><th>FxDart</th><th>mientras estás ocupado</th></tr></thead>
     <tbody>
-      <tr><td><code>iterateEach</code></td><td><code>fromStream</code> / <code>.pull()</code></td><td>FIFO sin pérdidas — pausa la fuente, encola cada valor</td></tr>
+      <tr><td><code>iterateEach</code></td><td><code>fxFromStream</code> / <code>.pull()</code></td><td>FIFO sin pérdidas — pausa la fuente, encola cada valor</td></tr>
       <tr><td><code>iterateLatest</code></td><td><code>fromStreamLatest</code> / <code>.pullLatest()</code></td><td>descarta lo superado — quédate solo con el no leído más nuevo</td></tr>
       <tr><td><code>iterateBuffered</code></td><td><code>fromStreamChunked</code> / <code>.pullChunked()</code></td><td>lote — emite las llegadas como una lista</td></tr>
       <tr><td><code>iterateNext</code></td><td><code>fromStreamNext</code> / <code>.pullNext()</code></td><td>descarte por demanda — ignora lo que llegó sin un pull esperando</td></tr>
@@ -64,7 +64,7 @@ nextLabel: concurrent
     son peores que los huecos.
   </p>
 
-  <h2>Demo 1 · fromStream y fxStream</h2>
+  <h2>Demo 1 · fxFromStream y fxStream</h2>
   <p>Ambos envuelven un <code>Stream.fromIterable</code> para que puedas pasar
     un stream existente por los operadores de FxDart:</p>
   {{playground:0}}
@@ -81,7 +81,7 @@ nextLabel: concurrent
 
   <h2>Demo 3 · Cuatro formas de tirar de un stream</h2>
   <p>
-    Un ráfaga síncrona de 1, 2, 3 llega mientras un pull ya está
+    Una ráfaga síncrona de 1, 2, 3 llega mientras un pull ya está
     esperando. <code>fxFromStream</code> conserva cada valor;
     <code>fromStreamLatest</code> conserva solo el más nuevo;
     <code>fromStreamChunked</code> los emite como una lista;

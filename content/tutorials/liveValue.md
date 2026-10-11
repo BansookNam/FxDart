@@ -41,8 +41,8 @@ nextLabel: FxSubscriptions
     later <code>add</code> throws — though even a closed
     <code>LiveValue</code> still replays its last value to a late
     subscriber before closing their stream. If you know Rx, this is
-    <code>BehaviorSubject</code> reduced to its defining behavior;
-    fxdart events layer, not part of FxTS.
+    <code>BehaviorSubject</code> reduced to its defining behavior.
+    This is part of fxdart's events layer and is not part of FxTS.
   </p>
 
   <h2>Demo 1 · Late subscribers start from the latest value</h2>

@@ -22,7 +22,7 @@ async: true
   <p>
     FxDart에서는 정책 전체가 체인입니다: <code>chunk(3)</code>이 배치
     크기를 정하고, <code>concurrent(1)</code>이 속도를 정하며,
-    <code>scan</code>이 응답들을 거치며 누적 합계를 실어 나릅니다
+    <code>scan</code>이 응답마다 누적 합계를 이어 갑니다
     (<code>drop(1)</code>은 scan의 초기값을 버립니다). 엔드포인트
     자체는 <code>delay</code>로 지연을 시뮬레이션하고
     <code>sumBy</code>로 배치 합계를 계산합니다.

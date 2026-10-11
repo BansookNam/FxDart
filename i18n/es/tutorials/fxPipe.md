@@ -25,7 +25,7 @@ f(line);
 fx(lines).map(f);</code></pre>
   <p>
     Cada <code>.then</code> devuelve la cadena hasta ahora, así que no
-    hay nada que "terminar." Llámalo, o pásalo a <code>map</code> /
+    hay nada que «terminar». Llámalo, o pásalo a <code>map</code> /
     <code><a href="parallel.html">parallel</a></code>.
     <code>fxPipe(parse)</code> es simplemente <code>parse</code> — el
     nombre marca el inicio. <code>parse.then(normalise)</code> también
@@ -34,7 +34,7 @@ fx(lines).map(f);</code></pre>
   <p>
     Dos llamadas a <code>.parallel</code> copian cada resultado de
     vuelta a este isolate y otra vez hacia fuera. Un worker compuesto
-    paga el hop una vez:
+    paga el salto una vez:
   </p>
   <pre><code>await fx(lines)
     .parallel(4, fxPipe3(parse, normalise, score), chunked: true)

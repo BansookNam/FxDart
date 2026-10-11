@@ -38,12 +38,12 @@ noBenchmark: timing
     없습니다 — 두 체인은 연산자 대 연산자로 동일합니다.
   </p>
   <p>
-    fxdart의 이벤트 레이어는 push 쪽을 위해 Rx의 접근을
+    fxdart의 이벤트 레이어는 푸시(push) 쪽을 위해 Rx의 접근을
     흡수했습니다: <code>fxEvents</code>는 평범한 <code>Stream</code>
     위의 얇은 래퍼 체인으로 — 결코 extension이 아니어서 rxdart를
     포함해 어떤 것과도 충돌하지 않습니다. RxDart의 연산자 카탈로그는
     여전히 훨씬 큽니다; fxdart는 이벤트 코어를 작게 유지하고, 값별
-    처리가 자라면 <code>.pull()</code>로 타입 있는 pull 파이프라인으로
+    처리가 자라면 <code>.pull()</code>로 타입 있는 풀(pull) 파이프라인으로
     건너갑니다. 살아 있는 스트림 하나에 다른 스트림의 최신 값을 찍는
     일에서는 두 쪽이 동등합니다: 무승부입니다.
   </p>

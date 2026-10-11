@@ -38,6 +38,6 @@ async: true
     "at most two in flight": <code>Future.wait</code> fires everything at
     once, so the bounded half becomes a hand-rolled worker pool — shared
     cursor, pre-sized result slots, worker futures — that dwarfs the
-    two-line ranking it serves. Changing the limit, or dropping it, is
-    one number in the chain versus that whole scaffold.
+    two-line ranking it serves. Changing the limit edits one number and dropping it removes one step,
+    versus that whole scaffold.
   </p>

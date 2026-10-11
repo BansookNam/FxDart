@@ -56,7 +56,7 @@ nextLabel: createSeededRandom
     <code>fxShuffleAsync</code>입니다.
   </p>
   <p>
-    이름이 <code>fxShuffle</code>이 아닌 것은 취향 문제가 아닙니다.
+    이름이 <code>shuffle</code>이 아닌 것은 취향 문제가 아닙니다.
     <code>List.shuffle</code>은 이미 <code>dart:core</code>에 있고,
     <strong>제자리에서 섞고 void를 돌려줍니다</strong>. 인스턴스 멤버는 항상
     확장을 이기므로 <code>List</code>를 수신자로 두면 조용히 엉뚱한 쪽이

@@ -23,15 +23,18 @@ nextLabel: find
     <code>elementAtOrNull</code>은 Dart다운 이름이고
     (<code>Iterable.elementAtOrNull</code>과 짝을 이룹니다), fxdart는 FxTS식
     표기인 <code>fxNth</code>도 함께 받아들입니다 — 둘은 같은 연산자입니다.
-    음수 인덱스나 끝을 넘어선 인덱스는 그냥 <code>null</code>을 내놓습니다.
+    최상위 함수에서는 음수 인덱스나 끝을 넘어선 인덱스가 그냥 <code>null</code>을
+    내놓습니다(아래의 체인 메서드는 SDK의 것이라 음수 인덱스에서 다르게 동작합니다).
     일부 언어의 배열 인덱싱과 달리 여기에는
-    끝에서부터 되감는 동작이 없습니다 — 인덱스는 유효한 음이 아닌 위치여야 합니다.
+    끝에서부터 되감는 동작이 없습니다 — 인덱스는 음수가 아닌 유효한 위치여야 합니다.
   </p>
   <p>
     동기 체인에서 <code>fx(iterable).elementAtOrNull(index)</code>는
     <code>Iterable</code>에서 물려받은 메서드입니다 — 어떤 <code>Fx</code>
     체인에서든 그대로 호출하면 됩니다. <code>Fx</code>가 <em>곧</em>
-    <code>Iterable</code>이기 때문입니다. <code>FxAsyncIterable</code>에는
+    <code>Iterable</code>이기 때문입니다. SDK 메서드이므로 끝을 넘어서면
+    <code>null</code>을 반환하지만 음수 인덱스에서는 <code>RangeError</code>를
+    던집니다. <code>FxAsyncIterable</code>에는
     최상위 <code>elementAtOrNullAsync(index, iterable)</code>을 쓰세요.
   </p>
 

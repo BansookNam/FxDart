@@ -17,7 +17,7 @@ nextLabel: flatMap
   <h2>Lecture</h2>
   <p>
     Look at the source and you'll find <code>mapEffect</code> is literally
-    <code>B fxMapEffect(f, iterable) =&gt; fxMap(f, iterable);</code> — same
+    <code>Iterable&lt;B&gt; fxMapEffect&lt;A, B&gt;(f, iterable) =&gt; fxMap(f, iterable);</code> — same
     function, same laziness, same signature. It exists purely to document
     <em>intent</em> at the call site: reach for <code>mapEffect</code> when
     the callback's return value matters less than what it does along the way

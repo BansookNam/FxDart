@@ -101,9 +101,9 @@ description: FxDart es una librería de programación funcional para Dart, porta
       <ul>
         <li><strong>Pereza sin esfuerzo</strong>: los pipelines cortocircuitan; solo se calculan los valores solicitados.</li>
         <li><strong>Concurrencia que preserva el orden</strong> con un solo operador: <code>concurrent(n)</code> / <code>concurrentPool(n)</code> por orden de finalización.</li>
-        <li><strong>Cadenas totalmente tipadas</strong>: <code>fx()</code> mantiene la inferencia de principio a fin; los operadores síncronos son funciones normales sobre <code>Iterable</code>s nativos, así que todo interopera con Dart corriente.</li>
+        <li><strong>Cadenas totalmente tipadas</strong>: <code>fx()</code> mantiene la inferencia de principio a fin; los operadores síncronos son funciones normales sobre <code>Iterable</code>s nativos, así que todo interopera con Dart normal.</li>
         <li><strong>Funciones pequeñas y específicas</strong>: ~120 operadores que cubren transformación / filtrado / segmentación / combinación / agregación / objeto / util.</li>
-        <li><strong>Semántica probada en producción</strong>: comportamiento portado desde FxTS junto con más de 850 de sus tests.</li>
+        <li><strong>Semántica muy probada</strong>: comportamiento portado desde FxTS junto con más de 850 de sus tests.</li>
         <li><strong>Cero dependencias</strong>: Dart puro.</li>
       </ul>
     </div>

@@ -32,8 +32,8 @@ nextLabel: mapConcurrent
   </p>
   <p>
     Este es el canal de retorno que mencionaba la lección de <code>toAsync</code>:
-    el <code>Stream</code> de Dart no tiene forma de pedirle a posteriori a una
-    fuente de aguas arriba «dame 3 a la vez», porque un <code>Stream</code> empuja los
+    el <code>Stream</code> de Dart no tiene forma de pedirle a una fuente de aguas
+    arriba, una vez en marcha, «dame 3 a la vez», porque un <code>Stream</code> empuja los
     valores a su propio ritmo. El protocolo <code>next()</code> basado en pull de
     FxDart lleva esa petición aguas arriba en cada pull, y eso es justamente lo
     que hace posible <code>concurrent(n)</code>.

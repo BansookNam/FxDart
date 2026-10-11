@@ -23,12 +23,13 @@ nextLabel: nth
     표기인 <code>last</code>도 함께 받아들입니다 — 둘은 같은 연산자입니다.
     <code>head</code>와 달리 지름길은 없습니다. 지연 이터러블은 끝까지
     끌어당겨 보기 전에는 어디서 끝나는지 알 수 없으므로,
-    <code>lastOrNull</code>은 모든 원소를 소비해야 합니다. 상류 파이프라인이
-    지연으로 구성돼 있더라도 <code>O(n)</code>인 이유입니다.
+    <code>lastOrNull</code>은 모든 원소를 소비해야 합니다. 그래서 지연 파이프라인에서는
+    <code>O(n)</code>입니다(일반 <code>List</code>는 예외입니다:
+    <code>fxLast</code>는 끝으로 바로 인덱싱하여 <code>O(1)</code>입니다).
   </p>
   <p>
     <strong>동기 체인에서 주의하세요:</strong> <code>Fx</code>는
-    <code>Iterable</code>을 확장하므로 <code>fx(iterable).lastOrNull</code>은
+    <code>Iterable</code>을 구현하므로(그 위의 extension type입니다) <code>fx(iterable).lastOrNull</code>은
     Dart가 물려준 <code>Iterable.lastOrNull</code> <em>게터</em>로
     해석됩니다(괄호 없음) — 이 게터는 <em>실제로</em> null 안전해서 빈
     이터러블에서 <code>null</code>을 반환합니다. 함정은 바로 옆에 있는 "OrNull"이 없는

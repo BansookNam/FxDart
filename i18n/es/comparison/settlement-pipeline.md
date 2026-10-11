@@ -49,6 +49,6 @@ async: true
     que tienes que seguir a mano. La versión con FxDart es una única cadena
     ininterrumpida desde las transacciones en bruto hasta las liquidaciones
     publicadas — catorce líneas en las que la política (qué es válido, cómo
-    agrupar, con cuánta fuerza golpear la pasarela) es el texto visible, y la
+    agrupar, con cuánta presión ejercer sobre la pasarela) es el texto visible, y la
     mecánica es problema de la librería.
   </p>

@@ -46,25 +46,26 @@ nextLabel: difference
     <code>takeUniqBy</code> recibe su callback como <em>parámetro</em> de un
     cuerpo lo bastante pequeño para insertarse en el punto de llamada, así que
     el compilador inserta con él el cuerpo del closure. Medido sobre 1.000.000
-    de líneas de log, AOT:
+    de líneas de log, AOT, la cadena componible tarda 13,7 ms frente a 10,4 ms
+    de un bucle escrito a mano:
   </p>
   <table>
     <thead><tr><th>Forma</th><th>Tiempo</th></tr></thead>
     <tbody>
       <tr><td><code>filter().uniqBy().take(3)</code></td><td>13,7 ms</td></tr>
-      <tr><td><code>takeUniqBy(3, …)</code></td><td><strong>11,3 ms</strong></td></tr>
-      <tr><td>un bucle escrito a mano</td><td>10,2 ms</td></tr>
+      <tr><td>un bucle escrito a mano</td><td>10,4 ms</td></tr>
     </tbody>
   </table>
   <p>
-    Ambas formas, y ambas barras, están en
+    La forma <code>takeUniqBy(3, …)</code> está pensada para cerrar esa brecha
+    insertando los callbacks. Ambas formas están en
     <a href="../DartComparison/recent-errors.html">Mensajes de error recientes,
-    deduplicados</a>: la página de comparación que publica tres barras en lugar
-    de dos, porque la diferencia entre dos maneras de escribir la misma
-    tubería es precisamente lo que quiere mostrar.
+    deduplicados</a>, una de solo dos páginas de comparación que llevan una
+    tercera barra, porque la diferencia entre dos maneras de escribir el mismo
+    pipeline es precisamente lo que quiere mostrar.
   </p>
   <p>
-    Así que: recurre a esto cuando la tubería esté en el camino caliente y un
+    Así que: recurre a esto cuando el pipeline esté en el camino caliente y un
     perfilador diga que estos callbacks son el coste. Antes no. Extensión de
     fxdart — sin equivalente en FxTS, y sin gemelo asíncrono: la ganancia es la
     inserción, que la maquinaria asíncrona eclipsa.

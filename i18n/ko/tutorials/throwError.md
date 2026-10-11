@@ -10,7 +10,7 @@ prevLabel: unless
 next: throwIf.html
 nextLabel: throwIf
 ---
-  <p class="hero-sub">항상 예외를 던지는 단항 함수를 반환합니다 — 문장이 아니라 함수를 요구하는 자리를 위해서입니다.</p>
+  <p class="hero-sub">항상 예외를 던지는 단항 함수를 반환합니다. 문장 대신 함수를 받는 자리에 쓰기 위해서입니다.</p>
 
   {{signature}}
 

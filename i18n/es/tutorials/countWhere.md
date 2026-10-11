@@ -47,6 +47,6 @@ nextLabel: sort
   <div class="callout">
     <strong>Relacionados:</strong>
     <a href="countBy.html"><code>countBy</code></a> — conteos por clave ·
-    <a href="count.html"><code>size</code>/<code>count</code></a> — contarlo todo ·
+    <a href="size.html"><code>size</code>/<code>count</code></a> — contarlo todo ·
     <a href="filter.html"><code>filter</code></a> — cuando necesitas las coincidencias en sí
   </div>

@@ -42,6 +42,6 @@ async: true
     boilerplate, and it splits the task into two dialects: a fluent chain
     for prep, then imperative plumbing for the fetch. In the FxDart version
     the policy stays declarative end to end — <code>concurrent(3)</code> is
-    the entire worker pool, and changing the limit (or dropping it) touches
-    one number instead of the function's shape.
+    the entire worker pool, and changing the limit edits one number and dropping it removes one step,
+    instead of reshaping the function.
   </p>

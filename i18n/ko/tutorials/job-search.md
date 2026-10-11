@@ -19,7 +19,7 @@ nextLabel: bounded concurrent fetch
     검색 상자는 리스트가 아닙니다. 키 입력은 도착할 때 도착하고, 한 무리는
     마지막 질의로 접혀야 하며, 다음 질의가 도착했는데도 아직 떠 있는
     요청은 취소되어야 합니다 — 그렇지 않으면 느린 "da"가 빠른 "dart"를
-    덮어씁니다. 그것은 <em>push</em> 일입니다:
+    덮어씁니다. <em>push</em> 작업입니다:
     <code><a href="fxEvents.html">fxEvents</a></code> +
     <code><a href="debounce.html">fxDebounce</a></code> +
     <code><a href="switchMap.html">switchMap</a></code>.
@@ -28,20 +28,16 @@ nextLabel: bounded concurrent fetch
     같은 일의
     <a href="../RxDartComparison/debounced-search.html">RxDart 비교</a>는
     <strong>동점</strong>입니다. rxdart의
-    <code>debounceTime</code>이 같은 발상입니다. 여기서 FxDart의 주장은
-    속도가 아닙니다 — 기다림을 이길 수는 없습니다 — 이벤트 층이 pull
-    파이프라인 및 타입 있는 에러와 같은 import에 있어서, 다음 단계
-    (히트를 파싱하고, throw 대신 <code>Left</code>를 남기기)가 새
-    라이브러리를 열지 않는다는 것입니다.
+    <code>debounceTime</code>이 같은 발상입니다. FxDart의 주장은 속도가 아닙니다. 기다림은 이길 수 없으니까요. 주장은 이벤트 층이 pull 파이프라인, 타입 있는 에러와 같은 import에 들어 있어서, 다음 단계(히트를 파싱하고 throw 대신 <code>Left</code>를 남기기)에 새 라이브러리가 필요 없다는 것입니다.
   </p>
   <p>
     <code><a href="mapEither.html">mapEither</a></code>는 전달된 각
-    결과를 raise 스코프에서 돌립니다. 나쁜 페이로드는
+    결과를 Raise 스코프에서 돌립니다. 나쁜 페이로드는
     <code>Left</code>가 되고, 이후 질의는 그대로 도착합니다. 소스에
     <code><a href="attempt.html">attempt</a></code>를 두는 것은
     <em>throw</em>가 값이 되어야 할 때뿐입니다 — 체인이
     재시도도 한다면 <code>attempt</code>는
-    <strong>다음</strong> <code>retryOn</code>, 앞이 아닙니다.
+    <code>retryOn</code> <strong>뒤</strong>에 두고, 앞에 두지 않습니다.
   </p>
 
   <h2>데모 1 · 타이핑이 잦아들 때까지</h2>
@@ -64,7 +60,7 @@ nextLabel: bounded concurrent fetch
 
   <div class="callout">
     <strong>관련:</strong>
-    <a href="whichSurface.html">어느 표면</a> — 이것이 push인 이유 ·
+    <a href="whichSurface.html">어느 표면</a> — 왜 push인지 ·
     <a href="fxEvents.html"><code>fxEvents</code></a> ·
     <a href="debounce.html"><code>fxDebounce</code></a> ·
     <a href="switchMap.html"><code>switchMap</code></a> ·

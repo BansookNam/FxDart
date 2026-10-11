@@ -46,8 +46,8 @@ async: false
   </p>
   <p>
     El lado pull nunca pone los fallos en un canal, para empezar. El mismo
-    throw aterriza a un <code>try</code>/<code>catch</code> local de
-    distancia de volver a ser un valor ordinario — un record anulable —
+    throw queda a un <code>try</code>/<code>catch</code> local de
+    volver a ser un valor ordinario — un record anulable —
     así que el requisito completo es <code>map</code> y luego
     <code>partition</code>: una pasada, dos listas, ambas mitades igual de
     primera clase. Esta es la forma de la postura más amplia de FxDart

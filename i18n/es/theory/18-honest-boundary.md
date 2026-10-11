@@ -70,7 +70,7 @@ llamada.
 *Figura 18-1. La pregunta no es qué tan grave es el fallo, sino si quien
 llama tiene una reacción. Todo lo que quien llama puede accionar pertenece al
 tipo de retorno; todo lo demás pertenece al canal de excepciones, donde no
-saturará cada firma entre aquí y la cima.*
+abarrotará cada firma entre aquí y la cima.*
 
 ## Lo que los errores tipados no pueden prometer
 

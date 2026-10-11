@@ -41,7 +41,7 @@ void main() {
   print(shout2('  hello  '));
   print(['  a ', ' b'].map(shout2).toList());
 
-  // pipe1 is the same idea with the value supplied first.
+  // fxPipe1 is the same idea with the value supplied first.
   print(fxPipe1('  hi ', shout2));
 }
 ```
@@ -100,12 +100,11 @@ number of stages has to fall back on `dynamic`:
 ```dart
 // FxDart ships this for FxTS parity — and every stage boundary
 // is an unchecked cast.
-final result = pipe(
-  [1, 2, 3, 4],
+final result = pipe([1, 2, 3, 4], [
   (dynamic xs) =>
       fxMap((dynamic n) => (n as int) * 2, xs as Iterable),
   (dynamic xs) => fxToList(xs as Iterable<int>),
-);
+]);
 ```
 
 Every stage boundary is an unchecked cast. The type error you wanted the

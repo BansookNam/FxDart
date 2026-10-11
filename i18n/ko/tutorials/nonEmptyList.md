@@ -41,7 +41,7 @@ nextLabel: accumulation
     <code>NonEmptyList.orNull(list)</code>(빈 리스트에는 <code>null</code>을
     반환합니다 — 비어 있는지 확인하는 일은 경계에서 딱 한 번만 일어납니다)를
     통해서만 하세요. <code>list as Nel&lt;int&gt;</code> 같은 캐스트는 그
-    검사를 우회하며, 책임은 온전히 사용자 몫입니다.
+    검사를 우회하므로 위험은 직접 감수해야 합니다.
   </p>
 
   <h2>데모 1 · of, orNull, head &amp; tail</h2>
@@ -53,8 +53,8 @@ nextLabel: accumulation
   <h2>데모 3 · toNelOrNull — 어떤 Iterable이든</h2>
   <p>
     <code>Nel.orNull</code>은 <code>List</code>를 받기 때문에, 누적
-    파이프라인은 오류를 패널로 만들기 전에 항상 <code>.toList()</code>
-    셔플로 끝나야 했습니다. <code>toNelOrNull()</code> 확장(Arrow의
+    파이프라인은 오류를 패널로 만들기 전에 항상 <code>.toList()</code>를
+    거쳐야 했습니다. <code>toNelOrNull()</code> 확장(Arrow의
     <code>toNonEmptyListOrNull</code>)은 어떤 <code>Iterable</code>이든 —
     지연 <code>fx</code> 체인 포함 — 받아 복사한 뒤 <code>Nel?</code>을
     바로 돌려줍니다. "오류 없음"은 <code>null</code>, 아니면 비어 있지

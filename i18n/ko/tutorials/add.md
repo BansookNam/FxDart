@@ -10,25 +10,25 @@ prevLabel: cases
 next: comparisons.html
 nextLabel: gt · gte · lt · lte
 ---
-  <p class="hero-sub">같은 타입의 두 값을 더합니다. 여기저기 넘겨 쓸 수 있는 함수 형태입니다.</p>
+  <p class="hero-sub">같은 타입의 두 값을 더하는 함수입니다. 값처럼 넘겨 쓸 수 있습니다.</p>
 
   {{signature}}
 
   <h2>강의</h2>
   <p>
     <code>fxAdd(a, b)</code>는 <code>+</code>를 함수 값으로 감싼 것입니다.
-    <code>+</code>로 동적 디스패치하기 때문에 이 연산자를 지원하는 것이라면
-    무엇이든 동작합니다 — <code>num</code>, <code>String</code> 연결,
-    심지어 <code>List</code> 연결까지 — 숫자와 문자열을 모두 받는 FxTS의
-    <code>fxAdd</code>와 같은 동작입니다.
+    <code>+</code>로 동적 디스패치하므로 이 연산자를 지원하는 타입이라면 무엇이든
+    동작합니다. <code>num</code>, <code>String</code> 연결은 물론 <code>List</code>
+    연결도 됩니다. 숫자와 문자열을 모두 받는 FxTS의 <code>fxAdd</code>와 같은
+    방식입니다.
   </p>
   <p>
-    진가는 인라인 <code>(a, b) =&gt; a + b</code> 대신 이항
-    <code>(T, T) -&gt; T</code> 함수를 요구하는 API에서 드러납니다 —
-    가장 자연스러운 자리는 <code>reduce</code>/<code>fold</code>의 결합
-    함수입니다. 다만 이항 함수이므로 단항 <code>map</code> 콜백으로
-    쓰려면(모든 원소에 고정값을 더하는 경우) 한쪽을 직접 클로저로 묶어
-    주면 됩니다: <code>(b) =&gt; fxAdd(n, b)</code>.
+    <code>(a, b) =&gt; a + b</code>를 인라인으로 쓰는 대신 이항
+    <code>(T, T) -&gt; T</code> 함수를 받는 API에서 쓸모가 드러납니다. 가장
+    자연스러운 자리는 <code>reduce</code>/<code>fold</code>의 결합 함수입니다.
+    다만 이항 함수라서 단항 <code>map</code> 콜백으로 쓰려면(모든 원소에 같은 값을
+    더하는 경우) 한쪽 인자를 클로저로 묶어야 합니다:
+    <code>(b) =&gt; fxAdd(n, b)</code>.
   </p>
 
   <h2>데모 1 · 기본</h2>

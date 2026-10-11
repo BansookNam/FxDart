@@ -56,7 +56,7 @@ Future<List<T>> _shuffleAsync<T>(FxAsyncIterable<T> iterable, int? seed) async {
 
 /// Method spellings of [fxShuffle] and [fxShuffleAsync].
 ///
-/// Named `fxShuffle`, not `fxShuffle`: `List.shuffle` already exists in
+/// Named `fxShuffle`, not `shuffle`: `List.shuffle` already exists in
 /// `dart:core` and shuffles **in place, returning void**. An extension can
 /// never win against it, so a `List` receiver would silently call the wrong
 /// one — the prefix makes the two impossible to confuse.

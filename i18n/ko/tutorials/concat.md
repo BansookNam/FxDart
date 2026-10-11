@@ -24,10 +24,9 @@ nextLabel: zip
     안전합니다.
   </p>
   <p>
-    <code>fxConcatAsync</code>는 <code>take</code>나 <code>concat</code>의 다른
-    async 형제들처럼 그대로 통과시키는 연산자입니다. 내부에서 어느 쪽도
+    <code>fxConcatAsync</code>는 <code>take</code>처럼 그대로 통과시키는 연산자입니다. 내부에서 어느 쪽도
     직렬화하지 않기 때문에, 하류의 <code>concurrent(n)</code>은 현재 활성화된
-    쪽에 대해 여전히 pull을 겹쳐서 수행할 수 있습니다.
+    쪽에 대해 여전히 풀을 겹쳐서 수행할 수 있습니다.
   </p>
 
   <h2>데모 1 · 기본과 지연 평가</h2>

@@ -1,7 +1,7 @@
 ---
 slug: groupBy
 title: groupBy — FxDart 101
-description: Tutorial de groupBy en FxDart: reparte cada elemento en cubetas según una clave calculada, obteniendo un Map de Lists, con playground en vivo.
+description: Tutorial de groupBy en FxDart: reparte cada elemento en cubetas según una clave calculada, obteniendo un Map de listas, con playground en vivo.
 heading: <code>groupBy</code>
 section: 7
 crumb: groupBy

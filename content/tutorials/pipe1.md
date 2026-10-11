@@ -16,8 +16,8 @@ nextLabel: toList
 
   <h2>Lecture</h2>
   <p>
-    <code>fxPipe1</code> is the single-step building block that <code>pipe</code>
-    uses internally: apply <code>f</code> to <code>a</code>, but if
+    <code>fxPipe1</code> is the single-step form of <code>pipe</code>:
+    apply <code>f</code> to <code>a</code>, but if
     <code>a</code> is a <code>Future</code>, await it first. If <code>a</code>
     is a plain value, <code>f</code> runs immediately and <code>fxPipe1</code>
     returns whatever <code>f</code> returns — synchronously, with no
@@ -57,7 +57,7 @@ nextLabel: toList
 
   <div class="callout">
     <strong>Related:</strong>
-    <a href="pipe.html"><code>pipe</code></a> — multi-step pipeline built from pipe1 ·
+    <a href="pipe.html"><code>pipe</code></a> — multi-step pipeline, the same idea for a list of steps ·
     <a href="fx.html"><code>fx</code></a> — the typed chain alternative ·
     <a href="delay.html"><code>fxDelay &amp; fxSleep</code></a> — the async helpers used above
   </div>

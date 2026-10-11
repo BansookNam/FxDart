@@ -44,7 +44,7 @@ fun getResult(): Either&lt;Failure, SuccessData&gt; = either {
 }</code></pre>
   <p>FxDart te da la misma forma en Dart:</p>
   <pre class="code"><code>// FxDart
-Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
+Either&lt;Failure, SuccessData&gt; getResult() => fxEither((r) {
   final user  = r.bind(findUser(userId));
   final order = r.bind(findOrder(user.id));
   final total = r.bind(calculateTotal(order));
@@ -54,7 +54,7 @@ Either&lt;Failure, SuccessData&gt; getResult() => either((r) {
     Los dos sustituyen a la pirámide anidada de <code>flatMap</code> que
     tendrías que escribir si no:
   </p>
-  <pre class="code"><code>// A lo que sustituye
+  <pre class="code"><code>// What it replaces
 Either&lt;Failure, SuccessData&gt; getResult() =>
     findUser(userId).flatMap((user) =>
         findOrder(user.id).flatMap((order) =>
@@ -65,7 +65,7 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     parámetro explícito (<code>r</code>) porque Dart no tiene receptores en
     las lambdas, y la versión asíncrona tiene su propio constructor
     (<code>fxEitherAsync</code>) porque Dart no tiene <code>inline</code>. Por
-    dentro esto <em>no</em> es encadenado con flatMap: igual que en Arrow,
+    dentro, esto <em>no</em> es una cadena de flatMap: igual que en Arrow,
     <code>r.bind</code> sobre un fallo lanza una señal privada, etiquetada con
     el ámbito, que el constructor captura en la frontera. Por eso los retornos
     tempranos, los bucles y los <code>if</code> funcionan sin más dentro del
@@ -81,15 +81,15 @@ Either&lt;Failure, SuccessData&gt; getResult() =>
     Todo cuelga de la <code>r</code> que te entrega el constructor: escribe
     <code>r.</code> y lo irás descubriendo entero:
   </p>
-  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => either((r) {
-  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" no es un número');
-  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n está fuera de rango');
+  <pre class="code"><code>Either&lt;String, int&gt; parsePort(String raw) => fxEither((r) {
+  final n = r.ensureNotNull(int.tryParse(raw), () => '"$raw" is not a number');
+  r.ensure(n &gt; 0 &amp;&amp; n &lt; 65536, () => '$n is out of range');
   return n;
 });
 
 switch (parsePort('8080')) {
-  case Right(:final value): print('escuchando en $value');
-  case Left(:final value):  print('configuración incorrecta: $value');
+  case Right(:final value): print('listening on $value');
+  case Left(:final value):  print('bad config: $value');
 }</code></pre>
   <ul>
     <li><code>r.bind(either)</code> / <code>r.bindAll(eithers)</code> —
@@ -124,10 +124,10 @@ switch (parsePort('8080')) {
     Una validación quiere <em>todos</em> los errores, no el primero. Esta es
     la alternativa de Arrow a tener un tipo <code>Validated</code> aparte:
   </p>
-  <pre class="code"><code>final user = either&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
+  <pre class="code"><code>final user = fxEither&lt;Nel&lt;String&gt;, User&gt;((r) => r.accumulate((acc) {
   final name = acc.accumulating((r) => validateName(r, input));
   final age  = acc.accumulating((r) => validateAge(r, input));
-  return User(name.value, age.value); // todos los errores se informan juntos
+  return User(name.value, age.value); // all errors reported together
 }));</code></pre>
   <p>
     <code>r.accumulate</code> ejecuta todas las ramas y concatena todos los
@@ -151,10 +151,10 @@ switch (parsePort('8080')) {
     errores tipados fusionados con los pipelines perezosos y conscientes de la
     concurrencia de FxDart.
   </p>
-  <pre class="code"><code>// Valida 500 registros, 8 a la vez, y conserva TODOS los fallos — en orden.
+  <pre class="code"><code>// Validate 500 records, 8 at a time, and keep EVERY failure — in order.
 final result = await fxStream(records)
     .mapOrAccumulate&lt;String, User&gt;((r, rec) async {
-  final parsed = r.ensureNotNull(tryParse(rec), () => 'registro incorrecto: $rec');
+  final parsed = r.ensureNotNull(tryParse(rec), () => 'bad record: $rec');
   return await enrich(parsed);
 }, concurrency: 8);</code></pre>
   <p>

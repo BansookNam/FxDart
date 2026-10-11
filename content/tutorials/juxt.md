@@ -32,7 +32,7 @@ nextLabel: fxPipe
 
   <h2>Demo 1 · Basics</h2>
   <p>The classic example from the dartdoc: computing the min and max of a
-    list in one pass:</p>
+    list in one call:</p>
   {{playground:0}}
 
   <h2>Demo 2 · Projecting several fields</h2>
@@ -41,7 +41,7 @@ nextLabel: fxPipe
 
   <h2>Try it yourself</h2>
   <p>Exercise: use <code>fxJuxt</code> to compute the <code>sum</code> and
-    <code>average</code> of this list in a single pass.</p>
+    <code>average</code> of this list in a single call.</p>
   {{playground:2}}
 
   <div class="callout">

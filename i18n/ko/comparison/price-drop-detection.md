@@ -1,8 +1,8 @@
 ---
 slug: price-drop-detection
-title: 두 스냅숏 사이의 가격 하락 — Dart vs FxDart
-description: 두 가격표 스냅숏을 비교해 저렴해진 항목을 보고합니다 — indexBy + filter + sortBy + head + sumBy와, 맵 리터럴 및 where/fold 체인을 비교합니다.
-heading: 두 스냅숏 사이의 가격 하락
+title: 두 스냅샷 사이의 가격 하락 — Dart vs FxDart
+description: 두 가격표 스냅샷을 비교해 저렴해진 항목을 보고합니다 — indexBy + filter + sortBy + head + sumBy와, 맵 리터럴 및 where/fold 체인을 비교합니다.
+heading: 두 스냅샷 사이의 가격 하락
 order: 53
 tier: 4
 functions: indexBy, filter, map, sortBy, head, sumBy, join
@@ -12,7 +12,7 @@ async: false
 ---
   <h2>요구사항</h2>
   <p>
-    상점 가격표의 두 스냅숏(데이터는 코드 안에 있습니다): 6월과 7월.
+    상점 가격표의 두 스냅샷(데이터는 코드 안에 있습니다): 6월과 7월.
     일부 항목은 저렴해졌고, 일부는 비싸졌으며, 하나는 단종되었고
     하나는 새로 추가되었습니다. <strong>가격이 하락한</strong> 모든
     항목을 — 이전 가격, 새 가격, 하락 폭과 함께 — 하락 폭이 큰 순서로

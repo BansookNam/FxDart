@@ -30,7 +30,7 @@ dice:
 Ninguna flecha desde `A` hacia la segunda estructura. Ambas están ya ahí; la
 función solo combina los resultados. Un tipo con `map2` (más una forma de
 elevar un valor plano, exactamente el `of` del capítulo 1) es un **functor
-applicative**.
+aplicativo**.
 
 ![Dependiente frente a independiente](diagrams/t6-1-dependent-independent.svg)
 
@@ -177,7 +177,7 @@ lee el valor de otra rama no puede ejecutarse cuando ese valor no existe. Esa
 división — independiente frente a dependiente — es la distinción de este
 capítulo, convertida en API.
 
-> 🎓 **Las leyes, y la definición de verdad.** Un applicative se suele dar como
+> 🎓 **Las leyes y la definición general.** Un applicative se suele dar como
 > `pure : A → F<A>` más `ap : F<A → B> × F<A> → F<B>` (una función *dentro* de
 > la estructura, aplicada a un valor dentro de la estructura). `map2` y `ap`
 > son interdefinibles, y `map2` se lee mejor en un lenguaje sin currificación
@@ -196,8 +196,8 @@ capítulo, convertida en API.
 | Los pasos son independientes, informa de todos los fallos | `zipOrAccumulate` / `accumulate` | Solo la forma applicative puede |
 | Los pasos son independientes y lentos | Applicative + concurrencia | La independencia es lo que hace legal el solape |
 
-La última fila es la que se pasa por alto. `concurrent(n)` (capítulo 13) se
-aplica exactamente cuando los pasos no dependen entre sí — la misma condición
+La última fila es la que se pasa por alto. `concurrent(n)` (capítulo 13) es
+aplicable exactamente cuando los pasos no dependen entre sí — la misma condición
 que hace posible acumular errores. La independencia te compra ambas cosas, y
 `flatMap` la gasta.
 
@@ -242,7 +242,7 @@ ceremonia sin recompensa.
    nunca se aplica, así que el fallo de `b` nunca se examina. El tipo
    `A → Either<E, C>` es lo que vuelve inaccesible el segundo valor.
 3. Con `accumulating`, la rama del cupón se ejecuta aunque `qty` haya fallado, y
-   leer `q.value` dentro de ella detona — elevando los errores acumulados desde
+   leer `q.value` dentro de ella explota al lanzar los errores acumulados desde
    dentro de una rama en vez de al final. `dependent` existe para hacer eso
    imposible: se salta el bloque por completo cuando ya hay errores, que es el
    valor por defecto correcto para cualquier regla que lea el `.value` de una

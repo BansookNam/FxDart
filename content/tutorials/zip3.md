@@ -32,11 +32,11 @@ nextLabel: zipWith
     is joined by <code>tee3</code>.
   </p>
   <p>
-    One asymmetry to know: <code>zip</code> has a chain method
-    (<code>fx(a).zip(b)</code>) and <code>zip3</code> does not — a chain has
-    one receiver and <code>zip3</code> needs three peers. Call it as a
-    top-level function and wrap the result in <code>fx()</code> to carry on,
-    as the demo's last line does. <code>fxZip3Async</code> is the async form,
+    Both <code>zip</code> and <code>zip3</code> have chain methods
+    (<code>fx(a).zip(b)</code>, <code>fx(a).zip3(b, c)</code>); the chain
+    carries the receiver as the first input. The demo calls the top-level
+    <code>fxZip3</code> and wraps the result in <code>fx()</code> to carry
+    on. <code>fxZip3Async</code> is the async form,
     and like <code>fxZipAsync</code> it issues all three <code>next()</code>
     calls before awaiting any of them, so the sources are pulled in parallel
     per record rather than one after another.

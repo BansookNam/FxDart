@@ -33,10 +33,10 @@ nextLabel: Either combinators
     변환하고, <code>flatMap</code>은 앞 결과에 의존하는 실패 가능한 단계를
     이어 붙이고, <code>getOrNull</code>/<code>getOrElse</code>는 평범한
     Dart로 돌아가는 다리입니다. <code>Either</code>는 <em>경계에서</em>
-    살아야 하는 타입입니다. 계산 안쪽에서는
-    <a href="raise.html"><code>fxEither</code> 빌더</a>를 쓰세요. 거기서는 각
-    단계가 <code>flatMap</code> 피라미드가 아니라 일직선
-    <code>r.bind</code> 한 줄입니다.
+    쓰는 타입입니다. 계산 안쪽에서는
+    <a href="raise.html"><code>fxEither</code> 빌더</a>를 쓰세요. 빌더에서는
+    각 단계가 <code>r.bind</code> 한 줄로 쓰여서 <code>flatMap</code> 피라미드가
+    생기지 않습니다.
   </p>
 
   <h2>데모 1 · Left, Right, 그리고 빠짐없는 switch</h2>

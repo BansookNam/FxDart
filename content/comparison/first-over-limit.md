@@ -27,8 +27,8 @@ async: false
   <h2>Why they differ</h2>
   <p>
     They don't — and here plain Dart is the honest pick. Core
-    <code>skipWhile</code> plus <code>firstOrNull</code> (from
-    <code>package:collection</code>) is a clean, lazy one-liner that says
+    <code>skipWhile</code> plus <code>firstOrNull</code> (in
+    <code>dart:core</code> since Dart 3.0) is a clean, lazy one-liner that says
     exactly what it means, with the same nullable result to handle. FxDart's
     <code>dropWhile → head</code> is the same idea under FxTS names — worth
     using if the rest of your file is already FxDart chains, but nobody

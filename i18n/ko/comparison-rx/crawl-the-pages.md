@@ -35,7 +35,7 @@ async: true
     <code>map(fetchPage)</code>, <code>takeWhile(isNotEmpty)</code>,
     평탄화. 커서에 한계를 두는 것은 아무것도 없습니다. 요구가 곧
     한계이기 때문입니다: <code>takeWhile</code>이 빈 페이지를 보면
-    그냥 풀기를 멈추고, 5페이지는 생성조차 되지 않습니다.
+    더 요청하지 않고, 5페이지는 생성조차 되지 않습니다.
   </p>
   <p>
     스트림 쪽도 같은 곳에 도달하지만, 풀 메커니즘을 빌려서만

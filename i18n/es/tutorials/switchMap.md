@@ -22,7 +22,7 @@ nextLabel: mergeMap
     últimos y pisan los buenos. La solución no es <em>ignorar</em> la
     respuesta vieja sino hacerla imposible: <code>switchMap(f)</code> mapea
     cada evento a un stream interno y, en el momento en que llega un evento
-    más nuevo, <strong>cancela</strong> de raíz el stream interno anterior.
+    más nuevo, <strong>cancela</strong> por completo el stream interno anterior.
     Solo el stream interno más nuevo se refleja aguas abajo.
   </p>
   <p>
