@@ -54,9 +54,9 @@ nextLabel: fx
 
   <div class="callout">
     <strong>0.8.10 채널 규칙.</strong>
-    <code>attempt</code>는
+    <code>attempt</code>는 <strong>나중에</strong> 둡니다.
     <code><a href="retryOn.html">retryOn</a></code> /
-    <code>retryOnError</code> <strong>뒤에</strong> 둡니다. 앞에 두지 않습니다.
+    <code>retryOnError</code>보다 앞에 두지 않습니다.
     그 연산자들은 에러 채널을 보고, 실패가 <code>Left</code>가 되면
     거기에는 재시도할 것이 남지 않습니다.
   </div>

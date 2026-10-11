@@ -20,7 +20,7 @@ nextLabel: countWhere
     <code><a href="filter.html">filter</a></code> +
     <code><a href="foldBy.html">foldBy</a></code> escrito como una única
     llamada estricta. Todo lo que <code>foldBy</code> garantiza sigue en pie:
-    <code>seed</code> inicia cada clave en lugar de arrastrarse entre ellas,
+    la semilla inicia cada clave en lugar de arrastrarse entre ellas,
     las claves salen en orden de primera aparición y el mapa se consulta una
     vez por elemento. La única vuelta de tuerca es la función de clave:
     devolver <code>null</code> significa «salta este elemento», la misma forma

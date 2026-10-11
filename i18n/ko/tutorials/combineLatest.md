@@ -37,7 +37,7 @@ nextLabel: withLatestFrom
     이벤트만 방출해야 하고 다른 스트림은 최신 값만 참고하면 된다면
     <code><a href="withLatestFrom.html">withLatestFrom</a></code>을 씁니다.
     풀(pull) 세계의 <code><a href="zip.html">zip</a></code>과 비교해 보세요.
-    zip은 <em>n</em>번째끼리 짝짓지만, <code>combineLatest</code>는 가장 최신
+    zip은 <em>n</em>번째를 <em>n</em>번째와 짝짓지만, <code>combineLatest</code>는 가장 최신
     값끼리 짝짓고 인덱스가 맞기를 기다리지 않습니다. fxdart 이벤트 레이어의
     연산자이며 Rx의 같은 이름 연산자를 따랐습니다.
   </p>

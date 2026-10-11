@@ -5,10 +5,10 @@ description: Tutorial de throttle en FxDart: invoca una función como máximo un
 heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
-next: shuffle.html
-nextLabel: shuffle
 prev: debounce.html
 prevLabel: debounce
+next: shuffle.html
+nextLabel: shuffle
 ---
   <p class="hero-sub">Invoca una función como máximo una vez por periodo de espera — a un ritmo fijo, a diferencia del «esperar a que haya calma» de debounce.</p>
 

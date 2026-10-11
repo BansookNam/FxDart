@@ -5,10 +5,10 @@ description: Tutorial de concurrentPool en FxDart: un pool de tamaño fijo de pe
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
-next: retry.html
-nextLabel: retry
 prev: mapConcurrent.html
 prevLabel: mapConcurrent
+next: retry.html
+nextLabel: retry
 ---
   <p class="hero-sub">Como concurrent, pero emite los resultados por orden de finalización — el primero que acaba es el primero que sale.</p>
 

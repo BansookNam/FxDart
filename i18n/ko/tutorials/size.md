@@ -43,7 +43,7 @@ nextLabel: join
     <code>.count()</code>는 <em>비동기</em> 체인에서 쓰세요. 이미 구체적인
     <code>List</code>를 들고 있다면 <code>.length</code>가 공짜입니다 —
     <code>count</code>는 지연 체인의 결과를 먼저
-    <code><a href="../101/index.html">toList</a></code>로 구체화하지 않고
+    <code>List</code>로, 곧 <code><a href="../101/index.html">toList</a></code>로 구체화하지 않고
     개수만 세고 싶을 때 쓰는 도구입니다.
   </p>
 

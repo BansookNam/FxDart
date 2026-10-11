@@ -5,10 +5,10 @@ description: FxDart throttle 튜토리얼: wait 구간마다 함수를 최대 �
 heading: <code>fxThrottle</code>
 section: 12
 crumb: throttle
-next: shuffle.html
-nextLabel: shuffle
 prev: debounce.html
 prevLabel: debounce
+next: shuffle.html
+nextLabel: shuffle
 ---
   <p class="hero-sub">wait 구간마다 함수를 최대 한 번만 실행합니다 — debounce의 "잠잠해질 때까지 기다리기"와 달리 일정한 주기로 발화합니다.</p>
 

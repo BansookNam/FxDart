@@ -56,8 +56,8 @@ nextLabel: either &amp; Raise
   </p>
   <p>
     <a href="raise.html"><code>recover</code></a>는 더 풍부한 형제입니다.
-    핸들러를 새 raise 스코프 안에서 돌리므로, 핸들러는 <code>Either</code>를
-    손으로 짓는 대신 평범한 Dart 코드를 쓰고 <code>r.raise</code>를 부릅니다.
+    핸들러를 새 raise 스코프 안에서 돌리므로, 핸들러는 평범한 Dart 코드를 쓰고
+    <code>r.raise</code>를 부르며, <code>Either</code>를 손으로 짓지 않습니다.
     교체할 <code>Either</code>가 이미 있으면
     <code>alt</code>/<code>orElse</code>를, 핸들러가 실제로 할 일이 있으면
     <code>recover</code>를 쓰세요.
@@ -65,8 +65,8 @@ nextLabel: either &amp; Raise
 
   <h3><code>filterOrElse</code> — 그 자리에서 검증하기</h3>
   <p>
-    술어에서 떨어진 <code>Right</code>를 <code>Left</code>로 강등시킵니다.
-    두 번째 콜백이 <em>그 값으로부터</em> <code>Left</code>를 만들므로, 메시지가 무엇이
+    술어에서 떨어진 <code>Right</code>를 두 번째 콜백이 만드는
+    <code>Left</code>로 강등시킵니다. 콜백이 <em>그 값으로부터</em> 만들기 때문에 메시지가 무엇이
     잘못됐는지 짚을 수 있습니다. <code>Left</code>는 손대지 않고 통과하며
     술어는 아예 실행되지 않습니다. 이어 붙이면 처음 실패한 검사가 이깁니다.
   </p>

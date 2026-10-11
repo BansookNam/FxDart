@@ -51,7 +51,7 @@ nextLabel: parallel
     <code>.parallel()</code> simple tardó aproximadamente 2.5× lo que el bucle
     de un solo isolate (13.7 s frente a 5.4 s), mientras que el caso de coste
     elevado por elemento <code>password-rehash</code> fue aproximadamente 6×
-    más <em>rápido</em>. Si el trabajo no es más pesado que el salto,
+    más rápido. Si el trabajo no es más pesado que el salto,
     quédate en este isolate.
   </p>
   <pre><code>// I/O — overlap Futures here

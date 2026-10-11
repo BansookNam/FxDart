@@ -29,7 +29,7 @@ nextLabel: nth
   <p>
     <strong>Ojo en la cadena síncrona:</strong> <code>Fx</code> implementa
     <code>Iterable</code> (es un extension type sobre uno), así que <code>fx(iterable).lastOrNull</code> resuelve
-    al <em>getter</em> <code>Iterable.lastOrNull</code> heredado de Dart (sin
+    al <code>Iterable.lastOrNull</code> heredado de Dart, un <em>getter</em> (sin
     paréntesis), que <em>sí</em> es seguro frente a nulos y devuelve
     <code>null</code> con un iterable vacío. La trampa es el getter vecino
     <code>.last</code> (sin «OrNull»): <code>fx(&lt;int&gt;[]).last</code> lanza

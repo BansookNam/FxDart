@@ -37,7 +37,7 @@ nextLabel: bounded concurrent fetch
     <code><a href="attempt.html">attempt</a></code>를 두는 것은
     <em>throw</em>가 값이 되어야 할 때뿐입니다 — 체인이
     재시도도 한다면 <code>attempt</code>는
-    <code>retryOn</code> <strong>뒤</strong>에 두고, 앞에 두지 않습니다.
+    <strong>나중에</strong>, 곧 <code>retryOn</code>보다 뒤에 두고 앞에 두지 않습니다.
   </p>
 
   <h2>데모 1 · 타이핑이 잦아들 때까지</h2>

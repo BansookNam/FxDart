@@ -47,7 +47,7 @@ nextLabel: parallel
     요소당 비용이 싼 <code>log-fingerprint</code> 사례에서 평범한
     <code>.parallel()</code>은 단일 isolate 루프보다 약 2.5배 오래
     걸렸고(13.7초 대 5.4초), 요소당 비용이 큰
-    <code>password-rehash</code> 사례는 약 6배 <em>빨랐습니다</em>. 일이 hop보다 무겁지 않으면 이 isolate에
+    <code>password-rehash</code> 사례는 약 6배 빨랐습니다. 일이 hop보다 무겁지 않으면 이 isolate에
     남으세요.
   </p>
   <pre><code>// I/O — overlap Futures here

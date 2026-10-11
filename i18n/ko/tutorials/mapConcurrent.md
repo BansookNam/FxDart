@@ -28,9 +28,9 @@ nextLabel: concurrentPool
   <p>
     재구현이 아니라 합성 <em>그 자체</em>이기 때문에 모든 보장이 그대로
     이어집니다. 결과는 <strong>원본 순서</strong>로 도착하고(완료 순서를
-    원하면 긴 형태에서 <code>concurrent</code> 대신
+    원하면 긴 형태에서
     <code><a href="concurrentPool.html">concurrentPool</a></code>을
-    쓰세요), 동시에 실행되는 콜백은 최대 <code>concurrency</code>개이며,
+    <code>concurrent</code> 대신 쓰세요), 동시에 실행되는 콜백은 최대 <code>concurrency</code>개이며,
     하류 연산자들은 계속 지연 방식으로 값을 끌어옵니다. 이미 비동기인
     체인에서는 <code>map(f).concurrent(n)</code>을 합성해 브리지를
     건너뜁니다.

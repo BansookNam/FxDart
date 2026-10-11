@@ -17,7 +17,7 @@ nextLabel: matches
   <h2>강의</h2>
   <p>
     <code>fxIsMatch</code>는 <code>pattern</code>을 재귀적으로 훑으면서
-    <code>target</code>이 <code>pattern</code>을 "담고 있는지" 확인합니다. 규칙은 모양에 따라 다릅니다.
+    <code>target</code>이 그것을 "담고 있는지" 확인합니다. 규칙은 모양에 따라 다릅니다.
   </p>
   <p>
     <strong>Map</strong>은 부분 일치입니다. <code>pattern</code>의 모든 키가

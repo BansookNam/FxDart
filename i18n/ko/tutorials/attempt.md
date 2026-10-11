@@ -19,7 +19,7 @@ nextLabel: mapEither
     이벤트 레이어의 에러 도구(<code><a href="onErrorResume.html">onErrorReturn</a></code>,
     <code>onErrorResume</code>, <code><a href="retryOn.html">retryOn</a></code>,
     <code>retryOnError</code>)는 모두 타입 없는 <code>Object</code>를 다룹니다.
-    에러 채널이 <code>Object</code>를 싣기 때문입니다. <code>attempt</code>는
+    에러 채널이 그것을 싣기 때문입니다. <code>attempt</code>는
     라이브러리의 타입 있는 영역으로 건너가는 다리입니다. 데이터 이벤트는
     <code>Right</code>가 되고, 에러 이벤트는 <code>onThrow</code>가 만든
     <code>Left</code>가 됩니다. 실패가 <code>Left</code>가 되면 컴파일러가 그
@@ -36,8 +36,9 @@ nextLabel: mapEither
     붙입니다.
   </p>
   <p>
-    <code>attempt</code>는 <code>retryOn</code> / <code>retryOnError</code> /
-    <code>FxEvents.retry</code> <strong>뒤에</strong> 두세요. 앞에 두면 안 됩니다.
+    <code>attempt</code>는 <strong>나중에</strong> 두세요.
+    <code>retryOn</code> / <code>retryOnError</code> /
+    <code>FxEvents.retry</code>보다 앞에 두면 안 됩니다.
     이 연산자들은 에러 채널을 보는데, 에러가 이미 값이 되어 버리면 재시도할
     대상이 남지 않기 때문입니다.
   </p>

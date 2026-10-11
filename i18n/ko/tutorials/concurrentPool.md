@@ -5,10 +5,10 @@ description: FxDart concurrentPool 튜토리얼: 고정 크기 풀로 요청을 
 heading: <code>concurrentPool</code>
 section: 11
 crumb: concurrentPool
-next: retry.html
-nextLabel: retry
 prev: mapConcurrent.html
 prevLabel: mapConcurrent
+next: retry.html
+nextLabel: retry
 ---
   <p class="hero-sub">concurrent와 같지만 결과를 완료 순서대로 내보냅니다 — 먼저 끝난 것이 먼저 나옵니다.</p>
 

@@ -38,7 +38,7 @@ nextLabel: FxSubscriptions
     <code>close()</code>는 피드를 끝냅니다: 구독자들의 스트림이 닫히고,
     이후의 <code>add</code>는 던집니다 — 다만 닫힌
     <code>LiveValue</code>도 늦은 구독자에게는 마지막 값을 재생해 준
-    뒤에 그 스트림을 닫습니다. Rx를 아신다면, <code>LiveValue</code>는
+    뒤에 그 스트림을 닫습니다. Rx를 아신다면, 이것은
     <code>BehaviorSubject</code>를 그 본질적 동작만 남기고 줄인
     것입니다. fxdart 이벤트 계층에 속하며 FxTS에는 없습니다.
   </p>

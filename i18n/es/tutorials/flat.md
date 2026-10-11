@@ -42,8 +42,8 @@ nextLabel: scan
   </p>
   <p>
     Igual que <code>flat</code> en FxTS, <code>fxFlattenedAsync</code> solo baja
-    por los anidamientos que ya sean un <code>Iterable</code> de forma
-    <em>síncrona</em> en el momento en que llegan — no espera a un <code>Future</code>
+    por los anidamientos que ya son, de forma
+    <em>síncrona</em>, un <code>Iterable</code> en el momento en que llegan — no espera a un <code>Future</code>
     escondido dentro de una colección anidada. Combínalo con una etapa previa
     <code>.map(...).concurrent(n)</code> para traer las listas anidadas en
     paralelo, y deja que <code>.flattened()</code> junte después los resultados

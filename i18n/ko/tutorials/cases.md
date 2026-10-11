@@ -39,7 +39,7 @@ nextLabel: add
   <p>
     아무것도 매치되지 않고 <code>orElse</code>도 주어지지 않으면
     <code>fxCases</code>는 <code>value</code>가 이미 <code>R</code>이면
-    <code>value</code> 자체를 반환하고 —
+    그 값 자체를 반환하고 —
     그렇지 않으면 <code>StateError</code>를 던집니다. 이는 컴파일 타임이 아니라
     런타임 검사입니다.
     실무에서는 술어가 모든 경우를 빠짐없이 다룬다고 확신할 수 있는 게
@@ -62,5 +62,5 @@ nextLabel: add
     <a href="when.html"><code>fxWhen</code></a> / <a href="unless.html"><code>fxUnless</code></a> — 술어 하나, 결과 타입은 동일 ·
     <a href="throwError.html"><code>fxThrowError</code></a> — 매치 실패가 치명적이어야 할 때 흔히 쓰는 orElse ·
     <a href="always.html"><code>fxAlways</code></a> — 상수 orElse ·
-    <a href="matches.html"><code>fxMatches</code></a> — <code>fxCases</code> 쌍에 넣을 수 있는 술어
+    <a href="matches.html"><code>fxMatches</code></a> — 케이스 쌍에 넣을 수 있는 술어
   </div>
