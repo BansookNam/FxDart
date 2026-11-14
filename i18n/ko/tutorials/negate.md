@@ -5,8 +5,8 @@ description: FxDart negate 튜토리얼: 어떤 술어든 논리적으로 뒤집
 heading: <code>fxNegate</code>
 section: 10
 crumb: negate
-prev: memoize.html
-prevLabel: memoize
+prev: memoizeLast.html
+prevLabel: memoizeLast
 next: not.html
 nextLabel: not
 ---

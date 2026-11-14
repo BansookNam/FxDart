@@ -40,6 +40,19 @@ nextLabel: throttle
     <strong>primera</strong> llamada de la ráfaga la que se dispare de
     inmediato, suprimiendo el resto hasta el siguiente periodo de calma.
   </p>
+  <p>
+    Un debounce en una app real necesita dos cosas más.
+    <code>maxWait</code> pone un tope a cuánto pueden seguir posponiendo la
+    ejecución las llamadas: un slider arrastrado sin pausa no se guardaría
+    nunca, mientras que con <code>maxWait: 2s</code> guarda el valor más
+    reciente al menos cada dos segundos. Y <code>.flush()</code> ejecuta la
+    llamada pendiente <em>ahora</em> — lo que quiere un hook de pausa de la
+    app o de <code>dispose</code>, ya que <code>.cancel()</code> perdería el
+    último valor y puede que el temporizador nunca llegue a dispararse.
+    <code>.isPending</code> indica si hay algo que hacer flush. Estas tres
+    son añadidos de fxdart (inspirados en lodash); el <code>debounce</code>
+    de FxTS solo tiene <code>cancel</code>.
+  </p>
 
   <h2>Demo 1 · Flanco de bajada (el valor por defecto)</h2>
   <p>Tres llamadas rápidas se colapsan en una — solo sobrevive el último argumento:</p>
@@ -52,6 +65,14 @@ nextLabel: throttle
     de bajada pendiente:
   </p>
   {{playground:1}}
+
+  <h2>Demo 3 · maxWait y flush()</h2>
+  <p>
+    Un arrastre que nunca se detiene sigue guardando según el ritmo de
+    <code>maxWait</code>, y <code>flush()</code> escribe el último valor antes
+    de que la app desaparezca:
+  </p>
+  {{playground:4}}
 
   <h2>La forma con método</h2>
   <p>
@@ -91,6 +112,8 @@ save('hello');   // only this one reaches _post</code></pre>
   <div class="callout">
     <strong>Relacionado:</strong>
     <a href="throttle.html"><code>fxThrottle</code></a> — se dispara a intervalos regulares en lugar de tras la calma ·
+    <a href="onChange.html"><code>fxOnChange</code></a> — omite las llamadas cuyo valor no cambió ·
+    <a href="conflate.html"><code>fxConflate</code></a> — una ejecución asíncrona a la vez, el valor más nuevo después ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — para montar demos con temporización ·
     <a href="concurrent.html"><code>concurrent</code></a> — limitar el ritmo de pipelines asíncronos ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — aleatoriedad con semilla

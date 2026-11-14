@@ -7,8 +7,8 @@ section: 12
 crumb: throttle
 prev: debounce.html
 prevLabel: debounce
-next: shuffle.html
-nextLabel: shuffle
+next: onChange.html
+nextLabel: onChange
 ---
   <p class="hero-sub">Invokes a function at most once per wait period — on a schedule, unlike debounce's "wait for quiet."</p>
 

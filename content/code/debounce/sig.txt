@@ -1,10 +1,12 @@
-Debounced&lt;T&gt; fxDebounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false})
+Debounced&lt;T&gt; fxDebounce&lt;T&gt;(void Function(T arg) func, Duration wait, {bool leading = false, Duration? maxWait})
 
 class Debounced&lt;T&gt; {
   void call(T arg);   // Debounced is callable: debounced(arg)
   void cancel();
+  void flush();       // run the pending call now
+  bool get isPending;
 }
 
 FxEvents&lt;T&gt; FxEvents&lt;T&gt;.debounce(Duration window) // chain (events)
 
-Debounced&lt;T&gt; (void Function(T arg)).fxDebounce(Duration wait, {bool leading = false}) // method
+Debounced&lt;T&gt; (void Function(T arg)).fxDebounce(Duration wait, {bool leading = false, Duration? maxWait}) // method

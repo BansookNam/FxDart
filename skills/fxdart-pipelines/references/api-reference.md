@@ -59,18 +59,23 @@ failing element), `drop`, `dropRight`, `dropWhile`, `dropUntil`,
 
 `reduce(f)` (unseeded, throws on empty), `fold(seed, f)` (chain) /
 `fxFold(seed, f, iterable)` (top-level), `fxReduceLazy`, `toList`, `sum`,
-`sumBy(f)`, `average`, `averageBy(f)`, `min`, `max`, `minBy(f)`, `maxBy(f)`
-(return `T?`), `size`, `join([sep])`, `groupBy(f)` → `Map<K, List<T>>`,
+`sumBy(f)` (→ `num`), `sumByDouble(f)` / `sumByInt(f)` (→ `double` / `int`,
+no cast), `average`, `averageBy(f)`, `min`, `max`, `minBy(f)`, `maxBy(f)`
+(return `T?`), `quantileBy(q, f)` (nearest-rank element, O(n) quickselect),
+`size`, `join([sep])`, `groupBy(f)` → `Map<K, List<T>>`,
 `indexBy(f)` → `Map<K, T>`, `countBy(f)` → `Map<K, int>`,
-`sort(comparator)`, `sortBy(keyFn)`, `fxToSorted`, `partition(f)` →
+`sort(comparator)`, `sortBy(keyFn)` (stable on every key type), `fxToSorted`, `partition(f)` →
 `(List<T>, List<T>)`, `each(f)`, `consume([n])`
 
-On `Fx<num>` / `FxAsync<num>`: no-arg `sum()`, `average()`, `min()`, `max()`.
+On `Fx<num>` / `FxAsync<num>`: no-arg `sum()`, `average()`, `min()`, `max()`,
+and `quantile(q)` (median = `quantile(0.5)`; prefer it over sort-then-index).
 
 ## Access (terminal)
 
 `head()`, `last()`, `nth(i)`, `find(f)`, `findIndex(f)`, `fxIncludes(v)`,
-`isEmpty`, `every(f)`, `some(f)` — `head`/`last`/`nth`/`find` return `T?`.
+`isEmpty`, `every(f)`, `some(f)`, `atLeast(n, f)` / `atMost(n, f)` (stop at
+the deciding match — prefer over `countWhere(f) >= n`) —
+`head`/`last`/`nth`/`find` return `T?`.
 
 ## Dart-idiomatic aliases (chains)
 
@@ -90,7 +95,9 @@ On `Fx<num>` / `FxAsync<num>`: no-arg `sum()`, `average()`, `min()`, `max()`.
 
 `pipe(value, [closures])` (dynamic, FxTS parity — prefer `fx()` chains),
 `fxPipe1`, `pipeLazy`, `fxIdentity`, `fxAlways(v)`, `fxTap(f)`, `fxApply(f, args)`,
-`fxJuxt([f, g])`, `fxMemoize(f)`, `fxNegate(f)`, `fxNot(v)`, `fxWhen(pred, f)`,
+`fxJuxt([f, g])`, `fxMemoize(f)` (caches every argument),
+`fxMemoizeLast(f, {equals = identical})` (one slot, identity — for pure
+functions of immutable state), `fxNegate(f)`, `fxNot(v)`, `fxWhen(pred, f)`,
 `fxUnless(pred, f)`, `fxThrowError(e)`, `fxThrowIf(pred, e)`, `fxCases(...)`,
 `fxAdd`, `fxGt`, `fxGte`, `fxLt`, `fxLte`, `fxDelay(ms, value)`, `fxSleep(ms)`,
 `unicodeToArray(s)`
@@ -120,8 +127,15 @@ here.
 
 ## Util
 
-`fxDebounce(ms, f)`, `fxThrottle(ms, f)`, `fxShuffle(iterable, [random])`,
-`createSeededRandom(seed)`
+`fxDebounce(f, wait, {leading, maxWait})` → `Debounced` with `cancel()`,
+`flush()` (run the pending call now — for dispose/app-pause) and `isPending`;
+`fxThrottle(f, wait, {leading, trailing})`; `fxOnChange(f, {equals})` (run
+only when the argument changed); `fxConflate(run, {onError})` (one async run
+in flight, newest waiting value next — seeks, syncs, previews); each also as
+a method on the callback (`save.fxDebounce(wait)`, `setCoins.fxOnChange()`).
+`fxShuffle(iterable, [random])`, `createSeededRandom(seed)`.
+`fxRetry(attempts, f, {delay, retryIf, onRetry})` / `.mapRetry(...)`:
+`retryIf` false rethrows at once.
 
 ## Deprecated stubs (use the replacement)
 

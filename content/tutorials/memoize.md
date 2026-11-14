@@ -7,8 +7,8 @@ section: 10
 crumb: memoize
 prev: fxPipe.html
 prevLabel: fxPipe
-next: negate.html
-nextLabel: negate
+next: memoizeLast.html
+nextLabel: memoizeLast
 ---
   <p class="hero-sub">Caches a unary function's results, keyed by its argument.</p>
 

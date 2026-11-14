@@ -5,8 +5,8 @@ description: Tutorial de negate en FxDart: convierte cualquier predicado en su o
 heading: <code>fxNegate</code>
 section: 10
 crumb: negate
-prev: memoize.html
-prevLabel: memoize
+prev: memoizeLast.html
+prevLabel: memoizeLast
 next: not.html
 nextLabel: not
 ---

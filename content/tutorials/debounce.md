@@ -39,6 +39,18 @@ nextLabel: throttle
     fires immediately instead, with every call before the next quiet period
     suppressed.
   </p>
+  <p>
+    Two things a debounce in a real app needs on top of that.
+    <code>maxWait</code> caps how long calls can keep postponing the run: a
+    slider dragged without a pause would otherwise never save at all, while
+    with <code>maxWait: 2s</code> it saves the newest value at least every two
+    seconds. And <code>.flush()</code> runs the pending call <em>now</em> —
+    what an app-pause or <code>dispose</code> hook wants, since
+    <code>.cancel()</code> would lose the last value and the timer may never
+    get to fire. <code>.isPending</code> says whether there is anything to
+    flush. These three are fxdart additions (after lodash); FxTS's
+    <code>debounce</code> has only <code>cancel</code>.
+  </p>
 
   <h2>Demo 1 · Trailing edge (the default)</h2>
   <p>Three rapid calls collapse into one — only the last argument survives:</p>
@@ -50,6 +62,14 @@ nextLabel: throttle
     the burst; <code>.cancel()</code> drops a pending trailing call entirely:
   </p>
   {{playground:1}}
+
+  <h2>Demo 3 · maxWait and flush()</h2>
+  <p>
+    A drag that never pauses still saves on the <code>maxWait</code>
+    schedule, and <code>flush()</code> writes the last value before the app
+    goes away:
+  </p>
+  {{playground:4}}
 
   <h2>Method spelling</h2>
   <p>
@@ -89,6 +109,8 @@ save('hello');   // only this one reaches _post</code></pre>
   <div class="callout">
     <strong>Related:</strong>
     <a href="throttle.html"><code>fxThrottle</code></a> — fires on a schedule instead of after quiet ·
+    <a href="onChange.html"><code>fxOnChange</code></a> — skip calls whose value did not change ·
+    <a href="conflate.html"><code>fxConflate</code></a> — one async run at a time, newest value next ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — building timing demos ·
     <a href="concurrent.html"><code>concurrent</code></a> — rate-limiting for async pipelines ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — seeded randomness

@@ -1,0 +1,9 @@
+Conflated&lt;T&gt; fxConflate&lt;T&gt;(Future&lt;void&gt; Function(T value) run, {void Function(Object error, StackTrace stackTrace)? onError})
+
+class Conflated&lt;T&gt; {
+  void call(T value);        // run now, or hold as the next value
+  bool get isRunning;
+  bool get isPending;        // a value is waiting for the run in flight
+  Future&lt;void&gt; get idle;     // nothing running, nothing waiting
+  void cancel();             // drop the waiting value
+}

@@ -5,8 +5,8 @@ description: FxDart count 튜토리얼: 파이프라인이 만들어내는 원�
 heading: <code>count</code>
 section: 7
 crumb: count
-prev: minBy.html
-prevLabel: minBy
+prev: quantile.html
+prevLabel: quantile
 next: join.html
 nextLabel: join
 ---

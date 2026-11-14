@@ -43,6 +43,17 @@ nextLabel: timeout
     iterador nuevo.
   </p>
   <p>
+    No todo error merece otra ejecución. <code>retryIf</code> recibe el
+    error y decide: si devuelve <code>false</code>, se relanza al instante
+    — sin espera, sin gastar intentos — así que un timeout se reintenta
+    mientras que un 404 o un error de parseo fallan rápido.
+    <code>onRetry</code> se llama con el error y el número de fallos en cada
+    fallo que <em>sí</em> se va a reintentar, antes de la espera: el sitio
+    para registrarlo, o para cerrar una conexión rota antes de la siguiente
+    ejecución. El fallo final no se notifica ahí; es el error con el que
+    termina la llamada. <code>mapRetry</code> acepta ambos, por elemento.
+  </p>
+  <p>
     Extensión de fxdart (sin contraparte en FxTS), inspirada en
     <code>retry</code>/<code>retryWhen</code> de Rx — rediseñada para el
     modelo pull, donde «resuscribirse» significa «construir el iterable
@@ -56,6 +67,9 @@ nextLabel: timeout
 
   <h2>Demo 2 · mapRetry bajo concurrent</h2>
   {{playground:1}}
+
+  <h2>Demo 3 · retryIf y onRetry</h2>
+  {{playground:3}}
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: haz que la importación sobreviva a sus filas inestables.</p>

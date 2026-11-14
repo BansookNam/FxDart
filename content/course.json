@@ -293,6 +293,10 @@
       "label": "sumBy"
     },
     {
+      "href": "sumByDouble.html",
+      "label": "sumByDouble"
+    },
+    {
       "href": "average.html",
       "label": "average"
     },
@@ -315,6 +319,10 @@
     {
       "href": "minBy.html",
       "label": "minBy"
+    },
+    {
+      "href": "quantile.html",
+      "label": "quantile"
     },
     {
       "href": "size.html",
@@ -407,6 +415,10 @@
       "label": "any"
     },
     {
+      "href": "atLeast.html",
+      "label": "atLeast"
+    },
+    {
       "href": "predicates.html",
       "label": "predicates (isNull, isString, …)"
     }
@@ -493,6 +505,10 @@
     {
       "href": "memoize.html",
       "label": "memoize"
+    },
+    {
+      "href": "memoizeLast.html",
+      "label": "memoizeLast"
     },
     {
       "href": "negate.html",
@@ -601,6 +617,14 @@
     {
       "href": "throttle.html",
       "label": "throttle"
+    },
+    {
+      "href": "onChange.html",
+      "label": "onChange"
+    },
+    {
+      "href": "conflate.html",
+      "label": "conflate"
     },
     {
       "href": "shuffle.html",

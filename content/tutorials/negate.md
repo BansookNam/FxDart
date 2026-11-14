@@ -5,8 +5,8 @@ description: FxDart negate tutorial: turn any predicate into its logical opposit
 heading: <code>fxNegate</code>
 section: 10
 crumb: negate
-prev: memoize.html
-prevLabel: memoize
+prev: memoizeLast.html
+prevLabel: memoizeLast
 next: not.html
 nextLabel: not
 ---

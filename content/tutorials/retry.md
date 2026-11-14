@@ -41,6 +41,16 @@ nextLabel: timeout
     iterator.
   </p>
   <p>
+    Not every error deserves another run. <code>retryIf</code> receives the
+    error and decides: return <code>false</code> and it rethrows at once —
+    no delay, no attempts spent — so a timeout retries while a 404 or a parse
+    error fails fast. <code>onRetry</code> is called with the error and the
+    failure count for every failure that <em>will</em> be retried, before
+    the delay: the place to log it, or to drop a broken connection before
+    the next run. The final failure is not reported there; it is the error
+    the call completes with. <code>mapRetry</code> takes both, per element.
+  </p>
+  <p>
     fxdart extension (no FxTS counterpart), after Rx's
     <code>retry</code>/<code>retryWhen</code> — re-designed for the pull
     model, where "resubscribe" means "build the iterable again". For
@@ -53,6 +63,9 @@ nextLabel: timeout
 
   <h2>Demo 2 · mapRetry under concurrent</h2>
   {{playground:1}}
+
+  <h2>Demo 3 · retryIf and onRetry</h2>
+  {{playground:3}}
 
   <h2>Try it yourself</h2>
   <p>Exercise: make the import survive its flaky rows.</p>

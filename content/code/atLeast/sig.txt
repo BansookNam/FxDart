@@ -1,0 +1,8 @@
+bool fxAtLeast&lt;A&gt;(int n, bool Function(A a) f, Iterable&lt;A&gt; iterable)
+bool fxAtMost&lt;A&gt;(int n, bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; fxAtLeastAsync&lt;A&gt;(int n, FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;bool&gt; fxAtMostAsync&lt;A&gt;(int n, FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+bool Fx&lt;T&gt;.atLeast(int n, bool Function(T a) f)                       // chain (sync)
+bool Fx&lt;T&gt;.atMost(int n, bool Function(T a) f)                        // chain (sync)
+Future&lt;bool&gt; FxAsync&lt;T&gt;.atLeast(int n, FutureOr&lt;bool&gt; Function(T a) f) // chain (async)
+Future&lt;bool&gt; FxAsync&lt;T&gt;.atMost(int n, FutureOr&lt;bool&gt; Function(T a) f)  // chain (async)

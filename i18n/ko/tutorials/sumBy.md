@@ -7,8 +7,8 @@ section: 7
 crumb: sumBy
 prev: sum.html
 prevLabel: sum
-next: average.html
-nextLabel: average
+next: sumByDouble.html
+nextLabel: sumByDouble
 ---
   <p class="hero-sub">모든 원소의 키를 더합니다 — <code>map</code> + <code>sum</code>을 한 단계로, 비어 있으면 <code>0</code>입니다.</p>
 

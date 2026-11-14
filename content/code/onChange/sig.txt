@@ -1,0 +1,8 @@
+OnChange&lt;T&gt; fxOnChange&lt;T&gt;(void Function(T arg) func, {bool Function(T previous, T next)? equals})
+
+class OnChange&lt;T&gt; {
+  void call(T arg);   // OnChange is callable: onChange(arg)
+  void reset();       // forget the last value
+}
+
+OnChange&lt;T&gt; (void Function(T arg)).fxOnChange({bool Function(T previous, T next)? equals}) // method
