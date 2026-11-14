@@ -1,3 +1,83 @@
+## 0.9.1
+
+Primitives a Flutter app built on fxdart kept writing by hand. A review of
+one such app turned up the same few guards, caches and counters in several
+places each, so they are now in the library. Nothing breaks. The one
+behaviour change, stable `sortBy` ties, is the last item.
+
+**Caching and change detection**
+
+- **`fxMemoizeLast(f, {equals = identical})`**: a one-slot memo. A call whose
+  argument is `identical` to the previous call's returns the previous result
+  in O(1). It fits a pure function of **immutable state**, the case
+  `fxMemoize` handles badly: `fxMemoize` keeps every argument it has seen, so
+  over a state replaced on every tick it grows on every tick, and it hashes a
+  large state on every call. Pass `equals` to compare by value or to key on
+  a record such as `(state, id)`.
+- **`fxOnChange(f, {equals})`** and `callback.fxOnChange()`: run a callback
+  only when its argument differs from the last one that ran. It is
+  `uniqAdjacent` for a function. Good for a value polled on a timer or
+  recomputed every frame that should cost a rebuild only when it moves.
+  `reset()` forgets the last value.
+
+**Rate limiting**
+
+- **`fxDebounce` gains `maxWait`, `flush()` and `isPending`** (after lodash).
+  `maxWait` caps how long a stream of calls can keep postponing the run, so
+  a slider dragged without a pause still saves on schedule. `flush()` runs
+  the pending call now, which is what an app-pause or `dispose` hook needs,
+  since `cancel()` would drop the last value. `isPending` says whether
+  there is anything to flush. `maxWait` must be at least `wait`. Calls
+  without the new options behave as in 0.9.0.
+- **`fxConflate(run, {onError})`**: an async runner with at most one run in
+  flight. A call that arrives meanwhile is held, a newer one replaces it,
+  and the newest runs when the current one finishes. This fits a video
+  seek, a "sync now" button, or a preview rendered from a slider. It never
+  waits for quiet (that is `fxDebounce`) and never abandons the run in
+  flight (that is `switchLatest`). Exposes `isRunning`, `isPending`,
+  `idle` and `cancel()`. An error goes to `onError` (or the zone) and does
+  not stop the next run. After Kotlin Flow's `conflate`.
+
+**Retry**
+
+- **`fxRetry` and `mapRetry` gain `retryIf` and `onRetry`.** `retryIf(error)`
+  returning false rethrows at once, with no delay and no attempts spent, so
+  a 404 or a parse error fails fast. `onRetry(error, failed)` sees every
+  failure that will be retried, before its delay; the final failure is the
+  error the call completes with.
+
+**Aggregates**
+
+- **`fxAtLeast(n, f)` / `fxAtMost(n, f)`** (chain: `atLeast` / `atMost`,
+  plus async twins). They stop at the deciding match, the `n`th or the
+  `n + 1`th, where `countWhere(f) >= n` walks everything. `atLeast(1, f)`
+  is `some` and `atMost(0, f)` is `none`. The async forms cancel upstream
+  like `some`.
+- **`fxQuantile(q, xs)` / `fxQuantileBy(q, f, xs)`** (chain: `quantile` on
+  numbers, `quantileBy`, plus async twins). Nearest-rank quantile, the value
+  at sorted index `((n - 1) * q).round()`, found by quickselect: O(n) on
+  average instead of sorting the whole input to read one index. The input is
+  not reordered. `quantileBy` returns the element, not the key.
+- **`sumByDouble(f)` / `sumByInt(f)`** (chain members of the same names, plus
+  async twins). This is `sumBy` with the result already typed, so a
+  `double` field no longer needs `.toDouble()` after every sum. The
+  accumulator starts in the right type, with no per-element int-to-double
+  test. Addition order and rounding are `sumBy`'s.
+
+**`sortBy` / `sortByDesc` are stable on every key type**
+
+Before, only `int` and `double` keys were stable. `String` keys and
+generic or mixed keys went through `List.sort`, which reorders ties once
+the input passes 32 elements. Those paths now tie-break on source index,
+so equal keys keep their input order everywhere, and two chained `sortBy`
+calls (secondary key, then primary) give a two-level order. Code that
+depended on the old, unspecified tie order of a `String`-keyed sort will
+see ties in input order instead.
+
+**Docs**: six new 101 pages (`sumByDouble`, `quantile`, `atLeast`,
+`memoizeLast`, `onChange`, `conflate`), in English and Korean. The
+`debounce`, `retry` and `sortBy` pages cover the additions.
+
 ## 0.9.0
 
 **Breaking: short top-level functions carry an `fx` prefix.** `map(f, xs)`
