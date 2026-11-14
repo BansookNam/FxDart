@@ -291,6 +291,87 @@ Future<bool> fxNoneAsync<A>(
   }
 }
 
+/// Returns true when at least [n] elements satisfy [f]. Stops at the [n]th
+/// match, so the rest of the input is never tested — `fxCountWhere(f, xs) >= n`
+/// says the same thing but walks everything.
+///
+/// `n <= 0` is true without reading anything. `fxAtLeast(1, f, xs)` is
+/// [fxSome].
+///
+/// fxdart extension (not part of FxTS).
+///
+/// ```dart
+/// fxAtLeast(2, (f) => f.schooling, tankFish); // a school needs two
+/// ```
+@pragma('vm:prefer-inline')
+bool fxAtLeast<A>(int n, bool Function(A a) f, Iterable<A> iterable) {
+  if (n <= 0) return true;
+  var seen = 0;
+  if (iterable is List<A>) {
+    final length = iterable.length;
+    for (var i = 0; i < length; i++) {
+      if (f(iterable[i]) && ++seen >= n) return true;
+    }
+    return false;
+  }
+  for (final a in iterable) {
+    if (f(a) && ++seen >= n) return true;
+  }
+  return false;
+}
+
+/// Async counterpart of [fxAtLeast]; cancels upstream at the [n]th match.
+Future<bool> fxAtLeastAsync<A>(
+  int n,
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => _countReaches(n, f, iterable);
+
+/// Returns true when at most [n] elements satisfy [f]. Stops at the
+/// `n + 1`th match, which is where the answer becomes false.
+///
+/// Negative [n] is false without reading anything. `fxAtMost(0, f, xs)` is
+/// [fxNone].
+///
+/// fxdart extension (not part of FxTS).
+///
+/// ```dart
+/// fxAtMost(3, (o) => o.isRival, neighbours); // a crowd starts at four
+/// ```
+@pragma('vm:prefer-inline')
+bool fxAtMost<A>(int n, bool Function(A a) f, Iterable<A> iterable) =>
+    n < 0 ? false : !fxAtLeast(n + 1, f, iterable);
+
+/// Async counterpart of [fxAtMost]; cancels upstream at the `n + 1`th match.
+Future<bool> fxAtMostAsync<A>(
+  int n,
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async => n < 0 ? false : !await _countReaches(n + 1, f, iterable);
+
+Future<bool> _countReaches<A>(
+  int n,
+  FutureOr<bool> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  if (n <= 0) return true;
+  var seen = 0;
+  final iterator = iterable.iterator;
+  try {
+    while (true) {
+      final r = await iterator.next();
+      if (r.done) return false;
+      if (await f(r.value) && ++seen >= n) {
+        fxCancel(iterator);
+        return true;
+      }
+    }
+  } catch (_) {
+    fxCancel(iterator);
+    rethrow;
+  }
+}
+
 /// Returns the first non-null result of [f], or `null` when [f] returns
 /// `null` for every element. Short-circuits.
 ///

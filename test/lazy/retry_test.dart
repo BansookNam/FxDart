@@ -158,4 +158,81 @@ void main() {
       },
     );
   });
+
+  group('fxRetry retryIf / onRetry', () {
+    test('retryIf false rethrows at once, keeping the attempts', () async {
+      final flaky = Flaky(5);
+      await expectLater(
+        fxRetry(5, flaky.call, retryIf: (e) => e is! StateError),
+        throwsStateError,
+      );
+      expect(flaky.calls, 1);
+    });
+
+    test('retryIf true retries as before', () async {
+      final flaky = Flaky(2);
+      expect(await fxRetry(3, flaky.call, retryIf: (e) => true), 'ok');
+      expect(flaky.calls, 3);
+    });
+
+    test('onRetry sees every retried failure, not the final one', () async {
+      final log = <(String, int)>[];
+      final flaky = Flaky(9);
+      await expectLater(
+        fxRetry(
+          3,
+          flaky.call,
+          onRetry: (e, failed) async => log.add(('$e', failed)),
+        ),
+        throwsStateError,
+      );
+      expect(log, [('Bad state: boom 1', 1), ('Bad state: boom 2', 2)]);
+    });
+
+    test('onRetry runs before the delay', () async {
+      final order = <String>[];
+      final flaky = Flaky(1);
+      await fxRetry(
+        2,
+        flaky.call,
+        delay: (failed) {
+          order.add('delay');
+          return Duration.zero;
+        },
+        onRetry: (_, _) => order.add('onRetry'),
+      );
+      expect(order, ['onRetry', 'delay']);
+    });
+
+    test('mapRetry passes both through, per element', () async {
+      final seen = <int>[];
+      final out = await fx([1, 2, 3])
+          .mapRetry(
+            2,
+            (x) {
+              if (x == 2 && !seen.contains(2)) {
+                seen.add(2);
+                throw StateError('once');
+              }
+              return x * 10;
+            },
+            retryIf: (e) => e is StateError,
+            onRetry: (_, failed) => seen.add(-failed),
+          )
+          .toList();
+      expect(out, [10, 20, 30]);
+      expect(seen, [2, -1]);
+
+      await expectLater(
+        fxAsync(fxToAsync([1]))
+            .mapRetry(
+              3,
+              (_) => throw ArgumentError('no'),
+              retryIf: (e) => e is StateError,
+            )
+            .toList(),
+        throwsArgumentError,
+      );
+    });
+  });
 }
