@@ -17,6 +17,8 @@ import 'map.dart';
 /// delay — the place to log it or to drop a broken connection. The final
 /// failure is not reported there; it is the error the returned future
 /// completes with.
+/// An error thrown by [onRetry] itself ends the loop: the returned future
+/// completes with that error, and no further attempts run.
 ///
 /// fxdart extension (not part of FxTS), after Rx's `retry`/`retryWhen`.
 /// To retry a whole pipeline, wrap its terminal:

@@ -212,6 +212,10 @@ R Function(A) fxMemoize<A, R>(R Function(A) f) {
 /// [equals] for value comparison (`(a, b) => a == b`), or to compare a
 /// record key field by field.
 ///
+/// `identical` misses on values that are equal but not the same instance —
+/// a `String` built at runtime, a freshly created record. For those pass
+/// `equals: (a, b) => a == b`.
+///
 /// Memoize only functions whose result depends on the argument alone — a
 /// function that also reads the clock or a mutable field returns a stale
 /// value from the slot.

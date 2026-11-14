@@ -251,15 +251,18 @@ class OnChange<T> {
 
   /// Runs the wrapped function with [arg] unless [arg] equals the argument
   /// of the last call that ran it. The first call always runs.
+  ///
+  /// [arg] becomes the last argument only once the wrapped function returns:
+  /// when it throws, the next call with the same value runs it again.
   void call(T arg) {
     if (_seen) {
       final last = _last as T;
       final equals = _equals;
       if (equals == null ? last == arg : equals(last, arg)) return;
     }
+    _func(arg);
     _last = arg;
     _seen = true;
-    _func(arg);
   }
 
   /// Forgets the last argument, so the next call runs whatever it carries.
@@ -292,7 +295,7 @@ OnChange<T> fxOnChange<T>(
 
 /// A conflating async runner, as returned by [fxConflate].
 class Conflated<T> {
-  final Future<void> Function(T value) _run;
+  final FutureOr<void> Function(T value) _run;
   final void Function(Object error, StackTrace stackTrace)? _onError;
   bool _running = false;
   bool _hasNext = false;
@@ -317,13 +320,18 @@ class Conflated<T> {
     Future<void>.sync(() => _run(value)).then(
       (_) => _done(),
       onError: (Object e, StackTrace st) {
-        final onError = _onError;
-        if (onError != null) {
-          onError(e, st);
-        } else {
-          Zone.current.handleUncaughtError(e, st);
+        // `finally`: an `onError` that throws must not leave the runner
+        // stuck in `_running` (its error still reaches the zone).
+        try {
+          final onError = _onError;
+          if (onError != null) {
+            onError(e, st);
+          } else {
+            Zone.current.handleUncaughtError(e, st);
+          }
+        } finally {
+          _done();
         }
-        _done();
       },
     );
   }
@@ -385,6 +393,6 @@ class Conflated<T> {
 /// // seeks one after another, each to wherever the thumb is now
 /// ```
 Conflated<T> fxConflate<T>(
-  Future<void> Function(T value) run, {
+  FutureOr<void> Function(T value) run, {
   void Function(Object error, StackTrace stackTrace)? onError,
 }) => Conflated._(run, onError);

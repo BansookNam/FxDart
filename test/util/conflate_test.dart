@@ -88,5 +88,32 @@ void main() {
       await pumpEventQueue();
       expect(errors.single, isA<StateError>());
     });
+
+    test('an onError that throws does not wedge the runner', () async {
+      final ran = <int>[];
+      final errors = <Object>[];
+      await runZonedGuarded(() async {
+        final c = fxConflate<int>((v) async {
+          if (v == 1) throw StateError('run');
+          ran.add(v);
+        }, onError: (e, st) => throw ArgumentError('handler'));
+        c(1);
+        await pumpEventQueue();
+        expect(c.isRunning, isFalse);
+        c(2);
+        await c.idle;
+      }, (e, _) => errors.add(e));
+      await pumpEventQueue();
+      expect(ran, [2]);
+      expect(errors.single, isA<ArgumentError>());
+    });
+
+    test('accepts a sync run', () async {
+      final ran = <int>[];
+      final c = fxConflate<int>(ran.add);
+      c(1);
+      await c.idle;
+      expect(ran, [1]);
+    });
   });
 }

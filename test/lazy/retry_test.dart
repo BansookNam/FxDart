@@ -234,5 +234,19 @@ void main() {
         throwsArgumentError,
       );
     });
+
+    group('fxRetry onRetry errors', () {
+      test('an onRetry that throws ends the loop with its error', () async {
+        var runs = 0;
+        await expectLater(
+          fxRetry<int>(3, () {
+            runs++;
+            throw StateError('run');
+          }, onRetry: (e, failed) => throw ArgumentError('log')),
+          throwsArgumentError,
+        );
+        expect(runs, 1);
+      });
+    });
   });
 }

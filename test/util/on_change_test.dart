@@ -49,5 +49,16 @@ void main() {
       f(1);
       expect(seen, [1]);
     });
+
+    test('a call that throws is not recorded as the last argument', () {
+      var calls = 0;
+      final f = fxOnChange<int>((_) {
+        if (++calls == 1) throw StateError('first');
+      });
+      expect(() => f(5), throwsStateError);
+      f(5);
+      f(5);
+      expect(calls, 2);
+    });
   });
 }
