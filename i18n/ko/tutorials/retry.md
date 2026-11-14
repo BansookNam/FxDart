@@ -43,6 +43,17 @@ nextLabel: timeout
     실행됩니다.
   </p>
   <p>
+    모든 에러가 다시 실행할 가치가 있는 것은 아닙니다. <code>retryIf</code>는
+    에러를 받아 판단합니다. <code>false</code>를 반환하면 즉시 다시
+    던집니다 — 지연도 없고 시도 횟수도 쓰지 않습니다. 그래서 타임아웃은
+    재시도하고, 404나 파싱 에러는 곧바로 실패합니다. <code>onRetry</code>는
+    재시도<em>될</em> 모든 실패마다, 지연 전에 에러와 실패 횟수를 받아
+    호출됩니다. 로그를 남기거나, 다음 실행 전에 망가진 연결을 끊기에
+    알맞은 자리입니다. 마지막 실패는 여기로 보고되지 않습니다. 그것은 호출이
+    완료될 때 내는 에러이기 때문입니다. <code>mapRetry</code>는 둘 다 원소
+    단위로 받습니다.
+  </p>
+  <p>
     Dart 고유의 추가 기능입니다(FxTS에는 대응물이 없습니다). Rx의
     <code>retry</code>/<code>retryWhen</code>을 따르되, "재구독"이
     "이터러블을 다시 만든다"를 뜻하는 pull 모델에 맞춰 다시
@@ -57,6 +68,9 @@ nextLabel: timeout
 
   <h2>데모 2 · concurrent 아래의 mapRetry</h2>
   {{playground:1}}
+
+  <h2>데모 3 · retryIf와 onRetry</h2>
+  {{playground:3}}
 
   <h2>직접 해 보기</h2>
   <p>연습: 불안정한 행이 있어도 임포트가 살아남게 만들어 보세요.</p>

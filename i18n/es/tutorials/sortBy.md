@@ -44,10 +44,18 @@ nextLabel: sortByDesc
     es un terminal que devuelve <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
   <p>
-    Para el orden descendente usa <a href="sortByDesc.html"><code>sortByDesc</code></a>.
-    Para una ordenación por varias claves, vuelve
-    a <code>sort</code> con un comparador explícito — <code>sortBy</code>
-    solo cubre el caso habitual de «ascendente por una clave extraída».
+    <code>sortBy</code> es <strong>estable</strong>: los elementos con claves
+    iguales conservan el orden en que llegaron, sea cual sea el tipo de la
+    clave. (Antes de 0.9.1 eso solo valía para claves <code>int</code> y
+    <code>double</code> — las claves <code>String</code> y las demás pasaban
+    por <code>List.sort</code>, que puede reordenar los empates.) La
+    estabilidad es lo que permite un orden de dos niveles sin comparador:
+    ordena por la clave secundaria y después por la principal.
+  </p>
+  <p>
+    Para el orden descendente usa <a href="sortByDesc.html"><code>sortByDesc</code></a>,
+    que también es estable. Para cualquier cosa más allá de encadenar claves
+    simples, vuelve a <code>sort</code> con un comparador explícito.
   </p>
 
   <h2>Demo 1 · Fundamentos</h2>
@@ -55,6 +63,9 @@ nextLabel: sortByDesc
 
   <h2>Demo 2 · Asíncrono — ya es un terminal</h2>
   {{playground:1}}
+
+  <h2>Demo 3 · Estable — un orden de dos niveles</h2>
+  {{playground:3}}
 
   <h2>Pruébalo tú</h2>
   <p>Ejercicio: ordena a las personas <strong>por edad</strong>, de menor a mayor.</p>

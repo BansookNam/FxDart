@@ -7,8 +7,8 @@ section: 10
 crumb: memoize
 prev: fxPipe.html
 prevLabel: fxPipe
-next: negate.html
-nextLabel: negate
+next: memoizeLast.html
+nextLabel: memoizeLast
 ---
   <p class="hero-sub">단항 함수의 결과를 인자를 키로 캐싱합니다.</p>
 

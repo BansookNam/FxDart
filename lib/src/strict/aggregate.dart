@@ -516,6 +516,198 @@ Future<num> fxSumByAsync<A>(
   FxAsyncIterable<A> iterable,
 ) => fxFoldAsync<A, num>(0, (acc, a) async => acc + await f(a), iterable);
 
+/// Sums `f(a)` over every element as a `double` — [fxSumBy] for a key that
+/// is always a `double`, so the result needs no `.toDouble()`.
+///
+/// The accumulator is an unboxed `double` from the start, with no
+/// int-then-double switch to test per element. Empty input returns `0.0`.
+/// Same left-to-right addition order as [fxSumBy], so the same rounding.
+///
+/// fxdart extension (not part of FxTS); Kotlin's `sumOf` picks its return
+/// type from the selector the same way.
+///
+/// ```dart
+/// final perHour = sumByDouble((t) => t.goldPerHour, tanks); // double
+/// ```
+@pragma('vm:prefer-inline')
+double sumByDouble<A>(double Function(A a) f, Iterable<A> iterable) {
+  var acc = 0.0;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      acc += f(iterable[i]);
+    }
+    return acc;
+  }
+  for (final a in iterable) {
+    acc += f(a);
+  }
+  return acc;
+}
+
+/// Async counterpart of [sumByDouble].
+Future<double> sumByDoubleAsync<A>(
+  FutureOr<double> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => fxFoldAsync<A, double>(0.0, (acc, a) async => acc + await f(a), iterable);
+
+/// Sums `f(a)` over every element as an `int` — [fxSumBy] for a key that is
+/// always an `int`, so the result needs no `.toInt()`. Empty input returns
+/// `0`.
+///
+/// fxdart extension (not part of FxTS); see [sumByDouble].
+///
+/// ```dart
+/// final fishCount = sumByInt((t) => t.fish.length, tanks); // int
+/// ```
+@pragma('vm:prefer-inline')
+int sumByInt<A>(int Function(A a) f, Iterable<A> iterable) {
+  var acc = 0;
+  if (iterable is List<A>) {
+    final len = iterable.length;
+    for (var i = 0; i < len; i++) {
+      acc += f(iterable[i]);
+    }
+    return acc;
+  }
+  for (final a in iterable) {
+    acc += f(a);
+  }
+  return acc;
+}
+
+/// Async counterpart of [sumByInt].
+Future<int> sumByIntAsync<A>(
+  FutureOr<int> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) => fxFoldAsync<A, int>(0, (acc, a) async => acc + await f(a), iterable);
+
+/// Returns the [q]-quantile of the numbers in [iterable]: the value that
+/// would sit at index `((n - 1) * q).round()` if the input were sorted
+/// ascending. `q = 0` is the minimum, `1` the maximum, `0.5` the median
+/// (the upper one of the two middle values when `n` is even). `null` when
+/// empty.
+///
+/// Found by quickselect on a copy — O(n) on average, against
+/// O(n log n) for sorting the whole input to read one index. The input is
+/// not modified. Values are ordered by `compareTo`, so a `NaN` counts as the
+/// largest value.
+///
+/// Throws [ArgumentError] unless `0 <= q <= 1`.
+///
+/// fxdart extension (not part of FxTS); nearest-rank, like numpy's
+/// `percentile(..., method='nearest')`.
+///
+/// ```dart
+/// fxQuantile(0.5, [7, 1, 5, 3, 9]);  // 5
+/// fxQuantile(0.95, frameTimesMs);    // the p95 frame time
+/// ```
+num? fxQuantile(double q, Iterable<num> iterable) {
+  _checkQuantile(q);
+  final keys = iterable.toList();
+  if (keys.isEmpty) return null;
+  final k = ((keys.length - 1) * q).round();
+  return keys[_select(keys, null, k)];
+}
+
+/// Async counterpart of [fxQuantile].
+Future<num?> fxQuantileAsync(double q, FxAsyncIterable<num> iterable) {
+  _checkQuantile(q);
+  return fxToListAsync(iterable).then((xs) => fxQuantile(q, xs));
+}
+
+/// Returns the element whose key `f(a)` is the [q]-quantile of all keys —
+/// [fxQuantile] over a key, returning the element rather than the number.
+/// [f] runs exactly once per element. `null` when empty.
+///
+/// Among elements with equal keys, which one is returned is unspecified.
+///
+/// fxdart extension (not part of FxTS).
+///
+/// ```dart
+/// final median = fxQuantileBy(0.5, (p) => p.price, products);
+/// ```
+A? fxQuantileBy<A>(double q, num Function(A a) f, Iterable<A> iterable) {
+  _checkQuantile(q);
+  final items = iterable.toList();
+  if (items.isEmpty) return null;
+  final keys = [for (final a in items) f(a)];
+  final idx = [for (var i = 0; i < items.length; i++) i];
+  final k = ((items.length - 1) * q).round();
+  return items[idx[_select(keys, idx, k)]];
+}
+
+/// Async counterpart of [fxQuantileBy].
+Future<A?> fxQuantileByAsync<A>(
+  double q,
+  FutureOr<num> Function(A a) f,
+  FxAsyncIterable<A> iterable,
+) async {
+  _checkQuantile(q);
+  final items = await fxToListAsync(iterable);
+  final keys = <num>[for (final a in items) await f(a)];
+  if (items.isEmpty) return null;
+  final idx = [for (var i = 0; i < items.length; i++) i];
+  final k = ((items.length - 1) * q).round();
+  return items[idx[_select(keys, idx, k)]];
+}
+
+void _checkQuantile(double q) {
+  if (!(q >= 0 && q <= 1)) {
+    throw ArgumentError.value(q, 'q', 'must be between 0 and 1');
+  }
+}
+
+/// Hoare quickselect: reorders [keys] (and [idx] in lockstep, when given)
+/// until position [k] holds the value a full sort would put there, and
+/// returns [k]. Median-of-three pivots keep sorted and reversed input — the
+/// common real shapes — at linear time.
+int _select(List<num> keys, List<int>? idx, int k) {
+  void swap(int i, int j) {
+    final t = keys[i];
+    keys[i] = keys[j];
+    keys[j] = t;
+    if (idx != null) {
+      final u = idx[i];
+      idx[i] = idx[j];
+      idx[j] = u;
+    }
+  }
+
+  var lo = 0;
+  var hi = keys.length - 1;
+  while (lo < hi) {
+    final mid = lo + ((hi - lo) >> 1);
+    if (keys[mid].compareTo(keys[lo]) < 0) swap(mid, lo);
+    if (keys[hi].compareTo(keys[lo]) < 0) swap(hi, lo);
+    if (keys[hi].compareTo(keys[mid]) < 0) swap(hi, mid);
+    final pivot = keys[mid];
+    var i = lo;
+    var j = hi;
+    while (i <= j) {
+      while (keys[i].compareTo(pivot) < 0) {
+        i++;
+      }
+      while (keys[j].compareTo(pivot) > 0) {
+        j--;
+      }
+      if (i <= j) {
+        swap(i, j);
+        i++;
+        j--;
+      }
+    }
+    if (k <= j) {
+      hi = j;
+    } else if (k >= i) {
+      lo = i;
+    } else {
+      return k;
+    }
+  }
+  return k;
+}
+
 /// Async counterpart of [fxSum].
 Future<num> fxSumAsync(FxAsyncIterable<num> iterable) =>
     fxFoldAsync<num, num>(0, (a, b) => a + b, iterable);
@@ -1390,11 +1582,18 @@ int _compareBy<A>(Object? Function(A a) f, A a, A b) =>
 
 /// Returns a new list sorted by the key extractor [f] (ascending).
 ///
+/// **Stable**: elements with equal keys keep their source order, on every
+/// key type (since 0.9.1 — before that, `String` and mixed keys went
+/// through `List.sort`, which is not). So sorting by a secondary key and
+/// then by a primary one gives a two-level order.
+///
 /// Port of FxTS `sortBy`.
 List<A> fxSortBy<A>(Object? Function(A a) f, Iterable<A> iterable) =>
     _sortByImpl(f, iterable, false);
 
 /// Returns a new list sorted by the key extractor [f], descending.
+///
+/// Stable like [fxSortBy]: equal keys keep their source order.
 ///
 /// The symmetric twin of [fxSortBy] (Kotlin's `sortedByDescending`) — works
 /// for any comparable key, unlike the numeric-only `sortBy((a) => -key)`
@@ -1481,10 +1680,20 @@ List<A> _sortByImpl<A>(
       sk[i] = k;
     }
     final indices = [for (var i = 0; i < length; i++) i];
+    // `List.sort` is not stable, so equal keys tie-break on source index —
+    // which is what makes every `fxSortBy` path stable, not only the
+    // numeric ones. Descending flips the key order but keeps the index
+    // order: equal keys stay in source order either way.
     indices.sort(
       desc
-          ? (i, j) => sk[j].compareTo(sk[i])
-          : (i, j) => sk[i].compareTo(sk[j]),
+          ? (i, j) {
+              final c = sk[j].compareTo(sk[i]);
+              return c != 0 ? c : i - j;
+            }
+          : (i, j) {
+              final c = sk[i].compareTo(sk[j]);
+              return c != 0 ? c : i - j;
+            },
     );
     return [for (final i in indices) items[i]];
   }
@@ -1522,10 +1731,17 @@ List<A> _sortSpilled<A>(
 
 List<A> _sortByKeys<A>(List<A> items, List<Object?> keys, bool desc) {
   final indices = [for (var i = 0; i < items.length; i++) i];
+  // Index tie-break for stability; see the String path above.
   indices.sort(
     desc
-        ? (i, j) => _compareKeys(keys[j], keys[i])
-        : (i, j) => _compareKeys(keys[i], keys[j]),
+        ? (i, j) {
+            final c = _compareKeys(keys[j], keys[i]);
+            return c != 0 ? c : i - j;
+          }
+        : (i, j) {
+            final c = _compareKeys(keys[i], keys[j]);
+            return c != 0 ? c : i - j;
+          },
   );
   return [for (final i in indices) items[i]];
 }

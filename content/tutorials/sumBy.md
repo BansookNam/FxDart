@@ -7,8 +7,8 @@ section: 7
 crumb: sumBy
 prev: sum.html
 prevLabel: sum
-next: average.html
-nextLabel: average
+next: sumByDouble.html
+nextLabel: sumByDouble
 ---
   <p class="hero-sub">Sum a key of every element — <code>map</code> + <code>sum</code> in one step, <code>0</code> when empty.</p>
 

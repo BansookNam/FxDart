@@ -1,0 +1,1 @@
+R Function(A) fxMemoizeLast&lt;A, R&gt;(R Function(A) f, {bool Function(A previous, A next) equals = identical})

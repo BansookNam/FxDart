@@ -7,8 +7,8 @@ section: 8
 crumb: any
 prev: every.html
 prevLabel: every
-next: predicates.html
-nextLabel: predicates
+next: atLeast.html
+nextLabel: atLeast
 ---
   <p class="hero-sub">원소 중 하나라도 술어를 만족하면 true — 빈 이터러블이면 false입니다.</p>
 

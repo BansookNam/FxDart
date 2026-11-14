@@ -9,25 +9,42 @@ import 'map.dart';
 /// run, waits [delay] (called with the number of failures so far, starting
 /// at 1 — return a growing [Duration] for backoff).
 ///
+/// [retryIf] decides which errors are worth another run: when it returns
+/// false the error is rethrown at once, without waiting and without
+/// spending the remaining attempts — a 404 or a parse error will not get
+/// better on the second try. [onRetry] is called with the error and the
+/// failure count for every failure that **will** be retried, before the
+/// delay — the place to log it or to drop a broken connection. The final
+/// failure is not reported there; it is the error the returned future
+/// completes with.
+/// An error thrown by [onRetry] itself ends the loop: the returned future
+/// completes with that error, and no further attempts run.
+///
 /// fxdart extension (not part of FxTS), after Rx's `retry`/`retryWhen`.
 /// To retry a whole pipeline, wrap its terminal:
 /// `fxRetry(3, () => fxAsync(source()).map(parse).toList())`.
 ///
 /// ```dart
 /// final user = await fxRetry(3, () => api.fetchUser(id),
-///     delay: (failed) => Duration(milliseconds: 100 * failed));
+///     delay: (failed) => Duration(milliseconds: 100 * failed),
+///     retryIf: (e) => e is SocketException || e is TimeoutException,
+///     onRetry: (e, failed) => log('fetchUser failed ($failed): $e'));
 /// ```
 Future<T> fxRetry<T>(
   int attempts,
   FutureOr<T> Function() f, {
   Duration Function(int failed)? delay,
+  bool Function(Object error)? retryIf,
+  FutureOr<void> Function(Object error, int failed)? onRetry,
 }) async {
   _checkAttempts(attempts);
   for (var attempt = 1; ; attempt++) {
     try {
       return await f();
-    } catch (_) {
+    } catch (e) {
       if (attempt >= attempts) rethrow;
+      if (retryIf != null && !retryIf(e)) rethrow;
+      if (onRetry != null) await onRetry(e, attempt);
       final wait = delay?.call(attempt);
       if (wait != null && wait > Duration.zero) {
         await Future<void>.delayed(wait);
@@ -47,7 +64,8 @@ void _checkAttempts(int attempts) {
 /// composes with `concurrent`, and each in-flight value retries
 /// independently.
 ///
-/// fxdart extension (not part of FxTS) — the per-element form of [fxRetry].
+/// fxdart extension (not part of FxTS) — the per-element form of [fxRetry];
+/// [retryIf] and [onRetry] apply to each element's runs.
 ///
 /// ```dart
 /// await fxAsync(fxToAsync(urls))
@@ -61,10 +79,18 @@ FxAsyncIterable<R> fxMapRetryAsync<A, R>(
   FutureOr<R> Function(A a) f,
   FxAsyncIterable<A> iterable, {
   Duration Function(int failed)? delay,
+  bool Function(Object error)? retryIf,
+  FutureOr<void> Function(Object error, int failed)? onRetry,
 }) {
   _checkAttempts(attempts);
   return fxMapAsync(
-    (A a) => fxRetry(attempts, () => f(a), delay: delay),
+    (A a) => fxRetry(
+      attempts,
+      () => f(a),
+      delay: delay,
+      retryIf: retryIf,
+      onRetry: onRetry,
+    ),
     iterable,
   );
 }

@@ -44,10 +44,18 @@ nextLabel: sortByDesc
     <code>Future&lt;List&lt;T&gt;&gt;</code>를 반환하는 종결 연산자입니다.
   </p>
   <p>
+    <code>sortBy</code>는 <strong>안정</strong> 정렬입니다. 키가 같은 원소들은
+    키 타입과 상관없이 들어온 순서를 유지합니다. (0.9.1 이전에는
+    <code>int</code>와 <code>double</code> 키에서만 그랬습니다 —
+    <code>String</code>을 비롯한 다른 키는 <code>List.sort</code>를 거쳤고,
+    그 정렬은 같은 키끼리의 순서를 바꿔도 됩니다.) 안정성 덕분에
+    비교자 없이도 두 단계 정렬이 가능합니다. 보조 키로 먼저 정렬한 뒤, 주 키로
+    정렬하면 됩니다.
+  </p>
+  <p>
     내림차순은 <a href="sortByDesc.html"><code>sortByDesc</code></a>를 쓰세요.
-    다중 키 정렬이 필요하다면 비교자를 명시하는
-    <code>sort</code>로 내려가세요. <code>sortBy</code>는 "추출한 키
-    하나로 오름차순"이라는 흔한 경우만 다룹니다.
+    이것도 안정 정렬입니다. 단일 키를 이어 붙이는 것 이상이 필요하다면 비교자를
+    명시하는 <code>sort</code>로 내려가세요.
   </p>
 
   <h2>데모 1 · 기본</h2>
@@ -55,6 +63,9 @@ nextLabel: sortByDesc
 
   <h2>데모 2 · 비동기 — 이미 종결 연산자</h2>
   {{playground:1}}
+
+  <h2>데모 3 · 안정 정렬 — 두 단계 순서</h2>
+  {{playground:3}}
 
   <h2>직접 해 보기</h2>
   <p>연습: 사람들을 <strong>나이순</strong>으로, 어린 사람이 먼저 오도록 정렬해 보세요.</p>

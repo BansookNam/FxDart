@@ -68,7 +68,11 @@ Never Function(T) fxThrowError<T>(Object Function(T) toError) =>
 /// [value] unchanged.
 ///
 /// Port of FxTS `fxThrowIf`.
-T fxThrowIf<T>(bool Function(T) predicate, Object Function(T) toError, T value) {
+T fxThrowIf<T>(
+  bool Function(T) predicate,
+  Object Function(T) toError,
+  T value,
+) {
   if (predicate(value)) throw toError(value);
   return value;
 }
@@ -143,7 +147,8 @@ R Function(A a) fxPipe<A, R>(R Function(A a) f) => f;
 extension FxPipeThen<A, R> on R Function(A a) {
   /// Runs [next] after `this`. The returned function is the chain so far.
   @pragma('vm:prefer-inline')
-  S Function(A a) then<S>(S Function(R r) next) => (A a) => next(this(a));
+  S Function(A a) then<S>(S Function(R r) next) =>
+      (A a) => next(this(a));
 }
 
 /// One-closure [fxPipe] of two stages. Prefer this over
@@ -194,6 +199,58 @@ R Function(A) fxMemoize<A, R>(R Function(A) f) {
   return (a) => cache.putIfAbsent(a, () => f(a));
 }
 
+/// Wraps [f] in a one-slot cache: a call whose argument matches the previous
+/// call's returns the previous result without running [f]; any other
+/// argument runs [f] and replaces the slot.
+///
+/// Arguments are compared with [identical] by default, which is the right
+/// test for **immutable state objects**: a new state is a new instance, so a
+/// changed state always recomputes, and an unchanged one is recognised in
+/// O(1) without hashing or deep `==`. That is the case [fxMemoize] handles
+/// badly — it keeps every argument it has ever seen, so memoizing over a
+/// state that is replaced on every tick grows the cache on every tick. Pass
+/// [equals] for value comparison (`(a, b) => a == b`), or to compare a
+/// record key field by field.
+///
+/// `identical` misses on values that are equal but not the same instance —
+/// a `String` built at runtime, a freshly created record. For those pass
+/// `equals: (a, b) => a == b`.
+///
+/// Memoize only functions whose result depends on the argument alone — a
+/// function that also reads the clock or a mutable field returns a stale
+/// value from the slot.
+///
+/// fxdart extension (not part of FxTS), after reselect's
+/// `defaultMemoize` / lodash's `memoizeOne` idea.
+///
+/// ```dart
+/// final beautyOf = fxMemoizeLast((AquariumState s) => computeBeauty(s));
+/// beautyOf(state); // computes
+/// beautyOf(state); // same instance → cached
+/// beautyOf(state.copyWith(gold: 1)); // new instance → computes
+///
+/// // Two arguments: a record key, compared per field.
+/// final cardFor = fxMemoizeLast<(State, String), Card>(
+///     (k) => buildCard(k.$1, k.$2),
+///     equals: (a, b) => identical(a.$1, b.$1) && a.$2 == b.$2);
+/// ```
+R Function(A) fxMemoizeLast<A, R>(
+  R Function(A) f, {
+  bool Function(A previous, A next) equals = identical,
+}) {
+  late A lastArg;
+  late R lastResult;
+  var filled = false;
+  return (a) {
+    if (filled && equals(lastArg, a)) return lastResult;
+    final r = f(a);
+    lastArg = a;
+    lastResult = r;
+    filled = true;
+    return r;
+  };
+}
+
 /// Returns a [Future] that completes with [value] after [wait].
 ///
 /// Port of FxTS `delay`.
@@ -201,7 +258,8 @@ R Function(A) fxMemoize<A, R>(R Function(A) f) {
 /// ```dart
 /// await fxDelay(Duration(seconds: 1), 'a'); // 'a' after 1s
 /// ```
-Future<T> fxDelay<T>(Duration wait, T value) => Future.delayed(wait, () => value);
+Future<T> fxDelay<T>(Duration wait, T value) =>
+    Future.delayed(wait, () => value);
 
 /// Returns a [Future] that completes after [wait].
 Future<void> fxSleep(Duration wait) => Future.delayed(wait);

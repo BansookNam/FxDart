@@ -428,8 +428,11 @@ FxAsyncIterable<A> _$defaultIfEmptyAsync<A>(
 // lazy/effect.dart (0.7.2)
 FxAsyncIterable<R> _$fxMapRetryAsync<A, R>(
         int attempts, FutureOr<R> Function(A a) f, FxAsyncIterable<A> iterable,
-        {Duration Function(int failed)? delay}) =>
-    fxMapRetryAsync(attempts, f, iterable, delay: delay);
+        {Duration Function(int failed)? delay,
+        bool Function(Object error)? retryIf,
+        FutureOr<void> Function(Object error, int failed)? onRetry}) =>
+    fxMapRetryAsync(attempts, f, iterable,
+        delay: delay, retryIf: retryIf, onRetry: onRetry);
 Iterable<R> _$fxMapCatching<A, R>(R Function(A a) f,
         R Function(Object error, StackTrace stackTrace) onError,
         Iterable<A> iterable) =>
@@ -513,6 +516,24 @@ num _$fxSumBy<A>(num Function(A a) f, Iterable<A> iterable) =>
 Future<num> _$fxSumByAsync<A>(
         FutureOr<num> Function(A a) f, FxAsyncIterable<A> iterable) =>
     fxSumByAsync(f, iterable);
+double _$sumByDouble<A>(double Function(A a) f, Iterable<A> iterable) =>
+    sumByDouble(f, iterable);
+Future<double> _$sumByDoubleAsync<A>(
+        FutureOr<double> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sumByDoubleAsync(f, iterable);
+int _$sumByInt<A>(int Function(A a) f, Iterable<A> iterable) =>
+    sumByInt(f, iterable);
+Future<int> _$sumByIntAsync<A>(
+        FutureOr<int> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    sumByIntAsync(f, iterable);
+num? _$fxQuantile(double q, Iterable<num> iterable) => fxQuantile(q, iterable);
+Future<num?> _$fxQuantileAsync(double q, FxAsyncIterable<num> iterable) =>
+    fxQuantileAsync(q, iterable);
+A? _$fxQuantileBy<A>(double q, num Function(A a) f, Iterable<A> iterable) =>
+    fxQuantileBy(q, f, iterable);
+Future<A?> _$fxQuantileByAsync<A>(double q, FutureOr<num> Function(A a) f,
+        FxAsyncIterable<A> iterable) =>
+    fxQuantileByAsync(q, f, iterable);
 num _$fxProductBy<A>(num Function(A a) f, Iterable<A> iterable) =>
     fxProductBy(f, iterable);
 Future<num> _$fxProductByAsync<A>(
@@ -636,6 +657,16 @@ bool _$fxNone<A>(bool Function(A a) f, Iterable<A> iterable) =>
 Future<bool> _$fxNoneAsync<A>(
         FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
     fxNoneAsync(f, iterable);
+bool _$fxAtLeast<A>(int n, bool Function(A a) f, Iterable<A> iterable) =>
+    fxAtLeast(n, f, iterable);
+Future<bool> _$fxAtLeastAsync<A>(
+        int n, FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    fxAtLeastAsync(n, f, iterable);
+bool _$fxAtMost<A>(int n, bool Function(A a) f, Iterable<A> iterable) =>
+    fxAtMost(n, f, iterable);
+Future<bool> _$fxAtMostAsync<A>(
+        int n, FutureOr<bool> Function(A a) f, FxAsyncIterable<A> iterable) =>
+    fxAtMostAsync(n, f, iterable);
 bool _$fxSequenceEqual<A>(
         Iterable<A> a, Iterable<A> b, [bool Function(A, A)? eq]) =>
     fxSequenceEqual(a, b, eq);

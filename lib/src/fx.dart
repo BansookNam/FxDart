@@ -441,14 +441,23 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// Switches to the async chain and maps [f], retrying each call up to
   /// [attempts] times (with optional [delay] backoff) before the error
-  /// propagates.
+  /// propagates. [retryIf] and [onRetry] are [fxRetry]'s.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapRetry<R>(
     int attempts,
     FutureOr<R> Function(T a) f, {
     Duration Function(int failed)? delay,
+    bool Function(Object error)? retryIf,
+    FutureOr<void> Function(Object error, int failed)? onRetry,
   }) => FxAsync(
-    l.fxMapRetryAsync(attempts, f, async_.fxToAsync(_inner), delay: delay),
+    l.fxMapRetryAsync(
+      attempts,
+      f,
+      async_.fxToAsync(_inner),
+      delay: delay,
+      retryIf: retryIf,
+      onRetry: onRetry,
+    ),
   );
 
   // --- terminal operators -------------------------------------------------
@@ -522,6 +531,14 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
   @pragma('vm:prefer-inline')
   bool none(bool Function(T a) f) => s.fxNone(f, _inner);
 
+  /// Whether [f] holds for at least [n] values; stops at the [n]th match.
+  @pragma('vm:prefer-inline')
+  bool atLeast(int n, bool Function(T a) f) => s.fxAtLeast(n, f, _inner);
+
+  /// Whether [f] holds for at most [n] values; stops at the `n + 1`th match.
+  @pragma('vm:prefer-inline')
+  bool atMost(int n, bool Function(T a) f) => s.fxAtMost(n, f, _inner);
+
   /// The first value [f] matches, or `null`.
   T? find(bool Function(T a) f) => s.fxFind(f, _inner);
 
@@ -556,6 +573,18 @@ extension type Fx<T>(Iterable<T> _inner) implements Iterable<T> {
 
   /// The sum of [f] over every value.
   num sumBy(num Function(T a) f) => s.fxSumBy(f, _inner);
+
+  /// The sum of [f] over every value, as a `double`; `0.0` when empty.
+  @pragma('vm:prefer-inline')
+  double sumByDouble(double Function(T a) f) => s.sumByDouble(f, _inner);
+
+  /// The sum of [f] over every value, as an `int`; `0` when empty.
+  @pragma('vm:prefer-inline')
+  int sumByInt(int Function(T a) f) => s.sumByInt(f, _inner);
+
+  /// The value whose key [f] is the [q]-quantile of all keys, or `null` if
+  /// empty. See the top-level `fxQuantileBy`.
+  T? quantileBy(double q, num Function(T a) f) => s.fxQuantileBy(q, f, _inner);
 
   /// The product of [f] over every value; `1` when empty.
   num productBy(num Function(T a) f) => s.fxProductBy(f, _inner);
@@ -725,6 +754,10 @@ extension FxNum on Fx<num> {
   /// The product of every value; `1` when empty.
   @pragma('vm:prefer-inline')
   num product() => s.fxProduct(_inner);
+
+  /// The [q]-quantile (nearest rank), or `null` if empty. See the top-level
+  /// `fxQuantile`.
+  num? quantile(double q) => s.fxQuantile(q, _inner);
 
   /// The smallest value under `num.compareTo` ordering.
   ///
@@ -945,13 +978,25 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// Maps [f], retrying each call up to [attempts] times (with optional
   /// [delay] backoff) before the error propagates. Retries compose with
-  /// [concurrent]: each in-flight value retries independently.
+  /// [concurrent]: each in-flight value retries independently. [retryIf]
+  /// and [onRetry] are [fxRetry]'s.
   @pragma('vm:prefer-inline')
   FxAsync<R> mapRetry<R>(
     int attempts,
     FutureOr<R> Function(T a) f, {
     Duration Function(int failed)? delay,
-  }) => FxAsync(l.fxMapRetryAsync(attempts, f, _inner, delay: delay));
+    bool Function(Object error)? retryIf,
+    FutureOr<void> Function(Object error, int failed)? onRetry,
+  }) => FxAsync(
+    l.fxMapRetryAsync(
+      attempts,
+      f,
+      _inner,
+      delay: delay,
+      retryIf: retryIf,
+      onRetry: onRetry,
+    ),
+  );
 
   /// Fails a pull with a [TimeoutException] when the upstream takes longer
   /// than [limit] to produce it (per pull, not whole-pipeline).
@@ -1169,6 +1214,16 @@ class FxAsync<T> implements FxAsyncIterable<T> {
   /// Whether [f] holds for no value.
   Future<bool> none(FutureOr<bool> Function(T a) f) => s.fxNoneAsync(f, _inner);
 
+  /// Whether [f] holds for at least [n] values; cancels upstream at the
+  /// [n]th match.
+  Future<bool> atLeast(int n, FutureOr<bool> Function(T a) f) =>
+      s.fxAtLeastAsync(n, f, _inner);
+
+  /// Whether [f] holds for at most [n] values; cancels upstream at the
+  /// `n + 1`th match.
+  Future<bool> atMost(int n, FutureOr<bool> Function(T a) f) =>
+      s.fxAtMostAsync(n, f, _inner);
+
   /// True when this chain and [other] yield the same values in the same
   /// order. Optional [eq] replaces `==`. After Rx's `sequenceEqual`.
   Future<bool> sequenceEqual(
@@ -1206,6 +1261,19 @@ class FxAsync<T> implements FxAsyncIterable<T> {
 
   /// The sum of [f] over every value.
   Future<num> sumBy(FutureOr<num> Function(T a) f) => s.fxSumByAsync(f, _inner);
+
+  /// The sum of [f] over every value, as a `double`; `0.0` when empty.
+  Future<double> sumByDouble(FutureOr<double> Function(T a) f) =>
+      s.sumByDoubleAsync(f, _inner);
+
+  /// The sum of [f] over every value, as an `int`; `0` when empty.
+  Future<int> sumByInt(FutureOr<int> Function(T a) f) =>
+      s.sumByIntAsync(f, _inner);
+
+  /// The value whose key [f] is the [q]-quantile of all keys, or `null` if
+  /// empty.
+  Future<T?> quantileBy(double q, FutureOr<num> Function(T a) f) =>
+      s.fxQuantileByAsync(q, f, _inner);
 
   /// The product of [f] over every value; `1` when empty.
   Future<num> productBy(FutureOr<num> Function(T a) f) =>
@@ -1327,6 +1395,9 @@ extension FxAsyncNum on FxAsync<num> {
 
   /// The product of every value; `1` when empty.
   Future<num> product() => s.fxProductAsync(this);
+
+  /// The [q]-quantile (nearest rank), or `null` if empty.
+  Future<num?> quantile(double q) => s.fxQuantileAsync(q, this);
 
   /// The smallest value.
   Future<num> min() => s.fxMinAsync(this);

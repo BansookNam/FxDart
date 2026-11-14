@@ -7,8 +7,8 @@ section: 12
 crumb: throttle
 prev: debounce.html
 prevLabel: debounce
-next: shuffle.html
-nextLabel: shuffle
+next: onChange.html
+nextLabel: onChange
 ---
   <p class="hero-sub">Invoca una función como máximo una vez por periodo de espera — a un ritmo fijo, a diferencia del «esperar a que haya calma» de debounce.</p>
 

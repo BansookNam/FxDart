@@ -5,8 +5,8 @@ description: FxDart type predicates: fxIsNull, fxIsBool, fxIsNum, fxIsString, is
 heading: <code>predicates</code>
 section: 8
 crumb: predicates
-prev: some.html
-prevLabel: some
+prev: atLeast.html
+prevLabel: atLeast
 next: fromEntries.html
 nextLabel: fromEntries
 ---

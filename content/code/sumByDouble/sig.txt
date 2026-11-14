@@ -1,0 +1,8 @@
+double sumByDouble&lt;A&gt;(double Function(A a) f, Iterable&lt;A&gt; iterable)
+int sumByInt&lt;A&gt;(int Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;double&gt; sumByDoubleAsync&lt;A&gt;(FutureOr&lt;double&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;int&gt; sumByIntAsync&lt;A&gt;(FutureOr&lt;int&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+double Fx&lt;T&gt;.sumByDouble(double Function(T a) f)                       // chain (sync)
+int Fx&lt;T&gt;.sumByInt(int Function(T a) f)                                // chain (sync)
+Future&lt;double&gt; FxAsync&lt;T&gt;.sumByDouble(FutureOr&lt;double&gt; Function(T a) f) // chain (async)
+Future&lt;int&gt; FxAsync&lt;T&gt;.sumByInt(FutureOr&lt;int&gt; Function(T a) f)          // chain (async)

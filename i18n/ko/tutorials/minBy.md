@@ -7,8 +7,8 @@ section: 7
 crumb: minBy
 prev: maxBy.html
 prevLabel: maxBy
-next: size.html
-nextLabel: count
+next: quantile.html
+nextLabel: quantile
 ---
   <p class="hero-sub">키가 가장 작은 원소 — 한 번의 순회, 정렬 없이, 비어 있으면 <code>null</code>입니다.</p>
 

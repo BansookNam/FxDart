@@ -38,6 +38,18 @@ nextLabel: throttle
     호출이 즉시 발화하고, 다음 잠잠해지는 구간이 올 때까지의 나머지 호출은
     모두 억제됩니다.
   </p>
+  <p>
+    실제 앱의 debounce에는 여기에 두 가지가 더 필요합니다.
+    <code>maxWait</code>는 호출이 실행을 계속 미룰 수 있는 시간에 상한을
+    둡니다. 멈추지 않고 끌리는 슬라이더는 그대로라면 영영 저장되지 않지만,
+    <code>maxWait: 2s</code>를 주면 적어도 2초마다 최신 값을 저장합니다.
+    그리고 <code>.flush()</code>는 대기 중인 호출을 <em>지금</em> 실행합니다 —
+    앱 일시 정지나 <code>dispose</code> 훅에서 원하는 동작입니다.
+    <code>.cancel()</code>은 마지막 값을 잃어버리고, 타이머는 끝내 발화할
+    기회를 얻지 못할 수도 있기 때문입니다. <code>.isPending</code>은 flush할
+    것이 있는지 알려 줍니다. 이 셋은 fxdart의 추가 기능이며(lodash를
+    따름), FxTS의 <code>debounce</code>에는 <code>cancel</code>만 있습니다.
+  </p>
 
   <h2>데모 1 · 트레일링 에지(기본 동작)</h2>
   <p>빠르게 이어진 세 번의 호출이 하나로 합쳐지고, 마지막 인자만 남습니다.</p>
@@ -49,6 +61,13 @@ nextLabel: throttle
     <code>.cancel()</code>은 대기 중인 트레일링 호출을 통째로 버립니다.
   </p>
   {{playground:1}}
+
+  <h2>데모 3 · maxWait와 flush()</h2>
+  <p>
+    멈추지 않는 드래그도 <code>maxWait</code> 주기에 맞춰 저장되고,
+    <code>flush()</code>는 앱이 사라지기 전에 마지막 값을 기록합니다.
+  </p>
+  {{playground:4}}
 
   <h2>메서드 표기</h2>
   <p>
@@ -88,6 +107,8 @@ save('hello');   // only this one reaches _post</code></pre>
   <div class="callout">
     <strong>관련 항목:</strong>
     <a href="throttle.html"><code>fxThrottle</code></a> — 잠잠해진 뒤가 아니라 일정 주기로 발화 ·
+    <a href="onChange.html"><code>fxOnChange</code></a> — 값이 바뀌지 않은 호출은 건너뛰기 ·
+    <a href="conflate.html"><code>fxConflate</code></a> — 비동기 실행은 한 번에 하나, 다음은 최신 값으로 ·
     <a href="delay.html"><code>fxDelay</code> &amp; <code>fxSleep</code></a> — 타이밍 데모를 만드는 재료 ·
     <a href="concurrent.html"><code>concurrent</code></a> — 비동기 파이프라인의 속도 제한 ·
     <a href="shuffle.html"><code>fxShuffle</code></a> — 시드를 지정하는 난수

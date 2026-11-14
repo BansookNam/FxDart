@@ -7,8 +7,8 @@ section: 8
 crumb: any
 prev: every.html
 prevLabel: every
-next: predicates.html
-nextLabel: predicates
+next: atLeast.html
+nextLabel: atLeast
 ---
   <p class="hero-sub">True when at least one element satisfies a predicate — false for an empty iterable.</p>
 

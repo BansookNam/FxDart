@@ -44,10 +44,18 @@ nextLabel: sortByDesc
     already a terminal returning <code>Future&lt;List&lt;T&gt;&gt;</code>.
   </p>
   <p>
-    For descending order use <a href="sortByDesc.html"><code>sortByDesc</code></a>.
-    For a multi-key sort, drop back down to <code>sort</code> with an
-    explicit comparator — <code>sortBy</code> only covers the common
-    "ascending by one extracted key" case.
+    <code>sortBy</code> is <strong>stable</strong>: elements whose keys are
+    equal keep the order they arrived in, whatever the key type. (Before
+    0.9.1 that held for <code>int</code> and <code>double</code> keys only —
+    <code>String</code> and other keys went through <code>List.sort</code>,
+    which is free to reorder ties.) Stability is what makes a two-level
+    order possible without a comparator: sort by the secondary key, then by
+    the primary one.
+  </p>
+  <p>
+    For descending order use <a href="sortByDesc.html"><code>sortByDesc</code></a>,
+    which is stable too. For anything beyond chained single keys, drop back
+    down to <code>sort</code> with an explicit comparator.
   </p>
 
   <h2>Demo 1 · Basics</h2>
@@ -55,6 +63,9 @@ nextLabel: sortByDesc
 
   <h2>Demo 2 · Async — already a terminal</h2>
   {{playground:1}}
+
+  <h2>Demo 3 · Stable — a two-level order</h2>
+  {{playground:3}}
 
   <h2>Try it yourself</h2>
   <p>Exercise: sort the people <strong>by age</strong>, youngest first.</p>

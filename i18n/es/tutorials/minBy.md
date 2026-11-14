@@ -7,8 +7,8 @@ section: 7
 crumb: minBy
 prev: maxBy.html
 prevLabel: maxBy
-next: size.html
-nextLabel: count
+next: quantile.html
+nextLabel: quantile
 ---
   <p class="hero-sub">El elemento cuya clave es la más pequeña — una sola pasada, sin ordenar, <code>null</code> cuando está vacío.</p>
 
