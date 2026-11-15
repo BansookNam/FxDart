@@ -5,8 +5,8 @@ description: FxDart groupBy 튜토리얼: 계산된 키를 기준으로 모든 �
 heading: <code>groupBy</code>
 section: 7
 crumb: groupBy
-prev: join.html
-prevLabel: join
+prev: sumStrings.html
+prevLabel: sumStrings
 next: groupedBy.html
 nextLabel: groupedBy
 ---

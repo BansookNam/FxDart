@@ -53,6 +53,15 @@ nextLabel: groupsBy
     <code>windowCount</code>, <code>windowTime</code>,
     <code>bufferToggle</code>을 따랐습니다.
   </p>
+  <p>
+    <code>windowWhen(closeOf)</code>는 이어 붙이는 형태입니다: listen
+    즉시 창이 열리고, <code>closeOf()</code>를 불러 새 닫개를 받으며, 그
+    닫개의 첫 이벤트가 — <em>혹은 완료가</em>, 이 점이
+    <code>windowToggle</code>과 다릅니다 — 창을 닫고 곧바로 다음 창을 엽니다. 그래서 창은 겹치지도, 틈을 내지도
+    않습니다. 닫개의 에러나 <code>closeOf</code> 자체의 throw는 살아 있는
+    창에, 이어서 바깥에 에러를 냅니다. Rx의 <code>windowWhen</code>을
+    따랐습니다.
+  </p>
 
   <h2>데모 1 · 둘씩 창</h2>
   {{playground:0}}

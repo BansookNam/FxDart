@@ -46,6 +46,19 @@ nextLabel: separated
     those with <code>attempt</code> upstream when you want them as
     <code>Left</code>s too.
   </p>
+  <p>
+    Once the chain carries <code>Either</code> values,
+    <code>mapRight</code> transforms each success and lets a
+    <code>Left</code> through unchanged (<code>mapLeft</code> is the
+    failure-side twin). It is not called <code>map</code> because
+    <code>FxEvents.map</code> already maps the <code>Either</code> as a
+    whole. Chaining <code>attempt</code> after <code>mapEither</code>
+    does catch a thrown exception, but wraps the result in
+    <code>Either&lt;E, Either&lt;E, R&gt;&gt;</code>;
+    <code>flattenEither</code> collapses that nest — an outer
+    <code>Left</code> stays a <code>Left</code>, an inner
+    <code>Either</code> comes out as it is.
+  </p>
 
   <h2>Demo 1 · A raise becomes Left, a return becomes Right</h2>
   {{playground:0}}

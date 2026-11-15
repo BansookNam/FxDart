@@ -7,8 +7,8 @@ section: 8
 crumb: atLeast
 prev: some.html
 prevLabel: any
-next: predicates.html
-nextLabel: predicates
+next: none.html
+nextLabel: none
 ---
   <p class="hero-sub">"Are there at least n?" — answered by stopping at the nth match instead of counting everything.</p>
 

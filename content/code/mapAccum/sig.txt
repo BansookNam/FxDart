@@ -1,0 +1,4 @@
+Iterable&lt;B&gt; fxMapAccum&lt;A, B&gt;(B Function(B acc, A a) f, B seed, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; fxMapAccumAsync&lt;A, B&gt;(FutureOr&lt;B&gt; Function(B acc, A a) f, FutureOr&lt;B&gt; seed, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;B&gt; Fx&lt;T&gt;.mapAccum&lt;B&gt;(B Function(B acc, T a) f, B seed)                                  // chain (sync)
+FxAsync&lt;B&gt; FxAsync&lt;T&gt;.mapAccum&lt;B&gt;(FutureOr&lt;B&gt; Function(B acc, T a) f, FutureOr&lt;B&gt; seed) // chain (async)

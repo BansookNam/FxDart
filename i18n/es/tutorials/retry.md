@@ -7,8 +7,8 @@ section: 11
 crumb: retry
 prev: concurrentPool.html
 prevLabel: concurrentPool
-next: timeout.html
-nextLabel: timeout
+next: mapCatching.html
+nextLabel: mapCatching
 ---
   <p class="hero-sub">Ejecuta de nuevo un efecto inestable hasta que tenga éxito — hasta <code>attempts</code> veces, con backoff opcional entre fallos.</p>
 

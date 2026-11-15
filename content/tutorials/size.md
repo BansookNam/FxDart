@@ -5,8 +5,8 @@ description: FxDart count: count the elements a pipeline produces, with a live p
 heading: <code>count</code>
 section: 7
 crumb: count
-prev: quantile.html
-prevLabel: quantile
+prev: topBy.html
+prevLabel: topBy
 next: join.html
 nextLabel: join
 ---

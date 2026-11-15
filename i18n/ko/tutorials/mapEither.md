@@ -44,6 +44,18 @@ nextLabel: separated
     소스 에러는 두 연산자 모두 손대지 않고 통과합니다. 이들을 <code>Left</code>로 만들고 싶으면 위쪽에
     <code>attempt</code>를 두세요.
   </p>
+  <p>
+    체인에 <code>Either</code> 값이 흐르기 시작하면,
+    <code>mapRight</code>는 각 성공을 변환하고 <code>Left</code>는 그대로
+    통과시킵니다(실패 쪽 쌍둥이는 <code>mapLeft</code>). 이름이
+    <code>map</code>이 아닌 것은 <code>FxEvents.map</code>이 이미
+    <code>Either</code> 전체를 매핑하기 때문입니다. <code>mapEither</code>
+    뒤에 <code>attempt</code>를 이으면 던져진 예외도 잡히지만, 결과가
+    <code>Either&lt;E, Either&lt;E, R&gt;&gt;</code>로 한 겹 더 싸입니다.
+    <code>flattenEither</code>가 그 중첩을 접습니다 — 바깥
+    <code>Left</code>는 <code>Left</code>로 남고, 안쪽
+    <code>Either</code>는 있는 그대로 나옵니다.
+  </p>
 
   <h2>데모 1 · raise는 Left, 반환은 Right</h2>
   {{playground:0}}

@@ -1,0 +1,8 @@
+List&lt;A&gt; fxTopBy&lt;A&gt;(int k, Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+List&lt;A&gt; fxBottomBy&lt;A&gt;(int k, Object? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; fxTopByAsync&lt;A&gt;(int k, Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Future&lt;List&lt;A&gt;&gt; fxBottomByAsync&lt;A&gt;(int k, Object? Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;T&gt; Fx&lt;T&gt;.topBy(int k, Object? Function(T a) f)                    // chain (sync)
+Fx&lt;T&gt; Fx&lt;T&gt;.bottomBy(int k, Object? Function(T a) f)                 // chain (sync)
+Future&lt;List&lt;T&gt;&gt; FxAsync&lt;T&gt;.topBy(int k, Object? Function(T a) f)     // chain (async)
+Future&lt;List&lt;T&gt;&gt; FxAsync&lt;T&gt;.bottomBy(int k, Object? Function(T a) f)  // chain (async)

@@ -49,6 +49,16 @@ nextLabel: sampleOn
     때는 <code>uniqAdjacent</code>를 쓰세요.
   </p>
   <p>
+    그 곁에 가장자리 연산자가 셋 더 있습니다.
+    <code>startWithAll(values)</code>는 소스의 첫 이벤트보다 먼저 모든 값을
+    내보내고, <code>endWithAll(values)</code>는 소스가 닫힌 뒤에 내보냅니다
+    — <code>startWith</code> / <code>endWith</code>의 여러 값 형태이며,
+    닫히기 전에 취소하면 꼬리 값은 버려집니다. <code>throwIfEmpty</code>는
+    <code>ifEmpty</code>의 실패 쪽 쌍둥이입니다: 값 없이 닫힌 소스는 대신
+    에러로 끝납니다 — 팩토리의 결과, 팩토리가 없으면
+    <code>StateError</code>입니다.
+  </p>
+  <p>
     fxdart 이벤트 레이어, Rx의 <code>tap</code>,
     갈아타지 않는 모양의 <code>catchError</code>, 그리고
     <code>finalize</code>를 따랐습니다. 이미 같은 뜻을 가진 곳에서는

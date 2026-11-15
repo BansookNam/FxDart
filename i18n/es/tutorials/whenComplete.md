@@ -49,6 +49,17 @@ nextLabel: sampleOn
     repeticiones consecutivas.
   </p>
   <p>
+    Junto a ellos hay tres operadores de borde más.
+    <code>startWithAll(values)</code> emite cada valor antes del primer
+    evento de la fuente, y <code>endWithAll(values)</code> los emite
+    después de que la fuente cierra — las formas de varios valores de
+    <code>startWith</code> / <code>endWith</code>; una cancelación antes
+    del cierre descarta el sufijo. <code>throwIfEmpty</code> es el gemelo
+    que falla de <code>ifEmpty</code>: una fuente que cierra sin ningún
+    valor termina con un error — el resultado de la fábrica, o un
+    <code>StateError</code> si no se da ninguna.
+  </p>
+  <p>
     Capa de eventos de fxdart, siguiendo a <code>tap</code>,
     <code>catchError</code> en su forma que no cambia de stream, y
     <code>finalize</code> de Rx. Los nombres de la capa pull ganan donde ya

@@ -5,8 +5,8 @@ description: FxDart where tutorial: keep only the elements a predicate accepts, 
 heading: <code>where</code>
 section: 4
 crumb: where
-prev: attach.html
-prevLabel: attach
+prev: mapNotNull.html
+prevLabel: mapNotNull
 next: reject.html
 nextLabel: reject
 ---

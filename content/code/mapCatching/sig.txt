@@ -1,0 +1,4 @@
+Iterable&lt;R&gt; fxMapCatching&lt;A, R&gt;(R Function(A a) f, R Function(Object error, StackTrace stackTrace) onError, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;R&gt; fxMapCatchingAsync&lt;A, R&gt;(FutureOr&lt;R&gt; Function(A a) f, FutureOr&lt;R&gt; Function(Object error, StackTrace stackTrace) onError, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx&lt;T&gt;.mapCatching&lt;R&gt;(R Function(T a) f, R Function(Object error, StackTrace stackTrace) onError)                                // chain (sync)
+FxAsync&lt;R&gt; FxAsync&lt;T&gt;.mapCatching&lt;R&gt;(FutureOr&lt;R&gt; Function(T a) f, FutureOr&lt;R&gt; Function(Object error, StackTrace stackTrace) onError) // chain (async)

@@ -30,6 +30,12 @@ nextLabel: always
     <code>(x) => x</code> a mano. No tiene variante asíncrona ni forma de
     cadena: es una función corriente de valor a valor que pasas de un lado a otro.
   </p>
+  <p>
+    Su hermana sin argumentos es <code>fxNoop</code>
+    (<code>void fxNoop()</code>), que no hace nada en absoluto: la suplente
+    para un hueco de callback que no recibe argumentos y no tiene trabajo
+    que hacer.
+  </p>
 
   <h2>Demo 1 · Fundamentos</h2>
   <p>Usada directamente y como función clave de una agrupación en la que

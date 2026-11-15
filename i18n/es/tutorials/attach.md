@@ -7,8 +7,8 @@ section: 3
 crumb: attach
 prev: pluck.html
 prevLabel: pluck
-next: filter.html
-nextLabel: filter
+next: mapNotNull.html
+nextLabel: mapNotNull
 ---
   <p class="hero-sub">Empareja cada valor con lo que derivas de él — la entrada se queda junto a su resultado.</p>
 

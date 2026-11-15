@@ -5,8 +5,8 @@ description: FxDart의 타입 술어 모음 - fxIsNull, fxIsBool, fxIsNum, fxIsS
 heading: <code>predicates</code>
 section: 8
 crumb: predicates
-prev: atLeast.html
-prevLabel: atLeast
+prev: none.html
+prevLabel: none
 next: fromEntries.html
 nextLabel: fromEntries
 ---

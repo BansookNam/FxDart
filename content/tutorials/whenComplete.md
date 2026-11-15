@@ -49,6 +49,17 @@ nextLabel: sampleOn
     go.
   </p>
   <p>
+    Three more edge operators sit beside them.
+    <code>startWithAll(values)</code> emits every value before the
+    source's first event, and <code>endWithAll(values)</code> emits them
+    after the source closes — the many-value forms of
+    <code>startWith</code> / <code>endWith</code>; a cancel before close
+    drops the suffix. <code>throwIfEmpty</code> is the failing twin of
+    <code>ifEmpty</code>: a source that closes without a value ends with
+    an error instead — the factory's result, or a
+    <code>StateError</code> when none is given.
+  </p>
+  <p>
     fxdart events layer, after Rx's <code>tap</code>,
     <code>catchError</code> in its non-switching shape, and
     <code>finalize</code>. Pull-layer names win where they already

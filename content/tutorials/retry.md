@@ -7,8 +7,8 @@ section: 11
 crumb: retry
 prev: concurrentPool.html
 prevLabel: concurrentPool
-next: timeout.html
-nextLabel: timeout
+next: mapCatching.html
+nextLabel: mapCatching
 ---
   <p class="hero-sub">Runs a flaky effect again until it succeeds — up to <code>attempts</code> times, with optional backoff between failures.</p>
 

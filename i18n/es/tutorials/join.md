@@ -7,8 +7,8 @@ section: 7
 crumb: join
 prev: size.html
 prevLabel: size
-next: groupBy.html
-nextLabel: groupBy
+next: sumStrings.html
+nextLabel: sumStrings
 ---
   <p class="hero-sub">Concatena todos los elementos en una sola cadena, con un separador entre ellos.</p>
 

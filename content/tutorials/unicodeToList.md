@@ -27,11 +27,16 @@ nextLabel: curried &amp; uncurried
     <code>unicodeToList</code> fixes that by iterating the string's
     <code>.runes</code> — Unicode code points — and turning each one back
     into its own single-character <code>String</code>. The result is the list
-    of code points, matching FxTS's <code>unicodeToList</code>, which splits
+    of code points, matching FxTS's <code>unicodeToArray</code>, which splits
     by code point rather than UTF-16 unit. Code points are not always what a
     person sees as one character: flags, ZWJ emoji sequences and combining
     marks are still split into several pieces, because grapheme clusters are
     not handled.
+  </p>
+  <p>
+    The FxTS name works too: <code>unicodeToArray</code> is an alias of
+    <code>unicodeToList</code>, which takes the Dart spelling because it
+    returns a <code>List</code>.
   </p>
 
   <h2>Demo 1 · Naive split vs. unicodeToList</h2>

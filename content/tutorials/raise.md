@@ -7,8 +7,8 @@ section: 13
 crumb: either &amp; Raise
 prev: eitherCombinators.html
 prevLabel: Either combinators
-next: nullable.html
-nextLabel: nullable
+next: foldRaise.html
+nextLabel: foldRaise
 ---
   <p class="hero-sub">
     Runs a block in a <code>Raise&lt;E&gt;</code> scope: straight-line code

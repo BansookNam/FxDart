@@ -5,8 +5,8 @@ description: Tutorial de peek en FxDart: observa los elementos que pasan por un 
 heading: <code>peek</code>
 section: 3
 crumb: peek
-prev: scan.html
-prevLabel: scan
+prev: mapAccum.html
+prevLabel: mapAccum
 next: pluck.html
 nextLabel: pluck
 ---

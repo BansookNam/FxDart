@@ -7,8 +7,8 @@ section: 11
 crumb: retry
 prev: concurrentPool.html
 prevLabel: concurrentPool
-next: timeout.html
-nextLabel: timeout
+next: mapCatching.html
+nextLabel: mapCatching
 ---
   <p class="hero-sub">불안정한 효과를 성공할 때까지 다시 실행합니다 — 최대 <code>attempts</code>번, 실패 사이에 선택적 백오프를 두고서.</p>
 

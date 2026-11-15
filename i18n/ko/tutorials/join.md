@@ -7,8 +7,8 @@ section: 7
 crumb: join
 prev: size.html
 prevLabel: size
-next: groupBy.html
-nextLabel: groupBy
+next: sumStrings.html
+nextLabel: sumStrings
 ---
   <p class="hero-sub">모든 원소를 구분자로 이어 붙여 하나의 문자열로 만듭니다.</p>
 

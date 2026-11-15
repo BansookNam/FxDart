@@ -7,8 +7,8 @@ section: 7
 crumb: sumByDouble
 prev: sumBy.html
 prevLabel: sumBy
-next: average.html
-nextLabel: average
+next: product.html
+nextLabel: product
 ---
   <p class="hero-sub">결과 타입이 이미 정해진 <code>sumBy</code>입니다 — 캐스트 없이 <code>double</code>이나 <code>int</code>로.</p>
 

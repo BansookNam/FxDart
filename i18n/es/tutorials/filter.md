@@ -5,8 +5,8 @@ description: Tutorial de where en FxDart: conserva solo los elementos que acepta
 heading: <code>where</code>
 section: 4
 crumb: where
-prev: attach.html
-prevLabel: attach
+prev: mapNotNull.html
+prevLabel: mapNotNull
 next: reject.html
 nextLabel: reject
 ---

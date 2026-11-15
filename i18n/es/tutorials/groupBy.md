@@ -5,8 +5,8 @@ description: Tutorial de groupBy en FxDart: reparte cada elemento en cubetas seg
 heading: <code>groupBy</code>
 section: 7
 crumb: groupBy
-prev: join.html
-prevLabel: join
+prev: sumStrings.html
+prevLabel: sumStrings
 next: groupedBy.html
 nextLabel: groupedBy
 ---

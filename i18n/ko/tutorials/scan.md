@@ -7,8 +7,8 @@ section: 3
 crumb: scan
 prev: flat.html
 prevLabel: flat
-next: peek.html
-nextLabel: peek
+next: mapAccum.html
+nextLabel: mapAccum
 ---
   <p class="hero-sub">지연 평가되는 누적 연산 — <code>reduce</code>와 비슷하지만 마지막 값만이 아니라 중간 값을 모두 내보냅니다.</p>
 

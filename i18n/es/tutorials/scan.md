@@ -7,8 +7,8 @@ section: 3
 crumb: scan
 prev: flat.html
 prevLabel: flat
-next: peek.html
-nextLabel: peek
+next: mapAccum.html
+nextLabel: mapAccum
 ---
   <p class="hero-sub">Una acumulación progresiva y perezosa — como <code>reduce</code>, pero emite todos los valores intermedios en lugar de solo el último.</p>
 

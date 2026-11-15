@@ -5,8 +5,8 @@ description: FxDart timeout 튜토리얼: 너무 오래 걸리는 pull을 실패
 heading: <code>timeout</code>
 section: 11
 crumb: timeout
-prev: retry.html
-prevLabel: retry
+prev: mapCatching.html
+prevLabel: mapCatching
 next: using.html
 nextLabel: using
 ---

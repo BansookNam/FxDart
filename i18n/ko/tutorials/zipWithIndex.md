@@ -5,8 +5,8 @@ description: FxDart indexed 튜토리얼: 각 원소를 0부터 시작하는 인
 heading: <code>indexed</code>
 section: 6
 crumb: indexed
-prev: zipWith.html
-prevLabel: zipWith
+prev: unzip.html
+prevLabel: unzip
 next: withIndex.html
 nextLabel: …WithIndex
 ---
