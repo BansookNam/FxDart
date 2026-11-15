@@ -53,6 +53,15 @@ nextLabel: groupsBy
     layer, after Rx's <code>window</code>, <code>windowCount</code>,
     <code>windowTime</code>, and <code>bufferToggle</code>.
   </p>
+  <p>
+    <code>windowWhen(closeOf)</code> is the back-to-back form: a window
+    opens on listen, <code>closeOf()</code> is called for a fresh closer,
+    and that closer's first event — <em>or its completion</em>, unlike
+    <code>windowToggle</code> — closes the window and opens the next at
+    once, so windows never overlap and never leave a gap. A closer's
+    error, or a throw from <code>closeOf</code> itself, errors the live
+    window and then the outer. After Rx's <code>windowWhen</code>.
+  </p>
 
   <h2>Demo 1 · Windows of two</h2>
   {{playground:0}}

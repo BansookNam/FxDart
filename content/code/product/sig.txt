@@ -1,0 +1,8 @@
+num fxProduct(Iterable&lt;num&gt; iterable)
+num fxProductBy&lt;A&gt;(num Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;num&gt; fxProductAsync(FxAsyncIterable&lt;num&gt; iterable)
+Future&lt;num&gt; fxProductByAsync&lt;A&gt;(FutureOr&lt;num&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+num Fx&lt;num&gt;.product()                                  // chain (sync)
+num Fx&lt;T&gt;.productBy(num Function(T a) f)               // chain (sync)
+Future&lt;num&gt; FxAsync&lt;num&gt;.product()                     // chain (async)
+Future&lt;num&gt; FxAsync&lt;T&gt;.productBy(FutureOr&lt;num&gt; Function(T a) f) // chain (async)

@@ -5,8 +5,8 @@ description: FxDart peek 튜토리얼: 파이프라인을 흐르는 원소를 �
 heading: <code>peek</code>
 section: 3
 crumb: peek
-prev: scan.html
-prevLabel: scan
+prev: mapAccum.html
+prevLabel: mapAccum
 next: pluck.html
 nextLabel: pluck
 ---

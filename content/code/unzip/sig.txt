@@ -1,0 +1,4 @@
+(List&lt;A&gt;, List&lt;B&gt;) fxUnzip&lt;A, B&gt;(Iterable&lt;(A, B)&gt; iterable)
+Future&lt;(List&lt;A&gt;, List&lt;B&gt;)&gt; fxUnzipAsync&lt;A, B&gt;(FxAsyncIterable&lt;(A, B)&gt; iterable)
+(List&lt;A&gt;, List&lt;B&gt;) Fx&lt;(A, B)&gt;.unzip()                          // chain (sync)
+Future&lt;(List&lt;A&gt;, List&lt;B&gt;)&gt; FxAsync&lt;(A, B)&gt;.unzip()            // chain (async)

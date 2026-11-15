@@ -5,8 +5,8 @@ description: FxDart groupBy tutorial: bucket every element by a computed key int
 heading: <code>groupBy</code>
 section: 7
 crumb: groupBy
-prev: join.html
-prevLabel: join
+prev: sumStrings.html
+prevLabel: sumStrings
 next: groupedBy.html
 nextLabel: groupedBy
 ---

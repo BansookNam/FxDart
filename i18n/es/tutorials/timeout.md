@@ -5,8 +5,8 @@ description: Tutorial de timeout en FxDart: haz fallar un pull que tarda demasia
 heading: <code>timeout</code>
 section: 11
 crumb: timeout
-prev: retry.html
-prevLabel: retry
+prev: mapCatching.html
+prevLabel: mapCatching
 next: using.html
 nextLabel: using
 ---

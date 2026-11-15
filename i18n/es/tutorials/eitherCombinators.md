@@ -82,6 +82,17 @@ nextLabel: either &amp; Raise
     constructor, prefiere <code>ensure</code>; sobre un valor que ya tienes en
     la mano, este método.
   </p>
+  <p>
+    Fuera de esos cuatro, unos pocos miembros pequeños completan el valor.
+    <code>onLeft</code> y <code>onRight</code> ejecutan un efecto secundario
+    en un solo lado — registrar el fallo, contar el éxito — y devuelven el
+    mismo <code>Either</code> sin cambios, así que se colocan a mitad de
+    cadena como <a href="peek.html"><code>peek</code></a> en un pipeline.
+    <code>swap</code> intercambia los lados y convierte
+    <code>Either&lt;L, R&gt;</code> en <code>Either&lt;R, L&gt;</code>.
+    <code>leftOrNull</code> es el espejo de <code>getOrNull</code>: el valor
+    del fallo, o <code>null</code> en un <code>Right</code>.
+  </p>
 
   <h2>Demo 1 · map2 y map3</h2>
   {{playground:0}}

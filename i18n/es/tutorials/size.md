@@ -5,8 +5,8 @@ description: Tutorial de size en FxDart: cuenta los elementos que produce un pip
 heading: <code>count</code>
 section: 7
 crumb: count
-prev: quantile.html
-prevLabel: quantile
+prev: topBy.html
+prevLabel: topBy
 next: join.html
 nextLabel: join
 ---

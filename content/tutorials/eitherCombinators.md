@@ -77,6 +77,17 @@ nextLabel: either &amp; Raise
     job inside an <code>fxEither</code> builder. Inside a builder, prefer
     <code>ensure</code>; on a value you already hold, this.
   </p>
+  <p>
+    Outside those four, a few small members round out the value.
+    <code>onLeft</code> and <code>onRight</code> run a side effect on one
+    side — log the failure, count the success — and return the same
+    <code>Either</code> unchanged, so they sit mid-chain the way
+    <a href="peek.html"><code>peek</code></a> sits in a pipeline.
+    <code>swap</code> exchanges the sides, turning
+    <code>Either&lt;L, R&gt;</code> into <code>Either&lt;R, L&gt;</code>.
+    <code>leftOrNull</code> mirrors <code>getOrNull</code>: the failure
+    value, or <code>null</code> on a <code>Right</code>.
+  </p>
 
   <h2>Demo 1 · map2 and map3</h2>
   {{playground:0}}

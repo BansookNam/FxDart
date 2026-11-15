@@ -7,8 +7,8 @@ section: 6
 crumb: zipWith
 prev: zip3.html
 prevLabel: zip3
-next: zipWithIndex.html
-nextLabel: zipWithIndex
+next: unzip.html
+nextLabel: unzip
 ---
   <p class="hero-sub">Empareja dos iterables y combina cada par a través de una función, en un solo paso.</p>
 

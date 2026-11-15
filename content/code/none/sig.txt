@@ -1,0 +1,4 @@
+bool fxNone&lt;A&gt;(bool Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;bool&gt; fxNoneAsync&lt;A&gt;(FutureOr&lt;bool&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+bool Fx&lt;T&gt;.none(bool Function(T a) f)                       // chain (sync)
+Future&lt;bool&gt; FxAsync&lt;T&gt;.none(FutureOr&lt;bool&gt; Function(T a) f) // chain (async)

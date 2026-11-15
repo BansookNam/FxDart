@@ -76,6 +76,17 @@ nextLabel: either &amp; Raise
     <code>fxEither</code> 빌더 안에서 같은 일을 합니다. 빌더 안이라면
     <code>ensure</code>를, 이미 손에 든 값에 대해서라면 이쪽을 쓰세요.
   </p>
+  <p>
+    이 넷 밖에도 값을 마무리하는 작은 멤버가 몇 있습니다.
+    <code>onLeft</code>와 <code>onRight</code>는 한쪽에서만 부수 효과를
+    실행하고 — 실패를 기록하거나 성공을 세거나 — 같은 <code>Either</code>를
+    그대로 돌려주므로, 파이프라인의
+    <a href="peek.html"><code>peek</code></a>처럼 체인 한가운데에 끼워 둘 수
+    있습니다. <code>swap</code>은 양쪽을 맞바꿔
+    <code>Either&lt;L, R&gt;</code>를 <code>Either&lt;R, L&gt;</code>로
+    만듭니다. <code>leftOrNull</code>은 <code>getOrNull</code>의 거울로,
+    실패 값을 돌려주고 <code>Right</code>이면 <code>null</code>입니다.
+  </p>
 
   <h2>데모 1 · map2와 map3</h2>
   {{playground:0}}

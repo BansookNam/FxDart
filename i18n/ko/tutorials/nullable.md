@@ -5,8 +5,8 @@ description: FxDart nullable 튜토리얼: nullable과 nullableAsync 빌더 — 
 heading: <code>fxNullable</code>
 section: 13
 crumb: nullable
-prev: raise.html
-prevLabel: either &amp; Raise
+prev: foldRaise.html
+prevLabel: foldRaise
 next: nonEmptyList.html
 nextLabel: NonEmptyList
 ---

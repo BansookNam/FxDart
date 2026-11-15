@@ -7,8 +7,8 @@ section: 7
 crumb: quantile
 prev: minBy.html
 prevLabel: minBy
-next: size.html
-nextLabel: count
+next: topBy.html
+nextLabel: topBy
 ---
   <p class="hero-sub">중앙값, p95, 혹은 어떤 백분위수든 — 전부 정렬하지 않고 선형 시간에 찾아냅니다.</p>
 

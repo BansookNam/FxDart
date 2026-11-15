@@ -81,6 +81,10 @@
       "label": "scan"
     },
     {
+      "href": "mapAccum.html",
+      "label": "mapAccum"
+    },
+    {
       "href": "peek.html",
       "label": "peek"
     },
@@ -91,6 +95,10 @@
     {
       "href": "attach.html",
       "label": "attach"
+    },
+    {
+      "href": "mapNotNull.html",
+      "label": "mapNotNull"
     }
   ],
   "4": [
@@ -235,6 +243,10 @@
       "label": "zipWith"
     },
     {
+      "href": "unzip.html",
+      "label": "unzip"
+    },
+    {
       "href": "zipWithIndex.html",
       "label": "indexed"
     },
@@ -297,6 +309,10 @@
       "label": "sumByDouble"
     },
     {
+      "href": "product.html",
+      "label": "product"
+    },
+    {
       "href": "average.html",
       "label": "average"
     },
@@ -325,12 +341,20 @@
       "label": "quantile"
     },
     {
+      "href": "topBy.html",
+      "label": "topBy"
+    },
+    {
       "href": "size.html",
       "label": "count"
     },
     {
       "href": "join.html",
       "label": "join"
+    },
+    {
+      "href": "sumStrings.html",
+      "label": "sumStrings"
     },
     {
       "href": "groupBy.html",
@@ -417,6 +441,10 @@
     {
       "href": "atLeast.html",
       "label": "atLeast"
+    },
+    {
+      "href": "none.html",
+      "label": "none"
     },
     {
       "href": "predicates.html",
@@ -593,6 +621,10 @@
       "label": "retry"
     },
     {
+      "href": "mapCatching.html",
+      "label": "mapCatching"
+    },
+    {
       "href": "timeout.html",
       "label": "timeout"
     },
@@ -651,6 +683,10 @@
     {
       "href": "raise.html",
       "label": "either &amp; Raise scope"
+    },
+    {
+      "href": "foldRaise.html",
+      "label": "foldRaise"
     },
     {
       "href": "nullable.html",

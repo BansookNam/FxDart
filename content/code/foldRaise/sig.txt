@@ -1,0 +1,2 @@
+B fxFoldRaise&lt;E, A, B&gt;(A Function(Raise&lt;E&gt; r) block, {required B Function(E error) onRaise, required B Function(A value) onValue, B Function(Object thrown, StackTrace stackTrace)? onThrow})
+Future&lt;B&gt; fxFoldRaiseAsync&lt;E, A, B&gt;(FutureOr&lt;A&gt; Function(Raise&lt;E&gt; r) block, {required FutureOr&lt;B&gt; Function(E error) onRaise, required FutureOr&lt;B&gt; Function(A value) onValue, FutureOr&lt;B&gt; Function(Object thrown, StackTrace stackTrace)? onThrow})

@@ -27,10 +27,15 @@ nextLabel: curried &amp; uncurried
     <code>unicodeToList</code>는 문자열의 <code>.runes</code>, 즉 유니코드
     코드 포인트를 순회하면서 각각을 다시 한 글자짜리 <code>String</code>으로
     되돌려 이 문제를 해결합니다. 결과는 코드 포인트의 목록이며, UTF-16 유닛이
-    아니라 코드 포인트 단위로 나누는 FxTS의 <code>unicodeToList</code>와
+    아니라 코드 포인트 단위로 나누는 FxTS의 <code>unicodeToArray</code>와
     동일하게 동작합니다. 다만 코드 포인트가 늘 사람 눈에 한 글자로 보이는 것은
     아닙니다. 자소 클러스터(grapheme cluster)는 다루지 않으므로 국기, ZWJ 이모지
     시퀀스, 결합 문자는 여전히 여러 조각으로 나뉩니다.
+  </p>
+  <p>
+    FxTS 이름도 그대로 쓸 수 있습니다: <code>unicodeToArray</code>는
+    <code>unicodeToList</code>의 별칭이며, 결과가 <code>List</code>이므로
+    Dart식 이름을 붙였습니다.
   </p>
 
   <h2>데모 1 · 단순 split과 unicodeToList 비교</h2>

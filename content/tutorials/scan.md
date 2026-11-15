@@ -7,8 +7,8 @@ section: 3
 crumb: scan
 prev: flat.html
 prevLabel: flat
-next: peek.html
-nextLabel: peek
+next: mapAccum.html
+nextLabel: mapAccum
 ---
   <p class="hero-sub">A lazy running accumulation — like <code>reduce</code>, but it yields every intermediate value instead of only the last.</p>
 

@@ -53,6 +53,16 @@ nextLabel: groupsBy
     siguiendo a <code>window</code>, <code>windowCount</code>,
     <code>windowTime</code> y <code>bufferToggle</code> de Rx.
   </p>
+  <p>
+    <code>windowWhen(closeOf)</code> es la forma consecutiva: se abre una
+    ventana al escuchar, se llama a <code>closeOf()</code> para obtener un
+    cierre nuevo, y el primer evento de ese cierre — <em>o su
+    finalización</em>, a diferencia de <code>windowToggle</code> — cierra
+    la ventana y abre la siguiente de inmediato, así que las ventanas nunca
+    se solapan ni dejan huecos. Un error del cierre, o un throw del propio
+    <code>closeOf</code>, da error a la ventana viva y después al externo.
+    Siguiendo a <code>windowWhen</code> de Rx.
+  </p>
 
   <h2>Demo 1 · Ventanas de dos</h2>
   {{playground:0}}

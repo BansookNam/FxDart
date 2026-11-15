@@ -5,8 +5,8 @@ description: FxDart average tutorial: the mean of every number in a pipeline, Na
 heading: <code>average</code>
 section: 7
 crumb: average
-prev: sumByDouble.html
-prevLabel: sumByDouble
+prev: product.html
+prevLabel: product
 next: averageBy.html
 nextLabel: averageBy
 ---

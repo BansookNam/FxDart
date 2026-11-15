@@ -5,8 +5,8 @@ description: Tutorial de zipWithIndex en FxDart: empareja cada elemento con su Ã
 heading: <code>indexed</code>
 section: 6
 crumb: indexed
-prev: zipWith.html
-prevLabel: zipWith
+prev: unzip.html
+prevLabel: unzip
 next: withIndex.html
 nextLabel: â€¦WithIndex
 ---

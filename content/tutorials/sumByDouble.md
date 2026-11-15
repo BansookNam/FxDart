@@ -7,8 +7,8 @@ section: 7
 crumb: sumByDouble
 prev: sumBy.html
 prevLabel: sumBy
-next: average.html
-nextLabel: average
+next: product.html
+nextLabel: product
 ---
   <p class="hero-sub"><code>sumBy</code> with the result already typed: a <code>double</code> or an <code>int</code>, no cast.</p>
 

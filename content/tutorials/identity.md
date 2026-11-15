@@ -30,6 +30,11 @@ nextLabel: always
     <code>(x) => x</code> yourself. It has no async variant and no chain
     form — it's a plain value-in, value-out function you pass around.
   </p>
+  <p>
+    Its zero-argument sibling is <code>fxNoop</code>
+    (<code>void fxNoop()</code>), which does nothing at all — the stand-in
+    for a callback slot that takes no arguments and has no work to do.
+  </p>
 
   <h2>Demo 1 · Basics</h2>
   <p>Used directly, and as the key function for a grouping operation where

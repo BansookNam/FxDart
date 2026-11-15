@@ -5,8 +5,8 @@ description: Tutorial de average en FxDart: la media de todos los números de un
 heading: <code>average</code>
 section: 7
 crumb: average
-prev: sumByDouble.html
-prevLabel: sumByDouble
+prev: product.html
+prevLabel: product
 next: averageBy.html
 nextLabel: averageBy
 ---

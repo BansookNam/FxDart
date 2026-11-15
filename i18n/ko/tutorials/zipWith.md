@@ -7,8 +7,8 @@ section: 6
 crumb: zipWith
 prev: zip3.html
 prevLabel: zip3
-next: zipWithIndex.html
-nextLabel: zipWithIndex
+next: unzip.html
+nextLabel: unzip
 ---
   <p class="hero-sub">두 이터러블을 zip하면서 각 쌍을 함수로 한 번에 결합합니다.</p>
 

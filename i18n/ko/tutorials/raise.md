@@ -7,8 +7,8 @@ section: 13
 crumb: either &amp; Raise
 prev: eitherCombinators.html
 prevLabel: Either combinators
-next: nullable.html
-nextLabel: nullable
+next: foldRaise.html
+nextLabel: foldRaise
 ---
   <p class="hero-sub">
     블록을 <code>Raise&lt;E&gt;</code> 스코프 안에서 실행합니다: 타입 있는

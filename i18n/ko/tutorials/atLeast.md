@@ -7,8 +7,8 @@ section: 8
 crumb: atLeast
 prev: some.html
 prevLabel: any
-next: predicates.html
-nextLabel: predicates
+next: none.html
+nextLabel: none
 ---
   <p class="hero-sub">"적어도 n개 있는가?" — 전부 세는 대신 n번째 일치에서 멈춰 답합니다.</p>
 

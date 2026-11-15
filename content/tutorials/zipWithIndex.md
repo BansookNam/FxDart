@@ -5,8 +5,8 @@ description: FxDart indexed: pair each element with its 0-based index, with a li
 heading: <code>indexed</code>
 section: 6
 crumb: indexed
-prev: zipWith.html
-prevLabel: zipWith
+prev: unzip.html
+prevLabel: unzip
 next: withIndex.html
 nextLabel: …WithIndex
 ---

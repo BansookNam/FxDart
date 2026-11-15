@@ -1,0 +1,3 @@
+String fxSumStrings(Iterable&lt;String&gt; iterable)
+String Fx.join([String separator = ''])        // chain equivalent (no sumStrings member)
+Future&lt;String&gt; FxAsync.join([String sep = ','])  // async: no twin — pass '' explicitly

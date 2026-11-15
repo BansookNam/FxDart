@@ -46,6 +46,19 @@ nextLabel: separated
     con <code>attempt</code> aguas arriba cuando también los quieras como
     <code>Left</code>s.
   </p>
+  <p>
+    Una vez que la cadena lleva valores <code>Either</code>,
+    <code>mapRight</code> transforma cada éxito y deja pasar un
+    <code>Left</code> sin cambios (<code>mapLeft</code> es el gemelo del
+    lado del fallo). No se llama <code>map</code> porque
+    <code>FxEvents.map</code> ya mapea el <code>Either</code> entero.
+    Encadenar <code>attempt</code> después de <code>mapEither</code> sí
+    atrapa una excepción lanzada, pero envuelve el resultado en
+    <code>Either&lt;E, Either&lt;E, R&gt;&gt;</code>;
+    <code>flattenEither</code> colapsa ese anidamiento — un
+    <code>Left</code> externo sigue siendo un <code>Left</code>, y el
+    <code>Either</code> interno sale tal cual.
+  </p>
 
   <h2>Demo 1 · Un raise se convierte en Left, un return en Right</h2>
   {{playground:0}}

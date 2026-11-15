@@ -7,8 +7,8 @@ section: 7
 crumb: quantile
 prev: minBy.html
 prevLabel: minBy
-next: size.html
-nextLabel: count
+next: topBy.html
+nextLabel: topBy
 ---
   <p class="hero-sub">The median, a p95, or any percentile — found in linear time, without sorting everything.</p>
 

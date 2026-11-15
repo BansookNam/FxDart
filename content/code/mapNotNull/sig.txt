@@ -1,0 +1,8 @@
+Iterable&lt;B&gt; mapNotNull&lt;A, B extends Object&gt;(B? Function(A a) f, Iterable&lt;A&gt; iterable)
+FxAsyncIterable&lt;B&gt; mapNotNullAsync&lt;A, B extends Object&gt;(FutureOr&lt;B?&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+B? firstNotNullOf&lt;A, B extends Object&gt;(B? Function(A a) f, Iterable&lt;A&gt; iterable)
+Future&lt;B?&gt; firstNotNullOfAsync&lt;A, B extends Object&gt;(FutureOr&lt;B?&gt; Function(A a) f, FxAsyncIterable&lt;A&gt; iterable)
+Fx&lt;R&gt; Fx&lt;T&gt;.mapNotNull&lt;R extends Object&gt;(R? Function(T a) f)           // chain (sync)
+R? Fx&lt;T&gt;.firstNotNullOf&lt;R extends Object&gt;(R? Function(T a) f)         // chain (sync)
+FxAsync&lt;R&gt; FxAsync&lt;T&gt;.mapNotNull&lt;R extends Object&gt;(FutureOr&lt;R?&gt; Function(T a) f)       // chain (async)
+Future&lt;R?&gt; FxAsync&lt;T&gt;.firstNotNullOf&lt;R extends Object&gt;(FutureOr&lt;R?&gt; Function(T a) f) // chain (async)

@@ -7,8 +7,8 @@ section: 3
 crumb: attach
 prev: pluck.html
 prevLabel: pluck
-next: filter.html
-nextLabel: filter
+next: mapNotNull.html
+nextLabel: mapNotNull
 ---
   <p class="hero-sub">각 값을 그 값에서 유도한 결과와 짝지습니다. 입력이 결과 곁에 남습니다.</p>
 

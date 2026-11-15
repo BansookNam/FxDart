@@ -28,11 +28,16 @@ nextLabel: curried &amp; uncurried
     <code>unicodeToList</code> lo resuelve iterando los <code>.runes</code> de la
     cadena — los puntos de código Unicode — y convirtiendo cada uno de vuelta en
     su propio <code>String</code> de un solo carácter. El resultado es la lista de
-    puntos de código, igual que el <code>unicodeToList</code> de FxTS, que divide
+    puntos de código, igual que el <code>unicodeToArray</code> de FxTS, que divide
     por punto de código y no por unidad UTF-16. Los puntos de código no siempre
     son lo que una persona ve como un solo carácter: las banderas, las secuencias
     de emoji con ZWJ y las marcas combinantes se siguen dividiendo en varias
     piezas, porque no se manejan los grapheme clusters.
+  </p>
+  <p>
+    El nombre de FxTS también funciona: <code>unicodeToArray</code> es un
+    alias de <code>unicodeToList</code>, que adopta la forma de Dart porque
+    devuelve una <code>List</code>.
   </p>
 
   <h2>Demo 1 · División ingenua frente a unicodeToList</h2>
